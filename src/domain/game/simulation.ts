@@ -67,7 +67,11 @@ function advanceTick(state: GameState): GameState {
     tick,
     stamina,
     resting,
-    energy: Math.min(rules.maxEnergy, state.energy + (resting ? 0 : dt / 1.5)),
+    energy: Math.min(
+      rules.maxEnergy,
+      (Math.round(state.energy * rules.energyTicksPerPoint) + (resting ? 0 : 1)) /
+        rules.energyTicksPerPoint,
+    ),
     excitement: Math.min(100, state.excitement + dt * 0.25),
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });

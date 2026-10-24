@@ -73,6 +73,7 @@ export type Action =
 
 export const rules = {
   ticksPerSecond: 60,
+  energyTicksPerPoint: 90,
   handSize: 5,
   deckSize: 9,
   maxEnergy: 10,
