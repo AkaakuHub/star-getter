@@ -3,6 +3,7 @@ import type { GameState } from '../../domain/game/model';
 import { cardAt } from '../../domain/game/projection';
 import { describeCard } from '../cardDescription';
 import { handLayout } from '../handLayout';
+import { CardArtwork } from '../mascots/CardArtwork';
 
 export function Hand({
   controller,
@@ -39,7 +40,7 @@ export function Hand({
               if (event.detail === 0) use();
             }}
           >
-            <img src={card.art} alt="" draggable={false} />
+            <CardArtwork card={card} />
             <span className="hand-cost">{card.cost}</span>
             <span className="hand-name">{card.name}</span>
           </button>

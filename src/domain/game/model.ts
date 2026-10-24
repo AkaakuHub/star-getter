@@ -1,5 +1,20 @@
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type Mood = 'warm' | 'cool' | 'bright';
+export const costumeIds = [
+  'star',
+  'moon',
+  'blossom',
+  'encore',
+  'sailor',
+  'witch',
+  'prism',
+  'snow',
+  'sunny',
+  'space',
+  'march',
+  'ribbon',
+] as const;
+export type CostumeId = (typeof costumeIds)[number];
 export type Effect =
   | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
@@ -17,7 +32,7 @@ export type Effect =
 export type Card = Readonly<{
   id: string;
   name: string;
-  art: string;
+  costume: CostumeId;
   performer: PerformerId;
   cost: number;
   appeal: number;

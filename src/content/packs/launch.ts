@@ -8,7 +8,7 @@ export const launchPack: CardPack = {
     {
       id: 'spark',
       name: 'はじまりの星',
-      art: '/cards/launch/spark.png',
+      costume: 'star',
       performer: 'nova',
       cost: 3,
       appeal: 125,
@@ -21,7 +21,7 @@ export const launchPack: CardPack = {
     {
       id: 'flare',
       name: '月灯りのアリア',
-      art: '/cards/launch/flare.png',
+      costume: 'moon',
       performer: 'nova',
       cost: 4,
       appeal: 135,
@@ -34,7 +34,7 @@ export const launchPack: CardPack = {
     {
       id: 'sunrise',
       name: '花咲くノート',
-      art: '/cards/launch/sunrise.png',
+      costume: 'blossom',
       performer: 'nova',
       cost: 2,
       appeal: 145,
@@ -47,7 +47,7 @@ export const launchPack: CardPack = {
     {
       id: 'ember',
       name: '金色のアンコール',
-      art: '/cards/launch/ember.png',
+      costume: 'encore',
       performer: 'nova',
       cost: 2,
       appeal: 110,
@@ -60,7 +60,7 @@ export const launchPack: CardPack = {
     {
       id: 'ripple',
       name: '水色のステージ',
-      art: '/cards/launch/ripple.png',
+      costume: 'sailor',
       performer: 'lumen',
       cost: 3,
       appeal: 115,
@@ -86,7 +86,7 @@ export const launchPack: CardPack = {
     {
       id: 'tide',
       name: '月影のセレナーデ',
-      art: '/cards/launch/tide.png',
+      costume: 'witch',
       performer: 'lumen',
       cost: 4,
       appeal: 130,
@@ -101,7 +101,7 @@ export const launchPack: CardPack = {
     {
       id: 'prism',
       name: '光のプリズム',
-      art: '/cards/launch/prism.png',
+      costume: 'prism',
       performer: 'lumen',
       cost: 2,
       appeal: 140,
@@ -113,7 +113,7 @@ export const launchPack: CardPack = {
     {
       id: 'dew',
       name: '星降るフィナーレ',
-      art: '/cards/launch/dew.png',
+      costume: 'snow',
       performer: 'lumen',
       cost: 2,
       appeal: 105,
@@ -126,7 +126,7 @@ export const launchPack: CardPack = {
     {
       id: 'bounce',
       name: 'サニー・スマイル',
-      art: '/cards/launch/bounce.png',
+      costume: 'sunny',
       performer: 'tetra',
       cost: 3,
       appeal: 120,
@@ -140,7 +140,7 @@ export const launchPack: CardPack = {
     {
       id: 'orbit',
       name: '宵空のリズム',
-      art: '/cards/launch/bounce.png',
+      costume: 'space',
       performer: 'tetra',
       cost: 2,
       appeal: 110,
@@ -153,7 +153,7 @@ export const launchPack: CardPack = {
     {
       id: 'comet',
       name: '青空のメロディ',
-      art: '/cards/launch/bounce.png',
+      costume: 'march',
       performer: 'tetra',
       cost: 5,
       appeal: 150,
@@ -162,7 +162,7 @@ export const launchPack: CardPack = {
     {
       id: 'halo',
       name: 'リボンの祝福',
-      art: '/cards/launch/bounce.png',
+      costume: 'ribbon',
       performer: 'tetra',
       cost: 3,
       appeal: 125,

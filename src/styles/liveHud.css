@@ -49,13 +49,7 @@
   border-radius: 2cqw;
   background: #ffe4a4;
 }
-.special-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 20%;
-}
-.special-portrait > span {
+.special-portrait > .special-charge {
   position: absolute;
   inset: auto 0 0;
   display: flex;

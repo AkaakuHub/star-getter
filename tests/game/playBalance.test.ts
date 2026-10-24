@@ -38,7 +38,7 @@ function play(seed: number, collectInterval: number, cardInterval: number) {
 
 describe('30秒ライブの得点バランス', () => {
   for (const seed of [7, 456, 1234]) {
-    it(`初期編成でカードを毎秒2回・回収を毎秒3回操作すると上限へ届く（seed ${seed}）`, () => {
+    it(`初期編成でカードを毎秒2回・回収を毎秒3回操作し、SPも使うと上限へ届く（seed ${seed}）`, () => {
       const fast = play(seed, 20, 30);
       const slow = play(seed, 180, 90);
       expect(fast.phase).toBe('finished');

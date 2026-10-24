@@ -4,10 +4,6 @@
     width: 100px;
     height: 145px;
   }
-  .portrait img {
-    @apply size-full object-cover;
-    object-position: 50% 28%;
-  }
   .skill-card {
     @apply relative flex min-w-0 flex-col overflow-hidden rounded-lg border-2 border-[#353148] bg-white text-left text-[#353148];
   }
@@ -21,10 +17,6 @@
   .card-art {
     @apply relative block w-full overflow-hidden;
     aspect-ratio: 3 / 4;
-  }
-  .card-art img {
-    @apply size-full object-cover;
-    object-position: 50% 25%;
   }
   .cost {
     @apply absolute top-1.5 left-1.5 flex h-6 min-w-7 items-center justify-center gap-0.5 rounded-md border-2 border-[#353148] bg-[#ffe4a4] px-1 text-xs font-black;

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './portraits.css';
+@import './mascots.css';
 @import './lobby.css';
 @import './game.css';
 @import './liveHud.css';

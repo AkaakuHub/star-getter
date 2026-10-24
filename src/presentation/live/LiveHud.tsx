@@ -1,11 +1,11 @@
 import { Flower2, Heart, Sparkles, Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
-import { performers } from '../../content/performers';
 import { type GameState, rules } from '../../domain/game/model';
 import { durationSeconds, sectionAt } from '../../domain/game/projection';
 import { formatFactor, formatScore, formatTime } from '../cardDescription';
 import { FittedText } from '../text/FittedText';
 import { liveLayout } from './layout';
+import { CardArtwork } from '../mascots/CardArtwork';
 
 export function LiveHud({
   controller,
@@ -49,8 +49,8 @@ export function LiveHud({
         onClick={() => controller.command({ type: 'special' })}
         aria-label={'スペシャルアピール、チャージ' + Math.floor(state.charge) + '%'}
       >
-        <img src={lead.art} alt={performers[lead.performer].name} draggable={false} />
-        <span>
+        <CardArtwork card={lead} />
+        <span className="special-charge">
           <Sparkles size={12} aria-hidden="true" />
           SP {Math.floor(state.charge)}%
         </span>

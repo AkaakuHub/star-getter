@@ -94,14 +94,12 @@
   transform-origin: 50% 50%;
   background: var(--accent);
 }
-.hand-card > img {
+.hand-card > .card-illustration {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 50% 26%;
   pointer-events: none;
 }
-.hand-card:disabled > img {
+.hand-card:disabled > .card-illustration {
   opacity: 0.5;
 }
 .hand-card:active,

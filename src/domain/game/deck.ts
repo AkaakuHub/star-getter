@@ -1,4 +1,4 @@
-import { type Card, rules } from './model';
+import { type Card, costumeIds, rules } from './model';
 
 export function validateDeck(deck: readonly Card[]): void {
   if (deck.length !== rules.deckSize || new Set(deck.map((card) => card.id)).size !== deck.length) {
@@ -16,7 +16,7 @@ export function validateCard(card: Card): void {
   if (
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(card.id) ||
     !card.name.trim() ||
-    !/^\/cards\/[a-z0-9/-]+\.png$/.test(card.art) ||
+    !costumeIds.includes(card.costume) ||
     !Number.isInteger(card.cost) ||
     card.cost < 1 ||
     card.cost > rules.maxEnergy ||

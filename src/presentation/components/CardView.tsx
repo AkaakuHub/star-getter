@@ -3,6 +3,7 @@ import { performers } from '../../content/performers';
 import type { Card } from '../../domain/game/model';
 import { describeCard } from '../cardDescription';
 import { FittedText } from '../text/FittedText';
+import { CardArtwork } from '../mascots/CardArtwork';
 
 export function CardView({
   card,
@@ -33,7 +34,7 @@ export function CardView({
       onClick={onClick}
     >
       <span className="card-art">
-        <img src={card.art} alt="" loading="lazy" draggable={false} />
+        <CardArtwork card={card} />
         <span className="cost">{card.cost}</span>
         {selected && (
           <span className="card-selected">

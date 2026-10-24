@@ -12,12 +12,11 @@ export function Stage({
   const CollectIcon = state.bloom ? Flower2 : Heart;
   return (
     <div className="absolute inset-0 overflow-hidden">
-      <img
-        src="/stage/concert.png"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover opacity-35"
-        draggable={false}
-      />
+      <div className="concert-backdrop" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
       <div
         className={'board-performers ' + (state.phase === 'playing' ? 'dancing' : '')}
         aria-hidden="true"

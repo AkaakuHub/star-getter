@@ -1,0 +1,117 @@
+.mascot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.portrait {
+  background: #f7f0e8;
+}
+.card-illustration {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--costume-paper);
+}
+.card-illustration::before {
+  content: '';
+  position: absolute;
+  top: -8%;
+  left: -20%;
+  width: 140%;
+  height: 36%;
+  transform: rotate(-12deg);
+  background: var(--costume-fabric);
+  opacity: 0.25;
+}
+.card-illustration .mascot {
+  position: relative;
+  z-index: 1;
+  padding: 2% 0 0;
+}
+.costume-motif {
+  position: absolute;
+  top: 28%;
+  right: 4%;
+  width: 20%;
+  aspect-ratio: 1;
+  background: var(--costume-trim);
+  opacity: 0.9;
+}
+.motif-star .costume-motif {
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 94%,
+    50% 72%,
+    21% 94%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+.motif-circle .costume-motif {
+  border: 3px solid var(--costume-fabric);
+  border-radius: 50%;
+  background: transparent;
+}
+.motif-diamond .costume-motif {
+  transform: rotate(45deg);
+}
+.motif-stripe .costume-motif {
+  width: 100%;
+  height: 13%;
+  top: 55%;
+  right: 0;
+  transform: rotate(-12deg);
+  background: var(--costume-fabric);
+  opacity: 0.2;
+}
+.concert-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #f7eee7;
+}
+.concert-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 16% 8% 32%;
+  border: 1.5cqw solid #e6cddc;
+  border-bottom: 0;
+  border-radius: 45% 45% 0 0;
+  background: #eee0e9;
+}
+.concert-backdrop::after {
+  content: '';
+  position: absolute;
+  top: 55%;
+  left: -5%;
+  width: 110%;
+  height: 9%;
+  border-radius: 50%;
+  background: #d3bacb;
+  border-bottom: 2cqw solid #bda8ba;
+}
+.concert-backdrop > span {
+  position: absolute;
+  top: 21%;
+  width: 13%;
+  height: 30%;
+  background: #fffaf5;
+  opacity: 0.45;
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+}
+.concert-backdrop > span:nth-child(1) {
+  left: 18%;
+}
+.concert-backdrop > span:nth-child(2) {
+  left: 44%;
+}
+.concert-backdrop > span:nth-child(3) {
+  left: 70%;
+}
