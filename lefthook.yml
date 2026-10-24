@@ -1,0 +1,13 @@
+pre-commit:
+  parallel: true
+  commands:
+    check:
+      run: vp check
+    test:
+      run: vp test
+    knip:
+      run: vp run knip
+pre-push:
+  commands:
+    build:
+      run: vp build
