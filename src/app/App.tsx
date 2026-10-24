@@ -134,7 +134,6 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
           onHome={() => void home()}
           onReplay={() => void start()}
           onPause={() => void controller.togglePause()}
-          onHelp={showHelp}
           helpOpen={help}
           busy={busy}
         />

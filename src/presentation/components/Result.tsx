@@ -12,7 +12,7 @@ export function Result({
   busy,
 }: Readonly<{
   state: GameState;
-  bestScore: number;
+  bestScore: bigint;
   onReplay: () => void;
   onHome: () => void;
   busy: boolean;
@@ -34,6 +34,10 @@ export function Result({
         <div>
           <dt>時間切れ・上限超過</dt>
           <dd>{state.stats.heartsMissed}</dd>
+        </div>
+        <div>
+          <dt>最大連続回収</dt>
+          <dd>{state.stats.bestCombo}</dd>
         </div>
         <div>
           <dt>カード使用</dt>

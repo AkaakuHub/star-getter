@@ -1,47 +1,25 @@
-import { X, Zap } from 'lucide-preact';
-import type { GameController } from '../../app/gameController';
-import { performers } from '../../content/performers';
-import { canUseCard } from '../../domain/game/projection';
-import { describeEffect } from '../cardDescription';
+import { X } from 'lucide-preact';
+import type { Card } from '../../domain/game/model';
+import { describeCard } from '../cardDescription';
+import { liveLayout } from '../live/layout';
+import { FittedText } from '../text/FittedText';
 
-export function CardPreview({ controller }: Readonly<{ controller: GameController }>) {
-  const card = controller.selectedCard;
+export function CardPreview({
+  card,
+  onClose,
+}: Readonly<{ card: Card | null; onClose: () => void }>) {
   if (!card) return null;
-  const index = controller.state.hand.indexOf(card.id);
   return (
-    <section aria-label="選択中のスキル" className="skill-preview">
-      <div className="relative flex gap-3">
-        <img
-          src={card.art}
-          alt={performers[card.performer].name}
-          className="w-[22cqw] shrink-0 self-start rounded-md border-2 border-[#353148] object-cover"
-          draggable={false}
-        />
-        <div className="min-w-0 flex-1 pr-5">
-          <h2 className="text-[3.6cqw] leading-6 font-bold">{card.name}</h2>
-          <div className="mt-2 grid gap-2 text-[3cqw] leading-5 text-[#353148]">
-            {card.effects.map((effect) => (
-              <p key={effect.kind}>{describeEffect(effect)}</p>
-            ))}
-          </div>
-        </div>
-        <button
-          type="button"
-          className="absolute -top-1 -right-1 grid size-9 place-items-center rounded-md bg-[#f3e7e7]"
-          aria-label="スキル表示を閉じる"
-          onClick={() => controller.clearSelection()}
-        >
-          <X size={17} aria-hidden="true" />
-        </button>
+    <section
+      aria-label={card.name + 'の効果'}
+      className="skill-preview"
+      style={liveLayout.description}
+    >
+      <div className="skill-description">
+        <FittedText text={describeCard(card)} />
       </div>
-      <button
-        type="button"
-        className="button primary mt-3 w-full"
-        disabled={!canUseCard(controller.state, index)}
-        onClick={() => controller.activateSelected()}
-      >
-        <Zap size={16} aria-hidden="true" />
-        発動 AP{card.cost}
+      <button type="button" className="skill-close" aria-label="効果表示を閉じる" onClick={onClose}>
+        <X size={14} aria-hidden="true" />
       </button>
     </section>
   );

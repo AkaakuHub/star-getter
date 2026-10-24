@@ -22,12 +22,34 @@ export function validateCard(card: Card): void {
     card.cost > rules.maxEnergy ||
     !Number.isSafeInteger(card.appeal) ||
     card.appeal <= 0 ||
-    card.effects.length === 0
+    card.effects.length === 0 ||
+    (card.relay !== undefined &&
+      (!Number.isSafeInteger(card.relay.threshold) ||
+        card.relay.threshold < 1 ||
+        card.relay.threshold > rules.maxHearts ||
+        !Number.isSafeInteger(card.relay.hearts) ||
+        card.relay.hearts < 1 ||
+        card.relay.hearts > rules.maxHearts))
   ) {
     throw new Error('カードの設定が正しくありません。');
   }
   for (const effect of card.effects) {
     if (effect.kind === 'collect') continue;
+    if (effect.kind === 'amplify' || effect.kind === 'resource-boost') {
+      if (!Number.isSafeInteger(effect.percent) || effect.percent <= 0 || effect.percent > 300)
+        throw new Error('増幅率が正しくありません。');
+      if (
+        effect.kind === 'resource-boost' &&
+        (!Number.isSafeInteger(effect.uses) || effect.uses < 1 || effect.uses > 10)
+      )
+        throw new Error('増幅回数が正しくありません。');
+      continue;
+    }
+    if (effect.kind === 'bloom') {
+      if (!Number.isSafeInteger(effect.strength) || effect.strength < 1 || effect.strength > 300)
+        throw new Error('開花の効果量が正しくありません。');
+      continue;
+    }
     if (effect.kind === 'boost') {
       if (
         !Number.isFinite(effect.multiplier) ||

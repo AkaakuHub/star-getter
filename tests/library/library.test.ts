@@ -28,7 +28,7 @@ describe('編成と記録の保存', () => {
   it('初回は9枚の編成と各楽曲の得点0から始まる', () => {
     const library = readLibrary(new MemoryStorage());
     expect(library.deckIds).toEqual(defaultDeckIds);
-    expect(Object.values(library.bestScores)).toEqual([0, 0]);
+    expect(Object.values(library.bestScores)).toEqual([0n, 0n]);
   });
 
   it('編成・選曲・ミュート・最高得点を保存して再読込できる', () => {
@@ -39,11 +39,11 @@ describe('編成と記録の保存', () => {
       muted: true,
       trackId: 'night-step',
       deckIds: initial.deckIds.map((id) => (id === 'spark' ? 'ember' : id)),
-      bestScores: { ...initial.bestScores, 'night-step': 123456 },
+      bestScores: { ...initial.bestScores, 'night-step': 9999n * 10n ** 68n - 1n },
     };
     writeLibrary(storage, edited);
     expect(readLibrary(storage)).toEqual(edited);
-    expect(bestScore(readLibrary(storage), 'night-step')).toBe(123456);
+    expect(bestScore(readLibrary(storage), 'night-step')).toBe(9999n * 10n ** 68n - 1n);
   });
 
   it('壊れた編成を保存せず、直前の有効なデータを維持する', () => {

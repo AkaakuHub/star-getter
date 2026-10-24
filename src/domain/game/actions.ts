@@ -1,6 +1,7 @@
 import { shuffle } from './deck';
-import { addHearts, collectHearts } from './hearts';
-import { type Action, type Effect, type GameState, rules } from './model';
+import { collectHearts } from './hearts';
+import { type Action, type GameState, rules } from './model';
+import { applyEffect, changeResource } from './effects';
 import { canUseCard, cardAt } from './projection';
 
 export function act(state: GameState, action: Action): GameState {
@@ -25,41 +26,15 @@ function useCard(state: GameState, index: number): GameState {
   const card = cardAt(state, index);
   let next: GameState = {
     ...state,
-    energy: state.energy - card.cost,
     charge: Math.min(100, state.charge + 8),
     lastActionTick: state.tick,
     lastPerformer: card.performer,
     lastCardName: card.name,
     stats: { ...state.stats, cardsUsed: state.stats.cardsUsed + 1 },
   };
+  next = changeResource(next, 'energy', -BigInt(card.cost));
   for (const effect of card.effects) next = applyEffect(next, effect);
   return replaceCard(next, index, card.id);
-}
-
-function applyEffect(state: GameState, effect: Effect): GameState {
-  switch (effect.kind) {
-    case 'hearts':
-      return addHearts(state, effect.amount);
-    case 'energy':
-      return { ...state, energy: Math.min(rules.maxEnergy, state.energy + effect.amount) };
-    case 'stamina':
-      return { ...state, stamina: Math.min(100, state.stamina + effect.amount) };
-    case 'excitement':
-      return { ...state, excitement: Math.min(100, state.excitement + effect.amount) };
-    case 'collect':
-      return collectHearts(state, state.hearts.length);
-    case 'boost':
-      return {
-        ...state,
-        boosts: [
-          ...state.boosts,
-          {
-            multiplier: effect.multiplier,
-            untilTick: state.tick + Math.round(effect.seconds * rules.ticksPerSecond),
-          },
-        ],
-      };
-  }
 }
 
 function replaceCard(state: GameState, index: number, usedId: string): GameState {
@@ -80,23 +55,29 @@ function replaceCard(state: GameState, index: number, usedId: string): GameState
     discard,
     drawPile: drawPile.slice(1),
     hand: state.hand.map((id, handIndex) => (handIndex === index ? drawn : id)),
+    relayUsed: state.relayUsed.filter((id) => id !== drawn),
   };
 }
 
 function useSpecial(state: GameState): GameState {
   if (state.phase !== 'playing' || state.charge < 100 || state.resting) return state;
-  return addHearts(
-    {
-      ...state,
-      charge: 0,
-      energy: Math.min(rules.maxEnergy, state.energy + 3),
-      stamina: Math.min(100, state.stamina + 10),
-      boosts: [
-        ...state.boosts,
-        { multiplier: 1.8, untilTick: state.tick + 8 * rules.ticksPerSecond },
-      ],
-      stats: { ...state.stats, specialsUsed: state.stats.specialsUsed + 1 },
-    },
-    8,
+  const next = applyEffect(
+    applyEffect(
+      {
+        ...state,
+        charge: 0,
+        boosts: [
+          ...state.boosts,
+          {
+            percent: (80n * state.amplification) / 100n,
+            untilTick: state.tick + 8 * rules.ticksPerSecond,
+          },
+        ],
+        stats: { ...state.stats, specialsUsed: state.stats.specialsUsed + 1 },
+      },
+      { kind: 'energy', amount: 3 },
+    ),
+    { kind: 'stamina', amount: 10 },
   );
+  return applyEffect(next, { kind: 'hearts', amount: 8 });
 }

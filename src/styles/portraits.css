@@ -36,6 +36,7 @@
     @apply mt-2 block truncate px-2 text-[11px] font-bold;
   }
   .card-effects {
-    @apply grid gap-0.5 px-2 pt-1 pb-3 text-[10px] leading-4 text-[#706778];
+    @apply block w-full px-2 pt-1 pb-3 text-[10px] leading-tight text-[#706778];
+    height: 76px;
   }
 }

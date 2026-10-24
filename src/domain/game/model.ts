@@ -3,6 +3,15 @@ export type Mood = 'warm' | 'cool' | 'bright';
 export type Effect =
   | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
+  | Readonly<{ kind: 'amplify'; percent: number }>
+  | Readonly<{ kind: 'bloom'; strength: number }>
+  | Readonly<{
+      kind: 'resource-boost';
+      target: 'excitement' | 'stamina';
+      percent: number;
+      uses: number;
+      condition: 'voltage20' | 'mental100';
+    }>
   | Readonly<{ kind: 'collect' }>;
 
 export type Card = Readonly<{
@@ -13,6 +22,7 @@ export type Card = Readonly<{
   cost: number;
   appeal: number;
   effects: readonly Effect[];
+  relay?: Readonly<{ threshold: number; hearts: number }>;
 }>;
 
 export type Section = Readonly<{
@@ -27,20 +37,31 @@ export type Track = Readonly<{
   name: string;
   bpm: number;
   beats: number;
-  targetScore: number;
+  targetScore: bigint;
   sections: readonly Section[];
   melody: readonly number[];
   chords: readonly (readonly [number, number, number])[];
 }>;
 
 export type Heart = Readonly<{ id: number; bornTick: number }>;
-export type Boost = Readonly<{ multiplier: number; untilTick: number }>;
+export type Boost = Readonly<{ percent: bigint; untilTick: number }>;
+export type ResourceBoost = Readonly<{
+  target: 'excitement' | 'stamina';
+  percent: bigint;
+  uses: number;
+}>;
+export type Bloom = Readonly<{
+  progress: bigint;
+  strength: bigint;
+  rollback: Readonly<{ energy: number; stamina: number; excitement: number }>;
+}>;
 export type PlayStats = Readonly<{
   cardsUsed: number;
   heartsCollected: number;
   heartsMissed: number;
   specialsUsed: number;
   bestCollection: number;
+  bestCombo: number;
 }>;
 
 export type GameState = Readonly<{
@@ -57,14 +78,20 @@ export type GameState = Readonly<{
   resting: boolean;
   excitement: number;
   charge: number;
-  score: number;
+  score: bigint;
   hearts: readonly Heart[];
   nextHeartId: number;
   boosts: readonly Boost[];
+  amplification: bigint;
+  resourceBoosts: readonly ResourceBoost[];
+  bloom: Bloom | null;
+  relayUsed: readonly string[];
+  combo: number;
+  lastCollectTick: number;
   lastActionTick: number;
   lastPerformer: PerformerId | null;
   lastCardName: string;
-  lastGain: number;
+  lastGain: bigint;
   stats: PlayStats;
 }>;
 
@@ -74,11 +101,13 @@ export type Action =
 
 export const rules = {
   ticksPerSecond: 60,
-  energyTicksPerPoint: 90,
+  energyTicksPerPoint: 30,
   handSize: 5,
   deckSize: 9,
   maxEnergy: 10,
   maxHearts: 40,
   heartLifetimeSeconds: 10,
-  actionCooldownTicks: 14,
+  actionCooldownTicks: 6,
+  comboWindowTicks: 120,
+  maxScore: 9999n * 10n ** 68n,
 } as const;

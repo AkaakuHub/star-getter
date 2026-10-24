@@ -1,7 +1,8 @@
-import { Check, Zap } from 'lucide-preact';
+import { Check } from 'lucide-preact';
 import { performers } from '../../content/performers';
 import type { Card } from '../../domain/game/model';
-import { describeCard, describeEffect } from '../cardDescription';
+import { describeCard } from '../cardDescription';
+import { FittedText } from '../text/FittedText';
 
 export function CardView({
   card,
@@ -33,10 +34,7 @@ export function CardView({
     >
       <span className="card-art">
         <img src={card.art} alt="" loading="lazy" draggable={false} />
-        <span className="cost">
-          <Zap size={13} aria-hidden="true" />
-          {card.cost}
-        </span>
+        <span className="cost">{card.cost}</span>
         {selected && (
           <span className="card-selected">
             <Check size={16} aria-hidden="true" />
@@ -45,9 +43,7 @@ export function CardView({
       </span>
       <span className="card-name">{card.name}</span>
       <span className="card-effects">
-        {card.effects.map((effect) => (
-          <span key={effect.kind}>{describeEffect(effect)}</span>
-        ))}
+        <FittedText text={describeCard(card)} />
       </span>
     </button>
   );

@@ -2,6 +2,7 @@ import { validateDeck, shuffle } from './deck';
 import { addHearts, collectHearts, expireHearts } from './hearts';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
+import { changeBloomResource, finishBloom } from './bloom';
 
 export function createGame(track: Track, deck: readonly Card[], seed: number): GameState {
   validateDeck(deck);
@@ -19,25 +20,32 @@ export function createGame(track: Track, deck: readonly Card[], seed: number): G
     drawPile: shuffled.items.slice(rules.handSize),
     discard: [],
     randomSeed: shuffled.seed,
-    energy: 5,
+    energy: 10,
     stamina: 100,
     resting: false,
     excitement: 0,
     charge: 0,
-    score: 0,
+    score: 0n,
     hearts: [],
     nextHeartId: 0,
     boosts: [],
+    amplification: 100n,
+    resourceBoosts: [],
+    bloom: null,
+    relayUsed: [],
+    combo: 0,
+    lastCollectTick: -rules.comboWindowTicks - 1,
     lastActionTick: -rules.actionCooldownTicks,
     lastPerformer: null,
     lastCardName: '',
-    lastGain: 0,
+    lastGain: 0n,
     stats: {
       cardsUsed: 0,
       heartsCollected: 0,
       heartsMissed: 0,
       specialsUsed: 0,
       bestCollection: 0,
+      bestCombo: 0,
     },
   };
 }
@@ -50,7 +58,8 @@ export function advanceTo(state: GameState, seconds: number): GameState {
   let next = state;
   while (next.tick < target) next = advanceTick(next);
   if (next.tick === endTick) {
-    return { ...collectHearts(next, next.hearts.length), phase: 'finished' };
+    const collected = collectHearts({ ...next, relayUsed: [...next.hand] }, next.hearts.length);
+    return { ...finishBloom(collected), phase: 'finished' };
   }
   return next;
 }
@@ -58,23 +67,30 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const stamina = state.resting
-    ? Math.min(100, state.stamina + 4 * dt)
-    : Math.max(0, state.stamina - 0.9 * dt);
+  const stamina = state.bloom
+    ? state.stamina
+    : state.resting
+      ? Math.min(100, state.stamina + 4 * dt)
+      : Math.max(0, state.stamina - 0.9 * dt);
   const resting = state.resting ? stamina < 40 : stamina <= 0;
   let next: GameState = expireHearts({
     ...state,
     tick,
     stamina,
     resting,
-    energy: Math.min(
-      rules.maxEnergy,
-      (Math.round(state.energy * rules.energyTicksPerPoint) + (resting ? 0 : 1)) /
-        rules.energyTicksPerPoint,
-    ),
-    excitement: Math.min(100, state.excitement + dt * 0.25),
+    energy: state.bloom
+      ? state.energy
+      : Math.min(
+          rules.maxEnergy,
+          (Math.round(state.energy * rules.energyTicksPerPoint) + (resting ? 0 : 1)) /
+            rules.energyTicksPerPoint,
+        ),
+    excitement: state.bloom ? state.excitement : Math.min(100, state.excitement + dt * 0.25),
+    combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
+  if (next.bloom && tick % rules.energyTicksPerPoint === 0)
+    next = changeBloomResource(next, 'energy', 1n);
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   if (beat !== previousBeat && beat % 2 === 0 && !resting) {
@@ -97,8 +113,7 @@ function validateTrack(track: Track): void {
     !Number.isInteger(track.beats) ||
     track.beats < 1 ||
     track.beats > 2000 ||
-    !Number.isFinite(track.targetScore) ||
-    track.targetScore <= 0 ||
+    track.targetScore <= 0n ||
     track.sections[0]?.startBeat !== 0
   )
     throw new Error('楽曲の設定が正しくありません。');

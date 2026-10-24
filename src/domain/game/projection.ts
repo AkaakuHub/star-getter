@@ -26,20 +26,14 @@ export function canUseCard(state: GameState, index: number): boolean {
     index < state.hand.length &&
     !state.resting &&
     state.tick - state.lastActionTick >= rules.actionCooldownTicks &&
-    state.energy >= cardAt(state, index).cost
+    (state.bloom !== null || state.energy >= cardAt(state, index).cost)
   );
 }
 
-export function scoreMultiplier(state: GameState): number {
-  const boost = state.boosts.reduce((value, item) => value * item.multiplier, 1);
-  const level = Math.floor(state.excitement / 20);
-  return (1 + level * 0.25) * (sectionAt(state).climax ? 1.5 : 1) * boost;
-}
-
 export function scoreGrade(state: GameState): string {
-  const ratio = state.score / state.track.targetScore;
-  if (ratio >= 1.5) return 'S';
-  if (ratio >= 1) return 'A';
-  if (ratio >= 0.6) return 'B';
+  if (state.score >= rules.maxScore) return 'SSS';
+  if (state.score >= state.track.targetScore * 10n) return 'S';
+  if (state.score >= state.track.targetScore) return 'A';
+  if (state.score * 10n >= state.track.targetScore * 6n) return 'B';
   return 'C';
 }

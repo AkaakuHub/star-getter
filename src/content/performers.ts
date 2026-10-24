@@ -31,9 +31,3 @@ export const performers: Readonly<Record<PerformerId, Performer>> = {
     portrait: '/cards/launch/bounce.png',
   },
 };
-
-export const moodNames: Readonly<Record<Mood, string>> = {
-  warm: 'ウォーム',
-  cool: 'クール',
-  bright: 'ブライト',
-};

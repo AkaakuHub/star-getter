@@ -12,7 +12,11 @@ export const launchPack: CardPack = {
       performer: 'nova',
       cost: 3,
       appeal: 125,
-      effects: [{ kind: 'hearts', amount: 8 }],
+      effects: [
+        { kind: 'bloom', strength: 100 },
+        { kind: 'hearts', amount: 8 },
+      ],
+      relay: { threshold: 3, hearts: 6 },
     },
     {
       id: 'flare',
@@ -21,17 +25,22 @@ export const launchPack: CardPack = {
       performer: 'nova',
       cost: 4,
       appeal: 135,
-      effects: [{ kind: 'excitement', amount: 22 }],
+      effects: [
+        { kind: 'excitement', amount: 40 },
+        { kind: 'boost', multiplier: 2, seconds: 30 },
+      ],
+      relay: { threshold: 6, hearts: 3 },
     },
     {
       id: 'sunrise',
       name: '花咲くノート',
       art: '/cards/launch/sunrise.png',
       performer: 'nova',
-      cost: 5,
+      cost: 2,
       appeal: 145,
       effects: [
-        { kind: 'boost', multiplier: 1.6, seconds: 8 },
+        { kind: 'amplify', percent: 50 },
+        { kind: 'boost', multiplier: 2, seconds: 30 },
         { kind: 'hearts', amount: 4 },
       ],
     },
@@ -43,7 +52,8 @@ export const launchPack: CardPack = {
       cost: 2,
       appeal: 110,
       effects: [
-        { kind: 'excitement', amount: 8 },
+        { kind: 'energy', amount: 3 },
+        { kind: 'excitement', amount: 18 },
         { kind: 'hearts', amount: 3 },
       ],
     },
@@ -54,7 +64,24 @@ export const launchPack: CardPack = {
       performer: 'lumen',
       cost: 3,
       appeal: 115,
-      effects: [{ kind: 'stamina', amount: 24 }],
+      effects: [
+        { kind: 'hearts', amount: 30 },
+        { kind: 'energy', amount: 13 },
+        {
+          kind: 'resource-boost',
+          target: 'excitement',
+          percent: 300,
+          uses: 3,
+          condition: 'voltage20',
+        },
+        {
+          kind: 'resource-boost',
+          target: 'stamina',
+          percent: 300,
+          uses: 3,
+          condition: 'mental100',
+        },
+      ],
     },
     {
       id: 'tide',
@@ -66,16 +93,22 @@ export const launchPack: CardPack = {
       effects: [
         { kind: 'hearts', amount: 6 },
         { kind: 'energy', amount: 2 },
+        { kind: 'excitement', amount: 22 },
+        { kind: 'stamina', amount: 15 },
       ],
+      relay: { threshold: 3, hearts: 9 },
     },
     {
       id: 'prism',
       name: '光のプリズム',
       art: '/cards/launch/prism.png',
       performer: 'lumen',
-      cost: 4,
+      cost: 2,
       appeal: 140,
-      effects: [{ kind: 'boost', multiplier: 1.4, seconds: 12 }],
+      effects: [
+        { kind: 'amplify', percent: 50 },
+        { kind: 'stamina', amount: 24 },
+      ],
     },
     {
       id: 'dew',
@@ -88,6 +121,7 @@ export const launchPack: CardPack = {
         { kind: 'stamina', amount: 12 },
         { kind: 'hearts', amount: 2 },
       ],
+      relay: { threshold: 3, hearts: 3 },
     },
     {
       id: 'bounce',
@@ -97,9 +131,11 @@ export const launchPack: CardPack = {
       cost: 3,
       appeal: 120,
       effects: [
-        { kind: 'hearts', amount: 5 },
+        { kind: 'hearts', amount: 12 },
+        { kind: 'energy', amount: 3 },
         { kind: 'excitement', amount: 10 },
       ],
+      relay: { threshold: 3, hearts: 6 },
     },
     {
       id: 'orbit',
@@ -108,7 +144,11 @@ export const launchPack: CardPack = {
       performer: 'tetra',
       cost: 2,
       appeal: 110,
-      effects: [{ kind: 'energy', amount: 3 }],
+      effects: [
+        { kind: 'energy', amount: 6 },
+        { kind: 'stamina', amount: 10 },
+      ],
+      relay: { threshold: 6, hearts: 3 },
     },
     {
       id: 'comet',
@@ -117,7 +157,7 @@ export const launchPack: CardPack = {
       performer: 'tetra',
       cost: 5,
       appeal: 150,
-      effects: [{ kind: 'hearts', amount: 12 }, { kind: 'collect' }],
+      effects: [{ kind: 'hearts', amount: 20 }, { kind: 'collect' }],
     },
     {
       id: 'halo',
@@ -127,6 +167,7 @@ export const launchPack: CardPack = {
       cost: 3,
       appeal: 125,
       effects: [
+        { kind: 'amplify', percent: 50 },
         { kind: 'excitement', amount: 12 },
         { kind: 'stamina', amount: 10 },
       ],

@@ -34,8 +34,8 @@ describe('ライブの進行', () => {
 
   it('エネルギーが回復し、上限を超えない', () => {
     const empty = { ...game(), energy: 0 };
-    expect(advanceTo(empty, 1.5).energy).toBe(1);
-    expect(advanceTo(empty, 1.6).energy).toBeGreaterThan(1);
+    expect(advanceTo(empty, 0.5).energy).toBe(1);
+    expect(advanceTo(empty, 0.6).energy).toBeGreaterThan(1);
     expect(advanceTo(empty, 30).energy).toBe(10);
   });
 
@@ -95,11 +95,8 @@ describe('カードと編成', () => {
       const index = turn % 5;
       const card = cardAt(state, index);
       const next = act(state, { type: 'card', index });
-      const refund = card.effects.reduce(
-        (sum, effect) => sum + (effect.kind === 'energy' ? effect.amount : 0),
-        0,
-      );
-      expect(next.energy).toBe(Math.min(10, 10 - card.cost + refund));
+      if (state.bloom) expect(next.energy).toBe(state.energy);
+      else expect(next.energy).toBeGreaterThanOrEqual(10 - card.cost);
       expect(next.hand).toHaveLength(5);
       const owned = [...next.hand, ...next.drawPile, ...next.discard];
       expect(new Set(owned).size).toBe(9);

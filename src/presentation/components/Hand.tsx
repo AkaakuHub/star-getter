@@ -1,4 +1,3 @@
-import { Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { GameState } from '../../domain/game/model';
 import { cardAt } from '../../domain/game/projection';
@@ -8,7 +7,8 @@ import { handLayout } from '../handLayout';
 export function Hand({
   controller,
   state,
-}: Readonly<{ controller: GameController; state: GameState }>) {
+  onSelect,
+}: Readonly<{ controller: GameController; state: GameState; onSelect: () => void }>) {
   return (
     <section
       aria-label="手札"
@@ -16,7 +16,10 @@ export function Hand({
     >
       {state.hand.map((id, index) => {
         const card = cardAt(state, index);
-        const use = () => controller.tapCard(index);
+        const use = () => {
+          onSelect();
+          controller.tapCard(index);
+        };
         return (
           <button
             type="button"
@@ -37,10 +40,7 @@ export function Hand({
             }}
           >
             <img src={card.art} alt="" draggable={false} />
-            <span className="hand-cost">
-              <Zap size={11} aria-hidden="true" />
-              {card.cost}
-            </span>
+            <span className="hand-cost">{card.cost}</span>
             <span className="hand-name">{card.name}</span>
           </button>
         );

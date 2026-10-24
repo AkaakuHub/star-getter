@@ -1,4 +1,4 @@
-import { Heart } from 'lucide-preact';
+import { Flower2, Heart } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { performers } from '../../content/performers';
 import type { GameState } from '../../domain/game/model';
@@ -9,6 +9,7 @@ export function Stage({
   state,
 }: Readonly<{ controller: GameController; state: GameState }>) {
   const collect = () => controller.command({ type: 'collect' });
+  const CollectIcon = state.bloom ? Flower2 : Heart;
   return (
     <div className="absolute inset-0 overflow-hidden">
       <img
@@ -53,7 +54,7 @@ export function Stage({
               animationDelay: (heart.id % 7) * -0.2 + 's',
             }}
           >
-            <Heart fill="currentColor" size={23} />
+            <CollectIcon fill={state.bloom ? 'none' : 'currentColor'} size={23} />
           </span>
         ))}
       </button>
