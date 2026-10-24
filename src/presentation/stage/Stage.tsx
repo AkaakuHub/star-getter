@@ -14,10 +14,9 @@ export function Stage({
       <img
         src="/stage/concert.png"
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover opacity-35"
         draggable={false}
       />
-      <div className="absolute inset-0 bg-linear-to-b from-[#160d36]/75 via-transparent to-[#1c0d36]/90" />
       <div
         className={'board-performers ' + (state.phase === 'playing' ? 'dancing' : '')}
         aria-hidden="true"

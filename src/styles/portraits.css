@@ -1,6 +1,6 @@
 @layer components {
   .portrait {
-    @apply relative block overflow-hidden rounded-2xl;
+    @apply relative block overflow-hidden rounded-lg;
     width: 100px;
     height: 145px;
   }
@@ -9,18 +9,14 @@
     object-position: 50% 28%;
   }
   .skill-card {
-    @apply relative flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-[#251b3f] text-left text-white shadow-lg transition;
-    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
-  }
-  .skill-card:hover:not(:disabled) {
-    @apply -translate-y-1 brightness-110;
+    @apply relative flex min-w-0 flex-col overflow-hidden rounded-lg border-2 border-[#353148] bg-white text-left text-[#353148];
   }
   .skill-card[aria-pressed='true'] {
-    outline: 2px solid #ffb3d6;
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
   }
   .skill-card:disabled {
-    @apply opacity-60;
+    @apply opacity-50;
   }
   .card-art {
     @apply relative block w-full overflow-hidden;
@@ -31,15 +27,15 @@
     object-position: 50% 25%;
   }
   .cost {
-    @apply absolute top-1.5 left-1.5 flex h-6 min-w-7 items-center justify-center gap-0.5 rounded-lg border border-white/70 bg-pink-950/85 px-1 text-xs font-black text-white;
+    @apply absolute top-1.5 left-1.5 flex h-6 min-w-7 items-center justify-center gap-0.5 rounded-md border-2 border-[#353148] bg-[#ffe4a4] px-1 text-xs font-black;
   }
   .card-selected {
-    @apply absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full border border-pink-100 bg-pink-500 text-white;
+    @apply absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full border-2 border-[#353148] bg-[#ed7297];
   }
   .card-name {
     @apply mt-2 block truncate px-2 text-[11px] font-bold;
   }
   .card-effects {
-    @apply grid gap-0.5 px-2 pt-1 pb-3 text-[10px] leading-4 text-purple-100;
+    @apply grid gap-0.5 px-2 pt-1 pb-3 text-[10px] leading-4 text-[#706778];
   }
 }

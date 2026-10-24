@@ -2,78 +2,63 @@
   .lobby {
     @apply grid grid-cols-1 gap-4 px-4 pb-8;
   }
-  .track-panel {
-    @apply overflow-hidden;
-  }
   .track-panel h2 {
-    @apply mb-4 flex items-center gap-2 text-pink-100;
+    @apply mb-3 flex items-center gap-2;
   }
   .track-list {
-    @apply grid gap-3;
+    @apply grid gap-2;
   }
   .track-choice {
-    @apply flex w-full items-center gap-4 rounded-2xl border border-white/15 bg-black/10 p-3 text-left transition;
+    @apply flex w-full items-center gap-3 rounded-lg border-2 border-transparent bg-[#f5f0eb] p-3 text-left;
   }
   .track-choice[aria-pressed='true'] {
-    @apply border-pink-300 bg-pink-400/10 shadow-[0_0_18px_#f687b522];
+    @apply border-[#353148] bg-[#fce1e8];
   }
   .track-cover {
-    @apply relative grid h-24 w-20 shrink-0 place-items-center overflow-hidden rounded-xl text-white;
-    background: linear-gradient(145deg, #ff8ea5, #a68de3);
-  }
-  .track-cover::before {
-    content: '';
-    position: absolute;
-    inset: 10px;
-    border: 1px solid #ffffff80;
-    border-radius: 50%;
-  }
-  .track-cover svg {
-    @apply relative z-10;
+    @apply grid size-16 shrink-0 place-items-center rounded-md border-2 border-[#353148] bg-[#ed7297] text-[#353148];
   }
   .track-1 .track-cover {
-    background: linear-gradient(145deg, #5575bd, #7141a0);
+    @apply bg-[#a9c9df];
   }
   .track-info {
-    @apply grid min-w-0 gap-2;
+    @apply grid min-w-0 gap-1;
   }
   .track-info strong {
     @apply text-sm font-bold leading-6;
   }
   .track-info > span {
-    @apply flex items-center text-xs text-purple-200;
+    @apply flex items-center text-xs text-[#706778];
   }
   .dot {
     @apply px-1;
   }
   .track-info .best {
-    @apply gap-2 font-semibold text-amber-200 tabular-nums;
+    @apply gap-2 font-semibold text-[#353148] tabular-nums;
   }
   .track-arrow {
-    @apply ml-auto text-pink-200 opacity-0;
+    @apply ml-auto shrink-0 opacity-0;
   }
   .track-choice[aria-pressed='true'] .track-arrow {
     @apply opacity-100;
   }
   .team-lineup {
-    @apply mt-5 grid grid-cols-3 gap-3;
+    @apply mt-4 grid grid-cols-3 gap-3;
   }
   .performer-column {
     @apply flex min-w-0 flex-col items-center text-center;
   }
   .performer-column > .portrait {
-    @apply mb-3 w-full shadow-lg;
+    @apply mb-3 w-full border-2 border-[#353148];
     height: 135px;
-    border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
   }
   .performer-column h3 {
-    @apply border-b-2 pb-2 text-xs font-bold;
+    @apply border-b-4 pb-2 text-xs font-bold;
     border-color: var(--accent);
   }
   .performer-column ul {
-    @apply m-0 mt-3 list-none p-0 text-[10px] leading-6 text-purple-100;
+    @apply m-0 mt-2 list-none p-0 text-[10px] leading-6 text-[#706778];
   }
   .start-button {
-    @apply my-2 min-h-15 w-full rounded-full text-base;
+    @apply my-2 min-h-14 w-full text-base;
   }
 }

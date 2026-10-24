@@ -37,7 +37,7 @@ export function LivePanel({
     <Modal title={title} onClose={onClose}>
       {panel === 'menu' ? (
         <div className="grid gap-3">
-          <div className="mb-2 rounded-2xl border border-white/15 bg-white/5 p-4 text-center text-xl font-bold tabular-nums">
+          <div className="mb-2 rounded-lg border-2 border-[#353148] bg-[#fffaf5] p-4 text-center text-xl font-bold tabular-nums">
             {formatScore(state.score)}
           </div>
           <button type="button" className="button primary" onClick={onResume}>
@@ -80,7 +80,7 @@ export function LivePanel({
             ))}
           </div>
           {selected && (
-            <div className="mt-5 rounded-2xl border border-white/15 bg-white/5 p-4">
+            <div className="mt-5 rounded-lg border-2 border-[#353148] bg-[#fffaf5] p-4">
               <h3 className="font-bold">
                 {performers[selected.performer].name} / {selected.name}
               </h3>

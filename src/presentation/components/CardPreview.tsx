@@ -14,12 +14,12 @@ export function CardPreview({ controller }: Readonly<{ controller: GameControlle
         <img
           src={card.art}
           alt={performers[card.performer].name}
-          className="w-[22cqw] shrink-0 self-start rounded-xl border border-white/50 object-cover"
+          className="w-[22cqw] shrink-0 self-start rounded-md border-2 border-[#353148] object-cover"
           draggable={false}
         />
         <div className="min-w-0 flex-1 pr-5">
           <h2 className="text-[3.6cqw] leading-6 font-bold">{card.name}</h2>
-          <div className="mt-2 grid gap-2 text-[3cqw] leading-5 text-purple-100">
+          <div className="mt-2 grid gap-2 text-[3cqw] leading-5 text-[#353148]">
             {card.effects.map((effect) => (
               <p key={effect.kind}>{describeEffect(effect)}</p>
             ))}
@@ -27,7 +27,7 @@ export function CardPreview({ controller }: Readonly<{ controller: GameControlle
         </div>
         <button
           type="button"
-          className="absolute -top-1 -right-1 grid size-9 place-items-center rounded-full bg-white/10"
+          className="absolute -top-1 -right-1 grid size-9 place-items-center rounded-md bg-[#f3e7e7]"
           aria-label="スキル表示を閉じる"
           onClick={() => controller.clearSelection()}
         >

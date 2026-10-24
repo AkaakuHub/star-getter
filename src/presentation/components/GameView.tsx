@@ -52,22 +52,22 @@ export function GameView({
       <Stage controller={controller} state={state} />
       <div className="pointer-events-none absolute inset-x-[5%] top-[max(12px,env(safe-area-inset-top))] z-10 text-center">
         <div className="score-display">
-          <span className="text-[2.5cqw] font-bold tracking-[0.25em] text-pink-100">LOVE</span>
+          <span className="text-[2.5cqw] font-bold tracking-widest text-[#706778]">LOVE</span>
           <strong className="block text-[7.2cqw] leading-tight font-black tabular-nums">
             {formatScore(state.score)}
           </strong>
-          <span className="mt-1 block text-[2.8cqw] text-pink-100">
+          <span className="mt-1 block text-[2.8cqw] text-[#706778]">
             ×{scoreMultiplier(state).toFixed(2)}
           </span>
         </div>
-        <div className="mt-3 flex items-center justify-between px-1 text-[3cqw] font-bold text-white drop-shadow">
+        <div className="mt-3 flex items-center justify-between px-1 text-[3cqw] font-bold text-[#353148]">
           <h1>{state.track.name}</h1>
           <span className="tabular-nums">
             {formatTime(seconds)} / {formatTime(durationSeconds(state))}
           </span>
         </div>
         <div
-          className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/40"
+          className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#e5d2da]"
           role="progressbar"
           aria-label="楽曲の進行"
           aria-valuemin={0}
@@ -75,7 +75,7 @@ export function GameView({
           aria-valuenow={Math.floor(seconds)}
         >
           <span
-            className="block h-full rounded-full bg-linear-to-r from-pink-400 to-amber-200"
+            className="block h-full rounded-full bg-[#ed7297]"
             style={{ width: (seconds / durationSeconds(state)) * 100 + '%' }}
           />
         </div>
@@ -84,13 +84,12 @@ export function GameView({
             <span
               key={item.startBeat}
               className={
-                'h-1.5 flex-1 rounded-full ' +
-                (item === section ? 'bg-white shadow-[0_0_10px_#fff]' : 'bg-white/25')
+                'h-1.5 flex-1 rounded-full ' + (item === section ? 'bg-[#353148]' : 'bg-[#d9b7c3]')
               }
             />
           ))}
         </div>
-        <div className="mt-2 text-[3cqw] font-bold tracking-widest text-white drop-shadow">
+        <div className="mt-2 text-[3cqw] font-bold tracking-widest text-[#353148]">
           {section.name}
         </div>
       </div>
@@ -138,7 +137,7 @@ export function GameView({
           </button>
         )}
       </nav>
-      <div className="pointer-events-none absolute top-[25%] right-[5%] z-10 rounded-full border border-amber-200/70 bg-black/30 px-3 py-1 text-[3cqw] font-bold text-amber-100">
+      <div className="pointer-events-none absolute top-[25%] right-[5%] z-10 rounded-md border-2 border-[#353148] bg-[#ffe4a4] px-3 py-1 text-[3cqw] font-bold text-[#353148]">
         VOLTAGE Lv.{Math.floor(state.excitement / 20)}
       </div>
       <button
@@ -149,28 +148,25 @@ export function GameView({
         aria-label={'スペシャルアピール、チャージ' + Math.floor(state.charge) + '%'}
       >
         <img src={lead.art} alt={performers[lead.performer].name} draggable={false} />
-        <span className="absolute inset-x-0 bottom-0 bg-linear-to-r from-amber-400 to-amber-100 py-1 text-[3cqw] font-black text-[#6f2859]">
+        <span className="absolute inset-x-0 bottom-0 bg-[#ffe4a4] py-1 text-[3cqw] font-black text-[#353148]">
           <Sparkles size={13} className="mr-1 inline" aria-hidden="true" />
           SP {Math.floor(state.charge)}%
         </span>
       </button>
       <div className="pointer-events-none absolute inset-x-[7%] bottom-[52cqw] z-10">
-        <div className="mb-2 flex items-center justify-between text-[2.8cqw] font-bold text-white">
+        <div className="mb-2 flex items-center justify-between text-[2.8cqw] font-bold text-[#353148]">
           <span>{moodNames[section.mood]}</span>
           <span>MENTAL {Math.floor(state.stamina)}%</span>
         </div>
         <div
-          className="h-2 overflow-hidden rounded-full border border-white/40 bg-black/35"
+          className="h-2 overflow-hidden rounded-full border-2 border-[#353148] bg-white"
           role="progressbar"
           aria-label="メンタル"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.floor(state.stamina)}
         >
-          <span
-            className="block h-full bg-linear-to-r from-cyan-300 to-emerald-200"
-            style={{ width: state.stamina + '%' }}
-          />
+          <span className="block h-full bg-[#83cdb5]" style={{ width: state.stamina + '%' }} />
         </div>
       </div>
       <button
@@ -189,7 +185,7 @@ export function GameView({
         aria-valuemin={0}
         aria-valuemax={10}
         aria-valuenow={Math.floor(state.energy)}
-        style={{ background: 'conic-gradient(#ff83ba ' + state.energy * 36 + 'deg, #ffffff24 0)' }}
+        style={{ background: 'conic-gradient(#ed7297 ' + state.energy * 36 + 'deg, #fffaf5 0)' }}
       >
         <div>
           <Zap size={15} fill="currentColor" aria-hidden="true" />
@@ -197,7 +193,7 @@ export function GameView({
           <span>AP</span>
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-[25cqw] z-10 flex justify-center gap-8 text-[2.7cqw] text-white/80">
+      <div className="pointer-events-none absolute inset-x-0 bottom-[25cqw] z-10 flex justify-center gap-8 text-[2.7cqw] text-[#353148]">
         <span>山札 {state.drawPile.length}</span>
         <span>使用済み {state.discard.length}</span>
       </div>

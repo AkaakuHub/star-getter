@@ -1,12 +1,11 @@
 .idol-game {
   position: relative;
   width: 100%;
-  height: auto;
   aspect-ratio: 9 / 16;
   max-width: 56.25dvh;
   overflow: hidden;
   container-type: inline-size;
-  background: #1d1231;
+  background: #f3dce2;
   touch-action: manipulation;
   user-select: none;
 }
@@ -18,19 +17,18 @@
   z-index: 40;
   transform: translateY(-50%);
   padding: 14px;
-  border: 1px solid #ffc7e3;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #492647f5, #251637f5);
-  box-shadow: 0 10px 45px #100b2999;
+  border: 2px solid #353148;
+  border-radius: 10px;
+  background: #fffaf5;
+  box-shadow: 0 4px 0 #353148;
 }
 .hand-card[aria-pressed='true'] {
   z-index: 30;
-  outline: 2px solid #fff1a9;
+  outline: 3px solid #fffaf5;
   outline-offset: 2px;
 }
 .live-tool[aria-pressed='true'] {
-  background: #ffe3a8;
-  color: #6b3d43;
+  background: #ffe4a4;
 }
 .pause-band {
   position: absolute;
@@ -47,31 +45,24 @@
   pointer-events: none;
 }
 .score-display {
-  border: 1px solid #ffc7e399;
-  border-radius: 18px;
-  padding: 8px 16px;
-  background: linear-gradient(110deg, #982765dd, #c4548cbb, #613291dd);
-  box-shadow:
-    inset 0 0 18px #ffd8eb30,
-    0 3px 24px #26103277;
-  color: #fff;
-  text-shadow: 0 2px 3px #842955;
+  border: 2px solid #353148;
+  border-radius: 8px;
+  padding: 6px 16px;
+  background: #fffaf5;
+  color: #353148;
 }
 .live-tool {
   display: grid;
   width: 44px;
   height: 44px;
   place-items: center;
-  border: 1px solid #ffffffa0;
-  border-radius: 50%;
-  background: linear-gradient(150deg, #fef5ffec, #c7c0dfed);
-  color: #674267;
-  box-shadow:
-    0 2px 8px #21102f80,
-    inset 0 1px 2px #fff;
+  border: 2px solid #353148;
+  border-radius: 8px;
+  background: #fffaf5;
+  color: #353148;
 }
 .live-tool:active {
-  transform: scale(0.94);
+  transform: translateY(2px);
 }
 .special-portrait {
   position: absolute;
@@ -81,10 +72,9 @@
   width: 21cqw;
   height: 27cqw;
   overflow: hidden;
-  border: 3px solid #ffe4a5;
-  border-radius: 50% 50% 15px 15px;
-  background: #f2b8cc;
-  box-shadow: 0 0 18px #ffe3ab77;
+  border: 2px solid #353148;
+  border-radius: 8px;
+  background: #ffe4a4;
 }
 .special-portrait img {
   width: 100%;
@@ -93,11 +83,11 @@
   object-position: 50% 20%;
 }
 .special-portrait:disabled {
-  filter: saturate(0.65);
-  box-shadow: none;
+  opacity: 0.65;
 }
 .special-portrait:enabled {
-  animation: special-glow 1.2s ease-in-out infinite;
+  outline: 3px solid #ffe4a4;
+  outline-offset: 2px;
 }
 .ap-wheel {
   position: absolute;
@@ -108,11 +98,8 @@
   height: 22cqw;
   transform: translateX(-50%);
   padding: 5px;
-  border: 1px solid #ffffffb0;
+  border: 2px solid #353148;
   border-radius: 50%;
-  box-shadow:
-    0 0 25px #ff7db24d,
-    inset 0 0 15px #fff4;
 }
 .ap-wheel > div {
   display: flex;
@@ -121,9 +108,10 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  border: 2px solid #353148;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 30%, #5c3561, #251131);
-  color: #ffe8f3;
+  background: #fffaf5;
+  color: #353148;
 }
 .ap-wheel strong {
   font-size: 7cqw;
@@ -133,7 +121,6 @@
 .ap-wheel span {
   font-size: 2.5cqw;
   font-weight: 700;
-  letter-spacing: 0.15em;
 }
 .collect-number {
   position: absolute;
@@ -146,10 +133,10 @@
   min-height: 40px;
   transform: translateX(-50%);
   padding: 5px 17px;
-  border: 1px solid #ffcedb80;
-  border-radius: 30px;
-  background: #621948b8;
-  color: #ffcbde;
+  border: 2px solid #353148;
+  border-radius: 8px;
+  background: #ed7297;
+  color: #353148;
   font-size: 4cqw;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -164,12 +151,10 @@
   height: 21.1111cqw;
   overflow: hidden;
   padding: 0;
-  border: 2px solid var(--accent);
-  border-radius: 8px;
+  border: 2px solid #353148;
+  border-radius: 5px;
   transform-origin: 50% 50%;
-  background: #32213f;
-  box-shadow: 0 1px 7px #0d071db3;
-  transition: filter 90ms;
+  background: var(--accent);
 }
 .hand-card > img {
   width: 100%;
@@ -179,12 +164,11 @@
   pointer-events: none;
 }
 .hand-card:disabled > img {
-  filter: brightness(0.7);
+  opacity: 0.5;
 }
 .hand-card:active,
 .hand-card:focus-visible {
   z-index: 50;
-  filter: brightness(1.2);
 }
 .hand-cost {
   position: absolute;
@@ -196,28 +180,22 @@
   align-items: center;
   justify-content: center;
   gap: 1px;
-  border: 1px solid #ffe2ed;
-  border-radius: 50%;
-  background: #c9327fe8;
-  color: #fff;
+  border: 1px solid #353148;
+  border-radius: 4px;
+  background: #ffe4a4;
+  color: #353148;
   font-size: 11px;
   font-weight: 900;
-  text-shadow: 0 1px #69234e;
 }
 .hand-name {
   position: absolute;
   inset: auto 0 0;
   overflow: hidden;
   padding: 3px 1px;
-  background: #251332c9;
-  color: #fff;
+  background: #fffaf5;
+  color: #353148;
   font-size: 1.65cqw;
   font-weight: 700;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-@keyframes special-glow {
-  50% {
-    box-shadow: 0 0 28px #ffe2a5bc;
-  }
 }
