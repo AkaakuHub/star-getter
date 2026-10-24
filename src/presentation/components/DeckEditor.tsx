@@ -1,8 +1,9 @@
 import { useState } from 'preact/hooks';
-import { cards } from '../../content/cards';
+import { cardsInPack } from '../../content/cards';
 import { performers } from '../../content/performers';
 import { CardView } from './CardView';
 import { Modal } from './Modal';
+import { PackFilter } from './PackFilter';
 
 export function DeckEditor({
   initial,
@@ -14,6 +15,8 @@ export function DeckEditor({
   onClose: () => void;
 }>) {
   const [selected, setSelected] = useState(initial);
+  const [packId, setPackId] = useState('');
+  const visibleCards = cardsInPack(packId);
   const toggle = (id: string) => {
     setSelected((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
@@ -21,12 +24,13 @@ export function DeckEditor({
   };
   return (
     <Modal title={`編成 ${selected.length}/9`} onClose={onClose} className="deck-modal">
+      <PackFilter value={packId} onChange={setPackId} />
       <div className="deck-groups">
         {Object.values(performers).map((performer) => (
           <section key={performer.id} className={`color-${performer.id}`}>
             <h3>{performer.name}</h3>
             <div className="catalog-cards">
-              {cards
+              {visibleCards
                 .filter((card) => card.performer === performer.id)
                 .map((card) => (
                   <CardView

@@ -1,0 +1,123 @@
+import type { CardPack } from '../../domain/catalog/packs';
+
+export const launchPack: CardPack = {
+  id: 'launch',
+  name: 'はじまりのパック',
+  releasedOn: '2026-10-25',
+  cards: [
+    {
+      id: 'spark',
+      name: 'スパーク',
+      performer: 'nova',
+      cost: 3,
+      appeal: 125,
+      effects: [{ kind: 'hearts', amount: 8 }],
+    },
+    {
+      id: 'flare',
+      name: 'フレア',
+      performer: 'nova',
+      cost: 4,
+      appeal: 135,
+      effects: [{ kind: 'excitement', amount: 22 }],
+    },
+    {
+      id: 'sunrise',
+      name: 'サンライズ',
+      performer: 'nova',
+      cost: 5,
+      appeal: 145,
+      effects: [
+        { kind: 'boost', multiplier: 1.6, seconds: 8 },
+        { kind: 'hearts', amount: 4 },
+      ],
+    },
+    {
+      id: 'ember',
+      name: 'エンバー',
+      performer: 'nova',
+      cost: 2,
+      appeal: 110,
+      effects: [
+        { kind: 'excitement', amount: 8 },
+        { kind: 'hearts', amount: 3 },
+      ],
+    },
+    {
+      id: 'ripple',
+      name: 'リプル',
+      performer: 'lumen',
+      cost: 3,
+      appeal: 115,
+      effects: [{ kind: 'stamina', amount: 24 }],
+    },
+    {
+      id: 'tide',
+      name: 'タイド',
+      performer: 'lumen',
+      cost: 4,
+      appeal: 130,
+      effects: [
+        { kind: 'hearts', amount: 6 },
+        { kind: 'energy', amount: 2 },
+      ],
+    },
+    {
+      id: 'prism',
+      name: 'プリズム',
+      performer: 'lumen',
+      cost: 4,
+      appeal: 140,
+      effects: [{ kind: 'boost', multiplier: 1.4, seconds: 12 }],
+    },
+    {
+      id: 'dew',
+      name: 'デュー',
+      performer: 'lumen',
+      cost: 2,
+      appeal: 105,
+      effects: [
+        { kind: 'stamina', amount: 12 },
+        { kind: 'hearts', amount: 2 },
+      ],
+    },
+    {
+      id: 'bounce',
+      name: 'バウンス',
+      performer: 'tetra',
+      cost: 3,
+      appeal: 120,
+      effects: [
+        { kind: 'hearts', amount: 5 },
+        { kind: 'excitement', amount: 10 },
+      ],
+    },
+    {
+      id: 'orbit',
+      name: 'オービット',
+      performer: 'tetra',
+      cost: 2,
+      appeal: 110,
+      effects: [{ kind: 'energy', amount: 3 }],
+    },
+    {
+      id: 'comet',
+      name: 'コメット',
+      performer: 'tetra',
+      cost: 5,
+      appeal: 150,
+      effects: [{ kind: 'hearts', amount: 12 }, { kind: 'collect' }],
+    },
+    {
+      id: 'halo',
+      name: 'ヘイロー',
+      performer: 'tetra',
+      cost: 3,
+      appeal: 125,
+      effects: [
+        { kind: 'excitement', amount: 12 },
+        { kind: 'stamina', amount: 10 },
+      ],
+    },
+  ],
+};

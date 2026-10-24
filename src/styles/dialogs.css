@@ -41,6 +41,21 @@
   display: grid;
   gap: 24px;
 }
+.pack-filter {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+.pack-filter:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
 .deck-groups h3 {
   border-left: 4px solid var(--accent);
   padding-left: 10px;
