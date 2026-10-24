@@ -13,13 +13,13 @@ function describeEffect(effect: Effect): string {
     case 'boost':
       return `${effect.seconds}秒間、獲得するLOVEを${Math.round((effect.multiplier - 1) * 100)}%増加させる。この効果は重複し、効果増幅の対象となる。`;
     case 'amplify':
-      return `このステージ中、あらゆるスキルの効果量を${effect.percent}%増幅する。既に発動した効果増幅を適用してから加算する。`;
+      return `このステージ中、あらゆるスキルの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
     case 'bloom':
       return 'このステージ中、開花を発動し、ハートをフラワーに変化させる。AP・ボルテージ・メンタルの増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のLOVEが増加する。発動時のゲージを保持し、開花中はAP残量に関係なくスキルを使用できる。';
     case 'resource-boost':
       return `${effect.condition === 'voltage20' ? 'ボルテージLv.が20以上' : 'メンタルが100%以上'}のとき、${effect.uses}回の間、${effect.target === 'excitement' ? 'ボルテージゲイン' : 'メンタルリカバー'}効果を${effect.percent}%増幅する。`;
     case 'collect':
-      return '出現中のハートを全て回収する。連続回収の対象となる。';
+      return '出現中のハートを全て回収する。';
   }
 }
 

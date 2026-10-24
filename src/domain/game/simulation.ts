@@ -1,8 +1,9 @@
 import { validateDeck, shuffle } from './deck';
-import { addHearts, collectHearts, expireHearts } from './hearts';
+import { addHearts, collectHearts, advanceHearts } from './hearts';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
 import { changeBloomResource, finishBloom } from './bloom';
+import { createLoveGatherHeartRuntimeState } from './live/heartSpawn';
 
 export function createGame(track: Track, deck: readonly Card[], seed: number): GameState {
   validateDeck(deck);
@@ -26,8 +27,8 @@ export function createGame(track: Track, deck: readonly Card[], seed: number): G
     excitement: 0,
     charge: 0,
     score: 0n,
-    hearts: [],
-    nextHeartId: 0,
+    hearts: createLoveGatherHeartRuntimeState((track.beats * 60) / track.bpm),
+    heartRandomSeed: seed,
     boosts: [],
     amplification: 100n,
     resourceBoosts: [],
@@ -58,7 +59,7 @@ export function advanceTo(state: GameState, seconds: number): GameState {
   let next = state;
   while (next.tick < target) next = advanceTick(next);
   if (next.tick === endTick) {
-    const collected = collectHearts({ ...next, relayUsed: [...next.hand] }, next.hearts.length);
+    const collected = collectHearts({ ...next, relayUsed: [...next.hand] });
     return { ...finishBloom(collected), phase: 'finished' };
   }
   return next;
@@ -73,7 +74,7 @@ function advanceTick(state: GameState): GameState {
       ? Math.min(100, state.stamina + 4 * dt)
       : Math.max(0, state.stamina - 0.9 * dt);
   const resting = state.resting ? stamina < 40 : stamina <= 0;
-  let next: GameState = expireHearts({
+  let next: GameState = advanceHearts({
     ...state,
     tick,
     stamina,

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
+import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import type { GameState, Track } from '../../src/domain/game/model';
 import { canUseCard, cardAt, durationSeconds } from '../../src/domain/game/projection';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
@@ -18,7 +19,7 @@ describe('ライブの進行', () => {
     let frequent = initial;
     for (let frame = 1; frame <= 600; frame++) frequent = advanceTo(frequent, frame / 60);
     expect(frequent).toEqual(advanceTo(initial, 10));
-    expect(frequent.hearts.length).toBeGreaterThan(0);
+    expect(heartCount(frequent)).toBeGreaterThan(0);
     expect(frequent.stamina).toBeLessThan(100);
   });
 
@@ -42,22 +43,22 @@ describe('ライブの進行', () => {
   it('スタミナが尽きると休憩し、回復してからカードを使用できる', () => {
     const resting = advanceTo({ ...game(), stamina: 0, energy: 5 }, 1);
     expect(resting.resting).toBe(true);
-    expect(resting.hearts).toHaveLength(0);
+    expect(heartCount(resting)).toBe(0);
     expect(canUseCard(resting, 0)).toBe(false);
     const recovered = advanceTo(resting, 11);
     expect(recovered.resting).toBe(false);
     expect(recovered.stamina).toBeGreaterThan(39);
-    expect(recovered.hearts.length).toBeGreaterThan(0);
+    expect(heartCount(recovered)).toBeGreaterThan(0);
   });
 
   it('終了時に残ったハートを回収し、その後の入力を受け付けない', () => {
     let state = game();
     const end = durationSeconds(state);
     state = advanceTo(state, end - 0.1);
-    state = { ...state, hearts: [{ id: 9999, bornTick: state.tick }] };
+    state = addHearts(state, 1);
     const finished = advanceTo(state, end + 10);
     expect(finished.phase).toBe('finished');
-    expect(finished.hearts).toHaveLength(0);
+    expect(heartCount(finished)).toBe(0);
     expect(finished.score).toBeGreaterThan(state.score);
     expect(act(finished, { type: 'card', index: 0 })).toBe(finished);
     expect(advanceTo(finished, end + 20)).toBe(finished);

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
-import { addHearts } from '../../src/domain/game/hearts';
+import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import { type GameState, rules } from '../../src/domain/game/model';
 import { canUseCard, durationSeconds, scoreGrade } from '../../src/domain/game/projection';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
@@ -21,23 +21,23 @@ describe('ハートと得点', () => {
     expect(collected.score).toBeGreaterThan(0);
     expect(collected.charge).toBe(8);
     expect(collected.stats.heartsCollected).toBe(10);
-    expect(collected.hearts).toHaveLength(0);
+    expect(heartCount(collected)).toBe(0);
     expect(act(collected, { type: 'collect' })).toBe(collected);
   });
 
-  it('時間切れは連続回収の倍率を付けず、基礎得点の20%になる', () => {
+  it('時間切れの回収は基礎得点の20%になる', () => {
     const state = { ...addHearts(game(), 10), resting: true, stamina: 0, excitement: 100 };
     const normal = act(state, { type: 'collect' });
     const expired = advanceTo(state, 10);
     expect(expired.stats.heartsMissed).toBe(10);
     expect(expired.stats.heartsCollected).toBe(0);
-    expect(expired.score).toBe(normal.score / 50n);
+    expect(expired.score).toBe(normal.score / 5n);
   });
 
-  it('上限を超えた分だけが失効し、新しいハートを保持する', () => {
-    const state = addHearts(addHearts(game(), 35), 12);
-    expect(state.hearts).toHaveLength(40);
-    expect(state.hearts[0]?.id).toBe(7);
+  it('上限を超えた追加分だけが失効し、既存のハートを保持する', () => {
+    const state = addHearts(addHearts(game(), 95), 12);
+    expect(heartCount(state)).toBe(100);
+    expect(state.hearts.stageHearts[0]?.spawnElapsedSeconds).toBe(0);
     expect(state.stats.heartsMissed).toBe(7);
   });
 
@@ -61,7 +61,7 @@ describe('ハートと得点', () => {
     expect(special.charge).toBe(0);
     expect(special.energy).toBe(5);
     expect(special.stamina).toBe(70);
-    expect(special.hearts).toHaveLength(8);
+    expect(heartCount(special)).toBe(8);
     expect(special.stats.specialsUsed).toBe(1);
     expect(special.boosts).toHaveLength(1);
     expect(act(special, { type: 'special' })).toBe(special);

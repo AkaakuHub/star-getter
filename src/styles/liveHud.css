@@ -71,23 +71,36 @@
 .collect-number {
   position: absolute;
   z-index: 12;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5cqw;
-  border: 1px solid #fff9;
-  border-radius: 2cqw;
-  background: #fffaf5e8;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: #df4a82;
   font-size: 4.5cqw;
   font-variant-numeric: tabular-nums;
 }
-.collect-number > span {
-  font-size: 2.5cqw;
-  color: #706778;
+.heart-count-icon {
+  position: absolute;
+  left: 8.5%;
+  top: 21%;
+  width: 5cqw;
+  height: 5cqw;
 }
-.collect-number:disabled {
-  opacity: 0.7;
+.heart-count-current {
+  position: absolute;
+  left: 30.34%;
+  top: 21.87%;
+  width: 31.25%;
+  height: 39.57%;
+  text-align: right;
+  line-height: 1;
+}
+.collect-number > .heart-count-limit {
+  position: absolute;
+  left: 66.8%;
+  top: 24.82%;
+  font-size: 3cqw;
+  line-height: 1.3;
+  color: #706778;
 }
 .voltage-gauge {
   position: absolute;
@@ -226,9 +239,8 @@
   justify-content: center;
   gap: 1cqw;
   padding: 0 1cqw;
-  border-radius: 1cqw;
-  background: #39274df2;
-  color: #ffe5a4;
+  background: transparent;
+  color: #674375;
   font-size: 2.5cqw;
   pointer-events: none;
 }

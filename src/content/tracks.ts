@@ -6,7 +6,7 @@ export const tracks: readonly Track[] = [
     name: '潮風シグナル',
     bpm: 120,
     beats: 60,
-    targetScore: 10n ** 48n,
+    targetScore: 20000n,
     sections: [
       { name: 'イントロ', startBeat: 0, mood: 'warm', climax: false },
       { name: 'ウェーブ', startBeat: 12, mood: 'cool', climax: false },
@@ -30,7 +30,7 @@ export const tracks: readonly Track[] = [
     name: 'ミッドナイト・ステップ',
     bpm: 132,
     beats: 66,
-    targetScore: 10n ** 48n,
+    targetScore: 22000n,
     sections: [
       { name: 'イントロ', startBeat: 0, mood: 'cool', climax: false },
       { name: 'グルーヴ', startBeat: 12, mood: 'bright', climax: false },

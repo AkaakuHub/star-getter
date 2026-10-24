@@ -2,6 +2,7 @@ import { activateBloom, changeBloomResource } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Effect, type GameState, rules } from './model';
 import { limitValue } from './scoring';
+import { applyLoveGatherSkillBoost } from './live/skillBoost';
 
 export function changeResource(
   state: GameState,
@@ -16,9 +17,9 @@ export function changeResource(
 export function applyEffect(state: GameState, effect: Effect): GameState {
   switch (effect.kind) {
     case 'hearts':
-      return addHearts(state, Math.min(rules.maxHearts, Number(scaled(state, effect.amount))));
+      return addHearts(state, Math.ceil(boosted(state, effect.amount)));
     case 'energy':
-      return changeResource(state, 'energy', scaled(state, effect.amount));
+      return changeResource(state, 'energy', BigInt(Math.ceil(boosted(state, effect.amount))));
     case 'stamina':
     case 'excitement': {
       const matching = state.resourceBoosts.filter((boost) => boost.target === effect.kind);
@@ -40,7 +41,7 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
       };
     }
     case 'collect':
-      return collectHearts(state, state.hearts.length);
+      return collectHearts(state);
     case 'boost':
       return {
         ...state,
@@ -55,7 +56,7 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
     case 'amplify':
       return {
         ...state,
-        amplification: limitValue(state.amplification + scaled(state, effect.percent)),
+        amplification: limitValue(state.amplification + BigInt(effect.percent)),
       };
     case 'bloom':
       return activateBloom(state, scaled(state, effect.strength));
@@ -76,5 +77,9 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
 }
 
 function scaled(state: GameState, value: number): bigint {
-  return limitValue((BigInt(value) * state.amplification) / 100n);
+  return limitValue(BigInt(Math.trunc(boosted(state, value))));
+}
+
+function boosted(state: GameState, value: number): number {
+  return applyLoveGatherSkillBoost(value, Number(state.amplification - 100n));
 }

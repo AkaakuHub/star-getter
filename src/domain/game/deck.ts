@@ -20,16 +20,13 @@ export function validateCard(card: Card): void {
     !Number.isInteger(card.cost) ||
     card.cost < 1 ||
     card.cost > rules.maxEnergy ||
-    !Number.isSafeInteger(card.appeal) ||
-    card.appeal <= 0 ||
+    Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
     card.effects.length === 0 ||
     (card.relay !== undefined &&
       (!Number.isSafeInteger(card.relay.threshold) ||
         card.relay.threshold < 1 ||
-        card.relay.threshold > rules.maxHearts ||
         !Number.isSafeInteger(card.relay.hearts) ||
-        card.relay.hearts < 1 ||
-        card.relay.hearts > rules.maxHearts))
+        card.relay.hearts < 1))
   ) {
     throw new Error('カードの設定が正しくありません。');
   }

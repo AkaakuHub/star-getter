@@ -37,10 +37,9 @@
 }
 .heart-field {
   position: absolute;
-  top: 22%;
-  right: 0;
-  bottom: 28%;
+  top: 10.416667%;
   left: 0;
+  height: 53.125%;
   z-index: 2;
   width: 100%;
   background: transparent;
@@ -50,6 +49,12 @@
   outline-color: #ffe4f2;
   outline-offset: -4px;
 }
+.heart-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
 .floating-heart {
   position: absolute;
   display: grid;
@@ -57,7 +62,6 @@
   width: 30px;
   height: 30px;
   color: #e64f86;
-  animation: heart-float 1.6s ease-in-out infinite;
   pointer-events: none;
 }
 .skill-notice,
@@ -79,11 +83,6 @@
 .rest-notice {
   top: 35%;
   background: #ffe4a4;
-}
-@keyframes heart-float {
-  50% {
-    transform: translateY(-5px) scale(1.05);
-  }
 }
 @keyframes board-sway {
   50% {

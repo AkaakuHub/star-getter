@@ -13,7 +13,7 @@ export function act(state: GameState, action: Action): GameState {
     case 'resume':
       return state.phase === 'paused' ? { ...state, phase: 'playing' } : state;
     case 'collect':
-      return state.phase === 'playing' ? collectHearts(state, state.hearts.length) : state;
+      return state.phase === 'playing' ? collectHearts(state) : state;
     case 'special':
       return useSpecial(state);
     case 'card':

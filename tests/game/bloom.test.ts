@@ -4,10 +4,9 @@ import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { activateBloom, changeBloomResource, finishBloom } from '../../src/domain/game/bloom';
 import { applyEffect } from '../../src/domain/game/effects';
-import { addHearts } from '../../src/domain/game/hearts';
+import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import { rules } from '../../src/domain/game/model';
 import { canUseCard } from '../../src/domain/game/projection';
-import { integerSqrt } from '../../src/domain/game/scoring';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game() {
@@ -20,9 +19,9 @@ describe('開花とスキルの相乗効果', () => {
   it('増幅を重ね、後続の効果に適用し、次のライブには引き継がない', () => {
     let state = applyEffect(game(), { kind: 'amplify', percent: 50 });
     state = applyEffect(state, { kind: 'amplify', percent: 50 });
-    expect(state.amplification).toBe(225n);
+    expect(state.amplification).toBe(200n);
     state = applyEffect({ ...state, energy: 0 }, { kind: 'energy', amount: 4 });
-    expect(state.energy).toBe(9);
+    expect(state.energy).toBe(8);
     expect(game().amplification).toBe(100n);
   });
 
@@ -49,6 +48,14 @@ describe('開花とスキルの相乗効果', () => {
     expect(finished.excitement).toBe(base.excitement);
   });
 
+  it('AP回復の効果増幅はFloat32計算後に端数を切り上げる', () => {
+    const state = applyEffect(
+      { ...game(), energy: 0, amplification: 150n },
+      { kind: 'energy', amount: 3 },
+    );
+    expect(state.energy).toBe(5);
+  });
+
   it('条件付き増幅は成立時だけ付与され、対象の効果3回で消費する', () => {
     const effect = {
       kind: 'resource-boost',
@@ -72,9 +79,9 @@ describe('開花とスキルの相乗効果', () => {
     if (!relay) throw new Error('回収特性のカードがありません。');
     const state = { ...base, hand: [relay.id] };
     const first = act(addHearts(state, 3), { type: 'collect' });
-    expect(first.hearts).toHaveLength(6);
+    expect(heartCount(first)).toBe(6);
     const second = act(first, { type: 'collect' });
-    expect(second.hearts).toHaveLength(0);
+    expect(heartCount(second)).toBe(0);
     expect(second.combo).toBe(2);
     expect(act(second, { type: 'collect' })).toBe(second);
   });
@@ -91,10 +98,7 @@ describe('開花とスキルの相乗効果', () => {
     expect(advanceTo(collected, 2.1).combo).toBe(0);
   });
 
-  it('巨大な整数の平方根と9999無量大数付近の加算を正確に扱う', () => {
-    const root = 10n ** 68n + 123456789n;
-    expect(integerSqrt(root * root)).toBe(root);
-    expect(integerSqrt(root * root - 1n)).toBe(root - 1n);
+  it('大きな合計得点を整数として加算する', () => {
     const state = { ...game(), score: rules.maxScore - 1n };
     expect(act(addHearts(state, 1), { type: 'collect' }).score).toBe(rules.maxScore);
   });

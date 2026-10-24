@@ -9,7 +9,7 @@ function hudRect(x: number, y: number, width: number, height: number) {
 
 export const liveLayout = {
   score: hudRect(259, 0, 562, 223),
-  pause: hudRect(953, 64, 100, 100),
+  pause: hudRect(32, 910, 100, 100),
   mental: hudRect(-15, 1216, 176, 264),
   ap: hudRect(919, 1216, 176, 264),
   hearts: hudRect(215, 1124, 384, 139),

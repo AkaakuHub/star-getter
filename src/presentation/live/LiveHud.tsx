@@ -6,6 +6,7 @@ import { formatFactor, formatScore, formatTime } from '../cardDescription';
 import { FittedText } from '../text/FittedText';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
+import { heartCount } from '../../domain/game/hearts';
 
 export function LiveHud({
   controller,
@@ -59,7 +60,7 @@ export function LiveHud({
         type="button"
         className="collect-number"
         style={liveLayout.hearts}
-        disabled={!state.hearts.length || state.phase !== 'playing'}
+        disabled={!heartCount(state) || state.phase !== 'playing'}
         onPointerDown={(event) => {
           if (event.button === 0) {
             event.preventDefault();
@@ -69,11 +70,16 @@ export function LiveHud({
         onClick={(event) => {
           if (event.detail === 0) controller.command({ type: 'collect' });
         }}
-        aria-label={state.hearts.length + '個の' + (state.bloom ? 'フラワー' : 'ハート') + 'を回収'}
+        aria-label={heartCount(state) + '個の' + (state.bloom ? 'フラワー' : 'ハート') + 'を回収'}
       >
-        <CollectIcon size={18} fill={state.bloom ? 'none' : 'currentColor'} aria-hidden="true" />
-        <strong>{state.hearts.length}</strong>
-        <span>/{rules.maxHearts}</span>
+        <CollectIcon
+          className="heart-count-icon"
+          size={18}
+          fill={state.bloom ? 'none' : 'currentColor'}
+          aria-hidden="true"
+        />
+        <strong className="heart-count-current">{heartCount(state)}</strong>
+        <span className="heart-count-limit">/{state.hearts.heartLimit}</span>
       </button>
       <div
         className="voltage-gauge"

@@ -3,6 +3,8 @@ import type { GameController } from '../../app/gameController';
 import { performers } from '../../content/performers';
 import type { GameState } from '../../domain/game/model';
 import { Portrait } from '../components/Portrait';
+import { heartCount } from '../../domain/game/hearts';
+import { heartLayout } from './heartLayout';
 
 export function Stage({
   controller,
@@ -30,8 +32,8 @@ export function Stage({
       <button
         type="button"
         className="heart-field"
-        aria-label={state.hearts.length + '個のハートを回収'}
-        disabled={state.phase !== 'playing' || state.hearts.length === 0}
+        aria-label={heartCount(state) + '個のハートを回収'}
+        disabled={state.phase !== 'playing' || heartCount(state) === 0}
         onPointerDown={(event) => {
           if (event.button === 0) {
             event.preventDefault();
@@ -41,22 +43,14 @@ export function Stage({
         onClick={(event) => {
           if (event.detail === 0) collect();
         }}
-      >
-        {state.hearts.slice(0, 24).map((heart) => (
-          <span
-            key={heart.id}
-            className="floating-heart"
-            aria-hidden="true"
-            style={{
-              left: 16 + ((heart.id * 37) % 70) + '%',
-              top: 22 + ((heart.id * 23) % 48) + '%',
-              animationDelay: (heart.id % 7) * -0.2 + 's',
-            }}
-          >
+      />
+      <div className="heart-layer" aria-hidden="true">
+        {heartLayout(state).map((style, index) => (
+          <span key={index} className="floating-heart" aria-hidden="true" style={style}>
             <CollectIcon fill={state.bloom ? 'none' : 'currentColor'} size={23} />
           </span>
         ))}
-      </button>
+      </div>
       {state.lastCardName && state.tick - state.lastActionTick < 60 && (
         <div className="skill-notice" role="status">
           {state.lastCardName}

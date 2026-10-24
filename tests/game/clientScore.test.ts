@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vite-plus/test';
+import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { tracks } from '../../src/content/tracks';
+import { act } from '../../src/domain/game/actions';
+import { collectionScore } from '../../src/domain/game/scoring';
+import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import {
+  calculateLoveGatherCardAppealValue,
+  calculateLoveGatherAddScoreMax,
+} from '../../src/domain/game/live/clientScoreInput';
+
+function game() {
+  const track = tracks[0];
+  if (!track) throw new Error('テスト楽曲がありません。');
+  const deck = resolveDeck(defaultDeckIds).map((card) => ({
+    ...card,
+    appeal: { smile: 125, pure: 125, cool: 125 },
+  }));
+  return act(createGame(track, deck, 7), { type: 'start' });
+}
+
+describe('ラブギャザーの回収得点', () => {
+  it('一致属性だけを1.5倍にし、楽曲秒数と1000で正規化する', () => {
+    expect(
+      calculateLoveGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
+    ).toBe(0.3);
+    expect(
+      calculateLoveGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
+    ).toBe(0.375);
+  });
+
+  it('30秒・各属性125の編成でハート10個は22500となる', () => {
+    expect(collectionScore(game(), 10, false)).toBe(22500n);
+  });
+
+  it('回収数×ボルテージによるハートランクで倍率が変わる', () => {
+    expect(collectionScore({ ...game(), excitement: 20 }, 10, false)).toBe(45000n);
+  });
+
+  it('LOVE増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
+    const base = game();
+    const boosts = [
+      { percent: 100n, untilTick: 100 },
+      { percent: 100n, untilTick: 100 },
+    ];
+    expect(collectionScore({ ...base, boosts }, 10, false)).toBe(67500n);
+    expect(
+      collectionScore(
+        {
+          ...base,
+          bloom: {
+            progress: 4n,
+            strength: 100n,
+            rollback: { energy: 10, stamina: 100, excitement: 0 },
+          },
+        },
+        10,
+        false,
+      ),
+    ).toBe(22517n);
+  });
+
+  it('回収回数やクライマックスだけでは独自の得点倍率を付けない', () => {
+    const base = game();
+    const expected = collectionScore(base, 10, false);
+    expect(collectionScore({ ...base, combo: 70 }, 10, false)).toBe(expected);
+    expect(collectionScore({ ...base, tick: 1200 }, 10, false)).toBe(expected);
+  });
+
+  it('カード未使用なら放置しても回収だけを繰り返しても億へ到達しない', () => {
+    const idle = advanceTo(game(), 30);
+    let collecting = game();
+    for (let tick = 1; tick <= 1800; tick++) {
+      collecting = act(advanceTo(collecting, tick / 60), { type: 'collect' });
+    }
+    expect(idle.stats.cardsUsed).toBe(0);
+    expect(collecting.stats.cardsUsed).toBe(0);
+    expect(idle.score).toBeLessThan(1_000_000n);
+    expect(collecting.score).toBeLessThan(1_000_000n);
+  });
+
+  it('1回の通常回収は本家の既定上限を適用する', () => {
+    expect(calculateLoveGatherAddScoreMax(100, [])).toBe(2147483647n);
+    const huge = { ...game(), boosts: [{ percent: 10n ** 20n, untilTick: 100 }] };
+    expect(collectionScore(huge, 100, false)).toBe(2147483647n);
+  });
+});

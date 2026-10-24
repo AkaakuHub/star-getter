@@ -1,5 +1,11 @@
 import type { GameState } from './model';
-import { integerSqrt, limitValue } from './scoring';
+import { limitValue } from './scoring';
+import {
+  calculateLoveGatherInitialGenesisGauge,
+  calculateLoveGatherGenesisGaugeDelta,
+} from './live/genesisGauge';
+
+const gaugeTypes = { energy: 1, stamina: 2, excitement: 3 } as const;
 
 export function activateBloom(state: GameState, strength: bigint): GameState {
   if (state.bloom) return { ...state, bloom: { ...state.bloom, strength } };
@@ -7,9 +13,11 @@ export function activateBloom(state: GameState, strength: bigint): GameState {
     ...state,
     bloom: {
       progress: BigInt(
-        Math.trunc(
-          state.stamina / 4 + (Math.floor(state.excitement / 2) + Math.floor(state.energy)) * 5,
-        ),
+        calculateLoveGatherInitialGenesisGauge({
+          currentAp: Math.floor(state.energy),
+          currentMental: Math.floor(state.stamina),
+          currentVoltageLevel: Math.floor(state.excitement / 2),
+        }),
       ),
       strength,
       rollback: { energy: state.energy, stamina: state.stamina, excitement: state.excitement },
@@ -23,14 +31,18 @@ export function changeBloomResource(
   amount: bigint,
 ): GameState {
   if (!state.bloom) throw new Error('開花が発動していません。');
-  const scale = { energy: 10_000n, stamina: 40_000n, excitement: 500_000n }[resource];
-  const magnitude = amount < 0n ? -amount : amount;
-  const delta = (integerSqrt(magnitude * scale) * state.bloom.strength) / 10_000n;
+  const delta = calculateLoveGatherGenesisGaugeDelta({
+    actionType: 14,
+    gaugeType: gaugeTypes[resource],
+    effectValue: Number(amount),
+    currentGenesisEffectValue: Number(state.bloom.strength) / 100,
+  });
+  if (delta === null) return state;
   return {
     ...state,
     bloom: {
       ...state.bloom,
-      progress: limitValue(state.bloom.progress + (amount < 0n ? -delta : delta)),
+      progress: limitValue(state.bloom.progress + BigInt(delta)),
     },
   };
 }

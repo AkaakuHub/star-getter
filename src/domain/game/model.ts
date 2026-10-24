@@ -1,3 +1,6 @@
+import type { LoveGatherHeartRuntimeState } from './live/heartTypes';
+import type { LoveGatherCardAppealParameters } from './live/clientScoreInput';
+
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type Mood = 'warm' | 'cool' | 'bright';
 export const costumeIds = [
@@ -35,7 +38,7 @@ export type Card = Readonly<{
   costume: CostumeId;
   performer: PerformerId;
   cost: number;
-  appeal: number;
+  appeal: LoveGatherCardAppealParameters;
   effects: readonly Effect[];
   relay?: Readonly<{ threshold: number; hearts: number }>;
 }>;
@@ -58,7 +61,6 @@ export type Track = Readonly<{
   chords: readonly (readonly [number, number, number])[];
 }>;
 
-export type Heart = Readonly<{ id: number; bornTick: number }>;
 export type Boost = Readonly<{ percent: bigint; untilTick: number }>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina';
@@ -94,8 +96,8 @@ export type GameState = Readonly<{
   excitement: number;
   charge: number;
   score: bigint;
-  hearts: readonly Heart[];
-  nextHeartId: number;
+  hearts: LoveGatherHeartRuntimeState;
+  heartRandomSeed: number;
   boosts: readonly Boost[];
   amplification: bigint;
   resourceBoosts: readonly ResourceBoost[];
@@ -120,8 +122,6 @@ export const rules = {
   handSize: 5,
   deckSize: 9,
   maxEnergy: 10,
-  maxHearts: 40,
-  heartLifetimeSeconds: 10,
   actionCooldownTicks: 6,
   comboWindowTicks: 120,
   maxScore: 9999n * 10n ** 68n,
