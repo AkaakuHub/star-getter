@@ -1,7 +1,7 @@
 import type { GameController } from '../../app/gameController';
 import type { GameState } from '../../domain/game/model';
 import { cardCost } from '../../domain/game/cards/cost';
-import { cardAt } from '../../domain/game/projection';
+import { canUseCard, cardAt } from '../../domain/game/projection';
 import { describeCard } from '../cardDescription';
 import { handLayout } from '../handLayout';
 import { HandCardFace } from '../cards/HandCardFace';
@@ -24,7 +24,11 @@ export function Hand({
           <button
             type="button"
             key={id}
-            className={'hand-card color-' + card.performer}
+            className={
+              'hand-card color-' +
+              card.performer +
+              (canUseCard(state, index) ? '' : ' is-unavailable')
+            }
             style={handLayout(index, state.hand.length)}
             disabled={state.phase !== 'playing' && state.phase !== 'paused'}
             aria-pressed={controller.selectedCard?.id === card.id}

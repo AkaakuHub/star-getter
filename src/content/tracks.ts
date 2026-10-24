@@ -7,11 +7,11 @@ export const tracks: readonly Track[] = [
     bpm: 120,
     beats: 60,
     sections: [
-      { name: 'イントロ', startBeat: 0, mood: 'warm', climax: false },
-      { name: 'ウェーブ', startBeat: 12, mood: 'cool', climax: false },
-      { name: 'ライジング', startBeat: 24, mood: 'bright', climax: false },
-      { name: 'クライマックス', startBeat: 36, mood: 'warm', climax: true },
-      { name: 'フィナーレ', startBeat: 48, mood: 'bright', climax: false },
+      { name: 'イントロ', startBeat: 0, mood: 'warm', moodValue: 50, climax: false },
+      { name: 'ウェーブ', startBeat: 12, mood: 'cool', moodValue: -50, climax: false },
+      { name: 'ライジング', startBeat: 24, mood: 'bright', moodValue: 0, climax: false },
+      { name: 'クライマックス', startBeat: 36, mood: 'warm', moodValue: 50, climax: true },
+      { name: 'フィナーレ', startBeat: 48, mood: 'bright', moodValue: 0, climax: false },
     ],
     melody: [
       72, 76, 79, 76, 74, 72, 67, 69, 72, 74, 76, 79, 81, 79, 76, 74, 65, 69, 72, 76, 74, 72, 69,

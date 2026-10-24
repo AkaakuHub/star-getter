@@ -1,0 +1,50 @@
+.live-analyzer {
+  position: absolute;
+  z-index: 10;
+  border-radius: 2cqw;
+  background: #fffaf5e6;
+  pointer-events: none;
+}
+.mood-value {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  font-size: 2.4cqw;
+  line-height: 1;
+  color: #353148;
+}
+.mood-graph {
+  position: absolute;
+  top: 17.1875%;
+  left: 2.168367%;
+  width: 95.663265%;
+  height: 66.40625%;
+}
+.mood-graph canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mood-position {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 0.462963cqw;
+  transform: translateX(-50%);
+  background: #82c8f3;
+  box-shadow: 0 0 1cqw #82c8f3;
+}
+.mood-start,
+.mood-goal {
+  position: absolute;
+  bottom: 2%;
+  font-size: 1.8cqw;
+  font-weight: 800;
+  line-height: 1;
+}
+.mood-start {
+  left: 2%;
+}
+.mood-goal {
+  right: 2%;
+}

@@ -150,11 +150,14 @@ function validateTrack(track: Track): void {
   let previous = -1;
   for (const section of track.sections) {
     if (
+      !Number.isSafeInteger(section.moodValue) ||
+      section.moodValue < -100 ||
+      section.moodValue > 100 ||
       !Number.isInteger(section.startBeat) ||
       section.startBeat <= previous ||
       section.startBeat >= track.beats
     ) {
-      throw new Error('区間の順番が正しくありません。');
+      throw new Error('区間の設定が正しくありません。');
     }
     previous = section.startBeat;
   }

@@ -55,6 +55,7 @@ export type Section = Readonly<{
   name: string;
   startBeat: number;
   mood: Mood;
+  moodValue: number;
   climax: boolean;
 }>;
 

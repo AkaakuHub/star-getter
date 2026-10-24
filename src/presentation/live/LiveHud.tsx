@@ -1,11 +1,12 @@
 import { Flower2, Heart, Sparkles, Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { type GameState, rules } from '../../domain/game/model';
-import { durationSeconds, sectionAt } from '../../domain/game/projection';
+import { durationSeconds } from '../../domain/game/projection';
 import { formatScore, formatTime } from '../cardDescription';
 import { FittedText } from '../text/FittedText';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
+import { MoodGraph } from './MoodGraph';
 import { heartCount } from '../../domain/game/hearts';
 
 export function LiveHud({
@@ -14,7 +15,6 @@ export function LiveHud({
 }: Readonly<{ controller: GameController; state: GameState }>) {
   const lead = state.deck[0];
   if (!lead) throw new Error('センターカードがありません。');
-  const section = sectionAt(state);
   const seconds = state.tick / rules.ticksPerSecond;
   const voltage = Math.floor(state.excitement / 2);
   const CollectIcon = state.bloom ? Flower2 : Heart;
@@ -127,29 +127,7 @@ export function LiveHud({
         <strong>{state.bloom ? '∞' : Math.floor(state.energy)}</strong>
         <span>AP</span>
       </div>
-      <div className="live-analyzer" style={liveLayout.analyzer}>
-        <div className="section-timeline">
-          {state.track.sections.map((item, index) => (
-            <div
-              key={item.startBeat}
-              className={'mood-' + item.mood + (item === section ? ' is-current' : '')}
-            >
-              <span>{index + 1}</span>
-              <i />
-            </div>
-          ))}
-        </div>
-        <div
-          className="music-progress"
-          role="progressbar"
-          aria-label="楽曲の進行"
-          aria-valuemin={0}
-          aria-valuemax={Math.ceil(durationSeconds(state))}
-          aria-valuenow={Math.floor(seconds)}
-        >
-          <i style={{ width: (seconds / durationSeconds(state)) * 100 + '%' }} />
-        </div>
-      </div>
+      <MoodGraph state={state} />
       {state.bloom && (
         <div className="bloom-progress" style={liveLayout.bloom}>
           <Flower2 size={13} aria-hidden="true" />

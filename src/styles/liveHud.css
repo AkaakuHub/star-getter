@@ -178,59 +178,6 @@
   width: 100%;
   background: currentColor;
 }
-.live-analyzer {
-  position: absolute;
-  z-index: 10;
-  padding: 1.5cqw;
-  border-radius: 2cqw;
-  background: #fffaf5e6;
-  pointer-events: none;
-}
-.section-timeline {
-  display: flex;
-  height: 85%;
-  gap: 0.5cqw;
-}
-.section-timeline > div {
-  position: relative;
-  display: flex;
-  flex: 1;
-  align-items: end;
-  justify-content: center;
-  overflow: hidden;
-  background: #ebe3ec;
-}
-.section-timeline span {
-  position: absolute;
-  top: 0.5cqw;
-  z-index: 1;
-  font-size: 2cqw;
-}
-.section-timeline i {
-  height: 100%;
-  width: 100%;
-  background: #ed72978c;
-}
-.section-timeline .mood-cool i {
-  background: #72c5cf8c;
-}
-.section-timeline .mood-bright i {
-  background: #ebc0618c;
-}
-.section-timeline .is-current {
-  outline: 0.5cqw solid #fff;
-  outline-offset: -0.5cqw;
-}
-.music-progress {
-  height: 1cqw;
-  margin-top: 1cqw;
-  background: #d8c6d0;
-}
-.music-progress i {
-  display: block;
-  height: 100%;
-  background: #e85c91;
-}
 .bloom-progress {
   position: absolute;
   z-index: 13;
