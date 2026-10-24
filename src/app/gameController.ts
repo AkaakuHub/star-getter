@@ -1,67 +1,63 @@
 import { act } from '../domain/game/actions';
-import type { Action, Card, GameState, Track } from '../domain/game/model';
-import { advanceTo, createGame } from '../domain/game/simulation';
-import { AudioSession } from '../infrastructure/audio/audioSession';
+import type { Action, GameState } from '../domain/game/model';
+import { advanceTo } from '../domain/game/simulation';
+import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 
 export class GameController {
-  state: GameState;
   error = '';
-  private readonly audio: AudioSession;
+  private currentState: GameState;
+  private readonly audio: PlaybackClock;
+  private readonly frames: FrameScheduler;
   private readonly listeners = new Set<() => void>();
   private frame = 0;
   private lastNotification = 0;
   private disposed = false;
   private busy = false;
+  private closing: Promise<void> | null = null;
 
-  private constructor(state: GameState, audio: AudioSession) {
-    this.state = act(state, { type: 'start' });
+  constructor(state: GameState, audio: PlaybackClock, frames: FrameScheduler) {
+    if (state.phase !== 'ready') throw new Error('開始前のライブを指定してください。');
+    this.currentState = act(state, { type: 'start' });
     this.audio = audio;
-    this.frame = requestAnimationFrame(this.update);
+    this.frames = frames;
+    this.requestFrame();
   }
 
-  static async create(
-    track: Track,
-    deck: readonly Card[],
-    muted: boolean,
-  ): Promise<GameController> {
-    const random = new Uint32Array(1);
-    crypto.getRandomValues(random);
-    const value = random[0];
-    if (value === undefined) throw new Error('ゲームの乱数を生成できません。');
-    const seed = (value | 1) >>> 0;
-    const state = createGame(track, deck, seed);
-    const audio = await AudioSession.create(track, muted);
-    return new GameController(state, audio);
+  get state(): GameState {
+    return this.currentState;
   }
 
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   command(
     action: Extract<Action, { type: 'card' }> | Readonly<{ type: 'collect' | 'special' }>,
   ): void {
-    if (this.disposed || this.busy) return;
-    this.state = act(advanceTo(this.state, this.audio.seconds), action);
-    if (this.state.phase === 'finished')
-      void this.audio.close().catch((error: unknown) => this.fail(error));
+    if (this.disposed || this.busy || this.currentState.phase !== 'playing') return;
+    this.advance();
+    this.currentState = act(this.currentState, action);
     this.notify();
   }
 
   async togglePause(): Promise<void> {
-    if (this.busy || this.disposed || this.state.phase === 'finished') return;
+    if (this.busy || this.disposed || this.currentState.phase === 'finished') return;
     this.busy = true;
     try {
-      if (this.state.phase === 'playing') {
+      if (this.currentState.phase === 'playing') {
         await this.audio.pause();
-        this.state = act(advanceTo(this.state, this.audio.seconds), { type: 'pause' });
-        cancelAnimationFrame(this.frame);
-      } else if (this.state.phase === 'paused') {
+        if (this.disposed) return;
+        this.advance();
+        this.currentState = act(this.currentState, { type: 'pause' });
+        this.stopFrames();
+      } else if (this.currentState.phase === 'paused') {
         await this.audio.resume();
         if (this.disposed) return;
-        this.state = act(this.state, { type: 'resume' });
-        this.frame = requestAnimationFrame(this.update);
+        this.currentState = act(this.currentState, { type: 'resume' });
+        this.requestFrame();
       }
       this.error = '';
     } catch (error) {
@@ -73,27 +69,27 @@ export class GameController {
   }
 
   setMuted(muted: boolean): void {
-    this.audio.setMuted(muted);
+    if (!this.disposed) this.audio.setMuted(muted);
   }
 
   async dispose(): Promise<void> {
     if (this.disposed) return;
     this.disposed = true;
-    cancelAnimationFrame(this.frame);
+    this.stopFrames();
     this.listeners.clear();
-    await this.audio.close();
+    await this.closeAudio();
   }
 
   private readonly update = (timestamp: number): void => {
-    if (this.disposed || this.state.phase !== 'playing') return;
-    if (this.audio.interrupted && !this.busy) {
-      this.state = act(this.state, { type: 'pause' });
+    this.frame = 0;
+    if (this.disposed || this.currentState.phase !== 'playing') return;
+    const advanced = this.advance();
+    if (advanced.phase === 'finished') {
       this.notify();
       return;
     }
-    this.state = advanceTo(this.state, this.audio.seconds);
-    if (this.state.phase === 'finished') {
-      void this.audio.close().catch((error: unknown) => this.fail(error));
+    if (this.audio.interrupted && !this.busy) {
+      this.currentState = act(this.currentState, { type: 'pause' });
       this.notify();
       return;
     }
@@ -101,8 +97,31 @@ export class GameController {
       this.lastNotification = timestamp;
       this.notify();
     }
-    this.frame = requestAnimationFrame(this.update);
+    this.requestFrame();
   };
+
+  private advance(): GameState {
+    this.currentState = advanceTo(this.currentState, this.audio.seconds);
+    if (this.currentState.phase === 'finished') {
+      this.stopFrames();
+      void this.closeAudio().catch((error: unknown) => this.fail(error));
+    }
+    return this.currentState;
+  }
+
+  private closeAudio(): Promise<void> {
+    if (!this.closing) this.closing = this.audio.close();
+    return this.closing;
+  }
+
+  private requestFrame(): void {
+    if (!this.disposed && !this.frame) this.frame = this.frames.request(this.update);
+  }
+
+  private stopFrames(): void {
+    this.frames.cancel(this.frame);
+    this.frame = 0;
+  }
 
   private notify(): void {
     for (const listener of this.listeners) listener();

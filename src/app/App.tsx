@@ -6,7 +6,8 @@ import { bestScore, type Library, writeLibrary } from '../infrastructure/storage
 import { GameView } from '../presentation/components/GameView';
 import { HowToPlay } from '../presentation/components/HowToPlay';
 import { Lobby } from '../presentation/components/Lobby';
-import { GameController } from './gameController';
+import type { GameController } from './gameController';
+import { createGameController } from './createGameController';
 import { useGameControls } from './useGameControls';
 
 export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
@@ -53,7 +54,7 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
       const track = tracks.find((item) => item.id === library.trackId);
       if (!track) throw new Error('選択された楽曲がありません。');
       if (controller) await controller.dispose();
-      const next = await GameController.create(track, resolveDeck(library.deckIds), library.muted);
+      const next = await createGameController(track, resolveDeck(library.deckIds), library.muted);
       setController(next);
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'ライブを開始できません。');
