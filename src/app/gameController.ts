@@ -192,6 +192,15 @@ export class GameController {
     if (!this.disposed) this.audio.setMuted(muted);
   }
 
+  toggleAutomaticHearts(): void {
+    if (this.disposed || this.currentState.phase === 'finished') return;
+    this.currentState = {
+      ...this.currentState,
+      automaticHeart: { enabled: !this.currentState.automaticHeart.enabled, timerSeconds: 0 },
+    };
+    this.notify();
+  }
+
   async dispose(): Promise<void> {
     if (this.disposed) return;
     this.disposed = true;

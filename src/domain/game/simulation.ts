@@ -1,5 +1,6 @@
 import { validateDeck, validateCard, shuffle } from './deck';
-import { addHearts, collectHearts, advanceHearts } from './hearts';
+import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
+import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
 import { changeBloomResource, finishBloom } from './bloom';
@@ -54,6 +55,7 @@ export function createGame(
       showPercentage: 100,
     },
     heartRandomSeed: seed,
+    automaticHeart: { enabled: true, timerSeconds: 0 },
     boosts: [],
     amplification: 100n,
     growthMultiplier: 1n,
@@ -133,7 +135,9 @@ function advanceTick(state: GameState): GameState {
     next = addHearts(next, stamina >= 30 ? count : 1);
   }
   if (sectionAt(next) !== sectionAt(state)) next = fillHand({ ...next, handLimit: rules.handSize });
-  return next;
+  const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
+  next = { ...next, automaticHeart: automatic.state };
+  return automatic.shouldCollect ? collectHearts(next) : next;
 }
 
 function validateTrack(track: Track): void {

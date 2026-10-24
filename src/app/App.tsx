@@ -89,19 +89,19 @@ export function App() {
         onMenu={() => void openPanel('menu')}
         onHand={() => void openPanel('hand')}
         busy={busy}
+        muted={muted}
+        onMuted={() => {
+          controller.setMuted(!muted);
+          setMuted(!muted);
+        }}
       />
       {menu && (
         <GameMenu
           route={route}
           heartShowLimit={heartShowLimit}
-          muted={muted}
           busy={busy}
           onRoute={(nextRoute) => void restart(nextRoute)}
           onHeartShowLimit={changeHeartShowLimit}
-          onMuted={() => {
-            controller.setMuted(!muted);
-            setMuted(!muted);
-          }}
           onClose={() => {
             setMenu(false);
             if (resumeAfterMenu) void controller.togglePause();

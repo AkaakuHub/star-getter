@@ -1,4 +1,4 @@
-import { Pause, Menu, List } from 'lucide-preact';
+import { Pause, Menu, List, Heart, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
@@ -19,6 +19,8 @@ export function GameView({
   onMenu,
   onHand,
   busy,
+  muted,
+  onMuted,
 }: Readonly<{
   controller: GameController;
   state: GameState;
@@ -28,6 +30,8 @@ export function GameView({
   onMenu: () => void;
   onHand: () => void;
   busy: boolean;
+  muted: boolean;
+  onMuted: () => void;
 }>) {
   return (
     <main className={'idol-game' + (state.bloom ? ' is-blooming' : '')} aria-label="ライブ">
@@ -53,6 +57,31 @@ export function GameView({
           onClick={onWaitMode}
         >
           <Pause size={20} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="live-tool live-auto-heart"
+          style={liveLayout.automaticHeart}
+          aria-label="ハート100個で自動回収"
+          aria-pressed={state.automaticHeart.enabled}
+          onClick={() => controller.toggleAutomaticHearts()}
+          disabled={busy || state.phase === 'finished'}
+        >
+          <Heart size={20} aria-hidden="true" />
+          <span>100</span>
+        </button>
+        <button
+          type="button"
+          className="live-tool live-sound-button"
+          aria-label={muted ? '音声をオンにする' : '音声をオフにする'}
+          aria-pressed={!muted}
+          onClick={onMuted}
+        >
+          {muted ? (
+            <VolumeX size={20} aria-hidden="true" />
+          ) : (
+            <Volume2 size={20} aria-hidden="true" />
+          )}
         </button>
         <button
           type="button"

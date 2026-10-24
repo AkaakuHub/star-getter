@@ -1,5 +1,6 @@
 import type { LoveGatherHeartRuntimeState } from './live/heartTypes';
 import type { LoveGatherCardAppealParameters } from './live/clientScoreInput';
+import type { AutomaticHeartState } from './live/automaticHeart';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type Mood = 'warm' | 'cool' | 'bright';
@@ -117,6 +118,7 @@ export type GameState = Readonly<{
   charge: number;
   score: bigint;
   hearts: LoveGatherHeartRuntimeState;
+  automaticHeart: AutomaticHeartState;
   heartRandomSeed: number;
   boosts: readonly Boost[];
   amplification: bigint;

@@ -231,3 +231,16 @@
   background: #5555;
   pointer-events: none;
 }
+
+.live-auto-heart {
+  flex-direction: column;
+  font-size: 2.2cqw;
+  font-weight: 800;
+}
+.live-sound-button {
+  top: 3%;
+  right: 16%;
+  width: 10cqw;
+  height: 10cqw;
+  z-index: 60;
+}
