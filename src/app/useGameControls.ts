@@ -11,10 +11,10 @@ export function useGameControls(controller: GameController | null, helpOpen: boo
         event.target.closest('dialog, input, textarea, select, [contenteditable="true"]')
       )
         return;
-      const index = ['1', '2', '3', '4', '5'].indexOf(event.key);
+      const index = ['1', '2', '3', '4', '5', '6', '7', '8'].indexOf(event.key);
       if (index >= 0) {
         event.preventDefault();
-        controller.command({ type: 'card', index });
+        controller.tapCard(index);
       }
       if (
         event.key === ' ' &&

@@ -26,5 +26,5 @@ export function compose(track: Track): readonly Note[] {
     if (halfBeat % 2 === 0) notes.push({ beat, midi: 36, length: 0.28, voice: 'kick' });
     notes.push({ beat, midi: 100, length: 0.05, voice: 'hat' });
   }
-  return notes;
+  return notes.map((note) => ({ ...note, length: Math.min(note.length, track.beats - note.beat) }));
 }

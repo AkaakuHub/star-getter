@@ -79,7 +79,7 @@ svg {
     @apply relative mx-auto min-h-dvh w-full max-w-[480px] bg-linear-to-b from-[#241232] to-[#110d22] shadow-2xl;
   }
   .app-shell.is-playing {
-    @apply h-dvh overflow-hidden;
+    @apply grid h-dvh place-items-center overflow-hidden;
   }
   .app-header {
     @apply flex min-h-20 items-center justify-between gap-4 px-5;

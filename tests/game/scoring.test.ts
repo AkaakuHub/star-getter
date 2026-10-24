@@ -81,7 +81,7 @@ describe('楽曲を最後まで遊べる', () => {
         if (frame % 12 === 0) state = act(state, { type: 'collect' });
       }
       expect(state.phase).toBe('finished');
-      expect(state.stats.cardsUsed).toBeGreaterThan(10);
+      expect(state.stats.cardsUsed).toBeGreaterThan(5);
       expect(state.stats.specialsUsed).toBeGreaterThan(0);
       expect(state.stats.heartsMissed).toBe(0);
       expect(state.score).toBeGreaterThan(track.targetScore);

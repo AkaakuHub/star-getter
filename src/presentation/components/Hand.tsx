@@ -1,7 +1,7 @@
 import { Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { GameState } from '../../domain/game/model';
-import { canUseCard, cardAt } from '../../domain/game/projection';
+import { cardAt } from '../../domain/game/projection';
 import { describeCard } from '../cardDescription';
 import { handLayout } from '../handLayout';
 
@@ -16,14 +16,15 @@ export function Hand({
     >
       {state.hand.map((id, index) => {
         const card = cardAt(state, index);
-        const use = () => controller.command({ type: 'card', index });
+        const use = () => controller.tapCard(index);
         return (
           <button
             type="button"
             key={id}
             className={'hand-card color-' + card.performer}
             style={handLayout(index, state.hand.length)}
-            disabled={!canUseCard(state, index)}
+            disabled={state.phase !== 'playing' && state.phase !== 'paused'}
+            aria-pressed={controller.selectedCard?.id === card.id}
             aria-label={card.name + '、AP' + card.cost + '、' + describeCard(card)}
             onPointerDown={(event) => {
               if (event.button === 0) {

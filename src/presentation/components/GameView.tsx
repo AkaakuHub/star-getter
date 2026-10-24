@@ -1,4 +1,4 @@
-import { Pause, List, Layers, Heart, Sparkles, Zap } from 'lucide-preact';
+import { Pause, Play, List, Layers, Heart, Sparkles, Zap, Menu } from 'lucide-preact';
 import { useState } from 'preact/hooks';
 import type { GameController } from '../../app/gameController';
 import { performers, moodNames } from '../../content/performers';
@@ -7,6 +7,7 @@ import { durationSeconds, scoreMultiplier, sectionAt } from '../../domain/game/p
 import { formatScore, formatTime } from '../cardDescription';
 import { Stage } from '../stage/Stage';
 import { Hand } from './Hand';
+import { CardPreview } from './CardPreview';
 import { LivePanel, type LivePanelKind } from './LivePanel';
 import { Result } from './Result';
 
@@ -31,7 +32,7 @@ export function GameView({
   helpOpen: boolean;
   busy: boolean;
 }>) {
-  const [panel, setPanel] = useState<LivePanelKind>('menu');
+  const [panel, setPanel] = useState<LivePanelKind | null>(null);
   const section = sectionAt(state);
   const seconds = state.tick / 60;
   const lead = state.deck[0];
@@ -41,6 +42,10 @@ export function GameView({
     if (state.phase === 'playing') onPause();
   };
   const special = () => controller.command({ type: 'special' });
+  const resume = () => {
+    setPanel(null);
+    onPause();
+  };
   const collect = () => controller.command({ type: 'collect' });
   return (
     <main className="idol-game" aria-label="ライブ">
@@ -96,10 +101,15 @@ export function GameView({
         <button
           type="button"
           className="live-tool"
-          aria-label="一時停止"
-          onClick={() => openPanel('menu')}
+          aria-label={state.phase === 'paused' ? '再開' : '一時停止'}
+          aria-pressed={state.phase === 'paused'}
+          onClick={onPause}
         >
-          <Pause size={20} aria-hidden="true" />
+          {state.phase === 'paused' ? (
+            <Play size={20} aria-hidden="true" />
+          ) : (
+            <Pause size={20} aria-hidden="true" />
+          )}
         </button>
         <button
           type="button"
@@ -117,6 +127,16 @@ export function GameView({
         >
           <Layers size={20} aria-hidden="true" />
         </button>
+        {state.phase === 'paused' && (
+          <button
+            type="button"
+            className="live-tool"
+            aria-label="ライブメニュー"
+            onClick={() => setPanel('menu')}
+          >
+            <Menu size={20} aria-hidden="true" />
+          </button>
+        )}
       </nav>
       <div className="pointer-events-none absolute top-[25%] right-[5%] z-10 rounded-full border border-amber-200/70 bg-black/30 px-3 py-1 text-[3cqw] font-bold text-amber-100">
         VOLTAGE Lv.{Math.floor(state.excitement / 20)}
@@ -182,12 +202,19 @@ export function GameView({
         <span>使用済み {state.discard.length}</span>
       </div>
       <Hand controller={controller} state={state} />
-      {state.phase === 'paused' && !helpOpen && (
+      <CardPreview controller={controller} />
+      {state.phase === 'paused' && panel === null && !helpOpen && (
+        <div className="pause-band" role="status">
+          一時停止
+        </div>
+      )}
+      {state.phase === 'paused' && panel !== null && !helpOpen && (
         <LivePanel
           state={state}
           panel={panel}
           onPanel={setPanel}
-          onResume={onPause}
+          onClose={() => setPanel(null)}
+          onResume={resume}
           onHome={onHome}
           onReplay={onReplay}
           onHelp={onHelp}

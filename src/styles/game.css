@@ -1,13 +1,50 @@
 .idol-game {
   position: relative;
   width: 100%;
-  height: 100dvh;
-  min-height: 540px;
+  height: auto;
+  aspect-ratio: 9 / 16;
+  max-width: 56.25dvh;
   overflow: hidden;
   container-type: inline-size;
   background: #1d1231;
   touch-action: manipulation;
   user-select: none;
+}
+.skill-preview {
+  position: absolute;
+  top: 50%;
+  left: 8%;
+  right: 8%;
+  z-index: 40;
+  transform: translateY(-50%);
+  padding: 14px;
+  border: 1px solid #ffc7e3;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #492647f5, #251637f5);
+  box-shadow: 0 10px 45px #100b2999;
+}
+.hand-card[aria-pressed='true'] {
+  z-index: 30;
+  outline: 2px solid #fff1a9;
+  outline-offset: 2px;
+}
+.live-tool[aria-pressed='true'] {
+  background: #ffe3a8;
+  color: #6b3d43;
+}
+.pause-band {
+  position: absolute;
+  inset: 50% 0 auto;
+  z-index: 25;
+  transform: translateY(-50%);
+  padding: 18px 0;
+  background: #000c;
+  color: #fff;
+  text-align: center;
+  font-size: 5cqw;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  pointer-events: none;
 }
 .score-display {
   border: 1px solid #ffc7e399;

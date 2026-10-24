@@ -12,6 +12,7 @@ export function LivePanel({
   state,
   panel,
   onPanel,
+  onClose,
   onResume,
   onHome,
   onReplay,
@@ -20,6 +21,7 @@ export function LivePanel({
   state: GameState;
   panel: LivePanelKind;
   onPanel: (panel: LivePanelKind) => void;
+  onClose: () => void;
   onResume: () => void;
   onHome: () => void;
   onReplay: () => void;
@@ -32,7 +34,7 @@ export function LivePanel({
   const title =
     panel === 'menu' ? 'ライブメニュー' : panel === 'cards' ? '手札を確認' : '編成を確認';
   return (
-    <Modal title={title} onClose={panel === 'menu' ? onResume : () => onPanel('menu')}>
+    <Modal title={title} onClose={onClose}>
       {panel === 'menu' ? (
         <div className="grid gap-3">
           <div className="mb-2 rounded-2xl border border-white/15 bg-white/5 p-4 text-center text-xl font-bold tabular-nums">

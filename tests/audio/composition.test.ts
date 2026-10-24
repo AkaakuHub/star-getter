@@ -6,6 +6,7 @@ describe('楽曲の合成データ', () => {
   for (const track of tracks) {
     it(`${track.name}を全区間で再生できる音符へ展開する`, () => {
       const notes = compose(track);
+      expect((track.beats * 60) / track.bpm).toBe(30);
       expect(notes.length).toBeGreaterThan(track.beats);
       expect(new Set(notes.map((note) => note.voice)).size).toBe(5);
       let previousBeat = 0;

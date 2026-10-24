@@ -1,5 +1,6 @@
 import { act } from '../domain/game/actions';
-import type { Action, GameState } from '../domain/game/model';
+import type { Action, Card, GameState } from '../domain/game/model';
+import { canUseCard, cardAt } from '../domain/game/projection';
 import { advanceTo } from '../domain/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 
@@ -14,6 +15,7 @@ export class GameController {
   private disposed = false;
   private busy = false;
   private closing: Promise<void> | null = null;
+  private selection: string | null = null;
 
   constructor(state: GameState, audio: PlaybackClock, frames: FrameScheduler) {
     if (state.phase !== 'ready') throw new Error('開始前のライブを指定してください。');
@@ -25,6 +27,42 @@ export class GameController {
 
   get state(): GameState {
     return this.currentState;
+  }
+
+  get selectedCard(): Card | null {
+    return this.currentState.deck.find((card) => card.id === this.selection) ?? null;
+  }
+
+  tapCard(index: number): void {
+    if (
+      this.disposed ||
+      this.busy ||
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= this.currentState.hand.length
+    )
+      return;
+    if (this.currentState.phase !== 'playing' && this.currentState.phase !== 'paused') return;
+    if (this.currentState.phase === 'playing' && this.advance().phase === 'finished') return;
+    const card = cardAt(this.currentState, index);
+    if (this.selection === card.id && canUseCard(this.currentState, index)) {
+      this.selection = null;
+      this.command({ type: 'card', index });
+    } else {
+      this.selection = card.id;
+      this.notify();
+    }
+  }
+
+  activateSelected(): void {
+    if (this.selection === null) return;
+    const index = this.currentState.hand.indexOf(this.selection);
+    if (index >= 0) this.tapCard(index);
+  }
+
+  clearSelection(): void {
+    this.selection = null;
+    this.notify();
   }
 
   subscribe(listener: () => void): () => void {
@@ -40,6 +78,8 @@ export class GameController {
     if (this.disposed || this.busy || this.currentState.phase !== 'playing') return;
     this.advance();
     this.currentState = act(this.currentState, action);
+    if (this.selection !== null && !this.currentState.hand.includes(this.selection))
+      this.selection = null;
     this.notify();
   }
 
@@ -103,6 +143,7 @@ export class GameController {
   private advance(): GameState {
     this.currentState = advanceTo(this.currentState, this.audio.seconds);
     if (this.currentState.phase === 'finished') {
+      this.selection = null;
       this.stopFrames();
       void this.closeAudio().catch((error: unknown) => this.fail(error));
     }
