@@ -38,11 +38,11 @@ function play(seed: number, collectInterval: number, cardInterval: number) {
 
 describe('30秒ライブの得点バランス', () => {
   for (const seed of [7, 456, 1234]) {
-    it(`カード効果と回収を組み合わせると遅い操作より得点が伸びる（seed ${seed}）`, () => {
+    it(`成長カードを循環すると9999無量大数へ到達し、遅い操作とは差が付く（seed ${seed}）`, () => {
       const fast = play(seed, 20, 30);
       const slow = play(seed, 180, 90);
       expect(fast.phase).toBe('finished');
-      expect(fast.score).toBeLessThanOrEqual(rules.maxScore);
+      expect(fast.score).toBe(rules.maxScore);
       expect(slow.score).toBeLessThan(fast.score);
     });
   }

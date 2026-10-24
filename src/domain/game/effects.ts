@@ -58,6 +58,11 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
         ...state,
         amplification: limitValue(state.amplification + BigInt(effect.percent)),
       };
+    case 'growth':
+      return {
+        ...state,
+        growthMultiplier: limitValue(state.growthMultiplier * BigInt(effect.multiplier)),
+      };
     case 'bloom':
       return activateBloom(state, scaled(state, effect.strength));
     case 'resource-boost': {

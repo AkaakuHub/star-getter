@@ -1,5 +1,5 @@
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-preact';
-import type { GameState } from '../../domain/game/model';
+import { type GameState, rules } from '../../domain/game/model';
 import { scoreGrade } from '../../domain/game/projection';
 import { formatScore } from '../cardDescription';
 import { Modal } from './Modal';
@@ -27,6 +27,10 @@ export function Result({
         最高得点 {formatScore(bestScore)}
       </p>
       <dl className="result-stats">
+        <div>
+          <dt>目標LOVE</dt>
+          <dd>{formatScore(rules.maxScore)}</dd>
+        </div>
         <div>
           <dt>回収ハート</dt>
           <dd>{state.stats.heartsCollected}</dd>

@@ -14,6 +14,8 @@ function describeEffect(effect: Effect): string {
       return `${effect.seconds}秒間、獲得するLOVEを${Math.round((effect.multiplier - 1) * 100)}%増加させる。この効果は重複し、効果増幅の対象となる。`;
     case 'amplify':
       return `このステージ中、あらゆるスキルの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
+    case 'growth':
+      return `このステージ中、LOVEの成長倍率を${formatScore(effect.multiplier)}倍にする。現在の成長倍率に乗算し、再使用するたびに複利で増える。`;
     case 'bloom':
       return 'このステージ中、開花を発動し、ハートをフラワーに変化させる。AP・ボルテージ・メンタルの増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のLOVEが増加する。発動時のゲージを保持し、開花中はAP残量に関係なくスキルを使用できる。';
     case 'resource-boost':
@@ -65,13 +67,4 @@ export function formatScore(score: bigint | number): string {
   const main = value / divisor;
   const lower = ((value % divisor) * 10000n) / divisor;
   return `${main}${scoreUnits[index]}${lower > 0n ? `${lower}${scoreUnits[index - 1]}` : ''}`;
-}
-
-export function formatFactor(percent: bigint): string {
-  const whole = percent / 100n;
-  if (whole >= 10000n) return formatScore(whole);
-  const fraction = percent % 100n;
-  return (
-    whole + (fraction > 0n ? '.' + fraction.toString().padStart(2, '0').replace(/0$/, '') : '')
-  );
 }

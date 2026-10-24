@@ -16,7 +16,7 @@ export function limitValue(value: bigint): bigint {
 export function collectionScore(state: GameState, count: number, missed: boolean): bigint {
   const voltage = Math.floor(state.excitement / 2);
   const rank = calculateLoveGatherHeartRank(count, voltage, null);
-  return calculateLoveGatherClientScore(
+  const base = calculateLoveGatherClientScore(
     {
       cards: state.deck.map((card) => ({
         appealValue: calculateLoveGatherCardAppealValue(card.appeal, 0, durationSeconds(state)),
@@ -35,4 +35,5 @@ export function collectionScore(state: GameState, count: number, missed: boolean
       getAddScoreMax: (collectCount) => calculateLoveGatherAddScoreMax(collectCount, []),
     },
   );
+  return limitValue(base * state.growthMultiplier);
 }

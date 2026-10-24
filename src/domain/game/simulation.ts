@@ -46,6 +46,7 @@ export function createGame(
     heartRandomSeed: seed,
     boosts: [],
     amplification: 100n,
+    growthMultiplier: 1n,
     resourceBoosts: [],
     bloom: null,
     relayUsed: [],
@@ -129,7 +130,6 @@ function validateTrack(track: Track): void {
     !Number.isInteger(track.beats) ||
     track.beats < 1 ||
     track.beats > 2000 ||
-    track.targetScore <= 0n ||
     track.sections[0]?.startBeat !== 0
   )
     throw new Error('楽曲の設定が正しくありません。');

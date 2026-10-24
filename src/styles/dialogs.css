@@ -116,7 +116,9 @@
   font-weight: 900;
   margin: 20px 0 8px;
 }
-.grade-S {
+.grade-S,
+.grade-SS,
+.grade-SSS {
   color: #a17719;
 }
 .result-score {

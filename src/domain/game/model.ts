@@ -22,6 +22,7 @@ export type Effect =
   | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
   | Readonly<{ kind: 'amplify'; percent: number }>
+  | Readonly<{ kind: 'growth'; multiplier: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | Readonly<{
       kind: 'resource-boost';
@@ -55,7 +56,6 @@ export type Track = Readonly<{
   name: string;
   bpm: number;
   beats: number;
-  targetScore: bigint;
   sections: readonly Section[];
   melody: readonly number[];
   chords: readonly (readonly [number, number, number])[];
@@ -100,6 +100,7 @@ export type GameState = Readonly<{
   heartRandomSeed: number;
   boosts: readonly Boost[];
   amplification: bigint;
+  growthMultiplier: bigint;
   resourceBoosts: readonly ResourceBoost[];
   bloom: Bloom | null;
   relayUsed: readonly string[];

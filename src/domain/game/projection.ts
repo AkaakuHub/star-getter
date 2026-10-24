@@ -32,8 +32,9 @@ export function canUseCard(state: GameState, index: number): boolean {
 
 export function scoreGrade(state: GameState): string {
   if (state.score >= rules.maxScore) return 'SSS';
-  if (state.score >= state.track.targetScore * 10n) return 'S';
-  if (state.score >= state.track.targetScore) return 'A';
-  if (state.score * 10n >= state.track.targetScore * 6n) return 'B';
+  if (state.score >= 10n ** 68n) return 'SS';
+  if (state.score >= 10n ** 60n) return 'S';
+  if (state.score >= 10n ** 48n) return 'A';
+  if (state.score >= 10n ** 16n) return 'B';
   return 'C';
 }

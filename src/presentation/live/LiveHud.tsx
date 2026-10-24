@@ -2,7 +2,7 @@ import { Flower2, Heart, Sparkles, Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { type GameState, rules } from '../../domain/game/model';
 import { durationSeconds, sectionAt } from '../../domain/game/projection';
-import { formatFactor, formatScore, formatTime } from '../cardDescription';
+import { formatScore, formatTime } from '../cardDescription';
 import { FittedText } from '../text/FittedText';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
@@ -157,7 +157,7 @@ export function LiveHud({
           <strong>{formatScore(state.bloom.progress)}</strong>
         </div>
       )}
-      <div className="live-amplification">効果増幅×{formatFactor(state.amplification)}</div>
+      <div className="live-amplification">成長×{formatScore(state.growthMultiplier)}</div>
     </>
   );
 }
