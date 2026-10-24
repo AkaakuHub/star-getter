@@ -8,6 +8,7 @@ export type Effect =
 export type Card = Readonly<{
   id: string;
   name: string;
+  art: string;
   performer: PerformerId;
   cost: number;
   appeal: number;

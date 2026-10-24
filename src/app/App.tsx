@@ -15,7 +15,6 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
   const [controller, setController] = useState<GameController | null>(null);
   const [error, setError] = useState('');
   const [help, setHelp] = useState(false);
-  const [threeD, setThreeD] = useState(true);
   const [busy, setBusy] = useState(false);
   const [, refresh] = useState(0);
   const state = controller?.state;
@@ -89,27 +88,29 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
 
   const message = error || controller?.error;
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <h1>
-          ラブギャザー
-          <span className="brand-dot" aria-hidden="true" />
-        </h1>
-        <nav aria-label="設定">
-          <button
-            type="button"
-            className="icon-button"
-            aria-label={library.muted ? '音声を有効にする' : '音声をミュート'}
-            aria-pressed={!library.muted}
-            onClick={toggleMute}
-          >
-            {library.muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
-          </button>
-          <button type="button" className="icon-button" aria-label="遊び方" onClick={showHelp}>
-            <CircleHelp aria-hidden="true" />
-          </button>
-        </nav>
-      </header>
+    <div className={'app-shell ' + (controller ? 'is-playing' : '')}>
+      {!controller && (
+        <header className="app-header">
+          <h1>
+            ラブギャザー
+            <span className="brand-dot" aria-hidden="true" />
+          </h1>
+          <nav aria-label="設定">
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={library.muted ? '音声を有効にする' : '音声をミュート'}
+              aria-pressed={!library.muted}
+              onClick={toggleMute}
+            >
+              {library.muted ? <VolumeX aria-hidden="true" /> : <Volume2 aria-hidden="true" />}
+            </button>
+            <button type="button" className="icon-button" aria-label="遊び方" onClick={showHelp}>
+              <CircleHelp aria-hidden="true" />
+            </button>
+          </nav>
+        </header>
+      )}
       {message && (
         <div role="alert" className="error-banner">
           <span>{message}</span>
@@ -130,11 +131,10 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
           controller={controller}
           state={state}
           bestScore={bestScore(library, state.track.id)}
-          threeD={threeD}
-          onToggle3D={() => setThreeD((value) => !value)}
           onHome={() => void home()}
           onReplay={() => void start()}
           onPause={() => void controller.togglePause()}
+          onHelp={showHelp}
           helpOpen={help}
           busy={busy}
         />

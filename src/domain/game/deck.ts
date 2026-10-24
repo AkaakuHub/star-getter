@@ -16,6 +16,7 @@ export function validateCard(card: Card): void {
   if (
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(card.id) ||
     !card.name.trim() ||
+    !/^\/cards\/[a-z0-9/-]+\.png$/.test(card.art) ||
     !Number.isInteger(card.cost) ||
     card.cost < 1 ||
     card.cost > rules.maxEnergy ||

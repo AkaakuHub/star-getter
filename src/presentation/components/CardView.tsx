@@ -2,7 +2,6 @@ import { Check, Zap } from 'lucide-preact';
 import { performers } from '../../content/performers';
 import type { Card } from '../../domain/game/model';
 import { describeCard, describeEffect } from '../cardDescription';
-import { Portrait } from './Portrait';
 
 export function CardView({
   card,
@@ -18,16 +17,24 @@ export function CardView({
   return (
     <button
       type="button"
-      className={`skill-card color-${card.performer}`}
-      aria-label={`${performers[card.performer].name}、${card.name}、エネルギー${card.cost}、${describeCard(card)}`}
+      className={'skill-card color-' + card.performer}
+      aria-label={
+        performers[card.performer].name +
+        '、' +
+        card.name +
+        '、AP' +
+        card.cost +
+        '、' +
+        describeCard(card)
+      }
       aria-pressed={selected}
       disabled={disabled}
       onClick={onClick}
     >
       <span className="card-art">
-        <Portrait performer={card.performer} />
+        <img src={card.art} alt="" loading="lazy" draggable={false} />
         <span className="cost">
-          <Zap size={14} aria-hidden="true" />
+          <Zap size={13} aria-hidden="true" />
           {card.cost}
         </span>
         {selected && (

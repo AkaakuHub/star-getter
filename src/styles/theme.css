@@ -1,33 +1,49 @@
-:root {
-  font-family: 'Avenir Next', 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', system-ui, sans-serif;
-  color: #223447;
-  background: #f4f3ec;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  --ink: #223447;
-  --muted: #64727d;
-  --paper: #fffdf7;
-  --line: #dfe3dc;
-  --teal: #237d76;
-  --teal-dark: #175f59;
-  --nova: #f78077;
-  --lumen: #7ccac5;
-  --tetra: #f1c86b;
-  --accent: var(--teal);
-  --stage: #101c2d;
+@import 'tailwindcss';
+@import './portraits.css';
+@import './lobby.css';
+@import './game.css';
+@import './stage.css';
+@import './dialogs.css';
+
+@theme {
+  --color-idol-pink: #ff79b0;
+  --color-idol-violet: #9272df;
+  --color-idol-ink: #f9f5ff;
+  --color-idol-surface: #23183d;
+  --font-sans: 'Avenir Next', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
 }
 
+:root {
+  font-family: var(--font-sans);
+  color: #f9f5ff;
+  background: #100c20;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #f9f5ff;
+  --muted: #c5b9db;
+  --paper: #23183d;
+  --line: #ffffff24;
+  --teal: #ff79b0;
+  --teal-dark: #bc4388;
+  --nova: #ff8fab;
+  --lumen: #7edce4;
+  --tetra: #ffd678;
+  --accent: var(--teal);
+  color-scheme: dark;
+}
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
   min-width: 320px;
+  background: radial-gradient(ellipse at top, #35204c, #100c20 60%);
 }
 button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  border: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -36,24 +52,14 @@ button:disabled {
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid var(--teal);
-  outline-offset: 4px;
-}
-button {
-  border: none;
+  outline: 3px solid #ffb3d6;
+  outline-offset: 3px;
 }
 h1,
 h2,
 h3,
 p {
   margin: 0;
-}
-h2 {
-  font-size: 1.1rem;
-  font-weight: 750;
-}
-h3 {
-  font-size: 1rem;
 }
 svg {
   flex-shrink: 0;
@@ -67,131 +73,57 @@ svg {
 .color-tetra {
   --accent: var(--tetra);
 }
-.app-shell {
-  width: min(1160px, 100%);
-  padding: 0 28px 36px;
-  margin: auto;
-}
-.app-header {
-  min-height: 98px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-.app-header h1 {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: clamp(1.4rem, 4vw, 1.8rem);
-  letter-spacing: -0.06em;
-  font-weight: 900;
-}
-.brand-dot {
-  display: inline-block;
-  height: 9px;
-  width: 9px;
-  background: var(--nova);
-  border-radius: 50%;
-  margin-top: 5px;
-}
-.app-header nav {
-  display: flex;
-  gap: 10px;
-}
-.icon-button {
-  background: transparent;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.icon-button:hover {
-  background: #2234470a;
-}
-.icon-button:disabled {
-  opacity: 0.4;
-}
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  min-height: 44px;
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-.primary {
-  background: var(--teal);
-  color: white;
-  box-shadow: 0 4px 0 var(--teal-dark);
-}
-.primary:hover:not(:disabled) {
-  background: var(--teal-dark);
-}
-.button:disabled {
-  opacity: 0.45;
-  box-shadow: none;
-}
-.quiet {
-  background: #edf0e9;
-}
-.quiet:hover {
-  background: #e3e9df;
-}
-.quiet[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--paper);
-}
-.panel {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  padding: 24px;
-}
-.panel-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.error-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 12px 18px;
-  border: 1px solid #bd4b47;
-  border-radius: 12px;
-  color: #8c2825;
-  background: #fff0e9;
-  font-size: 0.9rem;
-  overflow-wrap: anywhere;
-}
-.startup-error {
-  width: min(600px, 100%);
-  padding: 40px;
-  margin: auto;
-  display: grid;
-  gap: 24px;
-}
-@media (max-width: 600px) {
+
+@layer components {
   .app-shell {
-    padding: 0 14px 24px;
+    @apply relative mx-auto min-h-dvh w-full max-w-[480px] bg-linear-to-b from-[#241232] to-[#110d22] shadow-2xl;
+  }
+  .app-shell.is-playing {
+    @apply h-dvh overflow-hidden;
   }
   .app-header {
-    min-height: 76px;
+    @apply flex min-h-20 items-center justify-between gap-4 px-5;
+    padding-top: env(safe-area-inset-top);
+  }
+  .app-header h1 {
+    @apply flex items-center gap-2 text-2xl font-black tracking-tighter text-white;
+  }
+  .brand-dot {
+    @apply mt-1 inline-block size-2 rounded-full bg-pink-300 shadow-[0_0_12px_#ffa0d0];
   }
   .app-header nav {
-    gap: 2px;
+    @apply flex gap-1;
+  }
+  .icon-button {
+    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-pink-100 transition hover:bg-white/15 disabled:opacity-40;
+  }
+  .button {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold transition active:scale-[0.98] disabled:opacity-40;
+  }
+  .primary {
+    @apply border border-pink-200/60 bg-linear-to-r from-pink-500 via-fuchsia-500 to-violet-500 text-white shadow-[0_4px_0_#9d3678,0_0_24px_#ed63ad30] hover:brightness-110;
+  }
+  .quiet {
+    @apply border border-white/15 bg-white/8 text-pink-50 hover:bg-white/15;
   }
   .panel {
-    padding: 18px;
-    border-radius: 18px;
+    @apply rounded-3xl border border-white/12 bg-white/5 p-5;
+  }
+  .panel-heading {
+    @apply flex items-center justify-between gap-3;
+  }
+  .panel h2 {
+    @apply text-base font-bold;
+  }
+  .error-banner {
+    @apply relative z-50 mx-4 mb-3 flex items-center justify-between gap-3 rounded-2xl border border-rose-300 bg-rose-950/95 px-4 py-3 text-sm text-rose-100;
+    overflow-wrap: anywhere;
+  }
+  .is-playing > .error-banner {
+    @apply absolute inset-x-0 top-2;
+  }
+  .startup-error {
+    @apply mx-auto grid max-w-lg gap-6 p-8;
   }
 }
 @media (prefers-reduced-motion: reduce) {

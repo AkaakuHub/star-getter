@@ -2,63 +2,63 @@ import { Heart } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { performers } from '../../content/performers';
 import type { GameState } from '../../domain/game/model';
-import { sectionAt } from '../../domain/game/projection';
 import { Portrait } from '../components/Portrait';
-import { StageCanvas } from './StageCanvas';
 
 export function Stage({
   controller,
   state,
-  threeD,
-}: Readonly<{ controller: GameController; state: GameState; threeD: boolean }>) {
-  const section = sectionAt(state);
+}: Readonly<{ controller: GameController; state: GameState }>) {
   const collect = () => controller.command({ type: 'collect' });
   return (
-    <div className={`stage ${section.climax ? 'stage-climax' : ''}`}>
-      <div className="stage-orbit orbit-one" />
-      <div className="stage-orbit orbit-two" />
-      {threeD ? (
-        <StageCanvas controller={controller} />
-      ) : (
-        <div
-          className={`dom-stage ${state.phase === 'playing' ? 'dancing' : ''}`}
-          aria-hidden="true"
-        >
-          {Object.values(performers).map((performer) => (
-            <div key={performer.id} className={`dom-performer color-${performer.id}`}>
-              <Portrait performer={performer.id} />
-            </div>
-          ))}
-        </div>
-      )}
-      <div className="section-heading">
-        <span className={`mood mood-${section.mood}`} />
-        {section.name}
+    <div className="absolute inset-0 overflow-hidden">
+      <img
+        src="/stage/concert.png"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+        draggable={false}
+      />
+      <div className="absolute inset-0 bg-linear-to-b from-[#160d36]/75 via-transparent to-[#1c0d36]/90" />
+      <div
+        className={'board-performers ' + (state.phase === 'playing' ? 'dancing' : '')}
+        aria-hidden="true"
+      >
+        {Object.values(performers).map((performer) => (
+          <div key={performer.id} className={'board-performer color-' + performer.id}>
+            <Portrait performer={performer.id} />
+          </div>
+        ))}
       </div>
       <button
         type="button"
         className="heart-field"
-        aria-label={`${state.hearts.length}個のハートを回収`}
-        onClick={collect}
+        aria-label={state.hearts.length + '個のハートを回収'}
         disabled={state.phase !== 'playing' || state.hearts.length === 0}
+        onPointerDown={(event) => {
+          if (event.button === 0) {
+            event.preventDefault();
+            collect();
+          }
+        }}
+        onClick={(event) => {
+          if (event.detail === 0) collect();
+        }}
       >
-        {state.hearts.map((heart) => (
+        {state.hearts.slice(0, 24).map((heart) => (
           <span
             key={heart.id}
             className="floating-heart"
             aria-hidden="true"
-            data-fading={state.tick - heart.bornTick > 480}
             style={{
-              left: `${10 + ((heart.id * 37) % 78)}%`,
-              top: `${38 + ((heart.id * 23) % 40)}%`,
-              animationDelay: `${(heart.id % 7) * -0.2}s`,
+              left: 16 + ((heart.id * 37) % 70) + '%',
+              top: 22 + ((heart.id * 23) % 48) + '%',
+              animationDelay: (heart.id % 7) * -0.2 + 's',
             }}
           >
-            <Heart size={24} fill="currentColor" aria-hidden="true" />
+            <Heart fill="currentColor" size={23} />
           </span>
         ))}
       </button>
-      {state.lastCardName && state.tick - state.lastActionTick < 75 && (
+      {state.lastCardName && state.tick - state.lastActionTick < 60 && (
         <div className="skill-notice" role="status">
           {state.lastCardName}
         </div>
@@ -68,15 +68,6 @@ export function Stage({
           休憩中
         </div>
       )}
-      <button
-        type="button"
-        className="collect-button"
-        onClick={collect}
-        disabled={state.phase !== 'playing' || state.hearts.length === 0}
-      >
-        <Heart size={20} aria-hidden="true" />
-        回収<span>{state.hearts.length}</span>
-      </button>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite-plus';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  plugins: [tailwindcss()],
   build: { target: 'es2023', chunkSizeWarningLimit: 250 },
   lint: {
     options: { typeAware: true, typeCheck: true },

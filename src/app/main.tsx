@@ -1,11 +1,6 @@
 import { render } from 'preact';
 import { readLibrary } from '../infrastructure/storage/library';
 import '../styles/theme.css';
-import '../styles/portraits.css';
-import '../styles/lobby.css';
-import '../styles/game.css';
-import '../styles/stage.css';
-import '../styles/dialogs.css';
 import { App } from './App';
 
 const root = document.querySelector('#app');
