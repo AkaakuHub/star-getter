@@ -1,3 +1,4 @@
+import { cardCost } from './cards/cost';
 import { type Card, type GameState, type Section, rules } from './model';
 
 export function sectionAt(state: GameState): Section {
@@ -26,15 +27,6 @@ export function canUseCard(state: GameState, index: number): boolean {
     index < state.hand.length &&
     !state.resting &&
     state.tick - state.lastActionTick >= rules.actionCooldownTicks &&
-    (state.bloom !== null || state.energy >= cardAt(state, index).cost)
+    (state.bloom !== null || state.energy >= cardCost(state, cardAt(state, index)))
   );
-}
-
-export function scoreGrade(state: GameState): string {
-  if (state.score >= rules.maxScore) return 'SSS';
-  if (state.score >= 10n ** 68n) return 'SS';
-  if (state.score >= 10n ** 60n) return 'S';
-  if (state.score >= 10n ** 48n) return 'A';
-  if (state.score >= 10n ** 16n) return 'B';
-  return 'C';
 }

@@ -4,7 +4,7 @@ import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import { type GameState, rules } from '../../src/domain/game/model';
-import { canUseCard, durationSeconds, scoreGrade } from '../../src/domain/game/projection';
+import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game(): GameState {
@@ -86,7 +86,6 @@ describe('楽曲を最後まで遊べる', () => {
       expect(state.stats.specialsUsed).toBeGreaterThan(0);
       expect(state.score).toBeLessThanOrEqual(rules.maxScore);
       expect(state.score).toBeGreaterThan(0n);
-      expect(['B', 'C', 'A', 'S', 'SSS']).toContain(scoreGrade(state));
     });
   }
 });

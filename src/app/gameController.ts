@@ -1,6 +1,7 @@
 import { act } from '../domain/game/actions';
 import type { Action, Card, GameState } from '../domain/game/model';
 import { canUseCard, cardAt } from '../domain/game/projection';
+import { resolveLoveGatherHeartDrawCount } from '../domain/game/live/heartPresentation';
 import { advanceTo } from '../domain/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 
@@ -108,6 +109,15 @@ export class GameController {
     }
   }
 
+  setHeartShowLimit(value: number): void {
+    resolveLoveGatherHeartDrawCount(0, value);
+    this.currentState = {
+      ...this.currentState,
+      hearts: { ...this.currentState.hearts, showLimit: value, throwLimit: value },
+    };
+    this.notify();
+  }
+
   setMuted(muted: boolean): void {
     if (!this.disposed) this.audio.setMuted(muted);
   }
@@ -130,6 +140,7 @@ export class GameController {
     }
     if (this.audio.interrupted && !this.busy) {
       this.currentState = act(this.currentState, { type: 'pause' });
+      void this.audio.pause().catch((failure: unknown) => this.fail(failure));
       this.notify();
       return;
     }

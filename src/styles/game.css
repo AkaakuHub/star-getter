@@ -10,6 +10,7 @@
   user-select: none;
 }
 .skill-preview {
+  pointer-events: none;
   position: absolute;
   z-index: 40;
   padding: 1.2cqw 3cqw;
@@ -30,6 +31,7 @@
   overflow-wrap: anywhere;
 }
 .skill-close {
+  pointer-events: auto;
   position: absolute;
   top: 0;
   right: -5cqw;
@@ -134,4 +136,84 @@
   font-weight: 700;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.live-menu-button {
+  top: 3%;
+  right: 3%;
+  width: 10cqw;
+  height: 10cqw;
+  z-index: 60;
+}
+.result-panel {
+  position: absolute;
+  top: 24%;
+  left: 8%;
+  z-index: 50;
+  width: 84%;
+  padding: 5cqw;
+  border-radius: 2cqw;
+  background: #fffaf5f2;
+  text-align: center;
+}
+.result-panel h2 {
+  font-size: 4cqw;
+}
+.result-panel .result-score {
+  font-size: 7cqw;
+  margin-top: 3cqw;
+}
+.result-actions {
+  display: grid;
+  gap: 3cqw;
+  margin-top: 5cqw;
+}
+.result-actions a {
+  text-decoration: none;
+}
+.game-menu fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.game-menu legend {
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.preset-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.preset-options [aria-pressed='true'] {
+  background: #fce1e8;
+}
+.game-menu .heart-display-panel {
+  margin: 24px 0;
+}
+
+.card-use-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+.card-use {
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.hand-panel-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.hand-panel-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 6px;
+  border: 2px solid var(--accent);
+}
+.hand-panel-card .hand-name {
+  font-size: 10px;
 }

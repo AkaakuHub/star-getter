@@ -1,8 +1,9 @@
-import { validateDeck, shuffle } from './deck';
+import { validateDeck, validateCard, shuffle } from './deck';
 import { addHearts, collectHearts, advanceHearts } from './hearts';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
 import { changeBloomResource, finishBloom } from './bloom';
+import { fillHand } from './cards/drawing';
 import { createLoveGatherHeartRuntimeState } from './live/heartSpawn';
 import {
   loveGatherHeartShowLimitSettings,
@@ -14,22 +15,31 @@ export function createGame(
   deck: readonly Card[],
   seed: number,
   heartShowLimit: number = loveGatherHeartShowLimitSettings.defaultValue,
+  tokenCatalog: readonly Card[] = [],
 ): GameState {
   validateDeck(deck);
   validateTrack(track);
+  for (const card of tokenCatalog) validateCard(card);
   resolveLoveGatherHeartDrawCount(0, heartShowLimit);
   const shuffled = shuffle(
     deck.map((card) => card.id),
     seed,
   );
-  return {
+  const lead = deck[0];
+  if (!lead) throw new Error('先頭のカードがありません。');
+  const ordered = [lead.id, ...shuffled.items.filter((id) => id !== lead.id)];
+  const initial: GameState = {
     phase: 'ready',
     tick: 0,
     track,
     deck: [...deck],
-    hand: shuffled.items.slice(0, rules.handSize),
-    drawPile: shuffled.items.slice(rules.handSize),
+    hand: ordered.slice(0, rules.handSize),
+    drawPile: ordered.slice(rules.handSize),
     discard: [],
+    tokenCatalog,
+    nextTokenId: 1,
+    handLimit: rules.handSize,
+    nextDrawPreference: null,
     randomSeed: shuffled.seed,
     energy: 10,
     stamina: 100,
@@ -55,6 +65,7 @@ export function createGame(
     lastActionTick: -rules.actionCooldownTicks,
     lastPerformer: null,
     lastCardName: '',
+    cardUses: [],
     lastGain: 0n,
     stats: {
       cardsUsed: 0,
@@ -65,6 +76,7 @@ export function createGame(
       bestCombo: 0,
     },
   };
+  return fillHand(initial);
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {
@@ -103,6 +115,7 @@ function advanceTick(state: GameState): GameState {
             rules.energyTicksPerPoint,
         ),
     excitement: state.bloom ? state.excitement : Math.min(100, state.excitement + dt * 0.25),
+    cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
@@ -119,6 +132,7 @@ function advanceTick(state: GameState): GameState {
     const count = 1 + Math.floor(affinity / 3) + (section.climax ? 1 : 0);
     next = addHearts(next, stamina >= 30 ? count : 1);
   }
+  if (sectionAt(next) !== sectionAt(state)) next = fillHand({ ...next, handLimit: rules.handSize });
   return next;
 }
 

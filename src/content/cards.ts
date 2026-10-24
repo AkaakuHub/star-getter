@@ -1,15 +1,7 @@
 import type { Card } from '../domain/game/model';
-import { flattenPacks } from '../domain/catalog/packs';
-import { packs } from './packs';
+import { baseCards } from './baseCards';
 
-export const cards = flattenPacks(packs);
-
-export function cardsInPack(id: string): readonly Card[] {
-  if (id === '') return cards;
-  const pack = packs.find((item) => item.id === id);
-  if (!pack) throw new Error('公開されたパックがありません。');
-  return pack.cards;
-}
+const cards = baseCards;
 
 export const defaultDeckIds = [
   'spark',

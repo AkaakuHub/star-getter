@@ -18,9 +18,11 @@ export function collectionScore(state: GameState, count: number, missed: boolean
   const rank = calculateLoveGatherHeartRank(count, voltage, null);
   const base = calculateLoveGatherClientScore(
     {
-      cards: state.deck.map((card) => ({
-        appealValue: calculateLoveGatherCardAppealValue(card.appeal, 0, durationSeconds(state)),
-      })),
+      cards: state.deck
+        .filter((card) => !card.token)
+        .map((card) => ({
+          appealValue: calculateLoveGatherCardAppealValue(card.appeal, 0, durationSeconds(state)),
+        })),
       collectNum: count,
       heartRankMagnification: rank.magnification,
       isDisappearCollect: missed,

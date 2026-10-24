@@ -29,113 +29,12 @@
   flex-shrink: 0;
   margin: -6px -6px -6px 0;
 }
-.modal-actions {
-  display: flex;
-  justify-content: end;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 26px;
-}
-.deck-modal {
-  width: min(780px, calc(100% - 28px));
-}
-.deck-groups {
-  display: grid;
-  gap: 24px;
-}
-.pack-filter {
-  width: 100%;
-  min-height: 44px;
-  margin-bottom: 24px;
-  padding: 10px 14px;
-  border: 2px solid var(--line);
-  border-radius: 10px;
-  color: var(--ink);
-  background: var(--paper);
-  font: inherit;
-}
-.pack-filter:focus-visible {
-  outline: 3px solid var(--teal);
-  outline-offset: 3px;
-}
-.deck-groups h3 {
-  border-left: 4px solid var(--accent);
-  padding-left: 10px;
-  margin-bottom: 14px;
-}
-.catalog-cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-.instructions {
-  padding-left: 24px;
-  display: grid;
-  gap: 18px;
-  margin: 0 0 28px;
-  line-height: 1.9;
-  font-size: 0.85rem;
-}
-.instructions strong {
-  display: block;
-}
-.key-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.8rem;
-}
-.key-table caption {
-  text-align: left;
-  font-weight: 800;
-  padding-bottom: 12px;
-}
-.key-table th,
-.key-table td {
-  padding: 12px 8px;
-  border-top: 1px solid var(--line);
-  text-align: left;
-}
-.key-table th {
-  width: 100px;
-}
-.result-modal {
-  max-width: 460px;
-  text-align: center;
-}
-.result-modal .modal-heading {
-  justify-content: center;
-}
-.result-modal h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-.result-grade {
-  color: var(--teal);
-  font-size: 5rem;
-  line-height: 1.1;
-  font-weight: 900;
-  margin: 20px 0 8px;
-}
-.grade-S,
-.grade-SS,
-.grade-SSS {
-  color: #a17719;
-}
 .result-score {
   font-size: clamp(1.5rem, 7vw, 2.7rem);
   overflow-wrap: anywhere;
   font-weight: 800;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-}
-.result-best {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  margin-top: 12px;
-  color: var(--teal);
 }
 .result-stats {
   margin: 24px 0 0;
@@ -152,23 +51,4 @@
 .result-stats dd {
   margin: 0;
   font-weight: 800;
-}
-.result-modal .modal-actions {
-  justify-content: space-between;
-}
-@media (max-width: 600px) {
-  .modal {
-    padding: 20px;
-    border-radius: 12px;
-  }
-  .catalog-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-  .instructions {
-    padding-left: 20px;
-  }
-  .result-modal .button {
-    padding: 10px 12px;
-  }
 }

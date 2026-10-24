@@ -1,12 +1,11 @@
 import { render } from 'preact';
-import { readLibrary } from '../infrastructure/storage/library';
 import '../styles/theme.css';
 import { App } from './App';
 
 const root = document.querySelector('#app');
 if (!root) throw new Error('アプリの表示先がありません。');
 try {
-  render(<App initialLibrary={readLibrary(localStorage)} />, root);
+  render(<App />, root);
 } catch (error) {
   render(
     <main className="startup-error">

@@ -2,6 +2,9 @@ import { activateBloom, changeBloomResource } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Effect, type GameState, rules } from './model';
 import { limitValue } from './scoring';
+import { addTokens } from './cards/tokens';
+import { shuffleHand } from './cards/drawing';
+import { changeLoveGatherHeartLimit } from './live/heartLimit';
 import { applyLoveGatherSkillBoost } from './live/skillBoost';
 
 export function changeResource(
@@ -16,8 +19,28 @@ export function changeResource(
 
 export function applyEffect(state: GameState, effect: Effect): GameState {
   switch (effect.kind) {
-    case 'hearts':
-      return addHearts(state, Math.ceil(boosted(state, effect.amount)));
+    case 'hearts': {
+      const percent = state.deck.reduce(
+        (sum, card) =>
+          sum + (state.hand.includes(card.id) ? (card.passive?.heartsPercent ?? 0) : 0),
+        100,
+      );
+      return addHearts(state, Math.ceil((boosted(state, effect.amount) * percent) / 100));
+    }
+    case 'tokens':
+      return addTokens(state, effect.token, effect.count);
+    case 'hand-limit':
+      return { ...state, handLimit: Math.min(8, state.handLimit + effect.amount) };
+    case 'heart-limit':
+      return {
+        ...state,
+        hearts: changeLoveGatherHeartLimit(state.hearts, state.hearts.heartLimit + effect.amount)
+          .state,
+      };
+    case 'shuffle':
+      return shuffleHand(state);
+    case 'use-hand':
+      throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'energy':
       return changeResource(state, 'energy', BigInt(Math.ceil(boosted(state, effect.amount))));
     case 'stamina':

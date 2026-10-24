@@ -1,8 +1,9 @@
-import { shuffle } from './deck';
 import { collectHearts } from './hearts';
-import { type Action, type GameState, rules } from './model';
+import { type Action, type Card, type GameState, rules } from './model';
 import { applyEffect, changeResource } from './effects';
 import { canUseCard, cardAt } from './projection';
+import { cardCost } from './cards/cost';
+import { fillHand } from './cards/drawing';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -23,39 +24,51 @@ export function act(state: GameState, action: Action): GameState {
 
 function useCard(state: GameState, index: number): GameState {
   if (!canUseCard(state, index)) return state;
-  const card = cardAt(state, index);
-  let next: GameState = {
-    ...state,
-    charge: Math.min(100, state.charge + 8),
-    lastActionTick: state.tick,
-    lastPerformer: card.performer,
-    lastCardName: card.name,
-    stats: { ...state.stats, cardsUsed: state.stats.cardsUsed + 1 },
-  };
-  next = changeResource(next, 'energy', -BigInt(card.cost));
-  for (const effect of card.effects) next = applyEffect(next, effect);
-  return replaceCard(next, index, card.id);
+  const source = cardAt(state, index);
+  const queue = source.effects.some((effect) => effect.kind === 'use-hand')
+    ? [source.id, ...state.hand.filter((id) => id !== source.id)]
+    : [source.id];
+  let next = changeResource(state, 'energy', -BigInt(cardCost(state, source)));
+  for (const id of queue) {
+    const card = next.deck.find((item) => item.id === id);
+    if (!card) continue;
+    const handIndex = state.hand.indexOf(id);
+    next = {
+      ...next,
+      charge: Math.min(100, next.charge + 8),
+      lastActionTick: state.tick,
+      lastPerformer: card.performer,
+      lastCardName: card.name,
+      nextDrawPreference: card.drawPreference ?? next.nextDrawPreference,
+      stats: { ...next.stats, cardsUsed: next.stats.cardsUsed + 1 },
+      cardUses: [
+        ...next.cardUses,
+        {
+          key: next.stats.cardsUsed + 1,
+          card,
+          tick: state.tick,
+          handIndex,
+          handCount: state.hand.length,
+          cost: cardCost(state, card),
+        },
+      ],
+    };
+    next = retireCard(next, card);
+    for (const effect of card.effects)
+      if (effect.kind !== 'use-hand') next = applyEffect(next, effect);
+  }
+  return fillHand(next);
 }
 
-function replaceCard(state: GameState, index: number, usedId: string): GameState {
-  let drawPile = state.drawPile;
-  let discard = [...state.discard, usedId];
-  let randomSeed = state.randomSeed;
-  if (!drawPile.length) {
-    const shuffled = shuffle(discard, randomSeed);
-    drawPile = shuffled.items;
-    randomSeed = shuffled.seed;
-    discard = [];
-  }
-  const drawn = drawPile[0];
-  if (!drawn) throw new Error('補充するカードがありません。');
+function retireCard(state: GameState, card: Card): GameState {
   return {
     ...state,
-    randomSeed,
-    discard,
-    drawPile: drawPile.slice(1),
-    hand: state.hand.map((id, handIndex) => (handIndex === index ? drawn : id)),
-    relayUsed: state.relayUsed.filter((id) => id !== drawn),
+    hand: state.hand.filter((id) => id !== card.id),
+    deck: card.token ? state.deck.filter((item) => item.id !== card.id) : state.deck,
+    drawPile: state.drawPile.filter((id) => id !== card.id),
+    discard: card.token
+      ? state.discard.filter((id) => id !== card.id)
+      : [...state.discard.filter((id) => id !== card.id), card.id],
   };
 }
 

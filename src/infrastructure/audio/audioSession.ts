@@ -1,6 +1,7 @@
 import type { Track } from '../../domain/game/model';
 import { compose, type Note } from './composition';
 import { scheduleNote } from './synth';
+import { LiveClock } from './liveClock';
 
 export class AudioSession {
   private readonly context: AudioContext;
@@ -8,6 +9,8 @@ export class AudioSession {
   private readonly notes: readonly Note[];
   private readonly secondsPerBeat: number;
   private origin = 0;
+  private readonly clock: LiveClock;
+  private audioStarted = false;
   private nextNote = 0;
   private timer: ReturnType<typeof setInterval> | null = null;
   private closed = false;
@@ -19,28 +22,50 @@ export class AudioSession {
     this.output.connect(this.context.destination);
     this.secondsPerBeat = 60 / track.bpm;
     this.notes = compose(track);
+    this.clock = new LiveClock(() => performance.now() / 1000);
   }
 
-  static async create(track: Track, muted: boolean): Promise<AudioSession> {
+  static create(track: Track, muted: boolean): AudioSession {
     const session = new AudioSession(track, muted);
-    try {
-      await session.context.resume();
-      session.origin = session.context.currentTime + 0.1;
-      session.schedule();
-      session.timer = setInterval(() => session.schedule(), 50);
-      return session;
-    } catch (error) {
-      await session.close();
-      throw error;
-    }
+    session.context.addEventListener('statechange', session.alignAudio);
+    window.addEventListener('pointerdown', session.unlockAudio);
+    window.addEventListener('keydown', session.unlockAudio);
+    session.alignAudio();
+    session.unlockAudio();
+    session.timer = setInterval(() => session.schedule(), 50);
+    return session;
   }
+
+  private readonly alignAudio = (): void => {
+    if (this.closed || this.context.state !== 'running') return;
+    window.removeEventListener('pointerdown', this.unlockAudio);
+    window.removeEventListener('keydown', this.unlockAudio);
+    this.audioStarted = true;
+    this.origin = this.context.currentTime - this.clock.seconds;
+    this.schedule();
+  };
+
+  private readonly unlockAudio = (): void => {
+    if (this.closed || this.audioStarted) return;
+    void this.context
+      .resume()
+      .then(() => {
+        if (this.closed) return;
+        this.alignAudio();
+        window.removeEventListener('pointerdown', this.unlockAudio);
+        window.removeEventListener('keydown', this.unlockAudio);
+      })
+      .catch((failure: unknown) => {
+        if (!this.closed) console.error(failure);
+      });
+  };
 
   get seconds(): number {
-    return Math.max(0, this.context.currentTime - this.origin);
+    return this.clock.seconds;
   }
 
   get interrupted(): boolean {
-    return !this.closed && this.context.state !== 'running';
+    return !this.closed && this.audioStarted && this.context.state !== 'running';
   }
 
   setMuted(muted: boolean): void {
@@ -49,16 +74,23 @@ export class AudioSession {
   }
 
   async pause(): Promise<void> {
+    this.clock.pause();
     if (!this.closed) await this.context.suspend();
   }
 
   async resume(): Promise<void> {
-    if (!this.closed) await this.context.resume();
+    if (this.closed) return;
+    this.clock.resume();
+    this.unlockAudio();
+    if (this.audioStarted) await this.context.resume();
   }
 
   async close(): Promise<void> {
     if (this.closed) return;
     this.closed = true;
+    window.removeEventListener('pointerdown', this.unlockAudio);
+    window.removeEventListener('keydown', this.unlockAudio);
+    this.context.removeEventListener('statechange', this.alignAudio);
     if (this.timer !== null) clearInterval(this.timer);
     this.output.disconnect();
     await this.context.close();

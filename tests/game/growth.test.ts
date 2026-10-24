@@ -4,7 +4,6 @@ import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
 import { rules } from '../../src/domain/game/model';
-import { scoreGrade } from '../../src/domain/game/projection';
 import { collectionScore } from '../../src/domain/game/scoring';
 import { createGame } from '../../src/domain/game/simulation';
 
@@ -38,14 +37,5 @@ describe('ライブ中の複利成長', () => {
   it('十分に成長した回収で9999無量大数へ到達し、上限を超えない', () => {
     const state = { ...game(), growthMultiplier: 10n ** 72n };
     expect(collectionScore(state, 10, false)).toBe(rules.maxScore);
-  });
-
-  it('83万700はC評価で、S以上を目標の桁に合わせる', () => {
-    const base = game();
-    expect(scoreGrade({ ...base, score: 830700n })).toBe('C');
-    expect(scoreGrade({ ...base, score: 10n ** 60n })).toBe('S');
-    expect(scoreGrade({ ...base, score: 10n ** 68n })).toBe('SS');
-    expect(scoreGrade({ ...base, score: rules.maxScore - 1n })).toBe('SS');
-    expect(scoreGrade({ ...base, score: rules.maxScore })).toBe('SSS');
   });
 });

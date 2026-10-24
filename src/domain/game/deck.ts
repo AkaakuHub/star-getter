@@ -18,7 +18,7 @@ export function validateCard(card: Card): void {
     !card.name.trim() ||
     !costumeIds.includes(card.costume) ||
     !Number.isInteger(card.cost) ||
-    card.cost < 1 ||
+    card.cost < 0 ||
     card.cost > rules.maxEnergy ||
     Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
     card.effects.length === 0 ||
@@ -31,7 +31,18 @@ export function validateCard(card: Card): void {
     throw new Error('カードの設定が正しくありません。');
   }
   for (const effect of card.effects) {
-    if (effect.kind === 'collect') continue;
+    if (effect.kind === 'collect' || effect.kind === 'shuffle' || effect.kind === 'use-hand')
+      continue;
+    if (effect.kind === 'tokens') {
+      if (!Number.isSafeInteger(effect.count) || effect.count < 1 || effect.count > 30)
+        throw new Error('追加カードの枚数が正しくありません。');
+      continue;
+    }
+    if (effect.kind === 'hand-limit' || effect.kind === 'heart-limit') {
+      if (!Number.isSafeInteger(effect.amount) || effect.amount < 1 || effect.amount > 1000)
+        throw new Error('上限の増加量が正しくありません。');
+      continue;
+    }
     if (effect.kind === 'growth') {
       if (
         !Number.isSafeInteger(effect.multiplier) ||
@@ -67,7 +78,12 @@ export function validateCard(card: Card): void {
       ) {
         throw new Error('得点倍率と効果時間が正しくありません。');
       }
-    } else if (!Number.isSafeInteger(effect.amount) || effect.amount <= 0 || effect.amount > 100) {
+    } else if (
+      !('amount' in effect) ||
+      !Number.isSafeInteger(effect.amount) ||
+      effect.amount <= 0 ||
+      effect.amount > 100
+    ) {
       throw new Error('カードの効果量が正しくありません。');
     }
   }

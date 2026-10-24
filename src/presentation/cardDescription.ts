@@ -2,6 +2,23 @@ import type { Card, Effect } from '../domain/game/model';
 
 function describeEffect(effect: Effect): string {
   switch (effect.kind) {
+    case 'tokens': {
+      const names = {
+        ensemble: '共演の招待',
+        story: '花のページ',
+        clock: '時を刻む合図',
+        bookmark: '次の一幕',
+      };
+      return `「${names[effect.token]}」を${effect.count}枚、山札に追加する。追加されたカードは使用後に除外される。`;
+    }
+    case 'hand-limit':
+      return `このセクション中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
+    case 'heart-limit':
+      return `このステージ中、ハート上限を${effect.amount}個増加する。`;
+    case 'shuffle':
+      return '手札を山札・捨札と混ぜて引き直す。';
+    case 'use-hand':
+      return '他の手札のスキルを一斉に使用する。必要APは他の手札の合計からデッキ枚数に応じた値を引いて決まり、このカードは使用後に除外される。';
     case 'hearts':
       return `スキルハートを${effect.amount}個獲得する。`;
     case 'energy':
@@ -26,7 +43,11 @@ function describeEffect(effect: Effect): string {
 }
 
 export function describeCard(card: Card): string {
-  const skill = card.effects.map(describeEffect).join('');
+  const skill =
+    card.effects.map(describeEffect).join('') +
+    (card.passive
+      ? `手札にある間、スキルハート獲得数を+${card.passive.heartsPercent}%し、手札上限を${Math.abs(card.passive.handLimitDelta)}枚減少する。`
+      : '');
   return card.relay
     ? skill +
         `手札にある間、${card.relay.threshold}個以上を一度に回収したとき、ハートを${card.relay.hearts}個獲得する。この特性は再ドローで再発動できる。`

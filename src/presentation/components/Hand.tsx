@@ -1,15 +1,15 @@
 import type { GameController } from '../../app/gameController';
 import type { GameState } from '../../domain/game/model';
+import { cardCost } from '../../domain/game/cards/cost';
 import { cardAt } from '../../domain/game/projection';
 import { describeCard } from '../cardDescription';
 import { handLayout } from '../handLayout';
-import { CardArtwork } from '../mascots/CardArtwork';
+import { HandCardFace } from '../cards/HandCardFace';
 
 export function Hand({
   controller,
   state,
-  onSelect,
-}: Readonly<{ controller: GameController; state: GameState; onSelect: () => void }>) {
+}: Readonly<{ controller: GameController; state: GameState }>) {
   return (
     <section
       aria-label="手札"
@@ -18,7 +18,6 @@ export function Hand({
       {state.hand.map((id, index) => {
         const card = cardAt(state, index);
         const use = () => {
-          onSelect();
           controller.tapCard(index);
         };
         return (
@@ -29,7 +28,7 @@ export function Hand({
             style={handLayout(index, state.hand.length)}
             disabled={state.phase !== 'playing' && state.phase !== 'paused'}
             aria-pressed={controller.selectedCard?.id === card.id}
-            aria-label={card.name + '、AP' + card.cost + '、' + describeCard(card)}
+            aria-label={card.name + '、AP' + cardCost(state, card) + '、' + describeCard(card)}
             onPointerDown={(event) => {
               if (event.button === 0) {
                 event.preventDefault();
@@ -40,9 +39,7 @@ export function Hand({
               if (event.detail === 0) use();
             }}
           >
-            <CardArtwork card={card} />
-            <span className="hand-cost">{card.cost}</span>
-            <span className="hand-name">{card.name}</span>
+            <HandCardFace card={card} cost={cardCost(state, card)} />
           </button>
         );
       })}

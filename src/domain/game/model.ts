@@ -18,11 +18,15 @@ export const costumeIds = [
   'ribbon',
 ] as const;
 export type CostumeId = (typeof costumeIds)[number];
+export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark';
 export type Effect =
   | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
   | Readonly<{ kind: 'amplify'; percent: number }>
   | Readonly<{ kind: 'growth'; multiplier: number }>
+  | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
+  | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
+  | Readonly<{ kind: 'shuffle' | 'use-hand' }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | Readonly<{
       kind: 'resource-boost';
@@ -42,6 +46,9 @@ export type Card = Readonly<{
   appeal: LoveGatherCardAppealParameters;
   effects: readonly Effect[];
   relay?: Readonly<{ threshold: number; hearts: number }>;
+  token?: TokenKind;
+  drawPreference?: TokenKind;
+  passive?: Readonly<{ heartsPercent: number; handLimitDelta: number }>;
 }>;
 
 export type Section = Readonly<{
@@ -61,6 +68,14 @@ export type Track = Readonly<{
   chords: readonly (readonly [number, number, number])[];
 }>;
 
+export type CardUse = Readonly<{
+  key: number;
+  card: Card;
+  tick: number;
+  handIndex: number;
+  handCount: number;
+  cost: number;
+}>;
 export type Boost = Readonly<{ percent: bigint; untilTick: number }>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina';
@@ -89,6 +104,10 @@ export type GameState = Readonly<{
   hand: readonly string[];
   drawPile: readonly string[];
   discard: readonly string[];
+  tokenCatalog: readonly Card[];
+  nextTokenId: number;
+  handLimit: number;
+  nextDrawPreference: TokenKind | null;
   randomSeed: number;
   energy: number;
   stamina: number;
@@ -109,6 +128,7 @@ export type GameState = Readonly<{
   lastActionTick: number;
   lastPerformer: PerformerId | null;
   lastCardName: string;
+  cardUses: readonly CardUse[];
   lastGain: bigint;
   stats: PlayStats;
 }>;

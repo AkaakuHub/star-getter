@@ -1,6 +1,6 @@
 # ラブギャザー
 
-カードを組み合わせ、音楽に合わせてハートを集めるブラウザゲームです。
+固定プリセット「書架」「開花」のカードを組み合わせ、ハートを集めて9999無量大数を目指すブラウザゲームです。読み込み直後に1曲のライブが始まります。
 
 ## 開発
 
@@ -18,4 +18,4 @@ vp run knip
 vp build
 ```
 
-TypeScript、Preact、Three.jsで構成し、Oxlint・Oxfmtを`vp check`から実行します。lefthookはcommit時に検証を、push時にbuildを実行します。
+TypeScript、Preact、Canvasで構成し、Oxlint・Oxfmtを`vp check`から実行します。lefthookはcommit時に検証を、push時にbuildを実行します。
