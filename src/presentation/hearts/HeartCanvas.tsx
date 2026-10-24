@@ -28,10 +28,10 @@ export function HeartCanvas({ controller }: Readonly<{ controller: GameControlle
         width,
         height,
       );
-      if (controller.state.phase === 'playing') frame = requestAnimationFrame(draw);
+      if (controller.running) frame = requestAnimationFrame(draw);
     };
     const synchronize = () => {
-      if (controller.state.phase !== 'playing') {
+      if (!controller.running) {
         cancelAnimationFrame(frame);
         frame = 0;
         draw();

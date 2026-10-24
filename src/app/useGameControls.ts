@@ -29,7 +29,7 @@ export function useGameControls(controller: GameController | null, helpOpen: boo
       }
       if (event.key === 'Escape') {
         event.preventDefault();
-        void controller.togglePause();
+        void controller.toggleWaitMode();
       }
     };
     const visibility = () => {

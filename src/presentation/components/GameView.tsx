@@ -1,4 +1,4 @@
-import { Pause, Play, Menu, List } from 'lucide-preact';
+import { Pause, Menu, List } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
@@ -15,7 +15,7 @@ export function GameView({
   state,
   route,
   onReplay,
-  onPause,
+  onWaitMode,
   onMenu,
   onHand,
   busy,
@@ -24,7 +24,7 @@ export function GameView({
   state: GameState;
   route: RouteId;
   onReplay: () => void;
-  onPause: () => void;
+  onWaitMode: () => void;
   onMenu: () => void;
   onHand: () => void;
   busy: boolean;
@@ -48,15 +48,11 @@ export function GameView({
           type="button"
           className="live-tool live-pause"
           style={liveLayout.pause}
-          aria-label={state.phase === 'paused' ? '再開' : '一時停止'}
-          aria-pressed={state.phase === 'paused'}
-          onClick={onPause}
+          aria-label="カード使用可能時の自動停止"
+          aria-pressed={controller.waitModeEnabled}
+          onClick={onWaitMode}
         >
-          {state.phase === 'paused' ? (
-            <Play size={20} aria-hidden="true" />
-          ) : (
-            <Pause size={20} aria-hidden="true" />
-          )}
+          <Pause size={20} aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -71,9 +67,9 @@ export function GameView({
       <Hand controller={controller} state={state} />
       <CardUseLayer controller={controller} />
       <CardPreview card={controller.selectedCard} onClose={() => controller.clearSelection()} />
-      {state.phase === 'paused' && (
+      {(state.phase === 'paused' || controller.waiting) && (
         <div className="pause-band" role="status">
-          一時停止
+          {controller.waiting ? 'カード使用待ち' : '一時停止'}
         </div>
       )}
       {state.phase === 'finished' && (

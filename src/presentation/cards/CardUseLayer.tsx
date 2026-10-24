@@ -35,7 +35,7 @@ function CardUseGhost({
         animation.pause();
         return;
       }
-      if (controller.state.phase !== 'playing') {
+      if (!controller.running) {
         animation.currentTime = elapsed;
         animation.pause();
       } else if (animation.playState === 'paused') animation.play();

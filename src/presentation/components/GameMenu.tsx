@@ -1,3 +1,4 @@
+import { Volume2, VolumeX } from 'lucide-preact';
 import { routes, routeIds, type RouteId } from '../../content/routes';
 import { loveGatherHeartShowLimitSettings } from '../../domain/game/live/heartPresentation';
 import { Modal } from './Modal';
@@ -56,8 +57,18 @@ export function GameMenu({
           onInput={(event) => onHeartShowLimit(Number(event.currentTarget.value))}
         />
       </div>
-      <button type="button" className="button quiet" aria-pressed={!muted} onClick={onMuted}>
-        音声{muted ? 'OFF' : 'ON'}
+      <button
+        type="button"
+        className="button quiet"
+        aria-label={muted ? '音声をオンにする' : '音声をオフにする'}
+        aria-pressed={!muted}
+        onClick={onMuted}
+      >
+        {muted ? (
+          <VolumeX size={22} aria-hidden="true" />
+        ) : (
+          <Volume2 size={22} aria-hidden="true" />
+        )}
       </button>
     </Modal>
   );

@@ -85,7 +85,7 @@ export function App() {
         state={controller.state}
         route={route}
         onReplay={() => void restart(route)}
-        onPause={() => void controller.togglePause()}
+        onWaitMode={() => void controller.toggleWaitMode()}
         onMenu={() => void openPanel('menu')}
         onHand={() => void openPanel('hand')}
         busy={busy}

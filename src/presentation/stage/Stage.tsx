@@ -18,7 +18,7 @@ export function Stage({
         <span />
       </div>
       <div
-        className={'board-performers ' + (state.phase === 'playing' ? 'dancing' : '')}
+        className={'board-performers ' + (controller.running ? 'dancing' : '')}
         aria-hidden="true"
       >
         {Object.values(performers).map((performer) => (

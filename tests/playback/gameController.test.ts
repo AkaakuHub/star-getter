@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import { GameController } from '../../src/app/gameController';
 import type { FrameScheduler, PlaybackClock } from '../../src/app/playbackPorts';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
-import { durationSeconds } from '../../src/domain/game/projection';
+import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { createGame } from '../../src/domain/game/simulation';
 
 class TestClock implements PlaybackClock {
@@ -50,13 +50,13 @@ class TestFrames implements FrameScheduler {
   }
 }
 
-function session() {
+function session(energy = 10) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
   const audio = new TestClock();
   const frames = new TestFrames();
   const controller = new GameController(
-    createGame(track, resolveDeck(defaultDeckIds), 7),
+    { ...createGame(track, resolveDeck(defaultDeckIds), 7), energy },
     audio,
     frames,
   );
@@ -183,5 +183,113 @@ describe('音声時計とゲームの同期', () => {
     frames.run(5000);
     expect(controller.state).toBe(state);
     expect(notifications).toBe(0);
+  });
+});
+
+describe('カード使用可能時の自動停止', () => {
+  it('オンにすると使用可能な手札が1枚あれば停止し、停止中のカード使用で再開する', async () => {
+    const { controller, audio, frames } = session();
+    expect(controller.waitModeEnabled).toBe(false);
+    await controller.toggleWaitMode();
+    expect(controller.waitModeEnabled).toBe(true);
+    expect(controller.waiting).toBe(true);
+    expect(controller.running).toBe(false);
+    expect(audio.interrupted).toBe(true);
+    expect(frames.pending).toBe(0);
+    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
+    controller.tapCard(index);
+    controller.tapCard(index);
+    expect(controller.state.stats.cardsUsed).toBe(1);
+    expect(controller.waiting).toBe(false);
+    await vi.waitFor(() => expect(audio.interrupted).toBe(false));
+    expect(frames.pending).toBe(1);
+  });
+
+  it('使用後は0.35秒待ち、残りの手札が使用可能なら再び停止する', async () => {
+    const { controller, audio, frames } = session();
+    await controller.toggleWaitMode();
+    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
+    controller.command({ type: 'card', index });
+    await vi.waitFor(() => expect(frames.pending).toBe(1));
+    audio.seconds = 0.3;
+    frames.run(300);
+    expect(controller.waiting).toBe(false);
+    audio.seconds = 0.35;
+    frames.run(350);
+    expect(controller.state.hand.some((_, slot) => canUseCard(controller.state, slot))).toBe(true);
+    expect(controller.waiting).toBe(true);
+    expect(frames.pending).toBe(0);
+  });
+
+  it('使用可能なカードがない間は進み、1枚でも使用可能になったら停止する', async () => {
+    const { controller, audio, frames } = session(0);
+    await controller.toggleWaitMode();
+    expect(controller.waiting).toBe(false);
+    audio.seconds = 0.1;
+    frames.run(100);
+    expect(controller.running).toBe(true);
+    for (let step = 2; step < 100 && !controller.waiting; step++) {
+      audio.seconds = step / 10;
+      frames.run(step * 100);
+    }
+    expect(controller.waiting).toBe(true);
+    const usable = controller.state.hand.map((_, slot) => canUseCard(controller.state, slot));
+    expect(usable.some(Boolean)).toBe(true);
+    expect(usable.every(Boolean)).toBe(false);
+  });
+
+  it('使用できないカードを押しても停止を解除せず、音声の停止完了を待って再開する', async () => {
+    const { controller, audio, frames } = session(3);
+    let completePause: () => void = () => {
+      throw new Error('停止の待機がありません。');
+    };
+    audio.pauseBarrier = new Promise<void>((resolve) => {
+      completePause = resolve;
+    });
+    const toggled = controller.toggleWaitMode();
+    expect(controller.waiting).toBe(true);
+    const unavailable = controller.state.hand.findIndex(
+      (_, slot) => !canUseCard(controller.state, slot),
+    );
+    expect(unavailable).toBeGreaterThanOrEqual(0);
+    controller.command({ type: 'card', index: unavailable });
+    expect(controller.waiting).toBe(true);
+    expect(controller.state.stats.cardsUsed).toBe(0);
+    const available = controller.state.hand.findIndex((_, slot) =>
+      canUseCard(controller.state, slot),
+    );
+    controller.command({ type: 'card', index: available });
+    expect(controller.state.stats.cardsUsed).toBe(1);
+    expect(frames.pending).toBe(0);
+    completePause();
+    await toggled;
+    await vi.waitFor(() => expect(frames.pending).toBe(1));
+    expect(audio.interrupted).toBe(false);
+  });
+
+  it('オフにすると停止を解除し、カードが使用可能でも進行する', async () => {
+    const { controller, audio, frames } = session();
+    await controller.toggleWaitMode();
+    await controller.toggleWaitMode();
+    expect(controller.waitModeEnabled).toBe(false);
+    expect(controller.waiting).toBe(false);
+    expect(audio.interrupted).toBe(false);
+    audio.seconds = 1;
+    frames.run(1000);
+    expect(controller.state.tick).toBe(60);
+    expect(controller.running).toBe(true);
+  });
+
+  it('手札確認などの停止・再開でも自動停止を維持し、確認中はカードを使用しない', async () => {
+    const { controller, audio, frames } = session();
+    await controller.toggleWaitMode();
+    await controller.togglePause();
+    controller.command({ type: 'card', index: 0 });
+    expect(controller.state.stats.cardsUsed).toBe(0);
+    await controller.togglePause();
+    expect(controller.waitModeEnabled).toBe(true);
+    expect(controller.waiting).toBe(true);
+    expect(audio.interrupted).toBe(true);
+    expect(frames.pending).toBe(0);
   });
 });
