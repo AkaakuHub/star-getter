@@ -1,3 +1,4 @@
+import { scoreUnits } from './score/units';
 import type { Card, Effect } from '../domain/game/model';
 
 function describeEffect(effect: Effect): string {
@@ -58,27 +59,6 @@ export function formatTime(seconds: number): string {
   const whole = Math.max(0, Math.floor(seconds));
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`;
 }
-
-const scoreUnits = [
-  '',
-  '万',
-  '億',
-  '兆',
-  '京',
-  '垓',
-  '秭',
-  '穣',
-  '溝',
-  '澗',
-  '正',
-  '載',
-  '極',
-  '恒河沙',
-  '阿僧祇',
-  '那由他',
-  '不可思議',
-  '無量大数',
-];
 
 export function formatScore(score: bigint | number): string {
   const value = typeof score === 'bigint' ? score : BigInt(Math.floor(score));

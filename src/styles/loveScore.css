@@ -1,0 +1,32 @@
+.love-number {
+  display: grid;
+  grid-template-columns: repeat(var(--love-columns), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--love-rows), minmax(0, 1fr));
+  align-items: center;
+  height: 13cqw;
+  padding-bottom: 0.6em;
+  font-family: ui-monospace, monospace;
+  font-size: calc(60cqw / var(--love-columns));
+  font-weight: 800;
+  line-height: 1;
+}
+.love-digit {
+  position: relative;
+  min-width: 0;
+  text-align: center;
+}
+.love-comma {
+  position: absolute;
+  top: 0;
+  right: -0.1em;
+}
+.love-unit {
+  position: absolute;
+  top: 105%;
+  right: -0.2em;
+  color: #706778;
+  font-family: var(--font-sans);
+  font-size: 0.4em;
+  font-weight: 700;
+  white-space: nowrap;
+}

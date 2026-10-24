@@ -3,7 +3,7 @@ import type { GameController } from '../../app/gameController';
 import { type GameState, rules } from '../../domain/game/model';
 import { durationSeconds } from '../../domain/game/projection';
 import { formatScore, formatTime } from '../cardDescription';
-import { FittedText } from '../text/FittedText';
+import { LoveScore } from '../score/LoveScore';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { MoodGraph } from './MoodGraph';
@@ -22,9 +22,7 @@ export function LiveHud({
     <>
       <div className="score-display" style={liveLayout.score}>
         <span>LOVE</span>
-        <div className="score-value" aria-label={state.score.toString()}>
-          <FittedText text={formatScore(state.score)} />
-        </div>
+        <LoveScore value={state.score} />
       </div>
       <div className="live-track">
         <h1>{state.track.name}</h1>
