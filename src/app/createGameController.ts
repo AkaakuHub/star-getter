@@ -7,12 +7,13 @@ export async function createGameController(
   track: Track,
   deck: readonly Card[],
   muted: boolean,
+  heartShowLimit: number,
 ): Promise<GameController> {
   const random = new Uint32Array(1);
   crypto.getRandomValues(random);
   const value = random[0];
   if (value === undefined) throw new Error('ゲームの乱数を生成できません。');
-  const state = createGame(track, deck, (value | 1) >>> 0);
+  const state = createGame(track, deck, (value | 1) >>> 0, heartShowLimit);
   const audio = await AudioSession.create(track, muted);
   return new GameController(state, audio, {
     request: (callback) => requestAnimationFrame(callback),

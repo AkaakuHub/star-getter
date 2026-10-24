@@ -1,17 +1,15 @@
-import { Flower2, Heart } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { performers } from '../../content/performers';
 import type { GameState } from '../../domain/game/model';
 import { Portrait } from '../components/Portrait';
 import { heartCount } from '../../domain/game/hearts';
-import { heartLayout } from './heartLayout';
+import { HeartCanvas } from '../hearts/HeartCanvas';
 
 export function Stage({
   controller,
   state,
 }: Readonly<{ controller: GameController; state: GameState }>) {
   const collect = () => controller.command({ type: 'collect' });
-  const CollectIcon = state.bloom ? Flower2 : Heart;
   return (
     <div className="absolute inset-0 overflow-hidden">
       <div className="concert-backdrop" aria-hidden="true">
@@ -44,13 +42,7 @@ export function Stage({
           if (event.detail === 0) collect();
         }}
       />
-      <div className="heart-layer" aria-hidden="true">
-        {heartLayout(state).map((style, index) => (
-          <span key={index} className="floating-heart" aria-hidden="true" style={style}>
-            <CollectIcon fill={state.bloom ? 'none' : 'currentColor'} size={23} />
-          </span>
-        ))}
-      </div>
+      <HeartCanvas controller={controller} />
       {state.lastCardName && state.tick - state.lastActionTick < 60 && (
         <div className="skill-notice" role="status">
           {state.lastCardName}

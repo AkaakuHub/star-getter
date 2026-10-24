@@ -49,19 +49,12 @@
   outline-color: #ffe4f2;
   outline-offset: -4px;
 }
-.heart-layer {
+.heart-canvas {
   position: absolute;
   inset: 0;
   z-index: 3;
-  pointer-events: none;
-}
-.floating-heart {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  color: #e64f86;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 .skill-notice,

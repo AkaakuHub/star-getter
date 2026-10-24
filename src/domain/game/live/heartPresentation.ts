@@ -10,11 +10,11 @@ type LoveGatherHeartPresentation = Readonly<{
   collectionJumpHeight: number;
 }>;
 
-const loveGatherHeartShowLimitSettings = {
+export const loveGatherHeartShowLimitSettings = {
   minimum: 10,
   maximum: 100,
   step: 10,
-  defaultValue: 50,
+  defaultValue: 100,
 } as const;
 
 const waitFallSpeed = -0.2;

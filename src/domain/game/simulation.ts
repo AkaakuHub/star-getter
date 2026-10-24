@@ -4,10 +4,20 @@ import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
 import { changeBloomResource, finishBloom } from './bloom';
 import { createLoveGatherHeartRuntimeState } from './live/heartSpawn';
+import {
+  loveGatherHeartShowLimitSettings,
+  resolveLoveGatherHeartDrawCount,
+} from './live/heartPresentation';
 
-export function createGame(track: Track, deck: readonly Card[], seed: number): GameState {
+export function createGame(
+  track: Track,
+  deck: readonly Card[],
+  seed: number,
+  heartShowLimit: number = loveGatherHeartShowLimitSettings.defaultValue,
+): GameState {
   validateDeck(deck);
   validateTrack(track);
+  resolveLoveGatherHeartDrawCount(0, heartShowLimit);
   const shuffled = shuffle(
     deck.map((card) => card.id),
     seed,
@@ -27,7 +37,12 @@ export function createGame(track: Track, deck: readonly Card[], seed: number): G
     excitement: 0,
     charge: 0,
     score: 0n,
-    hearts: createLoveGatherHeartRuntimeState((track.beats * 60) / track.bpm),
+    hearts: {
+      ...createLoveGatherHeartRuntimeState((track.beats * 60) / track.bpm),
+      showLimit: heartShowLimit,
+      throwLimit: heartShowLimit,
+      showPercentage: 100,
+    },
     heartRandomSeed: seed,
     boosts: [],
     amplification: 100n,

@@ -1,0 +1,53 @@
+import { describe, expect, it } from 'vite-plus/test';
+import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { tracks } from '../../src/content/tracks';
+import { act } from '../../src/domain/game/actions';
+import { addHearts, heartCount } from '../../src/domain/game/hearts';
+import { canUseCard } from '../../src/domain/game/projection';
+import { advanceTo, createGame } from '../../src/domain/game/simulation';
+
+function game(limit?: number) {
+  const track = tracks[0];
+  if (!track) throw new Error('テスト楽曲がありません。');
+  return act(createGame(track, resolveDeck(defaultDeckIds), 7, limit), { type: 'start' });
+}
+
+function play(limit: number) {
+  let state = game(limit);
+  for (let tick = 1; tick <= 1800; tick++) {
+    state = advanceTo(state, tick / 60);
+    if (tick % 30 === 0) {
+      const index = state.hand.findIndex((id, slot) => Boolean(id) && canUseCard(state, slot));
+      if (index >= 0) state = act(state, { type: 'card', index });
+    }
+    if (tick % 20 === 0) state = act(state, { type: 'collect' });
+    state = act(state, { type: 'special' });
+  }
+  return {
+    score: state.score,
+    stats: state.stats,
+    hand: state.hand,
+    drawPile: state.drawPile,
+    randomSeed: state.randomSeed,
+  };
+}
+
+describe('ハートの表示上限', () => {
+  it('既定は100個で、表示上限を減らしても論理上の個数は減らさない', () => {
+    expect(game().hearts.showLimit).toBe(100);
+    for (let limit = 10; limit <= 100; limit += 10) {
+      const state = addHearts(game(limit), 100);
+      expect(heartCount(state)).toBe(100);
+      expect(state.hearts.stageHearts).toHaveLength(limit);
+      expect(state.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0)).toBe(
+        100 - limit,
+      );
+    }
+  });
+
+  it('10個・50個・100個の描画設定で得点・特性・カード循環が一致する', () => {
+    const full = play(100);
+    expect(play(10)).toEqual(full);
+    expect(play(50)).toEqual(full);
+  });
+});

@@ -7,14 +7,19 @@ import { bestScore, type Library } from '../../infrastructure/storage/library';
 import { formatScore, formatTime } from '../cardDescription';
 import { DeckEditor } from './DeckEditor';
 import { Portrait } from './Portrait';
+import { loveGatherHeartShowLimitSettings } from '../../domain/game/live/heartPresentation';
 
 export function Lobby({
   library,
+  heartShowLimit,
+  onHeartShowLimit,
   onChange,
   onStart,
   busy,
 }: Readonly<{
   library: Library;
+  heartShowLimit: number;
+  onHeartShowLimit: (value: number) => void;
   onChange: (library: Library) => void;
   onStart: () => void;
   busy: boolean;
@@ -58,6 +63,22 @@ export function Lobby({
             </button>
           ))}
         </div>
+      </section>
+      <section className="heart-display-panel panel">
+        <div className="panel-heading">
+          <label htmlFor="heart-show-limit">ハート表示数</label>
+          <output htmlFor="heart-show-limit">{heartShowLimit}個</output>
+        </div>
+        <input
+          id="heart-show-limit"
+          type="range"
+          min={loveGatherHeartShowLimitSettings.minimum}
+          max={loveGatherHeartShowLimitSettings.maximum}
+          step={loveGatherHeartShowLimitSettings.step}
+          value={heartShowLimit}
+          disabled={busy}
+          onInput={(event) => onHeartShowLimit(Number(event.currentTarget.value))}
+        />
       </section>
       <section className="team-panel panel">
         <div className="panel-heading">

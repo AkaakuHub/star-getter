@@ -9,9 +9,11 @@ import { Lobby } from '../presentation/components/Lobby';
 import type { GameController } from './gameController';
 import { createGameController } from './createGameController';
 import { useGameControls } from './useGameControls';
+import { readHeartShowLimit, writeHeartShowLimit } from '../infrastructure/storage/heartDisplay';
 
 export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
   const [library, setLibrary] = useState(initialLibrary);
+  const [heartShowLimit, setHeartShowLimit] = useState(() => readHeartShowLimit(localStorage));
   const [controller, setController] = useState<GameController | null>(null);
   const [error, setError] = useState('');
   const [help, setHelp] = useState(false);
@@ -53,7 +55,12 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
       const track = tracks.find((item) => item.id === library.trackId);
       if (!track) throw new Error('選択された楽曲がありません。');
       if (controller) await controller.dispose();
-      const next = await createGameController(track, resolveDeck(library.deckIds), library.muted);
+      const next = await createGameController(
+        track,
+        resolveDeck(library.deckIds),
+        library.muted,
+        heartShowLimit,
+      );
       setController(next);
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : 'ライブを開始できません。');
@@ -140,6 +147,16 @@ export function App({ initialLibrary }: Readonly<{ initialLibrary: Library }>) {
       ) : (
         <Lobby
           library={library}
+          heartShowLimit={heartShowLimit}
+          onHeartShowLimit={(value) => {
+            try {
+              writeHeartShowLimit(localStorage, value);
+              setHeartShowLimit(value);
+              setError('');
+            } catch (failure) {
+              setError(failure instanceof Error ? failure.message : '設定を保存できません。');
+            }
+          }}
           onChange={changeLibrary}
           onStart={() => void start()}
           busy={busy}
