@@ -1,6 +1,7 @@
 .live-analyzer {
   position: absolute;
   z-index: 10;
+  overflow: hidden;
   border-radius: 2cqw;
   background: #fffaf5e6;
   pointer-events: none;
@@ -15,20 +16,24 @@
 }
 .mood-graph {
   position: absolute;
+  overflow: hidden;
+  contain: size layout paint;
   top: 17.1875%;
   left: 2.168367%;
   width: 95.663265%;
   height: 66.40625%;
 }
 .mood-graph canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
 }
 .mood-position {
   position: absolute;
-  top: -1px;
-  bottom: -1px;
+  top: 0;
+  bottom: 0;
   width: 0.462963cqw;
   transform: translateX(-50%);
   background: #82c8f3;

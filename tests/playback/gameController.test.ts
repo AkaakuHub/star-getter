@@ -67,21 +67,23 @@ describe('音声時計とゲームの同期', () => {
   it('最初の選択ではAPを使わず、同じカードをもう一度選ぶと発動する', () => {
     const { controller } = session();
     const initial = controller.state;
-    controller.tapCard(0);
-    expect(controller.selectedCard?.id).toBe(initial.hand[0]);
+    const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
+    controller.tapCard(index);
+    expect(controller.selectedCard?.id).toBe(initial.hand[index]);
     expect(controller.state.energy).toBe(initial.energy);
     expect(controller.state.stats.cardsUsed).toBe(0);
-    controller.tapCard(0);
+    controller.tapCard(index);
     expect(controller.selectedCard).toBe(null);
     expect(controller.state.stats.cardsUsed).toBe(1);
   });
 
   it('停止中はカードを確認でき、連続で選んでも発動せず再開後に発動できる', async () => {
     const { controller } = session();
+    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
     await controller.togglePause();
-    controller.tapCard(0);
-    controller.tapCard(0);
-    expect(controller.selectedCard?.id).toBe(controller.state.hand[0]);
+    controller.tapCard(index);
+    controller.tapCard(index);
+    expect(controller.selectedCard?.id).toBe(controller.state.hand[index]);
     expect(controller.state.stats.cardsUsed).toBe(0);
     await controller.togglePause();
     controller.activateSelected();

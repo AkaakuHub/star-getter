@@ -19,12 +19,18 @@ export function cardAt(state: GameState, index: number): Card {
   return card;
 }
 
+export function canActivateBloom(state: GameState): boolean {
+  return sectionAt(state).moodValue <= -100;
+}
+
 export function canUseCard(state: GameState, index: number): boolean {
   return (
     state.phase === 'playing' &&
     Number.isInteger(index) &&
     index >= 0 &&
     index < state.hand.length &&
+    (canActivateBloom(state) ||
+      !cardAt(state, index).effects.some((effect) => effect.kind === 'bloom')) &&
     !state.resting &&
     state.tick - state.lastActionTick >= rules.actionCooldownTicks &&
     (state.bloom !== null || state.energy >= cardCost(state, cardAt(state, index)))

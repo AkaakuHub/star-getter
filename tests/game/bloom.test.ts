@@ -16,6 +16,38 @@ function game() {
 }
 
 describe('開花とスキルの相乗効果', () => {
+  for (const mood of [-99, 0, 100]) {
+    it(`ムード${mood}%ではAPが足りていても開花を使用・発動できない`, () => {
+      const base = game();
+      const state = {
+        ...base,
+        track: {
+          ...base.track,
+          sections: base.track.sections.map((section) => ({ ...section, moodValue: mood })),
+        },
+      };
+      const index = state.hand.indexOf('spark');
+      expect(index).toBeGreaterThanOrEqual(0);
+      expect(canUseCard(state, index)).toBe(false);
+      expect(act(state, { type: 'card', index })).toBe(state);
+      expect(activateBloom(state, 100n)).toBe(state);
+    });
+  }
+
+  it('楽曲のムード−100%区間で開花を使用でき、区間変更後も発動を維持する', () => {
+    let state = game();
+    const index = state.hand.indexOf('spark');
+    expect(canUseCard(advanceTo(state, 5.99), index)).toBe(false);
+    state = advanceTo(state, 6);
+    expect(canUseCard(state, index)).toBe(true);
+    state = act(state, { type: 'card', index });
+    expect(state.bloom).not.toBe(null);
+    expect(state.stats.cardsUsed).toBe(1);
+    const later = advanceTo(state, 12);
+    expect(later.bloom).not.toBe(null);
+    expect(later.bloom?.progress).toBeGreaterThan(state.bloom?.progress ?? 0n);
+  });
+
   it('増幅を重ね、後続の効果に適用し、次のライブには引き継がない', () => {
     let state = applyEffect(game(), { kind: 'amplify', percent: 50 });
     state = applyEffect(state, { kind: 'amplify', percent: 50 });
@@ -26,7 +58,7 @@ describe('開花とスキルの相乗効果', () => {
   });
 
   it('AP・メンタル・ボルテージを専用ゲージへ変換し、元の値を復元する', () => {
-    const base = { ...game(), energy: 0, excitement: 40, stamina: 80 };
+    const base = { ...advanceTo(game(), 6), energy: 0, excitement: 40, stamina: 80 };
     const active = activateBloom(base, 100n);
     expect(active.bloom?.progress).toBe(120n);
     expect(canUseCard(active, 0)).toBe(true);
@@ -65,7 +97,10 @@ describe('開花とスキルの相乗効果', () => {
       condition: 'voltage20',
     } as const;
     expect(applyEffect(game(), effect).resourceBoosts).toHaveLength(0);
-    let state = applyEffect(activateBloom({ ...game(), excitement: 40 }, 100n), effect);
+    let state = applyEffect(
+      activateBloom({ ...advanceTo(game(), 6), excitement: 40 }, 100n),
+      effect,
+    );
     state = applyEffect(state, { kind: 'stamina', amount: 1 });
     expect(state.resourceBoosts[0]?.uses).toBe(3);
     for (let count = 0; count < 3; count++)

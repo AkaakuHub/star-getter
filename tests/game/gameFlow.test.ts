@@ -107,7 +107,9 @@ describe('カードと編成', () => {
   });
 
   it('連打によるカードの重複使用を防ぐ', () => {
-    const state = act({ ...game(), energy: 10 }, { type: 'card', index: 0 });
+    const initial = { ...game(), energy: 10 };
+    const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
+    const state = act(initial, { type: 'card', index });
     expect(act(state, { type: 'card', index: 1 })).toBe(state);
     expect(state.stats.cardsUsed).toBe(1);
   });

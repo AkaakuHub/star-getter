@@ -1,5 +1,6 @@
 import type { GameState } from './model';
 import { limitValue } from './scoring';
+import { canActivateBloom } from './projection';
 import {
   calculateLoveGatherInitialGenesisGauge,
   calculateLoveGatherGenesisGaugeDelta,
@@ -8,6 +9,7 @@ import {
 const gaugeTypes = { energy: 1, stamina: 2, excitement: 3 } as const;
 
 export function activateBloom(state: GameState, strength: bigint): GameState {
+  if (!canActivateBloom(state)) return state;
   if (state.bloom) return { ...state, bloom: { ...state.bloom, strength } };
   return {
     ...state,
