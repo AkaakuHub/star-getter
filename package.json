@@ -13,10 +13,13 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "preact": "^10.29.0"
+    "lucide-preact": "^0.577.0",
+    "preact": "^10.29.0",
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@types/three": "^0.183.1",
     "knip": "^5.83.1",
     "lefthook": "^2.1.9",
     "typescript": "^6.0.3",

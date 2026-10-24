@@ -1,0 +1,244 @@
+.portrait {
+  --accent: var(--nova);
+  width: 120px;
+  height: 150px;
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  isolation: isolate;
+}
+.portrait-lumen {
+  --accent: var(--lumen);
+}
+.portrait-tetra {
+  --accent: var(--tetra);
+}
+.portrait-head {
+  position: absolute;
+  width: 66%;
+  height: 48%;
+  background: var(--accent);
+  left: 17%;
+  top: 21%;
+  border-radius: 45% 45% 40% 40%;
+  box-shadow:
+    inset -7px -7px 0 #22344714,
+    inset 3px 3px 0 #ffffff38;
+}
+.portrait-body {
+  position: absolute;
+  width: 50%;
+  height: 38%;
+  left: 25%;
+  top: 58%;
+  border-radius: 30% 30% 44% 44%;
+  background: var(--accent);
+  box-shadow: inset -6px -5px 0 #22344715;
+}
+.portrait-body::before,
+.portrait-body::after {
+  content: '';
+  position: absolute;
+  background: #fff1d9;
+  width: 28%;
+  height: 15%;
+  border-radius: 6px;
+  bottom: -4%;
+}
+.portrait-body::before {
+  left: 5%;
+  transform: rotate(-10deg);
+}
+.portrait-body::after {
+  right: 5%;
+  transform: rotate(10deg);
+}
+.portrait-eye {
+  position: absolute;
+  top: 45%;
+  width: 9%;
+  height: 14%;
+  background: var(--ink);
+  border-radius: 50%;
+}
+.eye-left {
+  left: 28%;
+}
+.eye-right {
+  right: 28%;
+}
+.portrait-mouth {
+  position: absolute;
+  top: 62%;
+  left: 45%;
+  width: 10%;
+  height: 8%;
+  border-bottom: 2px solid var(--ink);
+  border-radius: 50%;
+}
+.portrait-orbit {
+  position: absolute;
+  z-index: 2;
+  width: 84%;
+  height: 24%;
+  border: 5px solid #fff1d9;
+  border-radius: 50%;
+  top: 30%;
+  left: 8%;
+  transform: rotate(-22deg);
+}
+.portrait-lumen .portrait-orbit,
+.portrait-tetra .portrait-orbit {
+  display: none;
+}
+.portrait-ear {
+  display: none;
+  position: absolute;
+  background: var(--accent);
+  height: 27%;
+  width: 12%;
+  border-radius: 50% 50% 10% 10%;
+  top: 0;
+}
+.portrait-lumen .portrait-ear {
+  display: block;
+}
+.ear-left {
+  left: 29%;
+  transform: rotate(-10deg);
+}
+.ear-right {
+  right: 29%;
+  transform: rotate(10deg);
+}
+.portrait-lumen .portrait-head {
+  border-radius: 48% 48% 35% 35%;
+}
+.portrait-tetra .portrait-head {
+  clip-path: polygon(22% 0, 78% 0, 100% 28%, 92% 85%, 60% 100%, 25% 92%, 0 55%, 3% 20%);
+  border-radius: 0;
+}
+.portrait-tetra .ear-left {
+  display: block;
+  width: 17%;
+  height: 14%;
+  background: #fff1d9;
+  left: 42%;
+  top: 3%;
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+.skill-card {
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  border-radius: 15px;
+  padding: 0 0 12px;
+  text-align: left;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  transition:
+    transform 120ms,
+    box-shadow 120ms;
+}
+.skill-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.skill-card[aria-pressed='true'] {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+.card-art {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  height: 116px;
+  margin-bottom: 12px;
+  background:
+    radial-gradient(circle at 75% 20%, #fff9 0 20%, transparent 21%),
+    linear-gradient(
+      140deg,
+      color-mix(in srgb, var(--accent) 23%, white),
+      color-mix(in srgb, var(--accent) 55%, white)
+    );
+  overflow: hidden;
+}
+.card-art .portrait {
+  width: 90px;
+  height: 112px;
+  transform: rotate(-6deg) translateY(6px);
+}
+.cost {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  min-width: 31px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: var(--ink);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.card-selected {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+}
+.card-name {
+  display: block;
+  padding: 0 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+.card-effects {
+  padding: 0 12px;
+  display: grid;
+  gap: 3px;
+  font-size: 0.71rem;
+  line-height: 1.5;
+}
+.hand-cards .skill-card:disabled {
+  border-color: var(--line);
+}
+.hand-cards .skill-card:disabled .card-art {
+  filter: saturate(0.3);
+  opacity: 0.7;
+}
+@media (max-width: 600px) {
+  .card-name,
+  .card-effects {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .card-art {
+    height: 96px;
+    margin-bottom: 9px;
+  }
+  .card-art .portrait {
+    width: 74px;
+    height: 93px;
+  }
+  .card-name {
+    font-size: 0.75rem;
+  }
+  .card-effects {
+    font-size: 0.65rem;
+  }
+}

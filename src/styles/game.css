@@ -1,0 +1,283 @@
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 18px;
+}
+.live-board {
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.live-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+}
+.live-heading > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+.live-heading h2 {
+  font-size: 0.95rem;
+}
+.live-heading span {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.live-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.live-tools .button {
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+}
+.song-progress {
+  height: 3px;
+  background: #d9e0d8;
+}
+.song-progress > span {
+  height: 100%;
+  display: block;
+  background: var(--teal);
+}
+.section-strip {
+  display: flex;
+  padding: 0 14px;
+  gap: 9px;
+}
+.section-strip span {
+  padding: 11px 0;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-align: center;
+  border-bottom: 3px solid transparent;
+}
+.section-strip .current {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+  font-weight: 800;
+}
+.live-meters {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.score-panel {
+  position: relative;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 20px;
+}
+.score-panel h2 {
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+.score-panel > strong {
+  font-size: clamp(1.7rem, 3vw, 2.1rem);
+  line-height: 1;
+  display: block;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.multiplier {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--teal);
+  margin-top: 8px;
+  background: #237d760a;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.meter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+.meter-heading strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.meter-heading strong span {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.67rem;
+}
+.meter-track {
+  height: 8px;
+  border-radius: 5px;
+  background: #e8ece5;
+  overflow: hidden;
+}
+.meter-track > span {
+  display: block;
+  height: 100%;
+  background: var(--teal);
+  border-radius: inherit;
+}
+.energy-meter .meter-track > span {
+  background: #507f9b;
+}
+.excitement-meter .meter-track > span {
+  background: #dc8279;
+}
+.current-mood {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+}
+.special-button {
+  position: relative;
+  background: #ece7d7;
+  border: 1px solid #d7cda9;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 52px;
+  padding: 12px;
+  margin-top: auto;
+}
+.special-button:enabled {
+  border-color: #aa8732;
+  box-shadow: 0 3px 0 #d7bd6f;
+}
+.special-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #f1c86b;
+}
+.special-label {
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.special-label strong {
+  margin-left: auto;
+}
+.hand-panel {
+  grid-column: 1 / -1;
+  padding: 18px 22px;
+}
+.hand-panel .panel-heading {
+  margin-bottom: 16px;
+}
+.hand-panel .panel-heading > span {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.hand-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.hand-cards .card-art {
+  height: 100px;
+}
+.hand-cards .card-art .portrait {
+  width: 82px;
+  height: 102px;
+}
+@media (max-width: 900px) {
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+  }
+  .live-meters {
+    padding: 18px;
+  }
+  .hand-cards {
+    gap: 10px;
+  }
+}
+@media (max-width: 700px) {
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .live-meters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 18px;
+  }
+  .score-panel {
+    grid-column: 1 / 3;
+    border: none;
+    padding: 0;
+  }
+  .score-panel h2 {
+    display: inline;
+    margin-right: 12px;
+  }
+  .score-panel > strong {
+    display: inline;
+    font-size: 1.65rem;
+  }
+  .multiplier {
+    margin-left: 8px;
+    margin-top: 0;
+  }
+  .current-mood {
+    grid-column: 3;
+    grid-row: 1;
+    justify-content: end;
+  }
+  .special-button {
+    grid-column: 1 / -1;
+    min-height: 44px;
+    margin: 0;
+  }
+  .hand-panel {
+    padding: 16px 14px;
+  }
+  .hand-cards {
+    gap: 8px;
+    overflow-x: auto;
+    padding: 3px 3px 8px;
+    grid-template-columns: repeat(5, minmax(104px, 1fr));
+  }
+  .hand-cards .card-art {
+    height: 86px;
+  }
+  .hand-cards .card-art .portrait {
+    width: 70px;
+    height: 88px;
+  }
+}
+@media (max-width: 400px) {
+  .live-heading {
+    padding: 10px 12px;
+  }
+  .live-tools {
+    gap: 4px;
+  }
+  .live-heading h2 {
+    font-size: 0.8rem;
+  }
+  .live-heading span {
+    font-size: 0.65rem;
+  }
+  .section-strip {
+    gap: 6px;
+    padding: 0 6px;
+  }
+  .section-strip span {
+    font-size: 0.55rem;
+  }
+  .live-meters {
+    gap: 14px 10px;
+  }
+  .meter-heading {
+    font-size: 0.65rem;
+  }
+}
