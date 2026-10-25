@@ -1,7 +1,6 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
-import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   MentalBarrierAdditionalBuffEffect,
@@ -26,7 +25,7 @@ export function activateMentalBarrierAdditionalBuff(
       )
     : 0;
   const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
-  const value = roundToEvenFloat32(
+  const value = toInt32(
     Math.fround(
       Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
         Math.fround(multiplier),
@@ -145,5 +144,5 @@ function matches(target: MentalBarrierAdditionalBuffTarget, card: Card): boolean
 function toInt32(value: number): number {
   return !Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647
     ? -2_147_483_648
-    : Math.trunc(value);
+    : Math.trunc(value) || 0;
 }
