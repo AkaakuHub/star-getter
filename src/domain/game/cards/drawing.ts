@@ -118,7 +118,7 @@ function drawUntil(state: GameState, count: number, trimOverflow: boolean): Game
       ...next,
       handEffectCardIds: [...next.handEffectCardIds.filter((id) => id !== card.id), card.id],
     };
-    if (state.drawContext !== 'initial') next = activateHandPermanentEffects(next, card);
+    next = activateHandPermanentEffects(next, card);
   }
   const maximum = handCapacity(next);
   if (trimOverflow && next.hand.length > maximum) {
