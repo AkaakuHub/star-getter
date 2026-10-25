@@ -10,16 +10,18 @@ export function addMentalBarrier(
 ): GameState {
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  const remainingSections = effect.duration.kind === 'sections' ? effect.duration.value : null;
+  const suppressExpiry = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
+  const remainingSections =
+    effect.duration.kind === 'sections' && !suppressExpiry ? effect.duration.value : null;
   const barrier: MentalBarrier = {
     kind: effect.barrier,
     endurance: effect.enduranceType === 'infinite' ? 0 : endurance,
     currentEndurance: 0,
     attenuation,
     remainingSeconds:
-      effect.duration.kind === 'milliseconds'
+      effect.duration.kind === 'milliseconds' && !suppressExpiry
         ? Math.fround(effect.duration.value / 1000)
-        : effect.duration.kind === 'sections'
+        : effect.duration.kind === 'sections' && !suppressExpiry
           ? secondsToSectionChange(state, effect.duration.value)
           : null,
     remainingSections,

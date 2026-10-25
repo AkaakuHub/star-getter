@@ -66,6 +66,7 @@ export type MentalBarrierEffect = Readonly<{
   endurance: number;
   attenuation: number;
   deactivationKey?: string;
+  invocationType?: number;
   duration:
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
     | Readonly<{ kind: 'stage' }>;

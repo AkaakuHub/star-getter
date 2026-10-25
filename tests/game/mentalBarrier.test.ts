@@ -61,6 +61,19 @@ describe('元気バリア', () => {
     expect(damaged.mentalBarriers[0]?.currentEndurance).toBe(2);
   });
 
+  it('InvocationType 0x388では指定時間が過ぎてもバリアを維持する', () => {
+    const active = applyEffect(game(), {
+      kind: 'mental-barrier',
+      barrier: 'endurance',
+      enduranceType: 'fixed',
+      endurance: 10,
+      attenuation: 1,
+      duration: { kind: 'milliseconds', value: 100 },
+      invocationType: 0x388,
+    });
+    expect(advanceTo(active, 1).mentalBarriers).toHaveLength(1);
+  });
+
   it('耐久無限型はスキルと自然減少を吸収する', () => {
     const active = applyEffect(game(), {
       kind: 'mental-barrier',
