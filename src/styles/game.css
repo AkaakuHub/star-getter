@@ -6,8 +6,6 @@
   overflow: hidden;
   container-type: inline-size;
   background: #f3dce2;
-  touch-action: manipulation;
-  user-select: none;
 }
 .skill-preview {
   pointer-events: none;
