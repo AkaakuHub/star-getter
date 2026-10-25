@@ -22,10 +22,7 @@ import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaug
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
 import { initializeHandCardStats } from './cards/skillCostChanges';
-import {
-  activateHandParameterChanges,
-  initializeParameterValueFactors,
-} from './parameters/parameterValueChange';
+import { initializeParameterValueFactors } from './parameters/parameterValueChange';
 
 export function createGame(
   track: Track,
@@ -42,7 +39,12 @@ export function createGame(
   if (!lead) throw new Error('先頭のカードがありません。');
   const initial: GameState = {
     supportLevels: {},
-    modes: createModes(deck.flatMap((card) => card.modeIds ?? [])),
+    modes: createModes(
+      deck.flatMap((card) => [
+        ...(card.modeIds ?? []),
+        ...(card.modeParameterChanges ? [card.modeParameterChanges.modeId] : []),
+      ]),
+    ),
     modeReactions: [],
     phase: 'ready',
     tick: 0,
@@ -54,6 +56,7 @@ export function createGame(
     skillCostChanges: [],
     parameterValueFactors: [],
     parameterValueChangeCounts: {},
+    activeModeParameterChanges: [],
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
     deckOutCount: 0,
@@ -138,7 +141,7 @@ export function createGame(
     },
   };
   const prepared = initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]);
-  return fillHand(activateHandParameterChanges(prepared, lead));
+  return fillHand(prepared);
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {

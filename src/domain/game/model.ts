@@ -61,12 +61,16 @@ export type Card = Readonly<{
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   modeIds?: readonly number[];
+  modeParameterChanges?: Readonly<{
+    modeId: number;
+    off: readonly ParameterValueChangeEffect[];
+    on: readonly ParameterValueChangeEffect[];
+  }>;
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
   beforeUseEffects?: readonly Effect[];
   handUse?: Readonly<{ trigger: UnitId; effects: readonly Effect[] }>;
-  handParameterChanges?: readonly ParameterValueChangeEffect[];
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
@@ -195,6 +199,11 @@ export type GameState = Readonly<{
   skillCostChanges: readonly SkillCostChange[];
   parameterValueFactors: readonly ParameterValueFactor[];
   parameterValueChangeCounts: Readonly<Record<string, Readonly<Record<string, number>>>>;
+  activeModeParameterChanges: readonly Readonly<{
+    cardId: string;
+    modeId: number;
+    isOn: boolean;
+  }>[];
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];

@@ -5,7 +5,7 @@ import {
   initializeParameterValueFactors,
 } from '../../src/domain/game/parameters/parameterValueChange';
 import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
-import { activateHandParameterChanges } from '../../src/domain/game/parameters/parameterValueChange';
+import { createModes } from '../../src/domain/game/live/modes';
 import { game } from './support/game';
 
 it('加算型の係数は今回の使用回数を含む', () => {
@@ -145,33 +145,53 @@ it('amount以外の詳細値も効果実行前に補正する', () => {
   expect(result.amplification).toBe(150);
 });
 
-it('手札永続の詳細値変更を手札から離れたとき解除する', () => {
+it('モード変更で前の能力を解除し、新しい能力の詳細値変更を発動する', () => {
   const initial = game();
   const source = initial.deck.find((item) => item.id === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const card = {
     ...source,
-    handParameterChanges: [
-      {
-        kind: 'parameter-value-change',
-        sourceEffectId: 'hand-change',
-        targetDetailId: 202141300101n,
-        calculation: 'add',
-        base: 10_000,
-        increment: 0,
-      },
-    ],
-  } as const;
-  const active = activateHandParameterChanges(
-    {
-      ...initial,
-      cardPool: initial.cardPool.map((item) => (item.id === card.id ? card : item)),
-      handEffectCardIds: [...initial.handEffectCardIds, card.id],
+    modeParameterChanges: {
+      modeId: 8,
+      off: [
+        {
+          kind: 'parameter-value-change',
+          sourceEffectId: 'mode-off-change',
+          targetDetailId: 202141300101n,
+          calculation: 'add',
+          base: 10_000,
+          increment: 0,
+        },
+      ],
+      on: [
+        {
+          kind: 'parameter-value-change',
+          sourceEffectId: 'mode-on-change',
+          targetDetailId: 202141300101n,
+          calculation: 'add',
+          base: 20_000,
+          increment: 0,
+        },
+      ],
     },
-    card,
-  );
-  expect(active.parameterValueFactors).toHaveLength(1);
-  const disposed = disposeHandEffects(active, [card.id]);
-  expect(disposed.parameterValueFactors).toHaveLength(0);
-  expect(disposed.parameterValueChangeCounts[card.id]?.['hand-change']).toBe(1);
+  } as const;
+  const prepared = initializeParameterValueFactors({
+    ...initial,
+    deck: initial.deck.map((item) => (item.id === card.id ? card : item)),
+    cardPool: initial.cardPool.map((item) => (item.id === card.id ? card : item)),
+    modes: createModes([8]),
+    handEffectCardIds: [...initial.handEffectCardIds, card.id],
+  });
+  const enabled = applyEffect(prepared, { kind: 'mode', modeId: 8, change: 'on' }, card);
+  expect(enabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-on-change');
+  const leftHand = disposeHandEffects(enabled, [card.id]);
+  expect(leftHand.parameterValueFactors).toHaveLength(0);
+  expect(leftHand.activeModeParameterChanges).toHaveLength(0);
+  const disabled = applyEffect(enabled, { kind: 'mode', modeId: 8, change: 'off' }, card);
+  expect(disabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-off-change');
+  expect(disabled.parameterValueChangeCounts[card.id]?.['mode-on-change']).toBe(1);
+  expect(disabled.parameterValueChangeCounts[card.id]?.['mode-off-change']).toBe(1);
+  expect(disabled.activeModeParameterChanges).toEqual([
+    { cardId: card.id, modeId: 8, isOn: false },
+  ]);
 });

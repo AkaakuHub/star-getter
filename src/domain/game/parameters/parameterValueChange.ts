@@ -79,7 +79,8 @@ export function initializeParameterValueFactors(
       ...(card.drawEffects ?? []),
       ...(card.beforeUseEffects ?? []),
       ...(card.handUse?.effects ?? []),
-      ...(card.handParameterChanges ?? []),
+      ...(card.modeParameterChanges?.off ?? []),
+      ...(card.modeParameterChanges?.on ?? []),
       ...(card.collectionEffects?.effects ?? []),
       ...(card.special?.effects ?? []),
     ].flatMap(collectNestedEffects);
@@ -91,11 +92,13 @@ export function initializeParameterValueFactors(
   return next;
 }
 
-export function deactivateHandParameterChanges(state: GameState, card: Card): GameState {
-  if (!card.handParameterChanges?.length) return state;
-  const targets = new Set(
-    card.handParameterChanges.map((effect) => parameterKey(effect.targetDetailId)),
-  );
+export function deactivateParameterValueChanges(
+  state: GameState,
+  card: Card,
+  effects: readonly ParameterValueChangeEffect[],
+): GameState {
+  if (!effects.length) return state;
+  const targets = new Set(effects.map((effect) => parameterKey(effect.targetDetailId)));
   return {
     ...state,
     parameterValueFactors: state.parameterValueFactors.filter(
@@ -104,8 +107,12 @@ export function deactivateHandParameterChanges(state: GameState, card: Card): Ga
   };
 }
 
-export function activateHandParameterChanges(state: GameState, card: Card): GameState {
-  return (card.handParameterChanges ?? []).reduce(
+export function activateModeParameterChanges(
+  state: GameState,
+  card: Card,
+  isOn: boolean,
+): GameState {
+  return ((isOn ? card.modeParameterChanges?.on : card.modeParameterChanges?.off) ?? []).reduce(
     (next, effect) => applyParameterValueChange(next, card, effect),
     state,
   );

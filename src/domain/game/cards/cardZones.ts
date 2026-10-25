@@ -53,6 +53,9 @@ function excludeCards(state: GameState, ids: readonly string[]): GameState {
     parameterValueFactors: state.parameterValueFactors.filter(
       (factor) => !ids.includes(factor.cardId),
     ),
+    activeModeParameterChanges: state.activeModeParameterChanges.filter(
+      (item) => !ids.includes(item.cardId),
+    ),
     hand: state.hand.filter((id) => !ids.includes(id)),
     drawPile: state.drawPile.filter((id) => !ids.includes(id)),
     discard: state.discard.filter((id) => !ids.includes(id)),

@@ -5,7 +5,6 @@ import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import type { Card, GameState, HandShuffle } from '../model';
 import { initializeHandCardStats } from './skillCostChanges';
-import { activateHandParameterChanges } from '../parameters/parameterValueChange';
 
 export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
@@ -82,7 +81,6 @@ function drawUntil(state: GameState, count: number): GameState {
       ...next,
       handEffectCardIds: [...next.handEffectCardIds.filter((id) => id !== card.id), card.id],
     };
-    next = activateHandParameterChanges(next, card);
   }
   const maximum = handCapacity(next);
   if (next.hand.length > maximum) {

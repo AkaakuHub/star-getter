@@ -1,5 +1,9 @@
 import type { Card, Effect, GameState } from '../model';
 import { enqueueModeChange, takeModeChange } from '../live/modes';
+import {
+  activateModeParameterChanges,
+  deactivateParameterValueChanges,
+} from '../parameters/parameterValueChange';
 
 type ApplyEffect = (
   state: GameState,
@@ -13,9 +17,42 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
   let next: GameState = { ...state, modes: { ...state.modes, changing: true } };
   while (next.modes.queue.length) {
     const transition = takeModeChange(next.modes);
+    const changed = transition.changed;
+    if (!changed) {
+      next = { ...next, modes: transition.state };
+      continue;
+    }
+    const modeId = changed.id;
+    const modeCards = next.deck.filter(
+      (card) =>
+        card.modeParameterChanges?.modeId === modeId && next.handEffectCardIds.includes(card.id),
+    );
+    for (const card of modeCards) {
+      const active = next.activeModeParameterChanges.find(
+        (item) => item.cardId === card.id && item.modeId === modeId,
+      );
+      if (!active || !card.modeParameterChanges) continue;
+      const effects = active.isOn ? card.modeParameterChanges.on : card.modeParameterChanges.off;
+      next = deactivateParameterValueChanges(next, card, effects);
+      next = {
+        ...next,
+        activeModeParameterChanges: next.activeModeParameterChanges.filter(
+          (item) => item.cardId !== card.id || item.modeId !== modeId,
+        ),
+      };
+    }
     next = { ...next, modes: transition.state };
-    if (!transition.changed?.on) continue;
-    const modeId = transition.changed.id;
+    for (const card of modeCards) {
+      next = activateModeParameterChanges(next, card, changed.on);
+      next = {
+        ...next,
+        activeModeParameterChanges: [
+          ...next.activeModeParameterChanges,
+          { cardId: card.id, modeId, isOn: changed.on },
+        ],
+      };
+    }
+    if (!changed.on) continue;
     const listeners = next.modeReactions
       .map((reaction, index) => ({ reaction, index }))
       .filter(({ reaction }) => reaction.modeId === modeId);

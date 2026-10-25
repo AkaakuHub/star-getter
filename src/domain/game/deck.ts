@@ -35,7 +35,8 @@ export function validateCard(card: Card): void {
     ...(card.drawEffects ?? []),
     ...(card.beforeUseEffects ?? []),
     ...(card.handUse?.effects ?? []),
-    ...(card.handParameterChanges ?? []),
+    ...(card.modeParameterChanges?.off ?? []),
+    ...(card.modeParameterChanges?.on ?? []),
     ...(card.collectionEffects?.effects ?? []),
   ])
     validateEffect(effect);
@@ -43,6 +44,15 @@ export function validateCard(card: Card): void {
     if (!Number.isSafeInteger(card.special.cost) || card.special.cost < 0)
       throw new Error('共鳴の消費量が正しくありません。');
     for (const effect of card.special.effects) validateEffect(effect);
+  }
+  if (card.modeParameterChanges) {
+    if (
+      !Number.isSafeInteger(card.modeParameterChanges.modeId) ||
+      card.modeParameterChanges.modeId < 1
+    )
+      throw new Error('能力モードの設定が正しくありません。');
+    for (const effect of [...card.modeParameterChanges.off, ...card.modeParameterChanges.on])
+      validateEffect(effect);
   }
 }
 
