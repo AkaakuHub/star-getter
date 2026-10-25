@@ -39,7 +39,8 @@ export function activateMoodValueBoost(
         value,
         target: effect.target,
         paramSeriesIds: effect.tokenCardSeriesIds ?? null,
-        remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
+        remainingUses: 1,
+        remainingDeactivations: effect.disabledType === 1 ? effect.disabledCount : null,
         remainingSeconds:
           effect.duration.kind !== 'milliseconds'
             ? null
@@ -129,9 +130,12 @@ export function deactivateMoodValueAdditionalBuffs(
 ): GameState {
   return {
     ...state,
-    moodValueAdditionalBuffs: state.moodValueAdditionalBuffs.filter(
-      (buff) => buff.deactivationKey !== deactivationKey,
-    ),
+    moodValueAdditionalBuffs: state.moodValueAdditionalBuffs.flatMap((buff) => {
+      if (buff.deactivationKey !== deactivationKey || buff.remainingDeactivations === null)
+        return [buff];
+      const remainingDeactivations = buff.remainingDeactivations - 1;
+      return remainingDeactivations < 1 ? [] : [{ ...buff, remainingDeactivations }];
+    }),
   };
 }
 

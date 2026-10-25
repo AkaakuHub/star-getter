@@ -95,6 +95,8 @@ it('Action50は時間・パート期限とDeactivator解除を適用する', () 
     additiveBoost({
       duration: { kind: 'milliseconds', value: 1000 },
       deactivationKey: 'mood-boost',
+      disabledType: 1,
+      disabledCount: 1,
     }),
   );
   expect(advanceTo(timed, 1.1).moodValueAdditionalBuffs).toHaveLength(0);
@@ -110,6 +112,28 @@ it('Action50は時間・パート期限とDeactivator解除を適用する', () 
     deactivationKey: 'mood-boost',
   });
   expect(deactivated.moodValueAdditionalBuffs).toHaveLength(0);
+});
+
+it('Action50のOnBuffUseはdisabledTypeにかかわらず一度でBuffを解除する', () => {
+  const initial = game('library');
+  const card = initial.deck[0];
+  if (!card) throw new Error('発動元カードがありません。');
+  const active = applyEffect(initial, additiveBoost({ disabledType: 0, disabledCount: 0 }));
+  const used = applyEffect(active, moodChange(20_000), card);
+  expect(used.moodValueAdditionalBuffs).toHaveLength(0);
+});
+
+it('Action50のDeactivatorはdisabledType1以外では解除しない', () => {
+  const initial = game('library');
+  const persistent = applyEffect(
+    initial,
+    additiveBoost({ deactivationKey: 'mood-boost', disabledType: 0 }),
+  );
+  const deactivated = act(persistent, {
+    type: 'deactivate-mood-value-boost',
+    deactivationKey: 'mood-boost',
+  });
+  expect(deactivated.moodValueAdditionalBuffs).toHaveLength(1);
 });
 
 it('Action50が逆符号の加算を行うとAction48のBuff符号も反転する', () => {

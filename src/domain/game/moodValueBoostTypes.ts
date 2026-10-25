@@ -20,7 +20,8 @@ export type MoodValueAdditionalBuff = Readonly<{
   value: number;
   target: HeartLimitBoostTarget;
   paramSeriesIds: readonly number[] | null;
-  remainingUses: number | null;
+  remainingUses: number;
+  remainingDeactivations: number | null;
   remainingSeconds: number | null;
   remainingSections: number | null;
   deactivationKey: string | null;
