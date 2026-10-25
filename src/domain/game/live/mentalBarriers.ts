@@ -1,5 +1,6 @@
 import type { MentalBarrier, MentalBarrierEffect } from '../modelTypes';
 import type { GameState } from '../model';
+import { absorbSkillEffect } from '../effects/proxySkill';
 
 export function addMentalBarrier(
   state: GameState,
@@ -23,6 +24,12 @@ export function addMentalBarrier(
           : null,
     remainingSections,
   };
+  const absorption = absorbSkillEffect(
+    state,
+    7,
+    BigInt.asIntN(32, BigInt(Math.trunc(barrier.endurance))),
+  );
+  if (absorption.absorbed) return absorption.state;
   const previousInterval = mentalDecreaseInterval(
     state,
     state.track.stage.mentalDecreaseIntervalSeconds,

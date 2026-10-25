@@ -115,6 +115,36 @@ export function isProxyTargetReached(
   return effect.totalAmount >= effect.targetAmount;
 }
 
+export function absorbSkillEffect(
+  state: GameState,
+  actionType: number,
+  amount: bigint,
+): Readonly<{ state: GameState; absorbed: boolean }> {
+  if (actionType !== 48 && amount < 0n) return { state, absorbed: false };
+  for (
+    let absorptionIndex = 0;
+    absorptionIndex < state.proxyAbsorptions.length;
+    absorptionIndex++
+  ) {
+    const absorption = state.proxyAbsorptions[absorptionIndex];
+    if (!absorption) continue;
+    const effectIndex = absorption.effects.findIndex((effect) => effect.actionType === actionType);
+    if (effectIndex < 0) continue;
+    const effect = absorption.effects[effectIndex];
+    if (!effect) continue;
+    if (absorption.hasAbsorbLimit && isProxyTargetReached(absorption, effect))
+      return { state, absorbed: true };
+    const effects = absorption.effects.map((item, index) =>
+      index === effectIndex ? { ...item, totalAmount: item.totalAmount + amount } : item,
+    );
+    const proxyAbsorptions = state.proxyAbsorptions.map((item, index) =>
+      index === absorptionIndex ? { ...item, effects } : item,
+    );
+    return { state: { ...state, proxyAbsorptions }, absorbed: true };
+  }
+  return { state, absorbed: false };
+}
+
 export function forceProxySkillActivation(
   state: GameState,
   targetType: 1 | 2 | 3 | 4 | 5,

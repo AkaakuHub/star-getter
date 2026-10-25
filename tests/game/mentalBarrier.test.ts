@@ -2,11 +2,51 @@ import { describe, expect, it } from 'vite-plus/test';
 import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
 import { applyEffect } from '../../src/domain/game/effects';
 import { changeResource } from '../../src/domain/game/resources';
-import { mentalDecreaseInterval } from '../../src/domain/game/live/mentalBarriers';
+import {
+  addMentalBarrier,
+  mentalDecreaseInterval,
+} from '../../src/domain/game/live/mentalBarriers';
+import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
 describe('元気バリア', () => {
+  it('ActionType7のProxyへ整数耐久値を渡し、吸収時にバリアを登録しない', () => {
+    const initial = game();
+    const source = initial.deck[0];
+    if (!source) throw new Error('Proxy発動元カードがありません。');
+    const active = registerProxySkill(
+      initial,
+      {
+        kind: 'proxy-skill',
+        absorbLimit: 1,
+        periodType: 1,
+        periodParam: 3000,
+        induceTiming: 1,
+        induceCondition: 1,
+        inducePowerType: 1,
+        inducePowerParam: 0,
+        targets: [{ actionType: 7, targetAmount: 5 }],
+        effects: [],
+      },
+      source,
+    );
+    const barrier = {
+      kind: 'mental-barrier',
+      barrier: 'endurance',
+      enduranceType: 'fixed',
+      endurance: 0,
+      attenuation: 0,
+      duration: { kind: 'stage' },
+    } as const;
+    const first = addMentalBarrier(active, barrier, 5.8, 0);
+    expect(first.mentalBarriers).toHaveLength(0);
+    expect(first.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+    const afterLimit = addMentalBarrier(first, barrier, 3, 0);
+    expect(afterLimit.mentalBarriers).toHaveLength(0);
+    expect(afterLimit.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+  });
+
   it('耐久型は指定量まで元気減少を吸収し、超過分を通す', () => {
     const active = applyEffect(game(), {
       kind: 'mental-barrier',
