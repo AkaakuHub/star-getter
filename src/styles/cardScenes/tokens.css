@@ -43,10 +43,10 @@
   background: linear-gradient(110deg, #f5d6d5 0 48%, #c990a0 48% 52%, #fff0d4 52%);
 }
 .token-bookmark .token-artwork-symbol {
-  width: 72%;
-  height: 110%;
-  left: 14%;
-  top: -25%;
+  width: 85%;
+  height: 85%;
+  left: 8%;
+  top: -2%;
   fill: #d96b86;
   transform: rotate(12deg);
 }

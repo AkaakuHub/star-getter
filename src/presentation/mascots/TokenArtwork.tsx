@@ -1,11 +1,11 @@
-import { BookOpen, Bookmark, Clock3, Ghost, Tickets } from 'lucide-preact';
+import { Fan, KeyRound, Origami, Puzzle, Sailboat } from 'lucide-preact';
 
 const tokenSymbols = {
-  ensemble: Tickets,
-  story: BookOpen,
-  clock: Clock3,
-  bookmark: Bookmark,
-  shadow: Ghost,
+  ensemble: Sailboat,
+  story: Origami,
+  clock: Fan,
+  bookmark: KeyRound,
+  shadow: Puzzle,
 } as const;
 
 export function TokenArtwork({ kind }: Readonly<{ kind: keyof typeof tokenSymbols }>) {
