@@ -79,6 +79,7 @@ export function initializeParameterValueFactors(
       ...(card.drawEffects ?? []),
       ...(card.beforeUseEffects ?? []),
       ...(card.handUse?.effects ?? []),
+      ...(card.handParameterChanges ?? []),
       ...(card.collectionEffects?.effects ?? []),
       ...(card.special?.effects ?? []),
     ].flatMap(collectNestedEffects);
@@ -88,6 +89,26 @@ export function initializeParameterValueFactors(
     }
   }
   return next;
+}
+
+export function deactivateHandParameterChanges(state: GameState, card: Card): GameState {
+  if (!card.handParameterChanges?.length) return state;
+  const targets = new Set(
+    card.handParameterChanges.map((effect) => parameterKey(effect.targetDetailId)),
+  );
+  return {
+    ...state,
+    parameterValueFactors: state.parameterValueFactors.filter(
+      (factor) => factor.cardId !== card.id || !targets.has(parameterKey(factor.targetDetailId)),
+    ),
+  };
+}
+
+export function activateHandParameterChanges(state: GameState, card: Card): GameState {
+  return (card.handParameterChanges ?? []).reduce(
+    (next, effect) => applyParameterValueChange(next, card, effect),
+    state,
+  );
 }
 
 function collectNestedEffects(effect: Effect): readonly Effect[] {

@@ -22,7 +22,10 @@ import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaug
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
 import { initializeHandCardStats } from './cards/skillCostChanges';
-import { initializeParameterValueFactors } from './parameters/parameterValueChange';
+import {
+  activateHandParameterChanges,
+  initializeParameterValueFactors,
+} from './parameters/parameterValueChange';
 
 export function createGame(
   track: Track,
@@ -134,7 +137,8 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  return fillHand(initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]));
+  const prepared = initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]);
+  return fillHand(activateHandParameterChanges(prepared, lead));
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {

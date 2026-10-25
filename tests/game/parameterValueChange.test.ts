@@ -4,6 +4,8 @@ import {
   applyParameterValueChange,
   initializeParameterValueFactors,
 } from '../../src/domain/game/parameters/parameterValueChange';
+import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
+import { activateHandParameterChanges } from '../../src/domain/game/parameters/parameterValueChange';
 import { game } from './support/game';
 
 it('加算型の係数は今回の使用回数を含む', () => {
@@ -141,4 +143,35 @@ it('amount以外の詳細値も効果実行前に補正する', () => {
     card,
   );
   expect(result.amplification).toBe(150);
+});
+
+it('手札永続の詳細値変更を手札から離れたとき解除する', () => {
+  const initial = game();
+  const source = initial.deck.find((item) => item.id === 'class');
+  if (!source) throw new Error('検証用カードがありません。');
+  const card = {
+    ...source,
+    handParameterChanges: [
+      {
+        kind: 'parameter-value-change',
+        sourceEffectId: 'hand-change',
+        targetDetailId: 202141300101n,
+        calculation: 'add',
+        base: 10_000,
+        increment: 0,
+      },
+    ],
+  } as const;
+  const active = activateHandParameterChanges(
+    {
+      ...initial,
+      cardPool: initial.cardPool.map((item) => (item.id === card.id ? card : item)),
+      handEffectCardIds: [...initial.handEffectCardIds, card.id],
+    },
+    card,
+  );
+  expect(active.parameterValueFactors).toHaveLength(1);
+  const disposed = disposeHandEffects(active, [card.id]);
+  expect(disposed.parameterValueFactors).toHaveLength(0);
+  expect(disposed.parameterValueChangeCounts[card.id]?.['hand-change']).toBe(1);
 });

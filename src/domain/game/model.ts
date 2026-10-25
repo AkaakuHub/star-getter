@@ -19,6 +19,7 @@ import type {
   SearchRequest,
   SkillCostChange,
   ParameterValueFactor,
+  ParameterValueChangeEffect,
   TokenBoost,
 } from './modelTypes';
 
@@ -65,6 +66,7 @@ export type Card = Readonly<{
   drawEffects?: readonly Effect[];
   beforeUseEffects?: readonly Effect[];
   handUse?: Readonly<{ trigger: UnitId; effects: readonly Effect[] }>;
+  handParameterChanges?: readonly ParameterValueChangeEffect[];
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
