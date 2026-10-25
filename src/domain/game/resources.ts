@@ -21,6 +21,8 @@ export function changeResource(
   induceVoltageUp = false,
 ): GameState {
   if (resource === 'excitement') amount = BigInt.asIntN(32, amount);
+  const voltageInput = amount;
+  let masteryVoltageUp = 0n;
   if (resource === 'energy' && amount >= 0n) {
     const absorption = absorbSkillEffect(state, 14, BigInt.asIntN(32, amount));
     if (absorption.absorbed) return absorption.state;
@@ -45,7 +47,10 @@ export function changeResource(
       const gained = BigInt(mastery.gain);
       const conversion = convertVoltageIncrease(state, gained, undefined, applyEffect);
       state = conversion.state;
-      if (!conversion.converted) amount += gained;
+      if (!conversion.converted) {
+        amount += gained;
+        masteryVoltageUp = gained;
+      }
     }
   }
   if (
@@ -57,8 +62,14 @@ export function changeResource(
     if (!applyEffect || amount < 0n) return state;
     if (resource === 'stamina' && source === 'skill')
       return induceSkillEffects(state, 'mental-recover', Number(amount), applyEffect);
-    if (resource === 'excitement' && (amount > 0n || induceVoltageUp))
-      return induceSkillEffects(state, 'voltage', Number(amount), applyEffect);
+    if (resource === 'excitement') {
+      let next = state;
+      if (induceVoltageUp)
+        next = induceSkillEffects(next, 'voltage', Number(voltageInput), applyEffect);
+      if (masteryVoltageUp > 0n)
+        next = induceSkillEffects(next, 'voltage', Number(masteryVoltageUp), applyEffect);
+      return next;
+    }
     return state;
   }
   if (resource === 'stamina' && amount < 0n && source === 'skill' && !state.bloom) {
@@ -82,17 +93,31 @@ export function changeResource(
   }
   if (state.bloom) {
     const changed = changeBloomResource(state, resource, amount);
-    const withHandInduce =
+    let withHandInduce =
       resource === 'excitement'
         ? notifyVoltageBaseLevelChange(state, changed, applyEffect)
         : changed;
+    if (resource === 'excitement' && applyEffect) {
+      if (induceVoltageUp)
+        withHandInduce = induceSkillEffects(
+          withHandInduce,
+          'voltage',
+          Number(voltageInput),
+          applyEffect,
+        );
+      if (masteryVoltageUp > 0n)
+        withHandInduce = induceSkillEffects(
+          withHandInduce,
+          'voltage',
+          Number(masteryVoltageUp),
+          applyEffect,
+        );
+    }
     const withMissionEvent =
       resource === 'excitement' && state.excitement > 0 && withHandInduce.excitement === 0
         ? registerVoltageZeroMission(withHandInduce)
         : withHandInduce;
-    return resource === 'excitement' && (amount > 0n || induceVoltageUp) && applyEffect
-      ? induceSkillEffects(withMissionEvent, 'voltage', Number(amount), applyEffect)
-      : withMissionEvent;
+    return withMissionEvent;
   }
   const maximum =
     resource === 'energy'
@@ -110,8 +135,12 @@ export function changeResource(
   if (!applyEffect) return next;
   if (resource === 'stamina' && source === 'skill' && amount >= 0n)
     return induceSkillEffects(next, 'mental-recover', Number(amount), applyEffect);
-  if (resource === 'excitement' && (amount > 0n || induceVoltageUp))
-    return induceSkillEffects(next, 'voltage', Number(amount), applyEffect);
+  if (resource === 'excitement') {
+    if (induceVoltageUp)
+      next = induceSkillEffects(next, 'voltage', Number(voltageInput), applyEffect);
+    if (masteryVoltageUp > 0n)
+      next = induceSkillEffects(next, 'voltage', Number(masteryVoltageUp), applyEffect);
+  }
   return next;
 }
 

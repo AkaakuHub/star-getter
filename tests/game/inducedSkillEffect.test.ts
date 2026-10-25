@@ -55,7 +55,11 @@ it('ActionType41は負のイベントを無視し、電圧上昇を対応する�
   const negative = changeResource(active, 'excitement', -5n, 'skill', undefined, applyEffect);
   expect(negative.moodOffset).toBe(0);
   const positive = changeResource(negative, 'excitement', 5n, 'skill', undefined, applyEffect);
-  expect(positive.moodOffset).toBe(5);
+  expect(positive.moodOffset).toBe(0);
+  const induced = changeResource(negative, 'excitement', 5n, 'skill', undefined, applyEffect, true);
+  expect(induced.moodOffset).toBe(5);
+  const natural = changeResource(negative, 'excitement', 5n, 'natural', undefined, applyEffect);
+  expect(natural.moodOffset).toBe(0);
 });
 
 it('ActionType41はバリア登録が成立したときに耐久値を通知する', () => {

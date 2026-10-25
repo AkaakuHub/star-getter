@@ -302,6 +302,7 @@ function applyEffectInternal(
         'skill',
         card,
         applyEffect,
+        effect.kind === 'excitement',
       );
     }
     case 'collect':
