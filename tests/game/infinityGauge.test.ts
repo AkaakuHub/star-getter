@@ -41,6 +41,20 @@ describe('無限ゲージ', () => {
     expect(ended.excitement).toBe(voltageThreshold(10));
   });
 
+  it('元気無限の開始と最終解除で元気タイマーを0へ戻す', () => {
+    const initial = { ...game(), stamina: 42, mentalTimerSeconds: 0.4 };
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'mental',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    expect(active.stamina).toBe(100);
+    expect(active.mentalTimerSeconds).toBe(0);
+    const ended = advanceTo({ ...active, mentalTimerSeconds: 0.4 }, 0.5);
+    expect(ended.stamina).toBe(100);
+    expect(ended.mentalTimerSeconds).toBe(0);
+  });
+
   it('開花中は500のGenesisゲージを加算し、無限状態を作らない', () => {
     const initial = activateBloom(game('bloom'), 1);
     const next = applyEffect(initial, {

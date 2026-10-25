@@ -77,7 +77,7 @@ export function expireGaugeInfinities(
   let next = { ...state, gaugeInfinities: active };
   for (const gauge of ended) {
     if (active.some((infinity) => infinity.gauge === gauge)) continue;
-    if (gauge === 'mental') next = { ...next, stamina: 100 };
+    if (gauge === 'mental') next = { ...next, stamina: 100, mentalTimerSeconds: 0 };
     if (gauge === 'voltage') {
       next = {
         ...next,

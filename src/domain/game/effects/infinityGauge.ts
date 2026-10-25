@@ -17,8 +17,12 @@ export function activateInfinityGauge(
       effect.duration.kind === 'milliseconds' ? Math.fround(effect.duration.value / 1000) : null,
     remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
   };
+  const firstActivation = !state.gaugeInfinities.some(
+    (infinity) => infinity.gauge === effect.gauge,
+  );
   const next = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
   if (effect.gauge === 'ap') return { ...next, energy: next.maxEnergy };
-  if (effect.gauge === 'mental' && !state.resting) return { ...next, stamina: 100 };
+  if (effect.gauge === 'mental' && firstActivation && !state.resting)
+    return { ...next, stamina: 100, mentalTimerSeconds: 0 };
   return { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
 }
