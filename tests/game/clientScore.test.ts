@@ -5,8 +5,8 @@ import { act } from '../../src/domain/game/actions';
 import { collectionScore } from '../../src/domain/game/scoring';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 import {
-  calculateLoveGatherCardAppealValue,
-  calculateLoveGatherAddScoreMax,
+  calculateStarGatherCardAppealValue,
+  calculateStarGatherAddScoreMax,
 } from '../../src/domain/game/live/clientScoreInput';
 
 function game() {
@@ -19,25 +19,25 @@ function game() {
   return act(createGame(track, deck, 7), { type: 'start' });
 }
 
-describe('ラブギャザーの回収得点', () => {
+describe('スターギャザーの回収得点', () => {
   it('一致属性だけを1.5倍にし、楽曲秒数と1000で正規化する', () => {
     expect(
-      calculateLoveGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
+      calculateStarGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
     ).toBe(0.3);
     expect(
-      calculateLoveGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
+      calculateStarGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
     ).toBe(0.375);
   });
 
-  it('30秒・各属性125の編成でハート10個は22500となる', () => {
+  it('30秒・各属性125の編成できらめき10個は22500となる', () => {
     expect(collectionScore(game(), 10, false)).toBe(22500n);
   });
 
-  it('回収数×ボルテージによるハートランクで倍率が変わる', () => {
+  it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
     expect(collectionScore({ ...game(), excitement: 601 }, 10, false)).toBe(45000n);
   });
 
-  it('LOVE増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
+  it('STAR増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
     const base = game();
     const boosts = [
       { percent: 100, untilTick: 100 },
@@ -60,7 +60,7 @@ describe('ラブギャザーの回収得点', () => {
     ).toBe(22517n);
   });
 
-  it('回収回数やクライマックスだけでは独自の得点倍率を付けない', () => {
+  it('回収回数や山場だけでは独自の得点倍率を付けない', () => {
     const base = game();
     const expected = collectionScore(base, 10, false);
     expect(collectionScore({ ...base, combo: 70 }, 10, false)).toBe(expected);
@@ -80,7 +80,7 @@ describe('ラブギャザーの回収得点', () => {
   });
 
   it('1回の通常回収は本家の既定上限を適用する', () => {
-    expect(calculateLoveGatherAddScoreMax(100, [])).toBe(2147483647n);
+    expect(calculateStarGatherAddScoreMax(100, [])).toBe(2147483647n);
     const huge = { ...game(), boosts: [{ percent: 10 ** 20, untilTick: 100 }] };
     expect(collectionScore(huge, 100, false)).toBe(2147483647n);
   });

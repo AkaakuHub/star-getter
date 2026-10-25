@@ -51,7 +51,7 @@ describe('ライブの進行', () => {
     expect(heartCount(recovered)).toBeGreaterThan(0);
   });
 
-  it('終了時に残ったハートを回収し、その後の入力を受け付けない', () => {
+  it('終了時に残ったきらめきを回収し、その後の入力を受け付けない', () => {
     let state = game();
     const end = durationSeconds(state);
     state = advanceTo(state, end - 0.1);

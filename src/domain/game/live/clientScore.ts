@@ -1,8 +1,8 @@
-type LoveGatherClientScoreCard = Readonly<{
+type StarGatherClientScoreCard = Readonly<{
   appealValue: number;
 }>;
 
-type LoveGatherClientScorePorts = Readonly<{
+type StarGatherClientScorePorts = Readonly<{
   valueToFactor: (value: number) => number;
   getAddScoreMax: (collectNum: number) => bigint;
 }>;
@@ -11,9 +11,9 @@ const intMax = 2_147_483_647n;
 const longMax = 9_223_372_036_854_775_807n;
 const disappearCollectFactor = 0.20000000298023224;
 
-export function calculateLoveGatherClientScore(
+export function calculateStarGatherClientScore(
   input: Readonly<{
-    cards: readonly LoveGatherClientScoreCard[];
+    cards: readonly StarGatherClientScoreCard[];
     collectNum: number;
     heartRankMagnification: number;
     isDisappearCollect: boolean;
@@ -23,7 +23,7 @@ export function calculateLoveGatherClientScore(
     bonusScoreValue: number;
     challengeBonusFactor: number;
   }>,
-  ports: LoveGatherClientScorePorts,
+  ports: StarGatherClientScorePorts,
 ): bigint {
   validateInput(input);
   const appealAverage =
@@ -61,14 +61,14 @@ function truncateLong(value: number): bigint {
 
 function checkedFactor(value: number, label: string): number {
   if (!Number.isFinite(value)) {
-    throw new Error(`LoveGather client score ${label} factor is invalid`);
+    throw new Error(`StarGather client score ${label} factor is invalid`);
   }
   return value;
 }
 
 function validateInput(
   input: Readonly<{
-    cards: readonly LoveGatherClientScoreCard[];
+    cards: readonly StarGatherClientScoreCard[];
     collectNum: number;
     heartRankMagnification: number;
     masteryLoveBonusEffect: number;
@@ -79,10 +79,10 @@ function validateInput(
   }>,
 ): void {
   if (input.cards.length === 0) {
-    throw new Error('LoveGather client score cards are absent');
+    throw new Error('StarGather client score cards are absent');
   }
   if (!Number.isSafeInteger(input.collectNum) || input.collectNum < 0) {
-    throw new Error('LoveGather client score collect count is invalid');
+    throw new Error('StarGather client score collect count is invalid');
   }
   const values = [
     input.heartRankMagnification,
@@ -96,6 +96,6 @@ function validateInput(
     values.some((value) => !Number.isFinite(value)) ||
     input.cards.some((card) => !Number.isFinite(card.appealValue))
   ) {
-    throw new Error('LoveGather client score value is invalid');
+    throw new Error('StarGather client score value is invalid');
   }
 }

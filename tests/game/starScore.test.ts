@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { projectLoveScore } from '../../src/presentation/score/loveScore';
+import { projectStarScore } from '../../src/presentation/score/starScore';
 import { rules } from '../../src/domain/game/model';
 
 it('ゼロでは京までの20桁を埋め、3桁ごとの区切りと4桁ごとの漢字単位を表示する', () => {
-  const display = projectLoveScore(0n);
+  const display = projectStarScore(0n);
   expect(display.digits.map(({ digit, comma }) => digit + (comma ? ',' : '')).join('')).toBe(
     '00,000,000,000,000,000,000',
   );
@@ -17,15 +17,15 @@ it('ゼロでは京までの20桁を埋め、3桁ごとの区切りと4桁ごと
 });
 
 it('京の4桁を超えたときに垓の桁を追加する', () => {
-  expect(projectLoveScore(10n ** 20n - 1n).digits).toHaveLength(20);
-  const display = projectLoveScore(10n ** 20n);
+  expect(projectStarScore(10n ** 20n - 1n).digits).toHaveLength(20);
+  const display = projectStarScore(10n ** 20n);
   expect(display.digits).toHaveLength(24);
   expect(display.digits.find(({ unit }) => unit)?.unit).toBe('垓');
 });
 
 it('9999無量大数まで全桁を保持し、1行24桁以内で表示する', () => {
   const value = rules.maxScore - 123n;
-  const display = projectLoveScore(value);
+  const display = projectStarScore(value);
   expect(BigInt(display.digits.map(({ digit }) => digit).join(''))).toBe(value);
   expect(display.digits).toHaveLength(72);
   expect(display.digits.find(({ unit }) => unit)?.unit).toBe('無量大数');

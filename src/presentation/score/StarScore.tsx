@@ -1,11 +1,11 @@
-import { projectLoveScore } from './loveScore';
+import { projectStarScore } from './starScore';
 
-export function LoveScore({ value }: Readonly<{ value: bigint }>) {
-  const display = projectLoveScore(value);
+export function StarScore({ value }: Readonly<{ value: bigint }>) {
+  const display = projectStarScore(value);
   return (
     <div
       className="score-value love-number"
-      aria-label={value.toString() + 'LOVE'}
+      aria-label={value.toString() + 'スター'}
       style={{ '--love-columns': display.columns, '--love-rows': display.rows }}
     >
       {display.digits.map(({ digit, place, comma, unit }) => (

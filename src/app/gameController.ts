@@ -1,7 +1,7 @@
 import { act } from '../domain/game/actions';
 import { type Action, type Card, type GameState, rules } from '../domain/game/model';
 import { canUseCard, cardAt } from '../domain/game/projection';
-import { resolveLoveGatherHeartDrawCount } from '../domain/game/live/heartPresentation';
+import { resolveStarGatherHeartDrawCount } from '../domain/game/live/heartPresentation';
 import { advanceWaitMode, releaseWaitMode, type WaitModeState } from '../domain/game/live/waitMode';
 import { advanceTo } from '../domain/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
@@ -180,7 +180,7 @@ export class GameController {
   }
 
   setHeartShowLimit(value: number): void {
-    resolveLoveGatherHeartDrawCount(0, value);
+    resolveStarGatherHeartDrawCount(0, value);
     this.currentState = {
       ...this.currentState,
       hearts: { ...this.currentState.hearts, showLimit: value, throwLimit: value },

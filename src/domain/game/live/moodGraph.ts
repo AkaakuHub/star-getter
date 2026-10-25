@@ -5,7 +5,7 @@ export function projectMoodStepPoints(
   durationSeconds: number,
   graph: Readonly<{ x: number; y: number; width: number; height: number }>,
 ): readonly MoodPoint[] {
-  if (durationSeconds <= 0) throw new Error('ムードグラフの再生時間が正しくありません。');
+  if (durationSeconds <= 0) throw new Error('空模様グラフの再生時間が正しくありません。');
   const sorted = [...keys].sort((left, right) => left.songTimeSeconds - right.songTimeSeconds);
   if (sorted.length === 0) return [];
   const graphPoints = sorted.flatMap((key, index) => {

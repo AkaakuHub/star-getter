@@ -27,10 +27,10 @@ export function MoodGraph({ state }: Readonly<{ state: GameState }>) {
   return (
     <div className="live-analyzer" style={liveLayout.analyzer}>
       <strong className="mood-value">
-        MOOD {mood > 0 ? '+' : ''}
-        {mood}
+        空模様 {mood > 0 ? '+' : ''}
+        {mood}%
       </strong>
-      <div className="mood-graph" role="img" aria-label={'ムードグラフ、現在' + mood}>
+      <div className="mood-graph" role="img" aria-label={'空模様グラフ、現在' + mood}>
         <canvas ref={ref} aria-hidden="true" />
         <i className="mood-position" style={{ left: progress * 100 + '%' }} />
       </div>

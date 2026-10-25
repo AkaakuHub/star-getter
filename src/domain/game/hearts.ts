@@ -2,13 +2,13 @@ import { applyEffect } from './effects';
 import { fillHand, shuffleHand } from './cards/drawing';
 import { type GameState, rules } from './model';
 import { collectionScore, limitValue } from './scoring';
-import { collectLoveGatherHeartRuntime, advanceLoveGatherHeartRuntime } from './live/heartRuntime';
-import { spawnLoveGatherBeatHearts } from './live/heartSpawn';
-import { loveGatherHeartCount } from './live/heartState';
+import { collectStarGatherHeartRuntime, advanceStarGatherHeartRuntime } from './live/heartRuntime';
+import { spawnStarGatherBeatHearts } from './live/heartSpawn';
+import { starGatherHeartCount } from './live/heartState';
 import { createRangeRandom } from './random';
 
 export function heartCount(state: GameState): number {
-  return loveGatherHeartCount(state.hearts);
+  return starGatherHeartCount(state.hearts);
 }
 
 function awardHearts(state: GameState, count: number, missed: boolean): GameState {
@@ -40,7 +40,7 @@ function awardHearts(state: GameState, count: number, missed: boolean): GameStat
 export function collectHearts(state: GameState): GameState {
   if (heartCount(state) === 0) return state;
   const random = createRangeRandom(state.heartRandomSeed);
-  const collected = collectLoveGatherHeartRuntime(state.hearts, random.range);
+  const collected = collectStarGatherHeartRuntime(state.hearts, random.range);
   const next = awardHearts(
     { ...state, hearts: collected.state, heartRandomSeed: random.seed },
     collected.collectCount,
@@ -91,7 +91,7 @@ export function collectHearts(state: GameState): GameState {
 export function addHearts(state: GameState, count: number): GameState {
   if (count === 0) return state;
   const random = createRangeRandom(state.heartRandomSeed);
-  const spawned = spawnLoveGatherBeatHearts(state.hearts, count, random.range);
+  const spawned = spawnStarGatherBeatHearts(state.hearts, count, random.range);
   return awardHearts(
     { ...state, hearts: spawned.state, heartRandomSeed: random.seed },
     spawned.overflowCount,
@@ -100,6 +100,6 @@ export function addHearts(state: GameState, count: number): GameState {
 }
 
 export function advanceHearts(state: GameState): GameState {
-  const advanced = advanceLoveGatherHeartRuntime(state.hearts, 1 / rules.ticksPerSecond, false);
+  const advanced = advanceStarGatherHeartRuntime(state.hearts, 1 / rules.ticksPerSecond, false);
   return awardHearts({ ...state, hearts: advanced.state }, advanced.lapsedCount, true);
 }

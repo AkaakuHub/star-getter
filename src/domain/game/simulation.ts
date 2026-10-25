@@ -7,25 +7,25 @@ import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
 import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt } from './projection';
-import { changeBloomResource, finishBloom } from './bloom';
+import { finishBloom } from './bloom';
 import { fillHand } from './cards/drawing';
-import { createLoveGatherHeartRuntimeState } from './live/heartSpawn';
+import { createStarGatherHeartRuntimeState } from './live/heartSpawn';
 import {
-  loveGatherHeartShowLimitSettings,
-  resolveLoveGatherHeartDrawCount,
+  starGatherHeartShowLimitSettings,
+  resolveStarGatherHeartDrawCount,
 } from './live/heartPresentation';
 
 export function createGame(
   track: Track,
   deck: readonly Card[],
   seed: number,
-  heartShowLimit: number = loveGatherHeartShowLimitSettings.defaultValue,
+  heartShowLimit: number = starGatherHeartShowLimitSettings.defaultValue,
   tokenCatalog: readonly Card[] = [],
 ): GameState {
   validateDeck(deck);
   validateTrack(track);
   for (const card of tokenCatalog) validateCard(card);
-  resolveLoveGatherHeartDrawCount(0, heartShowLimit);
+  resolveStarGatherHeartDrawCount(0, heartShowLimit);
   const shuffled = shuffle(
     deck.map((card) => card.id),
     seed,
@@ -58,7 +58,7 @@ export function createGame(
     charge: 0,
     score: 0n,
     hearts: {
-      ...createLoveGatherHeartRuntimeState((track.beats * 60) / track.bpm),
+      ...createStarGatherHeartRuntimeState((track.beats * 60) / track.bpm),
       showLimit: heartShowLimit,
       throwLimit: heartShowLimit,
       showPercentage: 100,
@@ -121,43 +121,33 @@ function advanceTick(state: GameState): GameState {
       ? Math.min(100, state.stamina + 4 * dt)
       : Math.max(0, state.stamina - 0.9 * dt);
   const resting = state.resting ? stamina < 40 : stamina <= 0;
-  const ap = advanceStarGatherApGauge(
-    {
-      currentAp: state.bloom ? 0 : Math.floor(state.energy),
-      maxAp: rules.maxEnergy,
-      timerSeconds: state.apTimerSeconds,
-    },
-    {
-      deltaTimeSeconds: dt,
-      mentalDown: resting,
-      increaseIntervalSeconds:
-        state.apIntervalFactor * (rules.energyTicksPerPoint / rules.ticksPerSecond),
-    },
-  );
+  const ap = state.bloom
+    ? { currentAp: state.energy, timerSeconds: state.apTimerSeconds }
+    : advanceStarGatherApGauge(
+        {
+          currentAp: Math.floor(state.energy),
+          maxAp: rules.maxEnergy,
+          timerSeconds: state.apTimerSeconds,
+        },
+        {
+          deltaTimeSeconds: dt,
+          mentalDown: resting,
+          increaseIntervalSeconds:
+            state.apIntervalFactor * (rules.energyTicksPerPoint / rules.ticksPerSecond),
+        },
+      ).state;
   let next: GameState = advanceHearts({
     ...state,
     tick,
     stamina,
     resting,
-    energy: state.bloom ? state.energy : ap.state.currentAp,
-    apTimerSeconds: ap.state.timerSeconds,
+    energy: state.bloom ? state.energy : ap.currentAp,
+    apTimerSeconds: ap.timerSeconds,
     excitement: state.bloom ? state.excitement : Math.min(100, state.excitement + dt * 0.25),
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
-  if (next.bloom && ap.state.currentAp > 0) {
-    const progress = next.bloom.progress;
-    const increased = changeBloomResource(next, 'energy', 1n);
-    if (!increased.bloom) throw new Error('開花ゲージがありません。');
-    next = {
-      ...increased,
-      bloom: {
-        ...increased.bloom,
-        progress: progress + (increased.bloom.progress - progress) * BigInt(ap.state.currentAp),
-      },
-    };
-  }
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   if (beat !== previousBeat && beat % 2 === 0 && !resting) {

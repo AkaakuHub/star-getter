@@ -15,7 +15,26 @@ function game() {
   return act(createGame(track, resolveDeck(defaultDeckIds), 7), { type: 'start' });
 }
 
-describe('開花とスキルの相乗効果', () => {
+describe('開花とアクションの相乗効果', () => {
+  it('専用メーター自体が2³¹−1に達し、超えると符号付き32bitのオーバーフローで0へ戻る', () => {
+    const active = activateBloom(advanceTo(game(), 6), 1);
+    if (!active.bloom) throw new Error('開花が発動していません。');
+    const nearMaximum = {
+      ...active,
+      bloom: { ...active.bloom, progress: rules.maxBloomGauge - 1n },
+    };
+    const maximum = changeBloomResource(nearMaximum, 'energy', 1n);
+    expect(maximum.bloom?.progress).toBe(2_147_483_647n);
+    expect(changeBloomResource(maximum, 'energy', 1n).bloom?.progress).toBe(0n);
+    expect(maximum.energy).toBe(active.energy);
+    expect(maximum.stamina).toBe(active.stamina);
+    expect(maximum.excitement).toBe(active.excitement);
+    const maintained = advanceTo(maximum, 8);
+    expect(maintained.bloom?.progress).toBe(rules.maxBloomGauge);
+    expect(maintained.energy).toBe(maximum.energy);
+    expect(maintained.stamina).toBe(maximum.stamina);
+    expect(maintained.excitement).toBe(maximum.excitement);
+  });
   it('増幅と元気の回復を開花前に準備したときだけ、発動時の強度と条件付き増幅が上がる', () => {
     const base = { ...advanceTo(game(), 6), excitement: 200001 };
     const prepare = (state: typeof base) =>
@@ -49,7 +68,7 @@ describe('開花とスキルの相乗効果', () => {
     expect(preparedGain).toBeGreaterThan(reversedGain);
   });
   for (const mood of [-99, 0, 100]) {
-    it(`ムード${mood}%ではAPが足りていても開花を使用・発動できない`, () => {
+    it(`空模様${mood}%ではエナジーが足りていても開花を使用・発動できない`, () => {
       const base = game();
       const state = {
         ...base,
@@ -66,7 +85,7 @@ describe('開花とスキルの相乗効果', () => {
     });
   }
 
-  it('楽曲のムード−100%区間で開花を使用でき、区間変更後も発動を維持する', () => {
+  it('楽曲の空模様−100%区間で開花を使用でき、区間変更後も発動を維持する', () => {
     let state = game();
     const index = state.hand.indexOf('spark');
     expect(canUseCard(advanceTo(state, 5.99), index)).toBe(false);
@@ -77,7 +96,7 @@ describe('開花とスキルの相乗効果', () => {
     expect(state.stats.cardsUsed).toBe(1);
     const later = advanceTo(state, 12);
     expect(later.bloom).not.toBe(null);
-    expect(later.bloom?.progress).toBeGreaterThan(state.bloom?.progress ?? 0n);
+    expect(later.bloom?.progress).toBe(state.bloom?.progress);
   });
 
   it('増幅を重ね、後続の効果に適用し、次のライブには引き継がない', () => {
@@ -89,7 +108,7 @@ describe('開花とスキルの相乗効果', () => {
     expect(game().amplification).toBe(100);
   });
 
-  it('AP・メンタル・ボルテージを専用ゲージへ変換し、元の値を復元する', () => {
+  it('エナジー・元気・熱気を専用ゲージへ変換し、元の値を復元する', () => {
     const base = { ...advanceTo(game(), 6), energy: 0, excitement: 40, stamina: 80 };
     const active = activateBloom(base, 1);
     expect(active.bloom?.progress).toBe(30n);
@@ -112,7 +131,7 @@ describe('開花とスキルの相乗効果', () => {
     expect(finished.excitement).toBe(base.excitement);
   });
 
-  it('AP回復の効果増幅はFloat32計算後に端数を切り上げる', () => {
+  it('エナジー回復の効果増幅はFloat32計算後に端数を切り上げる', () => {
     const state = applyEffect(
       { ...game(), energy: 0, amplification: 150 },
       { kind: 'energy', amount: 3 },

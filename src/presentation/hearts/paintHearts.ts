@@ -1,7 +1,7 @@
 import type { GameState } from '../../domain/game/model';
 import { heartCount } from '../../domain/game/hearts';
-import { calculateLoveGatherHeartRank } from '../../domain/game/live/heartRank';
-import { projectLoveGatherHeartPresentations } from '../../domain/game/live/heartPresentation';
+import { calculateStarGatherHeartRank } from '../../domain/game/live/heartRank';
+import { projectStarGatherHeartPresentations } from '../../domain/game/live/heartPresentation';
 
 export function paintHearts(
   context: CanvasRenderingContext2D,
@@ -11,13 +11,13 @@ export function paintHearts(
   height: number,
 ): void {
   context.clearRect(0, 0, width, height);
-  const rank = calculateLoveGatherHeartRank(
+  const rank = calculateStarGatherHeartRank(
     heartCount(state),
     Math.floor(state.excitement / 2),
     null,
   );
   const pixelsPerWorldUnit = height / (9.600000381469727 * 2);
-  const presentations = projectLoveGatherHeartPresentations(state.hearts.stageHearts, rank.rank);
+  const presentations = projectStarGatherHeartPresentations(state.hearts.stageHearts, rank.rank);
   let drawn = 0;
   for (const heart of presentations) {
     if (drawn >= state.hearts.showLimit) break;

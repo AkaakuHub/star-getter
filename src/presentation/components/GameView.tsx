@@ -1,4 +1,4 @@
-import { Pause, Menu, List, Layers, Heart, Volume2, VolumeX } from 'lucide-preact';
+import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
@@ -74,12 +74,12 @@ export function GameView({
           type="button"
           className="live-tool live-auto-heart"
           style={liveLayout.automaticHeart}
-          aria-label="ハート100個で自動回収"
+          aria-label="きらめき100個で自動回収"
           aria-pressed={state.automaticHeart.enabled}
           onClick={() => controller.toggleAutomaticHearts()}
           disabled={busy || state.phase === 'finished'}
         >
-          <Heart size={20} aria-hidden="true" />
+          <Star size={20} aria-hidden="true" />
           <span>100</span>
         </button>
         <button

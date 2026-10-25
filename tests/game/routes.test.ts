@@ -31,7 +31,7 @@ describe('固定プリセット', () => {
     );
   });
 
-  it('書架は共演カード3枚を生成し、APをまとめて支払い、一斉使用後に除外する', () => {
+  it('書架は共演カード3枚を生成し、エナジーをまとめて支払い、一斉使用後に除外する', () => {
     let state = game('library');
     const hand = ['halo', 'orbit', 'ember', 'prism', 'flare'];
     state = {

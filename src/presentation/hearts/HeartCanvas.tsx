@@ -10,7 +10,7 @@ export function HeartCanvas({ controller }: Readonly<{ controller: GameControlle
     const canvas = ref.current;
     const context = canvas?.getContext('2d', { alpha: true, desynchronized: true });
     if (!canvas || !context) {
-      setError('ハートを描画できません。');
+      setError('きらめきを描画できません。');
       return;
     }
     let disposed = false;
@@ -58,7 +58,7 @@ export function HeartCanvas({ controller }: Readonly<{ controller: GameControlle
       })
       .catch((failure: unknown) => {
         if (!disposed)
-          setError(failure instanceof Error ? failure.message : 'ハートを描画できません。');
+          setError(failure instanceof Error ? failure.message : 'きらめきを描画できません。');
       });
     return () => {
       disposed = true;

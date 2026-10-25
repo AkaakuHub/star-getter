@@ -1,5 +1,5 @@
 import { routes, routeIds, type RouteId } from '../../content/routes';
-import { loveGatherHeartShowLimitSettings } from '../../domain/game/live/heartPresentation';
+import { starGatherHeartShowLimitSettings } from '../../domain/game/live/heartPresentation';
 import { Modal } from './Modal';
 
 export function GameMenu({
@@ -38,15 +38,15 @@ export function GameMenu({
       </fieldset>
       <div className="heart-display-panel">
         <div className="panel-heading">
-          <label htmlFor="heart-show-limit">ハート表示数</label>
+          <label htmlFor="heart-show-limit">きらめき表示数</label>
           <output htmlFor="heart-show-limit">{heartShowLimit}個</output>
         </div>
         <input
           id="heart-show-limit"
           type="range"
-          min={loveGatherHeartShowLimitSettings.minimum}
-          max={loveGatherHeartShowLimitSettings.maximum}
-          step={loveGatherHeartShowLimitSettings.step}
+          min={starGatherHeartShowLimitSettings.minimum}
+          max={starGatherHeartShowLimitSettings.maximum}
+          step={starGatherHeartShowLimitSettings.step}
           value={heartShowLimit}
           disabled={busy}
           onInput={(event) => onHeartShowLimit(Number(event.currentTarget.value))}

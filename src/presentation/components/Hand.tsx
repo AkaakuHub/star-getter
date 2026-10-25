@@ -32,7 +32,9 @@ export function Hand({
             style={handLayout(index, state.hand.length)}
             disabled={state.phase !== 'playing' && state.phase !== 'paused'}
             aria-pressed={controller.selectedCard?.id === card.id}
-            aria-label={card.name + '、AP' + cardCost(state, card) + '、' + describeCard(card)}
+            aria-label={
+              card.name + '、エナジー' + cardCost(state, card) + '、' + describeCard(card)
+            }
             onPointerDown={(event) => {
               if (event.button === 0) {
                 event.preventDefault();

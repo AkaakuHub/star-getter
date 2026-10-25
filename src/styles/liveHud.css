@@ -191,6 +191,25 @@
   font-size: 2.5cqw;
   pointer-events: none;
 }
+.bloom-gauge {
+  color: #9861d8;
+  border-color: #d3a6ff;
+  background: #ede1fff2;
+}
+.bloom-gauge .vertical-meter {
+  height: 14cqw;
+  background: #d5c6e6;
+}
+.bloom-maximum {
+  position: absolute;
+  z-index: 13;
+  display: grid;
+  align-items: center;
+  font-size: 2cqw;
+  color: #674375;
+  font-weight: 800;
+  pointer-events: none;
+}
 .live-amplification {
   position: absolute;
   top: 77.8%;

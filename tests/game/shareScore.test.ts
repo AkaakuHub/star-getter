@@ -8,7 +8,7 @@ it('X共有にスコア・ハッシュタグ・現在URLを含め、プリセッ
   const url = new URL(shareScoreUrl(rules.maxScore, '開花', current));
   expect(url.origin + url.pathname).toBe('https://twitter.com/intent/tweet');
   expect(url.searchParams.get('text')).toContain('9999無量大数');
-  expect(url.searchParams.get('hashtags')).toBe('ラブギャザー');
+  expect(url.searchParams.get('hashtags')).toBe('スターギャザー');
   expect(url.searchParams.get('url')).toBe(current);
   expect(initialRoute(current)).toBe('bloom');
   expect(initialRoute('https://example.com/')).toBe('library');

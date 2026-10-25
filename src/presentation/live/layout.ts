@@ -21,4 +21,7 @@ export const liveLayout = {
   deck: hudRect(826, 1526, 210, 48),
   description: hudRect(120, 1768, 840, 128),
   bloom: hudRect(148.5, 1084.5, 527, 73),
+  bloomMaximum: hudRect(723, 1085, 210, 72),
+  bloomLeft: hudRect(22.5, 1236.2, 126, 235),
+  bloomRight: hudRect(956.5, 1236.2, 126, 235),
 };

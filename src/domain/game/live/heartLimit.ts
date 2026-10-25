@@ -1,18 +1,18 @@
-import type { LoveGatherHeartRuntimeState } from './heartTypes';
-import { validateState, loveGatherHeartCount } from './heartState';
-type LoveGatherHeartLimitChangeResult = Readonly<{
-  state: LoveGatherHeartRuntimeState;
+import type { StarGatherHeartRuntimeState } from './heartTypes';
+import { validateState, starGatherHeartCount } from './heartState';
+type StarGatherHeartLimitChangeResult = Readonly<{
+  state: StarGatherHeartRuntimeState;
   lapsedCount: number;
 }>;
-export function changeLoveGatherHeartLimit(
-  state: LoveGatherHeartRuntimeState,
+export function changeStarGatherHeartLimit(
+  state: StarGatherHeartRuntimeState,
   heartLimit: number,
-): LoveGatherHeartLimitChangeResult {
+): StarGatherHeartLimitChangeResult {
   validateState(state);
   if (!Number.isSafeInteger(heartLimit) || heartLimit < 0) {
-    throw new Error('LoveGather Heart limit is invalid');
+    throw new Error('StarGather Heart limit is invalid');
   }
-  let remainingRemovalCount = Math.max(loveGatherHeartCount(state) - heartLimit, 0);
+  let remainingRemovalCount = Math.max(starGatherHeartCount(state) - heartLimit, 0);
   const stageRemovalIndices = new Set(
     state.stageHearts
       .map((heart, index) => ({ heart, index }))
@@ -38,7 +38,7 @@ export function changeLoveGatherHeartLimit(
     })
     .reverse();
   if (remainingRemovalCount !== 0) {
-    throw new Error('LoveGather Heart limit removal count differs');
+    throw new Error('StarGather Heart limit removal count differs');
   }
   return {
     state: {

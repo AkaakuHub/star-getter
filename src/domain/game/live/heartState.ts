@@ -1,5 +1,5 @@
-import type { LoveGatherHeartRuntimeState, LoveGatherHeartRandomRange } from './heartTypes';
-export function loveGatherHeartCount(state: LoveGatherHeartRuntimeState): number {
+import type { StarGatherHeartRuntimeState, StarGatherHeartRandomRange } from './heartTypes';
+export function starGatherHeartCount(state: StarGatherHeartRuntimeState): number {
   validateState(state);
   return (
     state.stageHearts.filter((heart) => heart.phase !== 'collect').length +
@@ -7,7 +7,7 @@ export function loveGatherHeartCount(state: LoveGatherHeartRuntimeState): number
   );
 }
 
-export function validateState(state: LoveGatherHeartRuntimeState): void {
+export function validateState(state: StarGatherHeartRuntimeState): void {
   for (const [label, value] of [
     ['limit', state.heartLimit],
     ['show limit', state.showLimit],
@@ -15,7 +15,7 @@ export function validateState(state: LoveGatherHeartRuntimeState): void {
     ['show percentage', state.showPercentage],
   ] as const) {
     if (!Number.isSafeInteger(value) || value < 0) {
-      throw new Error(`LoveGather Heart ${label} is invalid`);
+      throw new Error(`StarGather Heart ${label} is invalid`);
     }
   }
   if (
@@ -53,7 +53,7 @@ export function validateState(state: LoveGatherHeartRuntimeState): void {
         batch.lifeTimeSeconds < 0,
     )
   ) {
-    throw new Error('LoveGather Heart state is invalid');
+    throw new Error('StarGather Heart state is invalid');
   }
   const hiddenHeartCount = state.hiddenHeartBatches.reduce(
     (total, batch) => total + batch.count,
@@ -63,18 +63,18 @@ export function validateState(state: LoveGatherHeartRuntimeState): void {
     (heart) => heart.phase !== 'collect',
   ).length;
   if (logicalStageHeartCount + hiddenHeartCount > state.heartLimit) {
-    throw new Error('LoveGather Heart count exceeds limit');
+    throw new Error('StarGather Heart count exceeds limit');
   }
 }
 
 export function randomValue(
-  randomRange: LoveGatherHeartRandomRange,
+  randomRange: StarGatherHeartRandomRange,
   minimum: number,
   maximum: number,
 ): number {
   const value = randomRange(minimum, maximum);
   if (!Number.isFinite(value) || value < minimum || value > maximum) {
-    throw new Error('LoveGather Heart random value is invalid');
+    throw new Error('StarGather Heart random value is invalid');
   }
   return Math.fround(value);
 }

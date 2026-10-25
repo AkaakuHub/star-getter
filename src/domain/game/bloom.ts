@@ -2,8 +2,8 @@ import type { GameState } from './model';
 import { voltageLevel } from './live/voltageLevel';
 import { canActivateBloom } from './projection';
 import {
-  calculateLoveGatherInitialGenesisGauge,
-  calculateLoveGatherGenesisGaugeDelta,
+  calculateStarGatherInitialGenesisGauge,
+  calculateStarGatherGenesisGaugeDelta,
 } from './live/genesisGauge';
 
 const gaugeTypes = { energy: 1, stamina: 2, excitement: 3 } as const;
@@ -19,7 +19,7 @@ export function activateBloom(state: GameState, strength: number): GameState {
     ...state,
     bloom: {
       progress: BigInt(
-        calculateLoveGatherInitialGenesisGauge({
+        calculateStarGatherInitialGenesisGauge({
           currentAp: Math.floor(state.energy),
           currentMental: Math.floor(state.stamina),
           currentVoltageLevel: voltageLevel(state.excitement),
@@ -37,19 +37,19 @@ export function changeBloomResource(
   amount: bigint,
 ): GameState {
   if (!state.bloom) throw new Error('開花が発動していません。');
-  const delta = calculateLoveGatherGenesisGaugeDelta({
+  const delta = calculateStarGatherGenesisGaugeDelta({
     actionType: 14,
     gaugeType: gaugeTypes[resource],
     effectValue: Number(amount),
     currentGenesisEffectValue: state.bloom.strength,
   });
   if (delta === null) return state;
+  const progress = BigInt.asIntN(32, state.bloom.progress + BigInt(delta));
   return {
     ...state,
     bloom: {
       ...state.bloom,
-      progress:
-        state.bloom.progress + BigInt(delta) < 0n ? 0n : state.bloom.progress + BigInt(delta),
+      progress: progress < 0n ? 0n : progress,
     },
   };
 }

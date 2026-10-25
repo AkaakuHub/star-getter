@@ -1,6 +1,6 @@
-import type { LoveGatherStageHeart } from './heartTypes';
+import type { StarGatherStageHeart } from './heartTypes';
 
-type LoveGatherHeartPresentation = Readonly<{
+type StarGatherHeartPresentation = Readonly<{
   rank: 0 | 1 | 2 | 3 | 4;
   position: Readonly<{ x: number; y: number }>;
   scale: number;
@@ -10,7 +10,7 @@ type LoveGatherHeartPresentation = Readonly<{
   collectionJumpHeight: number;
 }>;
 
-export const loveGatherHeartShowLimitSettings = {
+export const starGatherHeartShowLimitSettings = {
   minimum: 10,
   maximum: 100,
   step: 10,
@@ -22,31 +22,31 @@ const spawnAlphaDurationSeconds = 0.5;
 const hideAfterThrowDurationSeconds = 0.2;
 const flashHalfCycleSeconds = 0.2;
 
-export function resolveLoveGatherHeartDrawCount(
+export function resolveStarGatherHeartDrawCount(
   heartCount: number,
   maximumVisibleHeartCount: number,
 ): number {
   if (!Number.isSafeInteger(heartCount) || heartCount < 0) {
-    throw new Error('LoveGather Heart draw count is invalid');
+    throw new Error('StarGather Heart draw count is invalid');
   }
-  const { minimum, maximum, step } = loveGatherHeartShowLimitSettings;
+  const { minimum, maximum, step } = starGatherHeartShowLimitSettings;
   if (
     !Number.isSafeInteger(maximumVisibleHeartCount) ||
     maximumVisibleHeartCount < minimum ||
     maximumVisibleHeartCount > maximum ||
     (maximumVisibleHeartCount - minimum) % step !== 0
   ) {
-    throw new Error('LoveGather Heart show limit is invalid');
+    throw new Error('StarGather Heart show limit is invalid');
   }
   return Math.min(heartCount, maximumVisibleHeartCount);
 }
 
-export function projectLoveGatherHeartPresentations(
-  hearts: readonly LoveGatherStageHeart[],
+export function projectStarGatherHeartPresentations(
+  hearts: readonly StarGatherStageHeart[],
   rank: number,
-): readonly LoveGatherHeartPresentation[] {
+): readonly StarGatherHeartPresentation[] {
   if (!Number.isSafeInteger(rank) || rank < 0 || rank > 4) {
-    throw new Error('LoveGather Heart rank is invalid');
+    throw new Error('StarGather Heart rank is invalid');
   }
   return hearts.flatMap((heart) => {
     const spawnProgress = Math.min(heart.spawnElapsedSeconds / heart.spawnDurationSeconds, 1);
@@ -94,7 +94,7 @@ export function projectLoveGatherHeartPresentations(
 }
 
 function collectionProgress(
-  heart: LoveGatherStageHeart,
+  heart: StarGatherStageHeart,
 ): Readonly<{ position: number; scale: number }> {
   if (heart.phase !== 'collect') return { position: 0, scale: 1 };
   const progress = Math.min(heart.collectElapsedSeconds / heart.collectMoveDurationSeconds, 1);

@@ -9,7 +9,7 @@ try {
 } catch (error) {
   render(
     <main className="startup-error">
-      <h1>ラブギャザー</h1>
+      <h1>スターギャザー</h1>
       <p role="alert">{error instanceof Error ? error.message : '起動できません。'}</p>
       <button type="button" className="button primary" onClick={() => location.reload()}>
         再読み込み

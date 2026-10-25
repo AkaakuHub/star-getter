@@ -4,7 +4,7 @@ import { tracks } from '../../src/content/tracks';
 import { resolveDeck, defaultDeckIds } from '../../src/content/cards';
 import { createGame } from '../../src/domain/game/simulation';
 
-it('ムードの変更時刻まで値を保ち、−100から100へ垂直に切り替える', () => {
+it('空模様の変更時刻まで値を保ち、−100から100へ垂直に切り替える', () => {
   expect(
     projectMoodStepPoints(
       [
@@ -23,7 +23,7 @@ it('ムードの変更時刻まで値を保ち、−100から100へ垂直に切�
   ]);
 });
 
-it('楽曲のムード値が範囲外なら開始を拒否する', () => {
+it('楽曲の空模様値が範囲外なら開始を拒否する', () => {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
   const invalid = {

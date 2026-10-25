@@ -1,49 +1,49 @@
-export type LoveGatherHeartPhase = 'throw' | 'wait' | 'flash' | 'collect';
-export type LoveGatherHeartShowState = 'show' | 'hide-after-throw';
-export type LoveGatherHeartRandomRange = (minimum: number, maximum: number) => number;
+export type StarGatherHeartPhase = 'throw' | 'wait' | 'flash' | 'collect';
+export type StarGatherHeartShowState = 'show' | 'hide-after-throw';
+export type StarGatherHeartRandomRange = (minimum: number, maximum: number) => number;
 
-export type LoveGatherHeartPosition = Readonly<{ x: number; y: number }>;
+export type StarGatherHeartPosition = Readonly<{ x: number; y: number }>;
 
-export type LoveGatherStageHeart = Readonly<{
+export type StarGatherStageHeart = Readonly<{
   lifeTimeSeconds: number;
-  phase: LoveGatherHeartPhase;
-  showState: LoveGatherHeartShowState;
+  phase: StarGatherHeartPhase;
+  showState: StarGatherHeartShowState;
   spawnElapsedSeconds: number;
   spawnDurationSeconds: number;
-  spawnStartPosition: LoveGatherHeartPosition;
-  waitPosition: LoveGatherHeartPosition;
+  spawnStartPosition: StarGatherHeartPosition;
+  waitPosition: StarGatherHeartPosition;
   flashElapsedSeconds: number;
   collectElapsedSeconds: number;
   collectMoveDurationSeconds: number;
   collectJumpHeight: number;
 }>;
 
-export type LoveGatherHeartRuntimeState = Readonly<{
+export type StarGatherHeartRuntimeState = Readonly<{
   heartLimit: number;
   showLimit: number;
   throwLimit: number;
   showPercentage: number;
   baseLifeTimeSeconds: number;
-  stageHearts: readonly LoveGatherStageHeart[];
+  stageHearts: readonly StarGatherStageHeart[];
   hiddenHeartBatches: readonly Readonly<{
     count: number;
     lifeTimeSeconds: number;
   }>[];
 }>;
 
-export type LoveGatherHeartSpawnResult = Readonly<{
-  state: LoveGatherHeartRuntimeState;
+export type StarGatherHeartSpawnResult = Readonly<{
+  state: StarGatherHeartRuntimeState;
   overflowCount: number;
 }>;
 
-export type LoveGatherHeartAdvanceResult = Readonly<{
-  state: LoveGatherHeartRuntimeState;
+export type StarGatherHeartAdvanceResult = Readonly<{
+  state: StarGatherHeartRuntimeState;
   lapsedCount: number;
   autoCollectCount: number;
 }>;
 
-export type LoveGatherHeartCollectResult = Readonly<{
-  state: LoveGatherHeartRuntimeState;
+export type StarGatherHeartCollectResult = Readonly<{
+  state: StarGatherHeartRuntimeState;
   collectCount: number;
   animationHeartCount: number;
 }>;

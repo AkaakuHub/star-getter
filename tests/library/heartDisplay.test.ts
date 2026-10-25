@@ -14,7 +14,7 @@ function storage() {
   };
 }
 
-describe('ハート表示数の保存', () => {
+describe('きらめき表示数の保存', () => {
   it('初回は100個で、選択した値を再読込できる', () => {
     const saved = storage();
     expect(readHeartShowLimit(saved)).toBe(100);

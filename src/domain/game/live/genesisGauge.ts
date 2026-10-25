@@ -1,4 +1,4 @@
-export function calculateLoveGatherInitialGenesisGauge(input: {
+export function calculateStarGatherInitialGenesisGauge(input: {
   currentAp: number;
   currentMental: number;
   currentVoltageLevel: number;
@@ -11,7 +11,7 @@ export function calculateLoveGatherInitialGenesisGauge(input: {
     !Number.isSafeInteger(input.currentVoltageLevel) ||
     input.currentVoltageLevel < 0
   ) {
-    throw new Error('LoveGather initial Genesis gauge input is invalid');
+    throw new Error('StarGather initial Genesis gauge input is invalid');
   }
   return Math.trunc(
     Math.fround(
@@ -21,7 +21,7 @@ export function calculateLoveGatherInitialGenesisGauge(input: {
   );
 }
 
-export function calculateLoveGatherGenesisGaugeDelta(input: {
+export function calculateStarGatherGenesisGaugeDelta(input: {
   actionType: number;
   gaugeType: 0 | 1 | 2 | 3;
   effectValue: number;
@@ -32,7 +32,7 @@ export function calculateLoveGatherGenesisGaugeDelta(input: {
     !Number.isFinite(input.effectValue) ||
     !Number.isFinite(input.currentGenesisEffectValue)
   ) {
-    throw new Error('LoveGather Genesis gauge input is invalid');
+    throw new Error('StarGather Genesis gauge input is invalid');
   }
   if (input.effectValue === 0) return null;
   const sign = input.effectValue < 0 ? -1 : 1;

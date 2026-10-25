@@ -1,19 +1,19 @@
 import type {
-  LoveGatherHeartRuntimeState,
-  LoveGatherHeartRandomRange,
-  LoveGatherHeartAdvanceResult,
-  LoveGatherHeartCollectResult,
+  StarGatherHeartRuntimeState,
+  StarGatherHeartRandomRange,
+  StarGatherHeartAdvanceResult,
+  StarGatherHeartCollectResult,
 } from './heartTypes';
-import { validateState, randomValue, loveGatherHeartCount } from './heartState';
+import { validateState, randomValue, starGatherHeartCount } from './heartState';
 const flashThresholdSeconds = 3;
-export function advanceLoveGatherHeartRuntime(
-  state: LoveGatherHeartRuntimeState,
+export function advanceStarGatherHeartRuntime(
+  state: StarGatherHeartRuntimeState,
   deltaTimeSeconds: number,
   autoPlay: boolean,
-): LoveGatherHeartAdvanceResult {
+): StarGatherHeartAdvanceResult {
   validateState(state);
   if (!Number.isFinite(deltaTimeSeconds) || deltaTimeSeconds < 0) {
-    throw new Error('LoveGather Heart delta time is invalid');
+    throw new Error('StarGather Heart delta time is invalid');
   }
   let expiredStageCount = 0;
   const stageHearts = state.stageHearts.flatMap((heart) => {
@@ -72,12 +72,12 @@ export function advanceLoveGatherHeartRuntime(
   };
 }
 
-export function collectLoveGatherHeartRuntime(
-  state: LoveGatherHeartRuntimeState,
-  randomRange: LoveGatherHeartRandomRange,
-): LoveGatherHeartCollectResult {
+export function collectStarGatherHeartRuntime(
+  state: StarGatherHeartRuntimeState,
+  randomRange: StarGatherHeartRandomRange,
+): StarGatherHeartCollectResult {
   validateState(state);
-  const collectCount = loveGatherHeartCount(state);
+  const collectCount = starGatherHeartCount(state);
   const collectingHearts = state.stageHearts.filter(
     (heart) => heart.phase !== 'collect' && heart.showState === 'show',
   );

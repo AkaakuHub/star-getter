@@ -14,8 +14,8 @@ function game(): GameState {
   return { ...state, relayUsed: [...state.hand] };
 }
 
-describe('ハートと得点', () => {
-  it('回収すると得点とチャージを得て、同じハートを二重回収しない', () => {
+describe('きらめきと得点', () => {
+  it('回収すると得点とチャージを得て、同じきらめきを二重回収しない', () => {
     const state = addHearts(game(), 10);
     const collected = act(state, { type: 'collect' });
     expect(collected.score).toBeGreaterThan(0);
@@ -34,7 +34,7 @@ describe('ハートと得点', () => {
     expect(expired.score).toBe(normal.score / 5n);
   });
 
-  it('上限を超えた追加分だけが失効し、既存のハートを保持する', () => {
+  it('上限を超えた追加分だけが失効し、既存のきらめきを保持する', () => {
     const state = addHearts(addHearts(game(), 95), 12);
     expect(heartCount(state)).toBe(100);
     expect(state.hearts.stageHearts[0]?.spawnElapsedSeconds).toBe(0);
@@ -54,7 +54,7 @@ describe('ハートと得点', () => {
     );
   });
 
-  it('チャージが満ちた時だけ全員のスキルを使用できる', () => {
+  it('チャージが満ちた時だけ全員のアクションを使用できる', () => {
     const state = game();
     expect(act(state, { type: 'special' })).toBe(state);
     const special = act({ ...state, charge: 100, energy: 2, stamina: 60 }, { type: 'special' });
@@ -70,7 +70,7 @@ describe('ハートと得点', () => {
 
 describe('楽曲を最後まで遊べる', () => {
   for (const track of tracks) {
-    it(`${track.name}でカード・回収・全員スキルを使って結果へ到達する`, () => {
+    it(`${track.name}でカード・回収・全員アクションを使って結果へ到達する`, () => {
       let state = act(createGame(track, resolveDeck(defaultDeckIds), 1234), { type: 'start' });
       for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
         state = advanceTo(state, frame / 4);

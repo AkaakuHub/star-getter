@@ -64,7 +64,7 @@ function session(energy = 10) {
 }
 
 describe('音声時計とゲームの同期', () => {
-  it('最初の選択ではAPを使わず、同じカードをもう一度選ぶと発動する', () => {
+  it('最初の選択ではエナジーを使わず、同じカードをもう一度選ぶと発動する', () => {
     const { controller } = session();
     const initial = controller.state;
     const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));

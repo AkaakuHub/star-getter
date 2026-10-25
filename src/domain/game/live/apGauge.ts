@@ -20,7 +20,7 @@ export function advanceStarGatherApGauge(
   validateState(state);
   validateFiniteNonNegative(input.deltaTimeSeconds, 'delta time');
   if (!Number.isFinite(input.increaseIntervalSeconds)) {
-    throw new Error('StarGather AP increase interval is invalid');
+    throw new Error('StarGather エナジー increase interval is invalid');
   }
   if (state.currentAp >= state.maxAp || input.mentalDown) {
     return { state, gaugeDisplayValue: null };
@@ -52,13 +52,13 @@ function validateState(state: StarGatherApGaugeState): void {
     state.maxAp < 0 ||
     state.currentAp > state.maxAp
   ) {
-    throw new Error('StarGather AP gauge value is invalid');
+    throw new Error('StarGather エナジー gauge value is invalid');
   }
   validateFiniteNonNegative(state.timerSeconds, 'timer');
 }
 
 function validateFiniteNonNegative(value: number, label: string): void {
   if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`StarGather AP ${label} is invalid`);
+    throw new Error(`StarGather エナジー ${label} is invalid`);
   }
 }

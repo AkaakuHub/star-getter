@@ -32,7 +32,7 @@ function play(limit: number) {
   };
 }
 
-describe('ハートの表示上限', () => {
+describe('きらめきの表示上限', () => {
   it('既定は100個で、表示上限を減らしても論理上の個数は減らさない', () => {
     expect(game().hearts.showLimit).toBe(100);
     for (let limit = 10; limit <= 100; limit += 10) {

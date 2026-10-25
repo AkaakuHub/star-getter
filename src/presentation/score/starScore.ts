@@ -1,9 +1,9 @@
 import { scoreUnits } from './units';
 
-export function projectLoveScore(value: bigint) {
-  if (value < 0n) throw new Error('LOVEは非負の整数が必要です。');
+export function projectStarScore(value: bigint) {
+  if (value < 0n) throw new Error('STARは非負の整数が必要です。');
   const raw = value.toString(10);
-  if (raw.length > 72) throw new Error('LOVEが無量大数の表示範囲を超えています。');
+  if (raw.length > 72) throw new Error('STARが無量大数の表示範囲を超えています。');
   const length = Math.max(20, Math.ceil(raw.length / 4) * 4);
   const rows = Math.ceil(length / 24);
   return {

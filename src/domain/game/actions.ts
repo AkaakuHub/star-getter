@@ -29,7 +29,9 @@ function useCard(state: GameState, index: number): GameState {
   const queue = source.effects.some((effect) => effect.kind === 'use-hand')
     ? [source.id, ...state.hand.filter((id) => id !== source.id)]
     : [source.id];
-  let next = changeResource(state, 'energy', -BigInt(cardCost(state, source)));
+  let next = state.bloom
+    ? state
+    : changeResource(state, 'energy', -BigInt(cardCost(state, source)));
   for (const id of queue) {
     const card = next.deck.find((item) => item.id === id);
     if (!card) continue;

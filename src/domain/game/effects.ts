@@ -7,8 +7,8 @@ import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
 import { addTokens } from './cards/tokens';
 import { fillHand, shuffleHand } from './cards/drawing';
-import { changeLoveGatherHeartLimit } from './live/heartLimit';
-import { applyLoveGatherSkillBoost } from './live/skillBoost';
+import { changeStarGatherHeartLimit } from './live/heartLimit';
+import { applyStarGatherSkillBoost } from './live/skillBoost';
 
 export function changeResource(
   state: GameState,
@@ -54,7 +54,7 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     case 'heart-limit':
       return {
         ...state,
-        hearts: changeLoveGatherHeartLimit(
+        hearts: changeStarGatherHeartLimit(
           state.hearts,
           Math.min(10_000_000, state.hearts.heartLimit + Math.ceil(value(effect.amount))),
         ).state,
@@ -160,5 +160,5 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
     0,
   );
   const story = card?.token === 'story' ? state.storyAmplification + handBoost : 0;
-  return applyLoveGatherSkillBoost(base, state.amplification - 100 + story);
+  return applyStarGatherSkillBoost(base, state.amplification - 100 + story);
 }

@@ -1,19 +1,19 @@
 import type {
-  LoveGatherHeartRuntimeState,
-  LoveGatherHeartRandomRange,
-  LoveGatherHeartSpawnResult,
-  LoveGatherHeartShowState,
-  LoveGatherStageHeart,
+  StarGatherHeartRuntimeState,
+  StarGatherHeartRandomRange,
+  StarGatherHeartSpawnResult,
+  StarGatherHeartShowState,
+  StarGatherStageHeart,
 } from './heartTypes';
-import { validateState, randomValue, loveGatherHeartCount } from './heartState';
+import { validateState, randomValue, starGatherHeartCount } from './heartState';
 const defaultHeartLimit = 100;
 const defaultShowLimit = 50;
 const defaultShowPercentage = 50;
 const spawnDurationSeconds = 0.5;
 
-function calculateLoveGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds: number): number {
+function calculateStarGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds: number): number {
   if (!Number.isFinite(musicFinishTimeSeconds) || musicFinishTimeSeconds < 0) {
-    throw new Error('LoveGather Heart music finish time is invalid');
+    throw new Error('StarGather Heart music finish time is invalid');
   }
   const finishMilliseconds = Math.fround(Math.fround(musicFinishTimeSeconds) * Math.fround(1000));
   const scaled = Math.fround(
@@ -22,34 +22,34 @@ function calculateLoveGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds: num
   return Math.trunc(scaled) / 1000;
 }
 
-export function createLoveGatherHeartRuntimeState(
+export function createStarGatherHeartRuntimeState(
   musicFinishTimeSeconds: number,
-): LoveGatherHeartRuntimeState {
+): StarGatherHeartRuntimeState {
   return {
     heartLimit: defaultHeartLimit,
     showLimit: defaultShowLimit,
     throwLimit: defaultHeartLimit,
     showPercentage: defaultShowPercentage,
-    baseLifeTimeSeconds: calculateLoveGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds),
+    baseLifeTimeSeconds: calculateStarGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds),
     stageHearts: [],
     hiddenHeartBatches: [],
   };
 }
 
-export function spawnLoveGatherBeatHearts(
-  state: LoveGatherHeartRuntimeState,
+export function spawnStarGatherBeatHearts(
+  state: StarGatherHeartRuntimeState,
   requestedCount: number,
-  randomRange: LoveGatherHeartRandomRange,
-): LoveGatherHeartSpawnResult {
-  return spawnLoveGatherHearts(state, requestedCount, state.baseLifeTimeSeconds, randomRange);
+  randomRange: StarGatherHeartRandomRange,
+): StarGatherHeartSpawnResult {
+  return spawnStarGatherHearts(state, requestedCount, state.baseLifeTimeSeconds, randomRange);
 }
 
-function spawnLoveGatherHearts(
-  state: LoveGatherHeartRuntimeState,
+function spawnStarGatherHearts(
+  state: StarGatherHeartRuntimeState,
   requestedCount: number,
   lifeTimeSeconds: number,
-  randomRange: LoveGatherHeartRandomRange,
-): LoveGatherHeartSpawnResult {
+  randomRange: StarGatherHeartRandomRange,
+): StarGatherHeartSpawnResult {
   validateState(state);
   if (
     !Number.isSafeInteger(requestedCount) ||
@@ -57,11 +57,11 @@ function spawnLoveGatherHearts(
     !Number.isFinite(lifeTimeSeconds) ||
     lifeTimeSeconds < 0
   ) {
-    throw new Error('LoveGather Heart spawn count is invalid');
+    throw new Error('StarGather Heart spawn count is invalid');
   }
   const createdCount = Math.min(
     requestedCount,
-    Math.max(state.heartLimit - loveGatherHeartCount(state), 0),
+    Math.max(state.heartLimit - starGatherHeartCount(state), 0),
   );
   const displayCount = Math.ceil(
     Math.fround(Math.fround(createdCount * state.showPercentage) * Math.fround(0.01)),
@@ -71,7 +71,7 @@ function spawnLoveGatherHearts(
   const throwCount = Math.min(displayCount, state.throwLimit);
   const hideAfterThrowCount = throwCount - showCount;
   const hiddenCount = createdCount - throwCount;
-  const createStageHeart = (showState: LoveGatherHeartShowState): LoveGatherStageHeart => {
+  const createStageHeart = (showState: StarGatherHeartShowState): StarGatherStageHeart => {
     const waitPosition = {
       x: randomValue(randomRange, -5.5, 5.5),
       y: randomValue(randomRange, -1.5, 0.5),
