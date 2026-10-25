@@ -119,7 +119,7 @@ export function applyEffect(
       };
     }
     case 'hand-limit':
-      return { ...state, handLimit: state.handLimit + Math.trunc(effect.amount) };
+      return { ...state, handLimit: state.handLimit + Math.trunc(value(effect.amount)) };
     case 'heart-limit':
       return {
         ...state,

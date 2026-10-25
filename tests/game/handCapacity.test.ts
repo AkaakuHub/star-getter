@@ -25,9 +25,10 @@ it('手札上限を増やすと8枚まで補充し、パート終了時に5枚�
   expect(nextPart.hand).toHaveLength(5);
 });
 
-it('手札枚数変更の小数値を0方向へ切り捨てる', () => {
-  const next = applyEffect(game(), { kind: 'hand-limit', amount: 1.9 });
-  expect(next.handLimit).toBe(6);
+it('手札枚数変更にスキル増幅を適用して整数化する', () => {
+  const state = { ...game(), amplification: 150 };
+  const next = applyEffect(state, { kind: 'hand-limit', amount: 3 });
+  expect(next.handLimit).toBe(9);
 });
 
 it('手札内の減少効果を合算してから、上限を3〜8枚に制限する', () => {
