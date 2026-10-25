@@ -1,7 +1,6 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
-import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   VoltageUpAdditionalBuffEffect,
@@ -27,17 +26,14 @@ export function activateVoltageUpAdditionalBuff(
     : 0;
   const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
   const base = Math.fround(
-    roundToEvenFloat32(
-      Math.fround(
-        Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
-          Math.fround(multiplier),
-      ),
-    ),
+    Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+      Math.fround(multiplier),
   );
-  if (base > 0 && !source) throw new Error('熱気追加バフの発動元カードがありません。');
-  const boosted =
-    base > 0 && source ? applyAction52SkillBoost(state, source, base) : { state, value: base };
-  const percent = base > 0 && source ? toInt32(boosted.value) : base;
+  const value = toInt32(base);
+  if (value <= 0) return state;
+  if (!source) throw new Error('熱気追加バフの発動元カードがありません。');
+  const boosted = value > 0 ? applyAction52SkillBoost(state, source, value) : { state, value };
+  const percent = value > 0 ? toInt32(boosted.value) : value;
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['voltageUpAdditionalBuffs'][number] = {
     id: boosted.state.nextSkillAdditionalBuffId,
