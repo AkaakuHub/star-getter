@@ -2,8 +2,9 @@ import type { RouteId } from '../../src/content/routes';
 import { createPresetGame } from '../../src/app/createPresetGame';
 import { GameController } from '../../src/app/gameController';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
-import { cardAt, canUseCard } from '../../src/domain/game/projection';
+import { cardAt, canUseCard, moodValue } from '../../src/domain/game/projection';
 import { canUseSpecial } from '../../src/domain/game/special';
+import { heartCount } from '../../src/domain/game/hearts';
 import { type GameState, type Card, rules } from '../../src/domain/game/model';
 
 export class GameDriver {
@@ -12,6 +13,8 @@ export class GameDriver {
   private readonly frames = new ScenarioFrames();
   collections = 0;
   successfulCollections = 0;
+  collectionRedraws = 0;
+  collectionAmplification = 0;
   cardActions = 0;
   specialActions = 0;
   peakGauge = 0n;
@@ -28,8 +31,7 @@ export class GameDriver {
       this.frames,
       new ScenarioAudio(),
     );
-    this.controller.toggleAutomaticHearts();
-    this.observe();
+    this.toggleAutomaticHearts();
   }
 
   get state(): GameState {
@@ -40,6 +42,11 @@ export class GameDriver {
     return this.state.tick / rules.ticksPerSecond;
   }
 
+  toggleAutomaticHearts(): void {
+    this.controller.toggleAutomaticHearts();
+    this.observe();
+  }
+
   tick(): void {
     this.clock.seconds = (this.state.tick + 1) / rules.ticksPerSecond;
     this.frames.run(this.clock.seconds * 1000);
@@ -48,9 +55,13 @@ export class GameDriver {
 
   collect(): void {
     const before = this.state.stats.heartsCollected;
+    const hand = this.state.hand.join(',');
+    const amplification = this.state.storyAmplification;
     this.controller.command({ type: 'collect' });
     this.collections++;
     if (this.state.stats.heartsCollected > before) this.successfulCollections++;
+    if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
+    this.collectionAmplification += this.state.storyAmplification - amplification;
     this.observe();
   }
 
@@ -128,11 +139,24 @@ export class GameDriver {
         specialActions: this.specialActions,
         collectionActions: this.collections,
         successfulCollections: this.successfulCollections,
+        collectionRedraws: this.collectionRedraws,
+        collectionAmplification: this.collectionAmplification,
         heartsCollected: this.state.stats.heartsCollected,
+        hearts: heartCount(this.state),
+        heartLimit: this.state.hearts.heartLimit,
+        storyAmplification: this.state.storyAmplification,
+        tokens: Object.fromEntries(
+          ['story', 'clock', 'bookmark', 'ensemble', 'shadow'].map((token) => [
+            token,
+            this.state.deck.filter((card) => card.token === token).length,
+          ]),
+        ),
         deck: this.state.deck.length,
         energy: this.state.energy,
         mental: this.state.stamina,
         ordinaryVoltage: this.state.excitement,
+        mood: moodValue(this.state),
+        scoreMultiplier: this.state.scoreMultiplier.toString(),
         classUses: this.state.cardUseCounts.class ?? 0,
         shadowUses: this.state.cardUseCounts['shadow-1'] ?? 0,
         score: this.state.score.toString(),

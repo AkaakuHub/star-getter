@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
-import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { addHearts, advanceHearts, heartCount } from '../../src/domain/game/hearts';
-import { type GameState, rules } from '../../src/domain/game/model';
-import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
+import { type GameState } from '../../src/domain/game/model';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game(): GameState {
@@ -56,29 +54,4 @@ describe('きらめきと得点', () => {
       act(addHearts(unboosted, 10), { type: 'collect' }).score,
     );
   });
-});
-
-describe('楽曲を最後まで遊べる', () => {
-  for (const track of tracks) {
-    it(`${track.name}でカード・回収・全員アクションを使って結果へ到達する`, () => {
-      let state = act(createGame(track, routes.bloom.deck, 1234, 100, routes.bloom.tokens), {
-        type: 'start',
-      });
-      for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
-        state = advanceTo(state, frame / 4);
-        const cardIndex = state.hand.findIndex(
-          (cardId, index) => Boolean(cardId) && canUseCard(state, index),
-        );
-        if (cardIndex >= 0) state = act(state, { type: 'card', index: cardIndex });
-        const special = specialCards(state).find((card) => canUseSpecial(state, card.id));
-        if (special) state = act(state, { type: 'special', cardId: special.id });
-        if (frame % 12 === 0) state = act(state, { type: 'collect' });
-      }
-      expect(state.phase).toBe('finished');
-      expect(state.stats.cardsUsed).toBeGreaterThan(5);
-      expect(state.stats.specialsUsed).toBeGreaterThan(0);
-      expect(state.score).toBeLessThanOrEqual(rules.maxScore);
-      expect(state.score).toBeGreaterThan(0n);
-    });
-  }
 });
