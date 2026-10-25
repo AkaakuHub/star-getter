@@ -197,7 +197,7 @@ it('Action49の対象と使用回数をAction25の発動カードで判定する
   expect(second.hearts.heartLimit).toBe(105);
 });
 
-it('Action49のトークン系列条件はAction25からnullで照会され一致しない', () => {
+it('Action49のParamValuesはParamがNoneのためAction25で条件に使わない', () => {
   const state = game();
   const source = state.deck[0];
   if (!source) throw new Error('きらめき上限変更の発動元カードがありません。');
@@ -226,7 +226,7 @@ it('Action49のトークン系列条件はAction25からnullで照会され一�
     },
     target,
   );
-  expect(changed.hearts.heartLimit).toBe(state.hearts.heartLimit + 1);
+  expect(changed.hearts.heartLimit).toBe(state.hearts.heartLimit + 101);
 });
 
 it('Action49は時間・パート期限と外部解除を処理する', () => {

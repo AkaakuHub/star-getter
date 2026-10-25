@@ -25,7 +25,6 @@ export type HeartLimitAdditionalBuff = Readonly<{
   calculation: 'add' | 'multiply2';
   value: number;
   target: HeartLimitBoostTarget;
-  paramSeriesIds: readonly number[] | null;
   remainingUses: number | null;
   remainingSeconds: number | null;
   remainingSections: number | null;
