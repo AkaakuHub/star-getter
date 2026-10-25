@@ -101,7 +101,7 @@ it('きらめき増幅値をC#の整数キャストと同じく0方向へ切り�
   expect(state.heartBoosts[0]?.percent).toBe(12);
 });
 
-it('ActionType16はActionType52適用後の小数増幅値を保持する', () => {
+it('ActionType16は整数化後にActionType52を適用し結果をint32化する', () => {
   const base = game();
   const initial = {
     ...base,
@@ -124,7 +124,31 @@ it('ActionType16はActionType52適用後の小数増幅値を保持する', () =
     card,
   );
   const state = applyEffect(withAction52, { kind: 'heart-boost', percent: 3, uses: null }, card);
-  expect(state.heartBoosts[0]?.percent).toBe(4.5);
+  expect(state.heartBoosts[0]?.percent).toBe(4);
+});
+
+it('ActionType16はAddValueを乗算前に加算する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('ActionType16の発動元カードがありません。');
+  const boosted = applyEffect(
+    applyEffect(
+      initial,
+      {
+        kind: 'skill-boost',
+        num: 500_000,
+        target: { kind: 'member', member: source.member },
+        duration: { kind: 'stage', value: 0 },
+        uses: null,
+      },
+      source,
+    ),
+    { kind: 'heart-boost', percent: 3, uses: null },
+    source,
+    2,
+    1,
+  );
+  expect(boosted.heartBoosts[0]?.percent).toBe(12);
 });
 
 it('回数制限なしのきらめき増幅は使用後も残り、InvocationType中は解除まで継続する', () => {

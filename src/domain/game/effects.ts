@@ -255,7 +255,7 @@ function applyEffectInternal(
         effect.addValue ?? addValue,
       );
     case 'heart-boost':
-      return addHeartBoost(state, effect, card, multiplier);
+      return addHeartBoost(state, effect, card, multiplier, addValue);
     case 'voltage-limit':
       return changeFixedParameterBase(state, 'voltage', effect.amount);
     case 'fixed-parameter-extend':

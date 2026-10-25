@@ -1,25 +1,35 @@
 import type { Card, Effect, GameState } from '../model';
 import type { HeartBoostState } from '../modelTypes';
-import { skillValue } from '../effects/skillValue';
 import { applyAction52SkillBoost } from '../effects/action52SkillBoost';
+import { calculateSkillMoodCorrection } from './skillMood';
+import { moodValue } from '../projection';
 
 export function addHeartBoost(
   state: GameState,
   effect: Extract<Effect, { kind: 'heart-boost' }>,
   card: Card | undefined,
   multiplier: number,
+  addValue: number,
 ): GameState {
-  const base = Math.fround(skillValue(state, effect.percent, effect, card) * multiplier);
-  const boosted = card
-    ? applyAction52SkillBoost(state, card, Math.trunc(base))
-    : { state, value: base };
+  const correction = effect.moodBonus
+    ? calculateSkillMoodCorrection(
+        effect.moodBonus.target,
+        moodValue(state),
+        effect.moodBonus.perPoint,
+      )
+    : 0;
+  const raw = Math.fround(
+    Math.fround(correction + Math.fround(effect.percent)) + Math.fround(addValue),
+  );
+  const base = int32(Math.fround(raw * Math.fround(multiplier)));
+  const boosted = card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...boosted.state,
     heartBoosts: [
       ...boosted.state.heartBoosts,
       {
-        percent: card ? boosted.value : Math.trunc(boosted.value),
+        percent: int32(boosted.value),
         uses: effect.uses,
         target: effect.target ?? { kind: 'all' },
         remainingSeconds: suppressDuration
@@ -35,6 +45,10 @@ export function addHeartBoost(
       },
     ],
   };
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function consumeHeartBoosts(
