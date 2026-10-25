@@ -67,11 +67,7 @@ function TierTable({
               {'moodBonus' in effect && effect.moodBonus && mood === 0 && (
                 <span>
                   空模様0%／
-                  {effect.moodBonus.target === 1
-                    ? '晴れ'
-                    : effect.moodBonus.target === 2
-                      ? '晴れ・雨'
-                      : '雨'}
+                  {effect.moodBonus.target === 1 ? '+' : effect.moodBonus.target === 2 ? '±' : '−'}
                   100%
                 </span>
               )}
@@ -84,7 +80,7 @@ function TierTable({
           <tr key={index}>
             <th scope="row">
               {index * step}
-              {index === tiers.length - 1 ? '以上' : '〜' + (index * step + step - 1)}
+              {index === tiers.length - 1 ? '以上' : '–' + (index * step + step - 1)}
             </th>
             {tier.map((effect, effectIndex) => (
               <td key={effectIndex}>

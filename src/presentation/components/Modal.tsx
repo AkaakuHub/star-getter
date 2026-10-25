@@ -1,6 +1,6 @@
 import { X } from 'lucide-preact';
 import type { ComponentChildren } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 
 export function Modal({
   title,
@@ -14,6 +14,9 @@ export function Modal({
   className?: string;
 }>) {
   const ref = useRef<HTMLDialogElement>(null);
+  useLayoutEffect(() => {
+    ref.current?.scrollTo({ top: 0 });
+  }, [title]);
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;

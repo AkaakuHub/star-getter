@@ -3,8 +3,8 @@ import type { Effect } from '../../domain/game/model';
 import { targetNames } from './targetNames';
 
 export const effectConditions = {
-  happy100: '空模様が晴れ100%',
-  mellow100: '空模様が雨100%',
+  happy100: '空模様が+100%（晴れ）',
+  mellow100: '空模様が−100%（雨）',
   deck80: '編成が80枚以上',
   'first-section': '最初のパート',
   'last-section': '最後のパート',
