@@ -1,6 +1,7 @@
 import { validateSkillCooldownEffect } from './skillCooldownTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
-import { isInt64, validateSpecialEffect } from './effectSpecialValidation';
+import { validateSpecialEffect } from './effectSpecialValidation';
+import { validateComboInduceEffect } from './comboInduceTypes';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
 import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
@@ -224,19 +225,7 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'combo-induce') {
-    const duration = effect.duration;
-    if (
-      effect.members.some((member) => !Number.isSafeInteger(member)) ||
-      !isInt64(effect.apPower) ||
-      ![0, 1, 2].includes(effect.repeatAction) ||
-      !['milliseconds', 'sections', 'stage'].includes(duration.kind) ||
-      !Number.isSafeInteger(duration.value) ||
-      (duration.kind === 'sections' && duration.value === 0) ||
-      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
-    )
-      throw new Error('コンボ誘発の設定が正しくありません。');
-    for (const child of effect.effects) validateEffect(child);
-    return;
+    return validateComboInduceEffect(effect, validateEffect);
   }
   if (effect.kind === 'additional-heart-induce') {
     validateAdditionalHeartInduceEffect(effect);

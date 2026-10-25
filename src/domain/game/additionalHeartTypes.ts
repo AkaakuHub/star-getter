@@ -1,4 +1,5 @@
 import type { Card, Effect, MemberId, UnitId } from './model';
+import { isInt64 } from './numeric';
 
 export type AdditionalHeartInduceCondition =
   | Readonly<{ kind: 'all' }>
@@ -9,7 +10,7 @@ export type AdditionalHeartInduceCondition =
 export type AdditionalHeartInduceEffect = Readonly<{
   kind: 'additional-heart-induce';
   condition: AdditionalHeartInduceCondition;
-  apPower: number;
+  apPower: bigint;
   heartEffect: Extract<Effect, { kind: 'hearts' }>;
   duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
   invocationType?: number;
@@ -20,7 +21,7 @@ export type AdditionalHeartInducer = Readonly<{
   id: number;
   sourceCardId: string;
   condition: AdditionalHeartInduceCondition;
-  apPower: number;
+  apPower: bigint;
   heartEffect: Extract<Effect, { kind: 'hearts' }>;
   addValue: number;
   multiplier: number;
@@ -31,7 +32,7 @@ export type AdditionalHeartInducer = Readonly<{
 
 export function validateAdditionalHeartInduceEffect(effect: AdditionalHeartInduceEffect): void {
   if (
-    !Number.isSafeInteger(effect.apPower) ||
+    !isInt64(effect.apPower) ||
     !['all', 'member', 'main-effect', 'unit'].includes(effect.condition.kind) ||
     (effect.condition.kind === 'member' && !Number.isSafeInteger(effect.condition.member)) ||
     (effect.condition.kind === 'main-effect' &&

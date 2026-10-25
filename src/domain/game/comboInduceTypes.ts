@@ -1,4 +1,5 @@
 import type { Effect, MemberId } from './model';
+import { isInt64 } from './numeric';
 
 export type ComboInduceEvent = Readonly<{ member: MemberId; ap: number }>;
 export type ComboInduceMemberAp = Readonly<{ member: MemberId; ap: number | null }>;
@@ -19,3 +20,21 @@ export type ComboInducer = Readonly<{
   phaseRemainingSeconds: number;
   events: readonly ComboInduceEvent[];
 }>;
+
+export function validateComboInduceEffect(
+  effect: Extract<Effect, { kind: 'combo-induce' }>,
+  validateChild: (effect: Effect) => void,
+): void {
+  const duration = effect.duration;
+  if (
+    effect.members.some((member) => !Number.isSafeInteger(member)) ||
+    !isInt64(effect.apPower) ||
+    ![0, 1, 2].includes(effect.repeatAction) ||
+    !['milliseconds', 'sections', 'stage'].includes(duration.kind) ||
+    !Number.isSafeInteger(duration.value) ||
+    (duration.kind === 'sections' && duration.value === 0) ||
+    (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+  )
+    throw new Error('コンボ誘発の設定が正しくありません。');
+  for (const child of effect.effects) validateChild(child);
+}

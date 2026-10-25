@@ -16,7 +16,7 @@ it('一致したスキル使用APからEffectPowerを求め、登録したAction
     {
       kind: 'additional-heart-induce',
       condition: { kind: 'all' },
-      apPower: 10_000,
+      apPower: 10_000n,
       heartEffect: { kind: 'hearts', amount: 1, lifetimeSeconds: 2 },
       duration: { kind: 'stage', value: 0 },
     },
@@ -54,7 +54,7 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
             {
               kind: 'additional-heart-induce',
               condition: { kind: 'member', member: source.member },
-              apPower: 10_000,
+              apPower: 10_000n,
               heartEffect: { kind: 'hearts', amount: 1 },
               duration: { kind: 'stage', value: 0 },
               deactivationKey: 'extra-heart',
@@ -80,4 +80,43 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
     deactivationKey: 'extra-heart',
   });
   expect(stopped.additionalHeartInducers).toHaveLength(0);
+});
+
+it('ActionType27はlong積をfloat32へ直接変換する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  const used = initial.deck[1];
+  if (!source || !used) throw new Error('追加きらめき誘発の検証カードがありません。');
+  const armed = applyEffect(
+    initial,
+    {
+      kind: 'additional-heart-induce',
+      condition: { kind: 'all' },
+      apPower: 0n,
+      heartEffect: { kind: 'hearts', amount: 1 },
+      duration: { kind: 'stage', value: 0 },
+    },
+    source,
+  );
+  const apPower = 9_007_199_791_611_905n;
+  const configured = {
+    ...armed,
+    additionalHeartInducers: armed.additionalHeartInducers.map((inducer) => ({
+      ...inducer,
+      apPower,
+    })),
+  };
+  const effectPowers: number[] = [];
+
+  induceAdditionalHearts(
+    configured,
+    used,
+    1,
+    (state, _effect, _card, _multiplier, _addValue, power) => {
+      effectPowers.push(power ?? 1);
+      return state;
+    },
+  );
+
+  expect(effectPowers).toEqual([900_720_033_792]);
 });
