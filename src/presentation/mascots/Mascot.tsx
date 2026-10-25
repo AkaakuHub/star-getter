@@ -53,13 +53,15 @@ export function Mascot({
       style={{ '--costume-fabric': palette.fabric, '--costume-trim': palette.trim }}
       aria-hidden="true"
     >
-      <Weather className="weather-body" strokeWidth={1.7} color="#353148" fill={character.fill} />
-      <span className="weather-face">
-        <span className="weather-smile" />
-      </span>
-      <span className="weather-scarf" />
-      <span className="weather-accessory">
-        <Accessory strokeWidth={2} />
+      <span className="weather-character">
+        <Weather className="weather-body" strokeWidth={1.7} color="#353148" fill={character.fill} />
+        <span className="weather-face">
+          <span className="weather-smile" />
+        </span>
+        <span className="weather-scarf" />
+        <span className="weather-accessory">
+          <Accessory strokeWidth={2} />
+        </span>
       </span>
     </span>
   );
