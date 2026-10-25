@@ -1,0 +1,21 @@
+:is(button, a, input, select, textarea):focus-visible:not(:disabled) {
+  outline: none;
+  background-color: #171324;
+  color: #fffaf5;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+:is(.hand-card, .card-browser-card, .special-portrait):focus-visible:not(:disabled)
+  > .card-illustration {
+  filter: brightness(0.45);
+}
+
+:is(.hand-card, .card-browser-card, .special-portrait):focus-visible:not(:disabled)
+  > :is(.hand-name, .hand-cost, .special-cost) {
+  background: #171324;
+  color: #fffaf5;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}

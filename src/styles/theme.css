@@ -11,6 +11,7 @@
 @import './cardBrowser.css';
 @import './effectDetails.css';
 @import './results.css';
+@import './focus.css';
 
 @theme {
   --color-idol-pink: #ed7297;
@@ -59,11 +60,6 @@ button {
 }
 button:disabled {
   cursor: default;
-}
-button:focus-visible,
-a:focus-visible {
-  outline: 3px solid #d94e7d;
-  outline-offset: 3px;
 }
 h1,
 h2,
