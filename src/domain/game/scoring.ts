@@ -25,7 +25,9 @@ export function collectionScore(
   const rank = state.bloom
     ? calculateStarGatherFlowerRank(rankHeartCount, Number(state.bloom.progress))
     : calculateStarGatherHeartRank(rankHeartCount, voltage, null);
-  const bonusScoreValue = state.boosts.reduce((sum, boost) => sum + boost.percent, 0);
+  const bonusScoreValue =
+    state.boosts.reduce((sum, boost) => sum + boost.percent, 0) +
+    state.temporaryScoreBoosts.reduce((sum, boost) => sum + boost.percent, 0);
   const base = calculateStarGatherClientScore(
     {
       cards: state.cardPool

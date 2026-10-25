@@ -27,6 +27,7 @@ import { forceProxySkillActivation, registerProxySkill } from './effects/proxySk
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
+import { activateVoltageConversion } from './effects/voltageConversion';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -263,10 +264,18 @@ export function applyEffect(
     case 'ap-speed-change': {
       return applyApSpeedChange(state, effect, card, multiplier, addValue);
     }
+    case 'voltage-convert':
+      return activateVoltageConversion(state, effect, card, multiplier, addValue);
     case 'stamina':
     case 'excitement': {
       const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);
-      return changeResource(boosted.state, effect.kind, BigInt(Math.trunc(boosted.value)));
+      return changeResource(
+        boosted.state,
+        effect.kind,
+        BigInt(Math.trunc(boosted.value)),
+        'skill',
+        card,
+      );
     }
     case 'collect':
       return collectHearts(state);

@@ -62,6 +62,8 @@ export function describeEffect(effect: Effect): string {
       return `${effect.duration === 'stage' ? 'このステージ' : 'このパート'}中、エナジー回復速度を${effect.percent > 0 ? '+' : ''}${effect.percent}%変化させる。`;
     case 'ap-speed-change':
       return 'エナジーの回復速度を変化させる。';
+    case 'voltage-convert':
+      return '熱気の増加を別の効果に変換する。';
     case 'mental-shield':
       return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
     case 'cost-reduction':

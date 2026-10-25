@@ -10,12 +10,14 @@ export function startGaugeRegeneration(
   intervalType: 1 | 2,
   intervalMilliseconds: number,
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>,
+  sourceCardId: string | null,
 ): GameState {
   if (duration.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const intervalSeconds = Math.fround(intervalMilliseconds / 1000);
   const regeneration: GaugeRegeneration = {
     gauge,
+    sourceCardId,
     amount,
     intervalType,
     intervalSeconds,
@@ -26,7 +28,7 @@ export function startGaugeRegeneration(
     remainingHeartEvents: duration.kind === 'sections' ? duration.value : null,
   };
   return {
-    ...pulseGauge(state, gauge, amount),
+    ...pulseGauge(state, gauge, amount, sourceCardId),
     gaugeRegenerations: [...state.gaugeRegenerations, regeneration],
   };
 }
@@ -38,7 +40,7 @@ export function advanceGaugeRegenerations(state: GameState, elapsedSeconds: numb
   for (const regeneration of state.gaugeRegenerations) {
     let accumulated = Math.fround(regeneration.elapsedSeconds + elapsed);
     if (regeneration.intervalType === 1 && regeneration.intervalSeconds <= accumulated) {
-      next = pulseGauge(next, regeneration.gauge, regeneration.amount);
+      next = pulseGauge(next, regeneration.gauge, regeneration.amount, regeneration.sourceCardId);
       accumulated = Math.fround(accumulated - regeneration.intervalSeconds);
     }
     const durationElapsedSeconds = Math.fround(regeneration.durationElapsedSeconds + elapsed);
@@ -76,12 +78,20 @@ function pulseGauge(
   state: GameState,
   gauge: GaugeRegeneration['gauge'],
   amount: number,
+  sourceCardId: string | null,
 ): GameState {
   const value = Math.trunc(amount);
   if (gauge === 'mental') {
     return state.bloom ? state : changeResource(state, 'stamina', BigInt(value));
   }
-  if (!state.bloom) return changeResource(state, 'excitement', BigInt(value));
+  if (!state.bloom)
+    return changeResource(
+      state,
+      'excitement',
+      BigInt(value),
+      'skill',
+      state.cardPool.find((card) => card.id === sourceCardId),
+    );
   const delta = calculateStarGatherGenesisGaugeDelta({
     actionType: 0,
     gaugeType: 1,

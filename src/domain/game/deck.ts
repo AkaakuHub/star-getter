@@ -161,6 +161,27 @@ function validateEffect(effect: Effect): void {
       throw new Error('AP回復速度変更の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'voltage-convert') {
+    const validDuration = (duration: typeof effect.displayDuration, allowZero: boolean) =>
+      (duration.kind === 'stage' ||
+        duration.kind === 'milliseconds' ||
+        duration.kind === 'sections') &&
+      Number.isSafeInteger(duration.value) &&
+      duration.value >= (allowZero ? 0 : duration.kind === 'sections' ? 1 : 0);
+    if (
+      !['hearts', 'love', 'stamina', 'mental-barrier'].includes(effect.destination) ||
+      !Number.isSafeInteger(effect.num) ||
+      ![0, 1, 2].includes(effect.convertDisabledType) ||
+      ![0, 1].includes(effect.disabledType) ||
+      !Number.isSafeInteger(effect.disabledValue) ||
+      !validDuration(effect.displayDuration, false) ||
+      !validDuration(effect.outputDuration, true) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('熱気変換の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'heart-boost') {
     const target = effect.target;
     if (

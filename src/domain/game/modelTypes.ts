@@ -1,6 +1,7 @@
 import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
+import type { VoltageConvertEffect } from './voltageConversionTypes';
 
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -15,6 +16,7 @@ type InfinityGaugeEffect = Readonly<{
 }>;
 export type GaugeRegeneration = Readonly<{
   gauge: 'mental' | 'voltage';
+  sourceCardId: string | null;
   amount: number;
   intervalType: 1 | 2;
   intervalSeconds: number;
@@ -267,6 +269,7 @@ type EffectShape =
       invocationType?: number;
       deactivationKey?: string;
     }>
+  | VoltageConvertEffect
   | ResetSpecial
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>

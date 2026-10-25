@@ -2,13 +2,21 @@ import type { GameState } from './model';
 import { voltageThreshold } from './live/voltageLevel';
 import { changeBloomResource } from './bloom';
 import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
+import type { Card } from './model';
+import { convertVoltageIncrease } from './effects/voltageConversion';
 
 export function changeResource(
   state: GameState,
   resource: 'energy' | 'stamina' | 'excitement',
   amount: bigint,
   source: 'skill' | 'natural' = 'skill',
+  card?: Card,
 ): GameState {
+  if (resource === 'excitement' && source === 'skill') {
+    const conversion = convertVoltageIncrease(state, amount, card);
+    if (conversion.converted) return conversion.state;
+    state = conversion.state;
+  }
   if (
     state.gaugeInfinities.some((infinity) => infinity.gauge === resourceToGauge(resource)) &&
     !(resource === 'stamina' && state.resting)

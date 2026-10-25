@@ -17,5 +17,6 @@ export function applyGaugeRegeneration(
     effect.intervalType,
     effect.intervalMilliseconds,
     effect.duration,
+    card?.id ?? null,
   );
 }

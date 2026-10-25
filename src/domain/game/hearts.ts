@@ -9,6 +9,7 @@ import { createRangeRandom } from './random';
 import { advanceHandCollectionAbilities } from './cards/collectionAbilities';
 import { recordScoreHistory } from './scoreHistory';
 import { voltageLevel } from './live/voltageLevel';
+import { expireConvertedScoreBoostsOnHeartCollect } from './effects/voltageConversion';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -109,7 +110,7 @@ export function collectHearts(state: GameState): GameState {
             );
     }
   }
-  return flushDeckActions(triggered);
+  return expireConvertedScoreBoostsOnHeartCollect(flushDeckActions(triggered));
 }
 
 export function addHearts(state: GameState, count: number): GameState {

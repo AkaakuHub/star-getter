@@ -41,6 +41,7 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       },
       'excitement',
       1n,
+      'natural',
     );
   }
   if (next.bloom && (next.mentalProtected || next.sectionMentalProtected)) return next;
