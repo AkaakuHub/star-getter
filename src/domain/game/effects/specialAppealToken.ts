@@ -11,7 +11,11 @@ export function activateSpecialAppealToken(
         tokenCardSet.tokenSetId === effect.tokenSetId &&
         effect.memberOrder.includes(tokenCardSet.targetParameter),
     )
-    .sort((left, right) => left.orderId - right.orderId);
+    .sort(
+      (left, right) =>
+        effect.memberOrder.indexOf(left.targetParameter) -
+        effect.memberOrder.indexOf(right.targetParameter),
+    );
   const additions: SpecialAppealToken[] = [];
 
   for (const tokenCardSet of tokenCardSets) {

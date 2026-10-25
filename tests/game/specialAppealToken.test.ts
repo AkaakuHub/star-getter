@@ -17,14 +17,14 @@ it('対象メンバーのトークンだけを順序付きで追加し、同じ�
     levelType: 2,
     sourceSkillLevel: 3,
     sourceSpecialAppealSkillLevel: 1,
-    memberOrder: [1021],
+    memberOrder: [1022, 1021],
     tokenCardSets: [
       {
         id: 2,
         tokenSetId: 8,
         resourceId: 202,
         targetParameter: 1022,
-        orderId: 1,
+        orderId: 2,
         skillSeriesId: 20,
         cardsBySkillLevel: [{ skillLevel: 3, card: base }],
       },
@@ -33,16 +33,16 @@ it('対象メンバーのトークンだけを順序付きで追加し、同じ�
         tokenSetId: 8,
         resourceId: 201,
         targetParameter: 1021,
-        orderId: 2,
+        orderId: 1,
         skillSeriesId: 10,
         cardsBySkillLevel: [{ skillLevel: 3, card: base }],
       },
     ],
   };
   const withToken = activateSpecialAppealToken(state, effect);
-  expect(withToken.specialAppealTokens.map((token) => token.recordId)).toEqual([1]);
-  expect(activateSpecialAppealToken(withToken, effect).specialAppealTokens).toHaveLength(1);
-  expect(withToken.specialAppealTokens[0]?.card.id).toBe('201');
+  expect(withToken.specialAppealTokens.map((token) => token.recordId)).toEqual([2, 1]);
+  expect(activateSpecialAppealToken(withToken, effect).specialAppealTokens).toHaveLength(2);
+  expect(withToken.specialAppealTokens[0]?.card.id).toBe('202');
 });
 
 it('トークン共鳴を使うと同じセットのクールタイムを開始する', () => {
