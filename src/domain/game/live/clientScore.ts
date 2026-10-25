@@ -28,26 +28,31 @@ export function calculateStarGatherClientScore(
   validateInput(input);
   const appealAverage =
     input.cards.reduce((sum, card) => sum + card.appealValue, 0) / input.cards.length;
-  const appealBase = Math.trunc(appealAverage * 120_000);
+  const appealBase = Math.ceil(appealAverage * 120_000);
   const genesisBonus =
     input.currentGenesisGauge < 1
       ? 0
-      : Math.trunc(Math.fround(Math.pow(Math.fround(input.currentGenesisGauge), 1.5)));
+      : Math.fround(
+          Math.min(
+            2_147_483_647,
+            Math.ceil(Math.fround(Math.pow(Math.fround(input.currentGenesisGauge), 1.5))),
+          ),
+        );
   const bonusScoreFactor = checkedFactor(
     ports.valueToFactor(genesisBonus + input.bonusScoreValue),
     'bonus score',
   );
   const collectFactor = input.isDisappearCollect ? disappearCollectFactor : 1;
   const rawScore =
-    collectFactor *
-    input.challengeBonusFactor *
     appealBase *
     input.heartRankMagnification *
     input.collectNum *
     input.masteryLoveBonusEffect *
     input.skillLoveBonusEffect *
-    (bonusScoreFactor + 1);
-  const score = truncateLong(rawScore);
+    (bonusScoreFactor + 1) *
+    input.challengeBonusFactor *
+    collectFactor;
+  const score = truncateLong(Math.ceil(rawScore));
   if (score <= 0n) return 0n;
   const scoreMax = input.isDisappearCollect ? intMax : ports.getAddScoreMax(input.collectNum);
   return score < scoreMax ? score : scoreMax;

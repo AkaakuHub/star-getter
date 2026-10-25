@@ -1,3 +1,6 @@
+import { additionalScoreLimit, type ScoreLimitParameters } from './scoreLimit';
+import { appealParameter } from '../parameters/cardParameters';
+
 export type StarGatherCardAppealParameters = Readonly<{
   smile: number;
   pure: number;
@@ -26,15 +29,28 @@ export function calculateStarGatherCardAppealValue(
   ) {
     throw new Error('StarGather card appeal input is invalid');
   }
-  return (
-    appeal(parameters.smile, musicType === 0 || musicType === 1) +
-    appeal(parameters.pure, musicType === 0 || musicType === 2) +
-    appeal(parameters.cool, musicType === 0 || musicType === 3)
+  return Math.fround(
+    Math.fround(
+      appealParameter(
+        parameters.smile,
+        0,
+        musicType === 0 || musicType === 1 ? 1.5 : 1,
+        timelineDurationSeconds,
+      ).value +
+        appealParameter(
+          parameters.pure,
+          0,
+          musicType === 0 || musicType === 2 ? 1.5 : 1,
+          timelineDurationSeconds,
+        ).value,
+    ) +
+      appealParameter(
+        parameters.cool,
+        0,
+        musicType === 0 || musicType === 3 ? 1.5 : 1,
+        timelineDurationSeconds,
+      ).value,
   );
-
-  function appeal(value: number, matchingMusicType: boolean): number {
-    return (value * (matchingMusicType ? 1.5 : 1)) / timelineDurationSeconds / 1000;
-  }
 }
 
 export function calculateStarGatherMasteryLoveBonusEffect(loveCorrectionValue: number): number {
@@ -48,12 +64,13 @@ export function starGatherValueToFactor(value: number): number {
   if (!Number.isFinite(value)) {
     throw new Error('StarGather skill effect value is invalid');
   }
-  return value / 10_000;
+  return value / 100;
 }
 
 export function calculateStarGatherAddScoreMax(
   collectCount: number,
   multipliers: readonly StarGatherStageScoreMultiplier[],
+  parameters: ScoreLimitParameters,
 ): bigint {
   if (!Number.isSafeInteger(collectCount) || collectCount < 0) {
     throw new Error('StarGather add score max collect count is invalid');
@@ -72,6 +89,6 @@ export function calculateStarGatherAddScoreMax(
           row.baseMultiplier +
             row.additionalMultiplier * BigInt(collectCount - row.minimumHeartCount),
         ) / 10_000;
-  const result = Math.trunc(multiplier * addScoreMaxBase);
+  const result = Math.ceil((multiplier + additionalScoreLimit(parameters)) * addScoreMaxBase);
   return result >= Number(longMax) ? longMax : BigInt(result);
 }

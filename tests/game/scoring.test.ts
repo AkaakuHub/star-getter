@@ -36,7 +36,7 @@ describe('きらめきと得点', () => {
     for (let tick = 1; tick <= 600; tick++) expired = advanceHearts({ ...expired, tick });
     expect(expired.stats.heartsMissed).toBe(1);
     expect(expired.stats.heartsCollected).toBe(0);
-    expect(expired.score).toBe(normal.score / 5n);
+    expect(expired.score).toBe(BigInt(Math.ceil(Number(normal.score) * 0.20000000298023224)));
   });
 
   it('上限を超えた追加分だけが失効し、既存のきらめきを保持する', () => {

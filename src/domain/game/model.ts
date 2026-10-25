@@ -1,3 +1,4 @@
+import type { ScoreLimitSettings } from './live/scoreLimit';
 import type { GameCondition } from './conditions/model';
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
 import type { StarGatherCardAppealParameters } from './live/clientScoreInput';
@@ -154,6 +155,7 @@ export type Track = Readonly<{
   songTime: number;
   beats: number;
   stage: StageGauges;
+  scoreLimit: ScoreLimitSettings;
   sections: readonly Section[];
   moodKeys: readonly MoodKey[];
 }>;

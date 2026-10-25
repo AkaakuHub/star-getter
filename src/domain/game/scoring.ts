@@ -25,6 +25,7 @@ export function collectionScore(
   const rank = state.bloom
     ? calculateStarGatherFlowerRank(rankHeartCount, Number(state.bloom.progress))
     : calculateStarGatherHeartRank(rankHeartCount, voltage, null);
+  const bonusScoreValue = state.boosts.reduce((sum, boost) => sum + boost.percent, 0);
   const base = calculateStarGatherClientScore(
     {
       cards: state.cardPool
@@ -38,13 +39,22 @@ export function collectionScore(
       masteryLoveBonusEffect: calculateStarGatherMasteryLoveBonusEffect(0),
       skillLoveBonusEffect: 1,
       currentGenesisGauge: Number(state.bloom?.progress ?? 0n),
-      bonusScoreValue: Number(state.boosts.reduce((sum, boost) => sum + boost.percent * 100, 0)),
+      bonusScoreValue,
       challengeBonusFactor: 1,
     },
     {
       valueToFactor: starGatherValueToFactor,
       getAddScoreMax: (collectCount) =>
-        calculateStarGatherAddScoreMax(collectCount, scoreMultipliers),
+        calculateStarGatherAddScoreMax(collectCount, scoreMultipliers, {
+          additionalEnabled: state.track.scoreLimit.additionalEnabled,
+          bonusScoreValue,
+          voltageMultiplier:
+            state.track.scoreLimit.voltageMultipliers.find(
+              (row) => row.minimumLevel <= voltage && voltage <= row.maximumLevel,
+            )?.multiplier ?? 0n,
+          bloomActive: state.bloom !== null,
+          bloomGauge: Number(state.bloom?.progress ?? 0n),
+        }),
     },
   );
   return base * state.scoreMultiplier;

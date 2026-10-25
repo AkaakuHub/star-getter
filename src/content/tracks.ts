@@ -11,6 +11,7 @@ export const tracks: readonly Track[] = [
     songTime: (stageTiming.durationSeconds * 1000) / 12,
     beats: (stageTiming.durationSeconds * stageTiming.bpm) / 60,
     stage: standardStage,
+    scoreLimit: { additionalEnabled: false, voltageMultipliers: [] },
     moodKeys: weatherTimeline,
     sections: weatherSections,
   },

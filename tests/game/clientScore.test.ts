@@ -9,6 +9,14 @@ import {
   calculateStarGatherAddScoreMax,
 } from '../../src/domain/game/live/clientScoreInput';
 
+const ordinaryLimit = {
+  additionalEnabled: false,
+  bonusScoreValue: 0,
+  voltageMultiplier: 0n,
+  bloomActive: false,
+  bloomGauge: 0,
+};
+
 function game() {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
@@ -23,27 +31,27 @@ describe('スターギャザーの回収得点', () => {
   it('一致属性だけを1.5倍にし、楽曲秒数と1000で正規化する', () => {
     expect(
       calculateStarGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
-    ).toBe(0.3);
+    ).toBeCloseTo(0.3, 7);
     expect(
       calculateStarGatherCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
-    ).toBe(0.375);
+    ).toBeCloseTo(0.375, 7);
   });
 
-  it('90秒では平均アピールの端数を切り捨ててきらめき10個が7490となる', () => {
-    expect(collectionScore(game(), 10, false, 10)).toBe(7490n);
+  it('90秒ではfloatで算出した平均アピールから基礎得点を切り上げ、10個が7500となる', () => {
+    expect(collectionScore(game(), 10, false, 10)).toBe(7500n);
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(14980n);
+    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(15000n);
   });
 
-  it('STAR増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
+  it('STAR増加は加算し、開花プログレスの1.5乗を百分率で加える', () => {
     const base = game();
     const boosts = [
       { percent: 100, untilTick: 100 },
       { percent: 100, untilTick: 100 },
     ];
-    expect(collectionScore({ ...base, boosts }, 10, false, 10)).toBe(22470n);
+    expect(collectionScore({ ...base, boosts }, 10, false, 10)).toBe(22500n);
     expect(
       collectionScore(
         {
@@ -58,7 +66,7 @@ describe('スターギャザーの回収得点', () => {
         false,
         10,
       ),
-    ).toBe(7495n);
+    ).toBe(8101n);
   });
 
   it('回収回数や山場だけでは独自の得点倍率を付けない', () => {
@@ -81,7 +89,7 @@ describe('スターギャザーの回収得点', () => {
   });
 
   it('1回の通常回収は本家の既定上限を適用する', () => {
-    expect(calculateStarGatherAddScoreMax(100, [])).toBe(2147483647n);
+    expect(calculateStarGatherAddScoreMax(100, [], ordinaryLimit)).toBe(2147483647n);
     const huge = { ...game(), boosts: [{ percent: 10 ** 20, untilTick: 100 }] };
     expect(collectionScore(huge, 100, false, 100)).toBe(2147483647n);
   });
