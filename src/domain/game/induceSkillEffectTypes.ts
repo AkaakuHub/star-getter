@@ -18,6 +18,7 @@ export type UseCountInduceEffect = Readonly<{
 export type EffectInduceEffect = Readonly<{
   kind: 'effect-induce';
   sourceEffectId: string;
+  deactivationKey?: string;
   target: 'mental-barrier' | 'bonus-score';
   threshold: Readonly<{ kind: 'none' | 'at-least' | 'at-most'; value: number }>;
   effects: readonly import('./modelTypes').Effect[];
@@ -45,6 +46,7 @@ export type ActiveEffectInducer = Readonly<{
   threshold: EffectInduceEffect['threshold'];
   effects: EffectInduceEffect['effects'];
   active: boolean;
+  deactivationKey: string | null;
 }>;
 
 export type ActiveCardMoveInducer = Readonly<{

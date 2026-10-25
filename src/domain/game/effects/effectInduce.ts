@@ -56,6 +56,7 @@ export function activateEffectInduce(
         threshold: effect.threshold,
         effects: effect.effects,
         active: false,
+        deactivationKey: effect.deactivationKey ?? null,
       },
     ],
   };
@@ -169,6 +170,8 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
     case 'amplify':
     case 'mood-change-skill':
       return { ...effect, deactivationKey };
+    case 'effect-induce':
+      return { ...effect, deactivationKey };
     case 'branch':
       return {
         ...effect,
@@ -192,6 +195,22 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
 }
 
 export function deactivateInducedEffects(state: GameState, deactivationKey: string): GameState {
+  let next = state;
+  const removedInducers = next.effectInducers.filter(
+    (inducer) => inducer.deactivationKey === deactivationKey,
+  );
+  next = {
+    ...next,
+    effectInducers: next.effectInducers.filter(
+      (inducer) => inducer.deactivationKey !== deactivationKey,
+    ),
+  };
+  for (const inducer of removedInducers)
+    next = deactivateInducerEffects(next, `effect-induce:${inducer.sourceEffectId}`);
+  return deactivateInducerEffects(next, deactivationKey);
+}
+
+function deactivateInducerEffects(state: GameState, deactivationKey: string): GameState {
   let next = state;
   for (const createAction of deactivationActions) next = act(next, createAction(deactivationKey));
   next = {

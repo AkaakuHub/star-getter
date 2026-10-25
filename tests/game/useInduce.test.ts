@@ -154,6 +154,7 @@ it('Action907は子効果のCheckDeckOutを実行する', () => {
         threshold: { kind: 'none' as const, value: 0 },
         effects: [{ kind: 'energy' as const, amount: 1 }],
         active: false,
+        deactivationKey: null,
       },
     ],
   };

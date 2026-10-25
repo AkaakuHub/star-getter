@@ -36,6 +36,7 @@ export function validateEffectInduceEffect(
     !['mental-barrier', 'bonus-score'].includes(effect.target) ||
     !['none', 'at-least', 'at-most'].includes(effect.threshold.kind) ||
     !Number.isFinite(effect.threshold.value) ||
+    (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string') ||
     !effect.effects.length
   )
     throw new Error('効果誘発の設定が正しくありません。');
