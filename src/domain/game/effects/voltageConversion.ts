@@ -20,11 +20,10 @@ export function activateVoltageConversion(
   if (effect.displayDuration.kind === 'sections' && effect.displayDuration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const base = Math.fround(
-    Math.fround(Math.trunc(effect.num) + addValue) * Math.fround(multiplier),
+    Math.fround(Math.fround(int32(effect.num)) + Math.fround(addValue)) * Math.fround(multiplier),
   );
   const boosted = applyAction52SkillBoost(state, card, base);
-  const num =
-    boosted.value === Number.POSITIVE_INFINITY ? -2_147_483_648 : Math.trunc(boosted.value);
+  const num = int32(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const conversion: VoltageConversion = {
     id: state.nextVoltageConversionId,
@@ -50,6 +49,12 @@ export function activateVoltageConversion(
     voltageConversions: [...boosted.state.voltageConversions, conversion],
     nextVoltageConversionId: boosted.state.nextVoltageConversionId + 1,
   };
+}
+
+function int32(value: number): number {
+  return !Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647
+    ? -2_147_483_648
+    : Math.trunc(value);
 }
 
 export function convertVoltageIncrease(

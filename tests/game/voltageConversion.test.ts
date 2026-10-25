@@ -52,6 +52,13 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
   expect(changeResource({ ...latest, excitement: 10 }, 'excitement', -10n).excitement).toBe(0);
 });
 
+it('Action22の詳細値をC#のint32へ変換する', () => {
+  const source = game().deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const converted = applyEffect(game(), { ...conversion, num: 2_147_483_648 }, source);
+  expect(converted.voltageConversions[0]?.num).toBe(-2_147_483_648);
+});
+
 it('ActionType22はActionType52適用前に変換数を整数化する', () => {
   const initial = unboostedGame();
   const source = initial.deck[0];
