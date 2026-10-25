@@ -1,6 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import {
+  applyAction52SkillBoost,
+  activateAction52SkillBoost,
   advanceAction52SkillBoosts,
   deactivateAction52SkillBoosts,
   expireAction52SkillBoostSections,
@@ -52,6 +54,19 @@ it('Action52は対象ActionType52の値へ割合を加え、回数期限を消�
   expect(heartCount(converted)).toBe(15);
   expect(converted.action52Buffs).toHaveLength(0);
   expect(converted.voltageConversions).toHaveLength(1);
+});
+
+it('Action52はC#のMultiply2計算と同じ精度で最後にfloatへ丸める', () => {
+  const initial = cleanGame();
+  const active = activateAction52SkillBoost(initial, {
+    kind: 'skill-boost',
+    num: 123_450,
+    target: { kind: 'all' },
+    duration: { kind: 'stage', value: 0 },
+    uses: null,
+  });
+  const result = applyAction52SkillBoost(active, undefined, 1.25);
+  expect(result.value).toBe(Math.fround((Math.fround(12.345) * 1.25) / 100 + 1.25));
 });
 
 it('Action52の対象外カードでは回数期限を消費しない', () => {

@@ -56,9 +56,8 @@ export function applyAction52SkillBoost(
   );
   if (matched.length === 0) return { state, value };
   const percent = matched.reduce((sum, buff) => Math.fround(sum + Math.fround(buff.percent)), 0);
-  const adjusted = Math.fround(
-    Math.fround((Math.max(-100, percent) * Math.fround(value)) / 100) + Math.fround(value),
-  );
+  const input = Math.fround(value);
+  const adjusted = Math.fround((Math.max(-100, percent) * input) / 100 + input);
   const usedIds = new Set(
     matched.flatMap((buff) => (buff.remainingUses === null ? [] : [buff.id])),
   );
