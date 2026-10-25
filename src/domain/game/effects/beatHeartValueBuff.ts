@@ -18,7 +18,7 @@ export function activateBeatHeartValueBuff(
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
         moodValue(state),
-        Math.fround(effect.moodBonus.perPoint / 10_000),
+        Math.fround(Math.fround(effect.moodBonus.perPoint) / Math.fround(10_000)),
       )
     : 0;
   const num = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.amount))));
@@ -31,7 +31,7 @@ export function activateBeatHeartValueBuff(
   if (value > 0) {
     const boosted = applyAction52SkillBoostForCard(state, card, value);
     next = boosted.state;
-    value = Math.trunc(boosted.value);
+    value = int32(boosted.value);
   }
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
@@ -51,6 +51,12 @@ export function activateBeatHeartValueBuff(
       },
     ],
   };
+}
+
+function int32(value: number): number {
+  return !Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647
+    ? -2_147_483_648
+    : Math.trunc(value);
 }
 
 export function advanceBeatHeartValueBuffs(state: GameState, elapsedSeconds: number): GameState {
