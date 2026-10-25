@@ -7,7 +7,6 @@ export function activateVoltageIncreaseStop(
   state: GameState,
   effect: StopVoltageIncreaseEffect,
 ): GameState {
-  if (effect.duration.value === 0) return state;
   const indefinite = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...state,

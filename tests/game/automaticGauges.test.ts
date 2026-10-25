@@ -63,12 +63,12 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
 
 it('熱気の自然増加停止を重ねると、すべての停止期限が切れるまでタイマーも停止する', () => {
   const initial = game('library');
-  expect(
-    applyEffect(initial, {
-      kind: 'stop-voltage-increase',
-      duration: { kind: 'milliseconds', value: 0 },
-    }),
-  ).toBe(initial);
+  const immediate = applyEffect(initial, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'milliseconds', value: 0 },
+  });
+  expect(immediate.voltageStops).toHaveLength(1);
+  expect(advanceTo(immediate, 1 / 60).voltageStops).toHaveLength(0);
   const first = applyEffect(initial, {
     kind: 'stop-voltage-increase',
     duration: { kind: 'milliseconds', value: 500 },
