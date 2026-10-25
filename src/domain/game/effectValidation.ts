@@ -270,16 +270,21 @@ export function validateEffect(effect: Effect): void {
       throw new Error('きらめき増幅の設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'beat-point-buff') {
+  if (effect.kind === 'beat-heart-value-buff') {
     if (
+      !['add', 'multiply', 'fixed'].includes(effect.calculation) ||
       !Number.isFinite(effect.amount) ||
       (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
       (effect.multiplier !== undefined && !Number.isFinite(effect.multiplier)) ||
       (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
       (effect.duration !== undefined &&
-        (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 1))
+        (!['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
+          !Number.isSafeInteger(effect.duration.value) ||
+          effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0))) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )
-      throw new Error('自然発生ビートポイントの設定が正しくありません。');
+      throw new Error('ビートハート値変更の設定が正しくありません。');
     return;
   }
   if (validateSpecialEffect(effect)) return;

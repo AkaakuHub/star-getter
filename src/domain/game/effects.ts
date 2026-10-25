@@ -6,7 +6,6 @@ import { energyMaximum } from './parameters/maximum';
 import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
 import { applyScoreBoost } from './effects/scoreBoost';
-import { calculateSkillMoodCorrection } from './live/skillMood';
 import { moodValue, sectionAt } from './projection';
 import { voltageLevel } from './live/voltageLevel';
 import { activateBloom } from './bloom';
@@ -46,6 +45,7 @@ import { activateAdditionalHeartInduce } from './effects/additionalHeart';
 import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
 import { startIngameMission } from './ingameMissions';
+import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -229,35 +229,14 @@ export function applyEffect(
         sectionBeatHeartBonus: boosted.state.sectionBeatHeartBonus + Math.trunc(boosted.value),
       };
     }
-    case 'beat-point-buff': {
-      const mood = effect.moodBonus
-        ? calculateSkillMoodCorrection(
-            effect.moodBonus.target,
-            moodValue(state),
-            effect.moodBonus.perPoint,
-          )
-        : 0;
-      const amount = Math.trunc(
-        Math.fround(
-          (Math.fround(effect.amount + mood) + (effect.addValue ?? 0)) *
-            (effect.multiplier ?? multiplier),
-        ),
+    case 'beat-heart-value-buff':
+      return activateBeatHeartValueBuff(
+        state,
+        effect,
+        card,
+        effect.multiplier ?? multiplier,
+        effect.addValue ?? addValue,
       );
-      const base = Math.trunc(
-        skillValue(state, amount, { kind: 'amplify', percent: amount }, card),
-      );
-      const boosted = applyAction52SkillBoostForCard(state, card, base);
-      return {
-        ...boosted.state,
-        beatPointBuffs: [
-          ...boosted.state.beatPointBuffs,
-          {
-            value: Math.trunc(boosted.value),
-            remainingSections: effect.duration?.sections ?? null,
-          },
-        ],
-      };
-    }
     case 'heart-boost':
       return addHeartBoost(state, effect, card, multiplier);
     case 'voltage-limit':

@@ -290,12 +290,15 @@ type EffectShape =
   | DisableMentalDownEffect
   | Readonly<{ kind: 'beat-count'; amount: number }>
   | Readonly<{
-      kind: 'beat-point-buff';
+      kind: 'beat-heart-value-buff';
+      calculation: 'add' | 'multiply' | 'fixed';
       amount: number;
       addValue?: number;
       multiplier?: number;
       moodBonus?: MoodBonus;
-      duration?: Readonly<{ sections: number }>;
+      duration?: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+      invocationType?: number;
+      deactivationKey?: string;
     }>
   | HeartBoostEffect
   | LoveUpAdditionalBuffEffect

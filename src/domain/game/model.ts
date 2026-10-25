@@ -245,7 +245,13 @@ export type GameState = Readonly<{
   nextDisableMentalDownId: number;
   sectionMentalProtected: boolean;
   sectionBeatHeartBonus: number;
-  beatPointBuffs: readonly Readonly<{ value: number; remainingSections: number | null }>[];
+  beatHeartValueBuffs: readonly Readonly<{
+    calculation: 'add' | 'multiply' | 'fixed';
+    value: number;
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+    deactivationKey: string | null;
+  }>[];
   heartBoosts: readonly HeartBoostState[];
   mentalShield: number;
   mentalBarriers: readonly MentalBarrier[];
@@ -304,7 +310,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

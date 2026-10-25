@@ -20,14 +20,18 @@ import {
   advanceVoltageUpAdditionalBuffs,
   expireVoltageUpAdditionalBuffSections,
 } from './voltageUpAdditionalBuff';
+import { advanceBeatHeartValueBuffs, expireBeatHeartValueBuffSections } from './beatHeartValueBuff';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceDisableMentalDownEffects(
-    advanceMentalBarrierAdditionalBuffs(
-      advanceMentalRecoverAdditionalBuffs(
-        advanceVoltageUpAdditionalBuffs(
-          advanceLoveUpAdditionalBuffs(
-            advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceBeatHeartValueBuffs(
+    advanceDisableMentalDownEffects(
+      advanceMentalBarrierAdditionalBuffs(
+        advanceMentalRecoverAdditionalBuffs(
+          advanceVoltageUpAdditionalBuffs(
+            advanceLoveUpAdditionalBuffs(
+              advanceAction52SkillBoosts(state, elapsedSeconds),
+              elapsedSeconds,
+            ),
             elapsedSeconds,
           ),
           elapsedSeconds,
@@ -41,11 +45,13 @@ export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number)
 }
 
 export function expireTimedSkillBuffSections(state: GameState): GameState {
-  return expireDisableMentalDownEffectSections(
-    expireMentalBarrierAdditionalBuffSections(
-      expireMentalRecoverAdditionalBuffSections(
-        expireVoltageUpAdditionalBuffSections(
-          expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+  return expireBeatHeartValueBuffSections(
+    expireDisableMentalDownEffectSections(
+      expireMentalBarrierAdditionalBuffSections(
+        expireMentalRecoverAdditionalBuffSections(
+          expireVoltageUpAdditionalBuffSections(
+            expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+          ),
         ),
       ),
     ),

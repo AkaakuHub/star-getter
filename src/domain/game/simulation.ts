@@ -153,7 +153,7 @@ export function createGame(
     nextDisableMentalDownId: 1,
     sectionMentalProtected: false,
     sectionBeatHeartBonus: 0,
-    beatPointBuffs: [],
+    beatHeartValueBuffs: [],
     heartBoosts: [],
     mentalShield: 0,
     mentalBarriers: [],
@@ -321,11 +321,6 @@ function advanceTick(state: GameState): GameState {
       moodOffset: 0,
       sectionMentalProtected: false,
       sectionBeatHeartBonus: 0,
-      beatPointBuffs: next.beatPointBuffs.flatMap((buff) => {
-        if (buff.remainingSections === null) return [buff];
-        const remainingSections = buff.remainingSections - 1;
-        return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
-      }),
       heartBoosts: expireSectionHeartBoosts(next.heartBoosts),
       skillCostChanges: next.skillCostChanges.flatMap((change) => {
         if (change.remainingSections === null) return [change];

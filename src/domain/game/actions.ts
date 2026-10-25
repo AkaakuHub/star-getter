@@ -34,6 +34,7 @@ import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
 import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
 import { missionActionEffect, registerMissionMember, skipIngameMission } from './ingameMissions';
+import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -98,6 +99,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateSkillCooldownEffects(state, action.deactivationKey);
     case 'deactivate-induced-skill-effect':
       return deactivateInducedSkillEffects(state, action.deactivationKey);
+    case 'deactivate-beat-heart-value-buff':
+      return deactivateBeatHeartValueBuffs(state, action.deactivationKey);
   }
 }
 

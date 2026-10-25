@@ -107,8 +107,12 @@ export function describeEffect(effect: Effect): string {
       return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、元気が0でも休憩に入らない。`;
     case 'beat-count':
       return `このパート中、自然発生するきらめきを${effect.amount}個増加する。`;
-    case 'beat-point-buff':
-      return `自然発生するきらめきのビートポイントを${effect.amount}増加する。`;
+    case 'beat-heart-value-buff':
+      return effect.calculation === 'multiply'
+        ? `自然発生するハート数を${effect.amount / 10_000}倍にする。`
+        : effect.calculation === 'fixed'
+          ? `自然発生するハート数を${effect.amount / 10_000}個にする。`
+          : `自然発生するハート数を${effect.amount / 10_000}個増加する。`;
     case 'heart-boost':
       return `次の${effect.uses}回のきらめき獲得効果を${effect.percent}%増幅する。`;
     case 'voltage-set':
