@@ -9,13 +9,14 @@ export function activateTokenBoost(
   multiplier: number,
   addValue: number,
 ): GameState {
-  const numValue = Math.fround(int64ToFloat32(BigInt(effect.num)) / Math.fround(10_000));
+  const num = BigInt.asIntN(32, BigInt(effect.num));
+  const numValue = Math.fround(int64ToFloat32(num) / Math.fround(10_000));
   const base = Math.fround(
     Math.fround(Math.fround(numValue + Math.fround(addValue)) * Math.fround(multiplier)),
   );
-  const boosted =
-    base > 0 && card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
-  const value = base > 0 && card ? toInt32(boosted.value) : base;
+  if (base <= 0) return state;
+  const boosted = card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
+  const value = card ? toInt32(boosted.value) : base;
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...boosted.state,

@@ -59,7 +59,7 @@ it('追加カードの増幅は対象カードと生成効果のシリーズ指�
   expect(matched.deck.filter((card) => card.token === 'story')).toHaveLength(4);
 });
 
-it('ActionType38は負の加算バフを登録して追加枚数を減らす', () => {
+it('ActionType38は負の計算値をバフとして登録しない', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
@@ -73,9 +73,9 @@ it('ActionType38は負の加算バフを登録して追加枚数を減らす', (
     },
     source,
   );
-  expect(boosted.tokenBoosts[0]?.value).toBe(-1);
+  expect(boosted.tokenBoosts).toHaveLength(0);
   const generated = requestTokens(boosted, 'story', 2, source.id);
-  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(1);
+  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(2);
 });
 
 it('追加カードの増幅は時間またはパート期限で解除する', () => {
@@ -271,6 +271,21 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
   ).toHaveLength(0);
 });
 
+it('ActionType38は詳細値をint32へ変換し、0以下なら登録しない', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const effect = {
+    kind: 'token-boost',
+    calculation: 'add',
+    target: { kind: 'all' },
+  } as const;
+  const wrapped = applyEffect(initial, { ...effect, num: 2_147_483_648 }, source);
+  const zero = applyEffect(initial, { ...effect, num: 0 }, source);
+  expect(wrapped.tokenBoosts).toHaveLength(0);
+  expect(zero.tokenBoosts).toHaveLength(0);
+});
+
 it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適用する', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
@@ -285,9 +300,7 @@ it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適�
     },
     source,
   );
-  expect(wrapped.tokenBoosts[0]?.value).toBe(
-    Math.trunc(Math.fround(Math.fround(2_147_483_648) / Math.fround(10_000))),
-  );
+  expect(wrapped.tokenBoosts).toHaveLength(0);
 
   const float32Value = applyEffect(
     initial,
