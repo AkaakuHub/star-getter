@@ -83,6 +83,7 @@ function validateEffect(effect: Effect): void {
   if (effect.kind === 'reset-special') {
     if (
       !['normal', 'extra', 'all'].includes(effect.scope) ||
+      !['all', 'source', 'others', 'member', 'unit'].includes(effect.target.kind) ||
       (effect.target.kind === 'member' && !Number.isSafeInteger(effect.target.member)) ||
       (effect.target.kind === 'unit' && ![1, 2, 3].includes(effect.target.unit))
     )
