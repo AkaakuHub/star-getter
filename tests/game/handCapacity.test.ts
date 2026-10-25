@@ -109,6 +109,32 @@ it('手札枚数変更にスキル増幅を適用して整数化する', () => {
   expect(next.handLimit).toBe(9);
 });
 
+it('ActionType20へ発動元対象のActionType52補正を適用して整数化する', () => {
+  const base = game();
+  const source = base.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const initial = {
+    ...base,
+    amplification: 100,
+    storyAmplification: 0,
+    handEffectCardIds: [],
+    targetBoosts: [],
+  };
+  const boosted = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'member', member: source.member },
+      duration: { kind: 'stage', value: 0 },
+      uses: null,
+    },
+    source,
+  );
+  const changed = applyEffect(boosted, { kind: 'hand-limit', amount: 3 }, source);
+  expect(changed.handLimit).toBe(9);
+});
+
 it('手札枚数を減らす効果はランダム除外後に発動元を補充しない', () => {
   const state = fillHand(game());
   const source = state.deck[0];

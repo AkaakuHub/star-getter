@@ -1,6 +1,7 @@
 import type { Card, Effect, GameState } from '../model';
 import { skillValue } from './skillValue';
 import { isProxyTargetReached } from './proxySkill';
+import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 
 type HandLimitEffect = Extract<Effect, { kind: 'hand-limit' }>;
 
@@ -16,17 +17,23 @@ export function applyHandLimit(
   if (duration?.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const scaledAmount = Math.trunc(Math.fround((baseAmount + addValue) * multiplier));
-  const amount = Math.trunc(
-    skillValue(state, scaledAmount, { kind: 'hand-limit', amount: baseAmount }, card),
+  const skillBoosted = skillValue(
+    state,
+    scaledAmount,
+    { kind: 'hand-limit', amount: baseAmount },
+    card,
   );
-  const absorption = amount >= 0 ? absorbHandLimit(state, amount) : null;
+  const action52 = applyAction52SkillBoostForCard(state, card, skillBoosted);
+  const amount = Math.trunc(action52.value);
+  const currentState = action52.state;
+  const absorption = amount >= 0 ? absorbHandLimit(currentState, amount) : null;
   const appliedAmount = absorption?.absorbed ? 0 : amount;
-  const activation = state.activation;
+  const activation = currentState.activation;
   const handLimitEffects =
     amount === 0
-      ? state.handLimitEffects
+      ? currentState.handLimitEffects
       : [
-          ...state.handLimitEffects,
+          ...currentState.handLimitEffects,
           {
             amount: appliedAmount,
             expirationAmount: -amount,
@@ -42,8 +49,8 @@ export function applyHandLimit(
           },
         ];
   return {
-    ...state,
-    handLimit: state.handLimit + appliedAmount,
+    ...currentState,
+    handLimit: currentState.handLimit + appliedAmount,
     handLimitEffects,
     ...(activation && card && appliedAmount !== 0
       ? {
