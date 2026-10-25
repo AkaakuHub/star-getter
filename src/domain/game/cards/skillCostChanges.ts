@@ -88,7 +88,7 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
     case 3:
       return voltageLevel(state.excitement, state.maximumVoltageLevel);
     case 4:
-      return Math.min(1, state.stamina / 100);
+      return Math.min(1, Math.trunc(state.stamina) / state.maximumMental);
     case 5:
       return stats ? state.track.sections.indexOf(sectionAt(state)) - stats.enteredSectionIndex : 0;
     case 6:

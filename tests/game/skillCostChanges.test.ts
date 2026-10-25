@@ -100,6 +100,24 @@ it('セクション期限のスキルコスト変化を期限後に除去する'
   expect(expired.skillCostChanges).toHaveLength(0);
 });
 
+it('Action17の条件4は最大元気に対する整数元気割合を使う', () => {
+  const initial = { ...game(), maximumMental: 200, stamina: 100 };
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const changed = applyEffect(
+    initial,
+    {
+      kind: 'skill-cost-change',
+      amount: 10,
+      minimum: -100,
+      maximum: 100,
+      conditionType: 4,
+    },
+    source,
+  );
+  expect(cardCost(changed, source) - cardCost(initial, source)).toBe(5);
+});
+
 it('Action17の解除キーで通常効果を解除し、InvocationType 0x388は期限とDeactivator解除を無視する', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
