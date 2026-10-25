@@ -70,6 +70,8 @@ export function describeEffect(effect: Effect): string {
       return effect.duration.kind === 'milliseconds'
         ? `${effect.duration.value}ミリ秒間、熱気の自然増加を停止する。`
         : `${effect.duration.value}パートの間、熱気の自然増加を停止する。`;
+    case 'infinity-gauge':
+      return `${effect.gauge === 'ap' ? 'エナジー' : effect.gauge === 'mental' ? '元気' : '熱気'}ゲージを無限にする。`;
     case 'voltage-limit':
       return `熱気Lv.上限を${effect.amount}増加する。`;
     case 'beat-hearts':

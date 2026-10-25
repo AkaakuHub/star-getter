@@ -17,6 +17,7 @@ import {
   starGatherHeartShowLimitSettings,
   resolveStarGatherHeartDrawCount,
 } from './live/heartPresentation';
+import { expireGaugeInfinities } from './resources';
 
 export function createGame(
   track: Track,
@@ -66,6 +67,7 @@ export function createGame(
     mentalTimerSeconds: 0,
     voltageTimerSeconds: 0,
     voltageStops: [],
+    gaugeInfinities: [],
     moodOffset: 0,
     costReductions: {},
     storyAmplification: 0,
@@ -152,7 +154,7 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = advanceAutomaticGauges(state, dt);
+  const gauges = expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt);
   let next: GameState = advanceHearts({
     ...gauges,
     tick,
@@ -175,7 +177,8 @@ function advanceTick(state: GameState): GameState {
   if (beat !== previousBeat && beat % 2 === 0 && !next.resting) {
     next = addHearts(next, beatHeartCount(next));
   }
-  if (sectionAt(next) !== sectionAt(state))
+  if (sectionAt(next) !== sectionAt(state)) {
+    next = expireGaugeInfinities(next, 'sections', 1);
     next = fillHand({
       ...next,
       voltageStops: next.voltageStops.flatMap((stop) => {
@@ -202,6 +205,7 @@ function advanceTick(state: GameState): GameState {
       sectionAmplification: 0,
       targetBoosts: next.targetBoosts.filter((boost) => boost.duration === 'stage'),
     });
+  }
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
   const collected = automatic.shouldCollect ? collectHearts(next) : next;

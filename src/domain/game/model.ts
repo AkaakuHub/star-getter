@@ -9,6 +9,7 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
+import type { GaugeInfinity, InfinityGaugeEffect } from './modelTypes';
 import type {
   MoodBonus,
   ResetSpecial,
@@ -30,6 +31,7 @@ export type {
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
 export type UnitId = 1 | 2 | 3;
+
 export const costumeIds = [
   'star',
   'moon',
@@ -118,6 +120,7 @@ export type Effect =
         | Readonly<{ kind: 'token'; token: TokenKind }>;
     }>
   | Readonly<{ kind: 'voltage-set'; amount: number }>
+  | InfinityGaugeEffect
   | Readonly<{
       kind: 'stop-voltage-increase';
       duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
@@ -302,6 +305,7 @@ export type GameState = Readonly<{
     remainingSeconds: number | null;
     remainingSections: number | null;
   }>[];
+  gaugeInfinities: readonly GaugeInfinity[];
   moodOffset: number;
   costReductions: Readonly<Record<string, number>>;
   storyAmplification: number;
