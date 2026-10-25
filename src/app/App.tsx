@@ -41,15 +41,15 @@ export function App() {
     history.replaceState(null, '', routeUrl(route, location.href));
   }, [route]);
 
-  function savePreferences(next: GamePreferences): void {
+  const savePreferences = useCallback((next: GamePreferences): void => {
     writeGamePreferences(localStorage, next);
     setPreferences(next);
-  }
+  }, []);
 
-  async function changeWaitMode(): Promise<void> {
+  const changeWaitMode = useCallback(async (): Promise<void> => {
     await controller.toggleWaitMode();
     savePreferences({ ...preferences, waitMode: controller.waitModeEnabled });
-  }
+  }, [controller, preferences, savePreferences]);
 
   async function restart(nextRoute: RouteId): Promise<void> {
     if (busy) return;
@@ -89,7 +89,7 @@ export function App() {
   );
 
   const openSpecial = useCallback(() => void openPanel('special'), [openPanel]);
-  useGameControls(controller, panel !== null, openSpecial);
+  useGameControls(controller, panel !== null, openSpecial, changeWaitMode);
 
   async function closePanel(specialCardId?: string): Promise<void> {
     if (busy) return;

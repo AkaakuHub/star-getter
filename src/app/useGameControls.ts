@@ -5,6 +5,7 @@ export function useGameControls(
   controller: GameController | null,
   helpOpen: boolean,
   onSpecial: () => void,
+  onWaitMode: () => void,
 ): void {
   useEffect(() => {
     if (!controller) return;
@@ -37,7 +38,7 @@ export function useGameControls(
       }
       if (event.key === 'Escape') {
         event.preventDefault();
-        void controller.toggleWaitMode();
+        onWaitMode();
       }
     };
     const visibility = () => {
@@ -49,5 +50,5 @@ export function useGameControls(
       window.removeEventListener('keydown', keyboard);
       document.removeEventListener('visibilitychange', visibility);
     };
-  }, [controller, helpOpen, onSpecial]);
+  }, [controller, helpOpen, onSpecial, onWaitMode]);
 }
