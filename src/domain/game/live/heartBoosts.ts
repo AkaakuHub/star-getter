@@ -19,7 +19,7 @@ export function addHeartBoost(
     heartBoosts: [
       ...boosted.state.heartBoosts,
       {
-        percent: Math.trunc(boosted.value),
+        percent: card ? boosted.value : Math.trunc(boosted.value),
         uses: effect.uses,
         target: effect.target ?? { kind: 'all' },
         remainingSeconds: suppressDuration
