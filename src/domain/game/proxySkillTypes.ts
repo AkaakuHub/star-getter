@@ -8,9 +8,9 @@ export type ProxyAbsorption = Readonly<{
   periodType: 1 | 2 | 3 | 4 | 5;
   remainingPeriod: number;
   isAbsorbEnd: boolean;
-  induceTiming: number;
-  induceCondition: number;
-  inducePowerType: number;
+  induceTiming: 1 | 2 | 3;
+  induceCondition: 1 | 2;
+  inducePowerType: 1 | 2 | 3;
   inducePowerParam: number;
   inducedEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
   effects: readonly Readonly<{
@@ -25,9 +25,9 @@ export type ProxySkillEffect = Readonly<{
   absorbLimit: number;
   periodType: 1 | 2 | 3 | 4 | 5;
   periodParam: number;
-  induceTiming: number;
-  induceCondition: number;
-  inducePowerType: number;
+  induceTiming: 1 | 2 | 3;
+  induceCondition: 1 | 2;
+  inducePowerType: 1 | 2 | 3;
   inducePowerParam: number;
   targets: readonly Readonly<{ actionType: number; targetAmount: number }>[];
   effects: readonly Readonly<{ actionType: number; effect: Effect }>[];

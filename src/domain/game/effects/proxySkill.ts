@@ -134,8 +134,10 @@ export function absorbSkillEffect(
     if (!effect) continue;
     if (absorption.hasAbsorbLimit && isProxyTargetReached(absorption, effect))
       return { state, absorbed: true };
+    const absorbedAmount =
+      actionType === 48 && absorption.isAbsoluteAdd && amount < 0n ? -amount : amount;
     const effects = absorption.effects.map((item, index) =>
-      index === effectIndex ? { ...item, totalAmount: item.totalAmount + amount } : item,
+      index === effectIndex ? { ...item, totalAmount: item.totalAmount + absorbedAmount } : item,
     );
     const proxyAbsorptions = state.proxyAbsorptions.map((item, index) =>
       index === absorptionIndex ? { ...item, effects } : item,
@@ -205,7 +207,7 @@ function finishProxyAbsorption(
       multiplier = Math.fround(multiplier * Math.fround(total / target));
     }
     next = absorption.inducedEffects.reduce(
-      (current, child) => apply(current, child.effect, card, multiplier, 0),
+      (current, child) => applyProxyChild(current, child, card, multiplier, 0, apply),
       next,
     );
   } else if (absorption.inducePowerType === 2) {
@@ -213,16 +215,35 @@ function finishProxyAbsorption(
     next = absorption.inducedEffects.reduce((current, child) => {
       const match = absorption.effects.find((item) => item.actionType === child.actionType);
       return match
-        ? apply(current, child.effect, card, power, Math.fround(Number(match.totalAmount)))
-        : apply(current, child.effect, card, 1, 0);
+        ? applyProxyChild(
+            current,
+            child,
+            card,
+            power,
+            Math.fround(Number(match.totalAmount)),
+            apply,
+          )
+        : applyProxyChild(current, child, card, 1, 0, apply);
     }, next);
   } else {
     next = absorption.inducedEffects.reduce(
-      (current, child) => apply(current, child.effect, card, 1, 0),
+      (current, child) => applyProxyChild(current, child, card, 1, 0, apply),
       next,
     );
   }
   return removeProxyAbsorption(next, absorption);
+}
+
+function applyProxyChild(
+  state: GameState,
+  child: GameState['proxyAbsorptions'][number]['inducedEffects'][number],
+  card: Card,
+  multiplier: number,
+  addValue: number,
+  apply: ApplyProxyEffect,
+): GameState {
+  const next = apply(state, child.effect, card, multiplier, addValue);
+  return next.deckOutCount > 0 ? { ...next, deckOutCount: next.deckOutCount - 1 } : next;
 }
 
 function endProxyAbsorption(

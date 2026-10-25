@@ -10,6 +10,7 @@ import {
   advanceProxySkillUses,
 } from '../../src/domain/game/effects/proxySkill';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import type { ProxySkillEffect } from '../../src/domain/game/proxySkillTypes';
 
 function game() {
   const track = tracks[0];
@@ -281,8 +282,8 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
   const source = initial.deck[0];
   const child = initial.deck[1];
   if (!source || !child) throw new Error('発動カードが足りません。');
-  const proxyEffect = {
-    kind: 'proxy-skill' as const,
+  const proxyEffect: ProxySkillEffect = {
+    kind: 'proxy-skill',
     absorbLimit: 1,
     periodType: 1 as const,
     periodParam: 3000,
@@ -326,15 +327,15 @@ it('スキル使用回数と消費APを使うProxy期限を個別に進める', 
     kind: 'proxy-skill' as const,
     absorbLimit: 1,
     periodParam: 3,
-    induceTiming: 1,
-    induceCondition: 1,
-    inducePowerType: 1,
+    induceTiming: 1 as const,
+    induceCondition: 1 as const,
+    inducePowerType: 1 as const,
     inducePowerParam: 0,
     targets: [{ actionType: 20, targetAmount: 1 }],
     effects: [],
   };
-  const uses = applyEffect(initial, { ...periodEffect, periodType: 4 }, source);
-  const costs = applyEffect(uses, { ...periodEffect, periodType: 5 }, source);
+  const uses = applyEffect(initial, { ...periodEffect, periodType: 4 as const }, source);
+  const costs = applyEffect(uses, { ...periodEffect, periodType: 5 as const }, source);
   const afterUse = advanceProxySkillUses(costs, 'other-card', 2, applyEffect);
   expect(afterUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([2, 1]);
   const afterSecondUse = advanceProxySkillUses(afterUse, 'other-card', 2, applyEffect);

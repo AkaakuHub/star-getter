@@ -81,6 +81,22 @@ export function validateEffect(effect: Effect): void {
       throw new Error('ミッションのグループIDが正しくありません。');
     return;
   }
+  if (effect.kind === 'proxy-skill') {
+    if (
+      !Number.isSafeInteger(effect.absorbLimit) ||
+      !Number.isSafeInteger(effect.periodParam) ||
+      (effect.periodType !== 3 && effect.periodParam < 1) ||
+      (effect.periodType === 3 && effect.induceTiming !== 1) ||
+      !Number.isFinite(effect.inducePowerParam) ||
+      effect.targets.some(
+        (target) =>
+          !Number.isSafeInteger(target.actionType) || !Number.isSafeInteger(target.targetAmount),
+      )
+    )
+      throw new Error('Proxyスキルの設定が正しくありません。');
+    for (const child of effect.effects) validateEffect(child.effect);
+    return;
+  }
   if (effect.kind === 'infinity-gauge') {
     if (
       (effect.duration.kind === 'sections' && effect.duration.value === 0) ||

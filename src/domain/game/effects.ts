@@ -30,7 +30,11 @@ import { resolveEffectParameterDetails } from './parameters/parameterValueChange
 import { applyParameterEffect, isParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
 import { activateHeartLimitChange, applyHeartLimitEffect } from './effects/heartLimit';
-import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
+import {
+  absorbSkillEffect,
+  forceProxySkillActivation,
+  registerProxySkill,
+} from './effects/proxySkill';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
@@ -122,9 +126,12 @@ export function applyEffect(
     case 'mood': {
       const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
+      const amount = Math.ceil(boosted.value);
+      const absorption = absorbSkillEffect(boosted.state, 48, BigInt.asIntN(32, BigInt(amount)));
+      if (absorption.absorbed) return absorption.state;
       return {
         ...boosted.state,
-        moodOffset: boosted.state.moodOffset + Math.ceil(boosted.value),
+        moodOffset: boosted.state.moodOffset + amount,
       };
     }
     case 'hearts':

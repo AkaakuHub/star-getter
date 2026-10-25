@@ -18,6 +18,10 @@ export function changeResource(
   applyEffect?: EffectApplier,
   induceVoltageUp = false,
 ): GameState {
+  if (resource === 'energy' && amount >= 0n) {
+    const absorption = absorbSkillEffect(state, 14, BigInt.asIntN(32, amount));
+    if (absorption.absorbed) return absorption.state;
+  }
   if (resource === 'excitement' && amount >= 0n) {
     const absorption = absorbSkillEffect(state, 10, BigInt.asIntN(32, amount));
     if (absorption.absorbed) return absorption.state;
