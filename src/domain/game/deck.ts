@@ -89,7 +89,12 @@ function validateEffect(effect: Effect): void {
     for (const tier of effect.tiers) for (const child of tier) validateEffect(child);
     return;
   }
-  if (effect.kind === 'collect' || effect.kind === 'shuffle' || effect.kind === 'protect-mental')
+  if (
+    effect.kind === 'collect' ||
+    effect.kind === 'shuffle' ||
+    effect.kind === 'protect-mental' ||
+    effect.kind === 'card-move'
+  )
     return;
   if (effect.kind === 'reset-special') {
     if (

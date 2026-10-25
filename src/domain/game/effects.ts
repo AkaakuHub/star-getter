@@ -155,6 +155,13 @@ export function applyEffect(
     }
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
+    case 'card-move': {
+      if (!card || state.skillUseDestinations[card.id] === 'exclusion') return state;
+      return {
+        ...state,
+        skillUseDestinations: { ...state.skillUseDestinations, [card.id]: effect.destination },
+      };
+    }
     case 'energy':
       return changeResource(state, 'energy', BigInt(Math.trunc(value(effect.amount))));
     case 'energy-limit':

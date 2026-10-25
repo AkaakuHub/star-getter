@@ -57,6 +57,7 @@ export function createGame(
     parameterValueFactors: [],
     parameterValueChangeCounts: {},
     activeModeParameterChanges: [],
+    skillUseDestinations: {},
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
     deckOutCount: 0,

@@ -9,9 +9,17 @@ export function finishCardActivation(state: GameState): GameState {
   const source = state.deck.find((card) => card.id === activation.sourceId);
   if (!source) throw new Error('使用したカードがありません。');
   const children = activation.usedCards.filter((id) => id !== source.id);
+  const excludedIds = new Set([
+    ...activation.excluded,
+    ...activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'exclusion'),
+  ]);
+  const returnToDrawIds = new Set([
+    ...activation.returnToDraw,
+    ...activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'deck'),
+  ]);
   let next = excludeCards(
     disposeHandEffects(state, children),
-    activation.excluded.filter((id) => id !== source.id),
+    [...excludedIds].filter((id) => id !== source.id),
   );
   const activeChildren = children.filter((id) => next.deck.some((card) => card.id === id));
   next = {
@@ -19,11 +27,11 @@ export function finishCardActivation(state: GameState): GameState {
     drawPile: [
       ...next.drawPile,
       ...(activation.recoverDiscard ? next.discard : []),
-      ...activeChildren.filter((id) => activation.returnToDraw.includes(id)),
+      ...activeChildren.filter((id) => returnToDrawIds.has(id)),
     ],
     discard: [
       ...(activation.recoverDiscard ? [] : next.discard),
-      ...activeChildren.filter((id) => !activation.returnToDraw.includes(id)),
+      ...activeChildren.filter((id) => !returnToDrawIds.has(id)),
     ],
   };
   next = flushDeckActions(next);
@@ -35,12 +43,20 @@ export function finishCardActivation(state: GameState): GameState {
     drawContext: 'skill',
   });
   next = disposeHandEffects(next, [source.id]);
-  next = activation.excluded.includes(source.id)
+  next = excludedIds.has(source.id)
     ? excludeCards(next, [source.id])
-    : activation.returnToDraw.includes(source.id)
+    : returnToDrawIds.has(source.id)
       ? { ...next, drawPile: [...next.drawPile, source.id] }
       : { ...next, discard: [...next.discard, source.id] };
-  return { ...next, activation: null };
+  return {
+    ...next,
+    skillUseDestinations: Object.fromEntries(
+      Object.entries(next.skillUseDestinations).filter(
+        ([id]) => !activation.usedCards.includes(id),
+      ),
+    ),
+    activation: null,
+  };
 }
 
 function excludeCards(state: GameState, ids: readonly string[]): GameState {
@@ -55,6 +71,9 @@ function excludeCards(state: GameState, ids: readonly string[]): GameState {
     ),
     activeModeParameterChanges: state.activeModeParameterChanges.filter(
       (item) => !ids.includes(item.cardId),
+    ),
+    skillUseDestinations: Object.fromEntries(
+      Object.entries(state.skillUseDestinations).filter(([id]) => !ids.includes(id)),
     ),
     hand: state.hand.filter((id) => !ids.includes(id)),
     drawPile: state.drawPile.filter((id) => !ids.includes(id)),

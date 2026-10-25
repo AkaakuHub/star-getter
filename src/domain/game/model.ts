@@ -204,6 +204,7 @@ export type GameState = Readonly<{
     modeId: number;
     isOn: boolean;
   }>[];
+  skillUseDestinations: Readonly<Record<string, 'deck' | 'exclusion'>>;
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];

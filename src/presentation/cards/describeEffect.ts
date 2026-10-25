@@ -40,6 +40,10 @@ export function describeEffect(effect: Effect): string {
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':
       return '他の手札のアクションを一斉に使用する。';
+    case 'card-move':
+      return effect.destination === 'deck'
+        ? '使用後、発動元カードを山札へ戻す。'
+        : '使用後、発動元カードを除外する。';
     case 'mood':
       return `このパート中、空模様を${effect.amount < 0 ? '雨' : '晴れ'}方向へ${Math.abs(effect.amount)}%変化させる。`;
     case 'conditional':

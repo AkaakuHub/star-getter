@@ -203,6 +203,7 @@ type EffectShape =
     }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'use-hand'; addAp?: number }>
+  | Readonly<{ kind: 'card-move'; destination: 'deck' | 'exclusion' }>
   | Readonly<{ kind: 'shuffle'; recoverDiscard: boolean; destination: 'draw' | 'discard' }>
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
