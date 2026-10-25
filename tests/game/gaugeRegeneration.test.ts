@@ -34,6 +34,37 @@ describe('ゲージの継続回復', () => {
     expect(advanceTo(active, 0.61).excitement).toBe(655_000_001);
   });
 
+  it('継続回復は一回限りの熱気・元気追加バフを消費しない', () => {
+    const initial = {
+      ...game(),
+      stamina: 40,
+      excitement: 40,
+      resourceBoosts: [
+        { target: 'stamina' as const, percent: 100, uses: 1 },
+        { target: 'excitement' as const, percent: 100, uses: 1 },
+      ],
+    };
+    const mental = applyEffect(initial, {
+      kind: 'gauge-regeneration',
+      gauge: 'mental',
+      amount: 10,
+      intervalType: 2,
+      intervalMilliseconds: 200,
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    const voltage = applyEffect(mental, {
+      kind: 'gauge-regeneration',
+      gauge: 'voltage',
+      amount: 10,
+      intervalType: 2,
+      intervalMilliseconds: 200,
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    expect(voltage.stamina).toBe(50);
+    expect(voltage.excitement).toBe(50);
+    expect(voltage.resourceBoosts).toHaveLength(2);
+  });
+
   it('ハート間隔指定は回復を繰り返さず、表示期限のハートイベントで終了する', () => {
     const active = applyEffect(
       { ...game(), stamina: 40 },

@@ -1,4 +1,3 @@
-import { applyAdditionalBuff } from './additionalBuff';
 import { skillValue } from './skillValue';
 import { startGaugeRegeneration } from '../live/gaugeRegeneration';
 import type { GaugeRegenerationEffect } from '../modelTypes';
@@ -11,14 +10,10 @@ export function applyGaugeRegeneration(
   multiplier: number,
 ): GameState {
   const base = Math.fround(skillValue(state, effect.amount, effect, card) * multiplier);
-  const boosted =
-    base > 0
-      ? applyAdditionalBuff(state, effect.gauge === 'mental' ? 'stamina' : 'excitement', base, card)
-      : { state, value: base };
   return startGaugeRegeneration(
-    boosted.state,
+    state,
     effect.gauge,
-    boosted.value,
+    base,
     effect.intervalType,
     effect.intervalMilliseconds,
     effect.duration,
