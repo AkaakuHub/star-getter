@@ -22,7 +22,7 @@ export function cardCost(state: GameState, card: Card, activeAllHandSkill = fals
     return (
       sum +
       (other.id === card.id
-        ? card.cost + (useHand.addAp ?? 0)
+        ? card.cost + toInt32(useHand.addAp ?? 0)
         : finalizeStarGatherSkillCost(
             other.cost,
             -(state.costReductions[other.id] ?? 0) +
@@ -43,6 +43,10 @@ export function cardCost(state: GameState, card: Card, activeAllHandSkill = fals
       skillCostDelta(state, card) +
       (state.onceSkillCostChanges[card.id] ?? 0),
   );
+}
+
+function toInt32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function applyCostReduction(

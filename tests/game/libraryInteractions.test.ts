@@ -272,6 +272,20 @@ it('一斉使用の追加APを全手札コストへ加え、最終コストを1�
   expect(cardCost(withoutReduction, updated)).toBe(cardCost(withoutReduction, source) + 7);
 });
 
+it('ActionType42の追加APはC#同様にint32へ変換する', () => {
+  const initial = game('library');
+  const source = card(initial, 'library-ensemble');
+  const updated = {
+    ...source,
+    effects: source.effects.map((effect) =>
+      effect.kind === 'use-hand' ? { ...effect, addAp: 2_147_483_648 } : effect,
+    ),
+  };
+  const deck = initial.deck.map((item) => (item.id === source.id ? updated : item));
+  const state = withHand({ ...initial, deck, cardPool: deck, energy: 100 }, [source.id]);
+  expect(cardCost(state, updated)).toBe(1);
+});
+
 it('一斉使用中の子カードはActionType42の合算コストではなく通常の個別コストを記録する', () => {
   const initial = game('library');
   const source = card(initial, 'library-ensemble');
