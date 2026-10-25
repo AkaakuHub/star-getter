@@ -9,7 +9,7 @@ import { act } from '../../src/domain/game/actions';
 import { game } from './support/game';
 
 it('通常上限1000を追加の共鳴で1500へ増やし、800万Pt刻みの閾値を使う', () => {
-  const initial = game();
+  const initial = { ...game(), energy: 3 };
   expect(initial.maximumVoltageLevel).toBe(1000);
   const extended = act(initial, { type: 'special', cardId: 'frost-pulse' });
   expect(extended.maximumVoltageLevel).toBe(1500);

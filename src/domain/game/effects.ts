@@ -84,7 +84,10 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
         ? { ...state, activation: { ...state.activation, shuffle: true } }
         : {
             ...state,
-            deckActions: { ...state.deckActions, shuffles: state.deckActions.shuffles + 1 },
+            deckActions: {
+              ...state.deckActions,
+              shuffles: [...state.deckActions.shuffles, card?.id ?? null],
+            },
           };
     case 'search-unit':
       return {

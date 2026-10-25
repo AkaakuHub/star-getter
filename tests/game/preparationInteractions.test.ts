@@ -58,7 +58,7 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
   expect(reacted.costReductions['frost-pulse']).toBe(9);
   expect(reacted.costReductions[shadow.id]).toBe(9);
   expect(reacted.costReductions.horizon).toBe(0);
-  expect(reacted.deckActions.shuffles).toBe(1);
+  expect(reacted.deckActions.shuffles).toHaveLength(1);
 });
 
 it('シールドは負の回復効果を防ぎ、自然減少は防がない', () => {
@@ -82,10 +82,10 @@ it('同時に登録した引き直しをまとめず全回実行し、後登録�
   state = applyEffect(state, { kind: 'shuffle' });
   state = applyEffect(state, { kind: 'shuffle' });
   state = applyEffect(state, { kind: 'search-unit', unit: 2, count: 4 });
-  expect(state.deckActions.shuffles).toBe(2);
+  expect(state.deckActions.shuffles).toHaveLength(2);
   expect(state.deckActions.searches).toHaveLength(4);
   const flushed = flushDeckActions(state);
-  expect(flushed.deckActions.shuffles).toBe(0);
+  expect(flushed.deckActions.shuffles).toHaveLength(0);
   expect(flushed.deckActions.searches).toHaveLength(0);
   expect(flushed.targetBoosts.length).toBeGreaterThan(state.targetBoosts.length);
 });
@@ -122,3 +122,15 @@ for (const [points, expected] of [
     expect(state.excitement).toBe(expected);
   });
 }
+
+it('通常の引き直しは元の手札枚数を維持し、発動元の編成でドロー条件を判定する', () => {
+  let state = withHand({ ...game(), handLimit: 8 }, ['frost-echo', 'camera']);
+  const source = state.deck.find((card) => card.id === 'frost-echo');
+  if (!source) throw new Error('発動元がありません。');
+  state = applyEffect(state, { kind: 'shuffle' }, source);
+  const replaced = flushDeckActions(state);
+  expect(replaced.hand).toHaveLength(2);
+  expect(replaced.lastUsedMember).toBe(source.member);
+  expect(replaced.lastUsedUnit).toBe(2);
+  expect(replaced.deckActions.shuffles).toHaveLength(0);
+});

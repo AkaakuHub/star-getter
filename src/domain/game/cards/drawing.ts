@@ -13,9 +13,17 @@ export function handCapacity(state: GameState): number {
 }
 
 export function fillHand(state: GameState): GameState {
+  return drawUntil(state, handCapacity);
+}
+
+export function fillHandToCount(state: GameState, count: number): GameState {
+  return drawUntil(state, () => count);
+}
+
+function drawUntil(state: GameState, limit: (state: GameState) => number): GameState {
   let next = state;
 
-  while (next.hand.length < handCapacity(next)) {
+  while (next.hand.length < limit(next)) {
     if (!next.drawPile.length) {
       if (!next.discard.length) break;
       const shuffled = shuffle(next.discard, next.randomSeed);
@@ -69,8 +77,8 @@ export function fillHand(state: GameState): GameState {
     if (!card) throw new Error('引いたカードがありません。');
     next = applyDrawAbility(next, card);
   }
-  const limit = handCapacity(next);
-  if (next.hand.length > limit) {
+  const maximum = handCapacity(next);
+  if (next.hand.length > maximum) {
     const ordered = [...next.hand].sort(
       (left, right) =>
         Number(Boolean(next.deck.find((card) => card.id === right)?.passive)) -
@@ -78,8 +86,8 @@ export function fillHand(state: GameState): GameState {
     );
     next = {
       ...next,
-      hand: ordered.slice(0, limit),
-      discard: [...next.discard, ...ordered.slice(limit)],
+      hand: ordered.slice(0, maximum),
+      discard: [...next.discard, ...ordered.slice(maximum)],
     };
   }
   return { ...next, drawContext: 'idle' };

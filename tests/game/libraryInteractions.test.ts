@@ -114,7 +114,7 @@ it('100枚の状態で鍵を使うと、生成判定が先なので追加でき�
   state = addTokens(state, 'story', 100 - state.deck.length);
   const source = token(state, 'bookmark');
   const beforeId = state.nextTokenId;
-  state = withHand(state, [source.id]);
+  state = withHand({ ...state, energy: 10 }, [source.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.deck).toHaveLength(99);
   expect(used.nextTokenId).toBe(beforeId);

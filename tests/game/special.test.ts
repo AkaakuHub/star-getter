@@ -17,7 +17,7 @@ it('共鳴はセンターの通常効果と基本カードの追加効果だけ�
 });
 
 it('初回の共鳴で30枚を生成し、追加の共鳴で上限を20へ増やして通常の共鳴を復帰させる', () => {
-  const initial = game('library');
+  const initial = { ...game('library'), energy: 10 };
   const prepared = act(initial, { type: 'special', cardId: 'library-pages' });
   expect(prepared.energy).toBe(7);
   expect(prepared.hand).toHaveLength(8);
@@ -33,7 +33,7 @@ it('初回の共鳴で30枚を生成し、追加の共鳴で上限を20へ増や
 });
 
 it('停止中も性能画面で使用条件を確認できるが、使用操作は進行中だけ受け付ける', () => {
-  const paused = act(game('library'), { type: 'pause' });
+  const paused = act({ ...game('library'), energy: 10 }, { type: 'pause' });
   expect(canUseSpecial(paused, 'library-pages')).toBe(true);
   expect(act(paused, { type: 'special', cardId: 'library-pages' })).toBe(paused);
   expect(canUseSpecial({ ...paused, energy: 2 }, 'library-pages')).toBe(false);

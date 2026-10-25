@@ -33,6 +33,10 @@ describe('固定プリセット', () => {
     );
   });
 
+  it('開始時のエナジーは0で、開始能力による回復を捏造しない', () => {
+    for (const routeId of routeIds) expect(game(routeId).energy).toBe(0);
+  });
+
   for (const routeId of routeIds) {
     for (const seed of [7, 456, 1234]) {
       it(`${routeId}を60秒循環し、カード所有と本家の得点上限を維持する（seed ${seed}）`, () => {

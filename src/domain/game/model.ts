@@ -177,7 +177,7 @@ export type GameState = Readonly<{
   nextTokenId: number;
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
-  deckActions: Readonly<{ shuffles: number; searches: readonly UnitId[] }>;
+  deckActions: Readonly<{ shuffles: readonly (string | null)[]; searches: readonly UnitId[] }>;
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;
   cardUseCounts: Readonly<Record<string, number>>;
