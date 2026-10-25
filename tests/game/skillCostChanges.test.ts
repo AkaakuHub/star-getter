@@ -118,6 +118,32 @@ it('Action17の条件4は最大元気に対する整数元気割合を使う', (
   expect(cardCost(changed, source) - cardCost(initial, source)).toBe(5);
 });
 
+it('Action17は負数をActionType52で増幅してint32化する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const withAction52 = applyEffect(initial, {
+    kind: 'skill-boost',
+    num: 500_000,
+    target: { kind: 'all' },
+    duration: { kind: 'stage', value: 0 },
+    uses: 1,
+  });
+  const changed = applyEffect(
+    withAction52,
+    {
+      kind: 'skill-cost-change',
+      amount: -20,
+      minimum: -100,
+      maximum: 0,
+      conditionType: 1,
+    },
+    source,
+  );
+  expect(changed.skillCostChanges[0]?.amount).toBe(-30);
+  expect(changed.action52Buffs).toHaveLength(0);
+});
+
 it('Action17の解除キーで通常効果を解除し、InvocationType 0x388は期限とDeactivator解除を無視する', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');

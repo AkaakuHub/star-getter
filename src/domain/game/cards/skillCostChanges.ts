@@ -1,6 +1,6 @@
 import { voltageLevel } from '../live/voltageLevel';
 import { sectionAt, moodValue } from '../projection';
-import { skillValue } from '../effects/skillValue';
+import { applyAction52SkillBoostForCard } from '../effects/action52SkillBoost';
 import type { Card, GameState } from '../model';
 import type { SkillCostChange, SkillCostChangeEffect } from '../modelTypes';
 
@@ -11,13 +11,15 @@ export function addSkillCostChange(
   multiplier: number,
 ): GameState {
   if (!card) throw new Error('発動元カードがありません。');
-  const base = Math.fround((effect.amount - (effect.addValue ?? 0)) * multiplier);
-  const amount =
+  const base = Math.fround(
+    Math.fround(Math.fround(effect.amount) - Math.fround(effect.addValue ?? 0)) *
+      Math.fround(multiplier),
+  );
+  const boosted =
     base < 0
-      ? Math.trunc(
-          -skillValue(state, Math.abs(base), { kind: 'amplify', percent: Math.abs(base) }, card),
-        )
-      : base;
+      ? applyAction52SkillBoostForCard(state, card, Math.fround(Math.abs(base)))
+      : { state, value: base };
+  const amount = base < 0 ? int32(-int32(boosted.value)) : base;
   const change: SkillCostChange = {
     sourceId: card.id,
     amount,
@@ -32,7 +34,11 @@ export function addSkillCostChange(
     invocationType: effect.invocationType ?? null,
     deactivationKey: effect.deactivationKey ?? null,
   };
-  return { ...state, skillCostChanges: [...state.skillCostChanges, change] };
+  return { ...boosted.state, skillCostChanges: [...boosted.state.skillCostChanges, change] };
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function deactivateSkillCostChanges(state: GameState, deactivationKey: string): GameState {
@@ -107,7 +113,8 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
     case 9:
       return (
         state.boosts.reduce((sum, boost) => sum + boost.percent, 0) +
-        state.skillScoreUps.reduce((sum, boost) => sum + boost.percent, 0)
+        state.skillScoreUps.reduce((sum, boost) => sum + boost.percent, 0) +
+        state.temporaryScoreBoosts.reduce((sum, boost) => sum + boost.percent, 0)
       );
     case 10:
       return currentHand.filter((card) => card.style === change.conditionId).length;
