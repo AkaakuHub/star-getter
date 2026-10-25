@@ -5,6 +5,7 @@ import { activateBloom } from '../../src/domain/game/bloom';
 import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
 import { notifyHandSkillUse } from '../../src/domain/game/cards/useAbilities';
 import { flushDeckActions } from '../../src/domain/game/cards/boardActions';
+import { fillHand } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
@@ -133,4 +134,39 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
   expect(replaced.lastUsedMember).toBe(source.member);
   expect(replaced.lastUsedUnit).toBe(2);
   expect(replaced.deckActions.shuffles).toHaveLength(0);
+});
+
+it('全枚数の補充を終えてからドロー能力を順番に実行し、途中の上限減少で抽選を打ち切らない', () => {
+  let state = addTokens(game(), 'shadow', 1);
+  const ids = [
+    'horizon',
+    'library-ensemble',
+    'frost-echo',
+    'frost-pulse',
+    'rain-preparation',
+    'perennial',
+    'class',
+  ];
+  const deck = state.deck
+    .filter((card) => ids.includes(card.id) || card.token === 'shadow')
+    .map((card) => ({
+      ...card,
+      drawEffects: [{ kind: 'amplify' as const, percent: 1 }],
+      ...(card.token === 'shadow' ? { drawRule: { priority: true as const } } : {}),
+    }));
+  state = {
+    ...state,
+    deck,
+    cardPool: deck,
+    hand: [],
+    drawPile: deck.map((card) => card.id),
+    discard: [],
+    handLimit: 8,
+    amplification: 100,
+    drawContext: 'skill',
+    lastUsedUnit: 2,
+  };
+  const drawn = fillHand(state);
+  expect(drawn.hand).toHaveLength(7);
+  expect(drawn.amplification).toBe(108);
 });

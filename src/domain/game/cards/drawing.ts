@@ -2,7 +2,7 @@ import { createRangeRandom } from '../random';
 import { drawCandidate } from './drawLottery';
 import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
-import type { GameState } from '../model';
+import type { Card, GameState } from '../model';
 
 export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
@@ -13,17 +13,18 @@ export function handCapacity(state: GameState): number {
 }
 
 export function fillHand(state: GameState): GameState {
-  return drawUntil(state, handCapacity);
+  return drawUntil(state, handCapacity(state));
 }
 
 export function fillHandToCount(state: GameState, count: number): GameState {
-  return drawUntil(state, () => count);
+  return drawUntil(state, count);
 }
 
-function drawUntil(state: GameState, limit: (state: GameState) => number): GameState {
+function drawUntil(state: GameState, count: number): GameState {
   let next = state;
+  const drawnCards: Card[] = [];
 
-  while (next.hand.length < limit(next)) {
+  while (next.hand.length < count) {
     if (!next.drawPile.length) {
       if (!next.discard.length) break;
       const shuffled = shuffle(next.discard, next.randomSeed);
@@ -75,8 +76,9 @@ function drawUntil(state: GameState, limit: (state: GameState) => number): GameS
     };
     const card = next.deck.find((item) => item.id === drawn);
     if (!card) throw new Error('引いたカードがありません。');
-    next = applyDrawAbility(next, card);
+    drawnCards.push(card);
   }
+  for (const card of drawnCards) next = applyDrawAbility(next, card);
   const maximum = handCapacity(next);
   if (next.hand.length > maximum) {
     const ordered = [...next.hand].sort(
