@@ -173,6 +173,38 @@ it('Action49の対象と使用回数をAction25の発動カードで判定する
   expect(second.hearts.heartLimit).toBe(105);
 });
 
+it('Action49のトークン系列条件はAction25からnullで照会され一致しない', () => {
+  const state = game();
+  const source = state.deck[0];
+  if (!source) throw new Error('きらめき上限変更の発動元カードがありません。');
+  const target = { ...source, tokenSeriesIds: [42] };
+  const seriesBuff = applyEffect(state, {
+    kind: 'heart-limit-boost',
+    calculationType: 2,
+    num: 1_000_000,
+    bonusMoodTarget: 0,
+    bonusMoodValue: 0,
+    duration: { kind: 'stage', value: 0 },
+    disabledType: 0,
+    disabledCount: 0,
+    target: { kind: 'all' },
+    tokenCardSeriesIds: [42],
+  });
+  const changed = applyEffect(
+    seriesBuff,
+    {
+      kind: 'heart-limit-change',
+      calculationType: 1,
+      num: 10_000,
+      bonusMoodTarget: 0,
+      bonusMoodValue: 0,
+      duration: { kind: 'stage' },
+    },
+    target,
+  );
+  expect(changed.hearts.heartLimit).toBe(state.hearts.heartLimit + 1);
+});
+
 it('Action49は時間・パート期限と外部解除を処理する', () => {
   const state = game();
   const timed = applyEffect(state, {

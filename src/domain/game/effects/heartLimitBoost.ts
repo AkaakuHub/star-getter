@@ -29,6 +29,7 @@ export function activateHeartLimitBoost(
     calculation: effect.calculationType === 1 ? 'multiply2' : 'add',
     value,
     target: effect.target,
+    paramSeriesIds: effect.tokenCardSeriesIds ?? null,
     remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
     remainingSeconds:
       suppressed || effect.duration.kind !== 'milliseconds'
@@ -49,10 +50,15 @@ export function applyHeartLimitBoosts(
   state: GameState,
   card: Card,
   value: number,
+  skillTokenSeriesIds: readonly number[] | null = null,
 ): Readonly<{ state: GameState; value: number }> {
   if (!(value > 0)) return { state, value };
-  const matched = state.heartLimitAdditionalBuffs.filter((buff) =>
-    matchesTarget(buff.target, card),
+  const matched = state.heartLimitAdditionalBuffs.filter(
+    (buff) =>
+      matchesTarget(buff.target, card) &&
+      (buff.paramSeriesIds === null ||
+        (skillTokenSeriesIds !== null &&
+          buff.paramSeriesIds.some((id) => skillTokenSeriesIds.includes(id)))),
   );
   if (matched.length === 0) return { state, value };
   let result = Math.fround(value);

@@ -16,6 +16,7 @@ export type HeartLimitBoostEffect = Readonly<{
   disabledType: number;
   disabledCount: number;
   target: HeartLimitBoostTarget;
+  tokenCardSeriesIds?: readonly number[];
   deactivationKey?: string;
 }>;
 
@@ -24,6 +25,7 @@ export type HeartLimitAdditionalBuff = Readonly<{
   calculation: 'add' | 'multiply2';
   value: number;
   target: HeartLimitBoostTarget;
+  paramSeriesIds: readonly number[] | null;
   remainingUses: number | null;
   remainingSeconds: number | null;
   remainingSections: number | null;
@@ -42,6 +44,7 @@ export function validateHeartLimitBoost(effect: HeartLimitBoostEffect): void {
     (effect.target.kind === 'member' && !Number.isSafeInteger(effect.target.member)) ||
     (effect.target.kind === 'unit' && ![1, 2, 3].includes(effect.target.unit)) ||
     (effect.target.kind === 'card-series' && !Number.isSafeInteger(effect.target.seriesId)) ||
+    (effect.tokenCardSeriesIds?.some((id) => !Number.isSafeInteger(id)) ?? false) ||
     (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )
     throw new Error('きらめき上限追加バフの設定が正しくありません。');
