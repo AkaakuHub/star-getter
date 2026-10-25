@@ -102,6 +102,7 @@ export function createGame(
         Math.round(((track.beats * 60) / track.bpm) * 1000),
       ) * rules.ticksPerSecond,
     ),
+    skillCooldownSeconds: null,
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],

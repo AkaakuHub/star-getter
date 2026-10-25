@@ -40,7 +40,8 @@ export function canUseCard(state: GameState, index: number): boolean {
     !state.resting &&
     state.tick - state.lastActionTick >=
       Math.ceil(
-        calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000)) *
+        (state.skillCooldownSeconds ??
+          calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000))) *
           rules.ticksPerSecond,
       ) &&
     (state.bloom !== null || state.energy >= cardCost(state, cardAt(state, index)))

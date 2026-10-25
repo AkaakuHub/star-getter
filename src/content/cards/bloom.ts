@@ -25,7 +25,17 @@ export const bloomCards: readonly Card[] = [
     beatPoint: 100,
     drawAbility: 'genesis',
     relay: { threshold: 3000, hearts: 3000, beats: true, moodBonus: { target: 2, perPoint: 15 } },
-    special: { cost: 20, extra: false, effects: [{ kind: 'bloom', strength: 3.5 }] },
+    special: {
+      cost: 20,
+      extra: false,
+      effects: [
+        { kind: 'bloom', strength: 3.5 },
+        {
+          kind: 'skill-cooldown',
+          seconds: Math.fround(Math.fround(Math.fround(6666 / 10000) * Math.fround(11605)) / 10000),
+        },
+      ],
+    },
     effects: [
       { kind: 'beat-hearts', amount: 300, moodBonus: { target: 2, perPoint: 1.5 } },
       { kind: 'ap-speed', percent: 30, duration: 'stage' },

@@ -235,6 +235,14 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
           state.sectionAmplification + (effect.duration === 'section' ? percent : 0),
       };
     }
+    case 'skill-cooldown':
+      return {
+        ...state,
+        skillCooldownSeconds:
+          state.skillCooldownSeconds === null
+            ? effect.seconds
+            : Math.min(state.skillCooldownSeconds, effect.seconds),
+      };
     case 'bloom':
       return activateBloom(state, value(effect.strength));
     case 'resource-boost': {

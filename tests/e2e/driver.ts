@@ -12,6 +12,7 @@ export class GameDriver {
   private readonly clock = new ScenarioClock();
   private readonly frames = new ScenarioFrames();
   collections = 0;
+  automaticCollections = 0;
   successfulCollections = 0;
   collectionRedraws = 0;
   collectionAmplification = 0;
@@ -49,7 +50,10 @@ export class GameDriver {
 
   tick(): void {
     this.clock.seconds = (this.state.tick + 1) / rules.ticksPerSecond;
+    const before = this.state.stats.heartsCollected;
     this.frames.run(this.clock.seconds * 1000);
+    if (this.state.automaticHeart.enabled && this.state.stats.heartsCollected > before)
+      this.automaticCollections++;
     this.observe();
   }
 
@@ -138,6 +142,7 @@ export class GameDriver {
         cardsUsed: this.state.stats.cardsUsed,
         specialActions: this.specialActions,
         collectionActions: this.collections,
+        automaticCollections: this.automaticCollections,
         successfulCollections: this.successfulCollections,
         collectionRedraws: this.collectionRedraws,
         collectionAmplification: this.collectionAmplification,

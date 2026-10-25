@@ -89,6 +89,11 @@ function validateEffect(effect: Effect): void {
       throw new Error('増幅回数が正しくありません。');
     return;
   }
+  if (effect.kind === 'skill-cooldown') {
+    if (!Number.isFinite(effect.seconds) || effect.seconds < 0)
+      throw new Error('アクション間隔が正しくありません。');
+    return;
+  }
   if (effect.kind === 'bloom') {
     if (!Number.isFinite(effect.strength) || effect.strength < 0)
       throw new Error('開花の効果量が正しくありません。');
