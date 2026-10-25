@@ -54,7 +54,11 @@ export function collectHearts(state: GameState): GameState {
     if (relay) {
       triggered = applyEffect(
         triggered,
-        { kind: relay.beats ? 'beat-hearts' : 'hearts', amount: relay.hearts },
+        {
+          kind: relay.beats ? 'beat-hearts' : 'hearts',
+          amount: relay.hearts,
+          ...(relay.moodBonus ? { moodBonus: relay.moodBonus } : {}),
+        },
         card,
       );
     } else if (state.deck.length >= 95) {

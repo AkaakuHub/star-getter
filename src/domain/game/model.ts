@@ -54,7 +54,7 @@ export type Card = Readonly<{
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   effects: readonly Effect[];
-  relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean }>;
+  relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
   drawPreference?: TokenKind;

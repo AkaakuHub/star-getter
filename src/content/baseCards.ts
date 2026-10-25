@@ -13,7 +13,12 @@ export const baseCards: readonly Card[] = [
       { kind: 'bloom', strength: 3.5 },
       { kind: 'hearts', amount: 8 },
     ],
-    relay: { threshold: 3000, hearts: 3000, beats: true },
+    relay: {
+      threshold: 3000,
+      hearts: 3000,
+      beats: true,
+      moodBonus: { target: 2, perPoint: 15 },
+    },
   },
   {
     id: 'flare',

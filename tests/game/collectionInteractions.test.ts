@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
+import { beatHeartCount } from '../../src/domain/game/beat';
 import { fillHand, shuffleHand } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
@@ -101,3 +102,20 @@ it('仕込んだ書架では手動連打の回収回数が0.3秒間隔の自動�
   expect(manual.score).toBeGreaterThan(automatic.score);
   expect(manual.tick).toBe(0);
 });
+
+for (const mood of [-100, 0, 100]) {
+  it(`開花の回収特性は空模様${mood}%に応じて3000〜3750回分のきらめきを獲得する`, () => {
+    const initial = game('bloom');
+    const state = {
+      ...initial,
+      track: {
+        ...initial.track,
+        sections: initial.track.sections.map((section) => ({ ...section, moodValue: mood })),
+      },
+      hand: ['spark'],
+      hearts: { ...initial.hearts, heartLimit: 1_000_000 },
+    };
+    const collected = act(addHearts(state, 3_000), { type: 'collect' });
+    expect(heartCount(collected)).toBe(beatHeartCount(state) * (mood === 0 ? 3_000 : 3_750));
+  });
+}
