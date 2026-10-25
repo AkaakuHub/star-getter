@@ -31,6 +31,7 @@ import { initializeParameterValueFactors } from './parameters/parameterValueChan
 import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/proxySkill';
 import { applyEffect } from './effects';
 import { advanceComboInducer, expireComboInducerSections } from './effects/comboInduce';
+import { advanceHeartLimitBuffs, expireHeartLimitBuffSections } from './effects/heartLimit';
 import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
 import {
   advanceVoltageConversions,
@@ -89,6 +90,9 @@ export function createGame(
     proxyAbsorptions: [],
     nextProxyAbsorptionId: 1,
     handLimitEffects: [],
+    heartLimitBase: 100,
+    heartLimitBuffs: [],
+    nextHeartLimitBuffId: 1,
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
     lastUsedMember: null,
@@ -245,6 +249,7 @@ function advanceTick(state: GameState): GameState {
   });
   const elapsedHandLimit = advanceHandLimitEffects(next, dt);
   next = elapsedHandLimit.state;
+  next = advanceHeartLimitBuffs(next, dt);
   if (elapsedHandLimit.handAdjustment > 0) {
     next = restoreHandLimitCount(next, elapsedHandLimit.handAdjustment);
   }
@@ -260,6 +265,7 @@ function advanceTick(state: GameState): GameState {
     next = expireAction52SkillBoostSections(next);
     next = expireMentalHeartInducerSections(next);
     next = expireComboInducerSections(next);
+    next = expireHeartLimitBuffSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;

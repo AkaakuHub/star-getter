@@ -216,6 +216,21 @@ function validateEffect(effect: Effect): void {
     for (const child of effect.effects) validateEffect(child);
     return;
   }
+  if (effect.kind === 'heart-limit-change') {
+    if (
+      ![1, 2].includes(effect.calculationType) ||
+      !Number.isSafeInteger(effect.num) ||
+      ![0, 1, 2, 3].includes(effect.bonusMoodTarget) ||
+      !Number.isSafeInteger(effect.bonusMoodValue) ||
+      !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
+      (effect.duration.kind !== 'stage' && !Number.isSafeInteger(effect.duration.value)) ||
+      (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('きらめき上限変更の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'skill-boost') {
     const duration = effect.duration;
     if (

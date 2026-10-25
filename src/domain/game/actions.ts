@@ -18,6 +18,7 @@ import { deactivateAction52SkillBoosts } from './effects/action52SkillBoost';
 import { restoreHandLimitCount } from './cards/drawing';
 import { deactivateMentalHeartInducers } from './effects/mentalHeartInduce';
 import { deactivateComboInducer, notifyComboSkillPoint } from './effects/comboInduce';
+import { deactivateHeartLimitBuffs } from './effects/heartLimit';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -49,6 +50,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateMentalHeartInducers(state, action.deactivationKey);
     case 'deactivate-combo-induce':
       return deactivateComboInducer(state, action.deactivationKey);
+    case 'deactivate-heart-limit':
+      return deactivateHeartLimitBuffs(state, action.deactivationKey);
   }
 }
 

@@ -258,6 +258,18 @@ type EffectShape =
       deactivationKey?: string;
     }>
   | Readonly<{ kind: 'heart-limit'; amount: number }>
+  | Readonly<{
+      kind: 'heart-limit-change';
+      calculationType: 1 | 2;
+      num: number;
+      bonusMoodTarget: 0 | 1 | 2 | 3;
+      bonusMoodValue: number;
+      duration:
+        | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+        | Readonly<{ kind: 'stage' }>;
+      invocationType?: number;
+      deactivationKey?: string;
+    }>
   | Readonly<{ kind: 'use-hand'; addAp?: number }>
   | Readonly<{ kind: 'card-move'; destination: 'deck' | 'exclusion' }>
   | Readonly<{ kind: 'shuffle'; recoverDiscard: boolean; destination: 'draw' | 'discard' }>

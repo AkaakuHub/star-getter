@@ -207,6 +207,16 @@ export type GameState = Readonly<{
     remainingSeconds: number | null;
     remainingSections: number | null;
   }>[];
+  heartLimitBase: number;
+  heartLimitBuffs: readonly Readonly<{
+    id: number;
+    calculation: 'add' | 'multiply';
+    value: number;
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+    deactivationKey: string | null;
+  }>[];
+  nextHeartLimitBuffId: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
     shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];
@@ -312,7 +322,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

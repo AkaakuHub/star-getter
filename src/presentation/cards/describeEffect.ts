@@ -70,6 +70,8 @@ export function describeEffect(effect: Effect): string {
       return '元気が変化するたび、きらめきを生成する。';
     case 'combo-induce':
       return '対象メンバーがアクションを使用したとき、合計APに応じた効果を発動する。';
+    case 'heart-limit-change':
+      return 'きらめき上限を変更する。';
     case 'mental-shield':
       return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
     case 'cost-reduction':

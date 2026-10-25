@@ -27,7 +27,7 @@ import { createHeartsFromEffect } from './effects/heartCreation';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
-import { applyHeartLimit } from './effects/heartLimit';
+import { activateHeartLimitChange, applyHeartLimitEffect } from './effects/heartLimit';
 import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
@@ -55,6 +55,8 @@ export function applyEffect(
     return activateMentalHeartInduce(state, effect, card, multiplier, addValue);
   if (effect.kind === 'combo-induce')
     return activateComboInduce(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'heart-limit-change')
+    return activateHeartLimitChange(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);
@@ -146,11 +148,8 @@ export function applyEffect(
     }
     case 'hand-limit':
       return applyHandLimit(state, effect, card, multiplier, addValue);
-    case 'heart-limit': {
-      const base = Math.fround(value(effect.amount) * effectPower);
-      const boosted = applyAction52SkillBoostForCard(state, card, base);
-      return applyHeartLimit(boosted.state, Math.trunc(boosted.value));
-    }
+    case 'heart-limit':
+      return applyHeartLimitEffect(state, value(effect.amount), card, effectPower);
     case 'shuffle':
       return enqueueHandShuffle(state, effect, card?.id ?? null);
     case 'search-unit':
