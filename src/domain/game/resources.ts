@@ -7,9 +7,9 @@ import type { Card } from './model';
 import { convertVoltageIncrease } from './effects/voltageConversion';
 import { induceMentalHearts } from './effects/mentalHeartInduce';
 import { induceSkillEffects, type EffectApplier } from './effects/induceSkillEffect';
-import { notifyHandVoltageIncrease } from './cards/handInduce';
 import { absorbSkillEffect } from './effects/proxySkill';
 import { registerVoltageZeroMission } from './ingameMissions';
+import { notifyHandVoltageIncrease } from './cards/handInduce';
 
 export function changeResource(
   state: GameState,
@@ -105,27 +105,16 @@ export function changeResource(
 export function setVoltageValue(
   state: GameState,
   amount: number,
-  applyEffect?: EffectApplier,
+  _applyEffect?: EffectApplier,
 ): GameState {
   const target = Math.max(0, Math.trunc(Math.fround(amount)));
   const delta = Math.trunc(Math.fround(target - state.excitement));
   if (state.bloom) {
-    return notifyVoltageLevelChange(
-      state,
-      changeBloomResource(state, 'excitement', BigInt(delta)),
-      applyEffect,
-    );
+    return changeBloomResource(state, 'excitement', BigInt(delta));
   }
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
     return state;
-  const next = notifyVoltageLevelChange(
-    state,
-    {
-      ...state,
-      excitement: target,
-    },
-    applyEffect,
-  );
+  const next = { ...state, excitement: target };
   return state.excitement > 0 && target === 0 ? registerVoltageZeroMission(next) : next;
 }
 
