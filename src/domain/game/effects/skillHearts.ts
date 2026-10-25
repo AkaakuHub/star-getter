@@ -31,14 +31,14 @@ export function createSkillHeartsFromEffect(
     Math.fround(Math.fround(moodCorrection + amountValue) + Math.fround(addValue)) *
       Math.fround(multiplier),
   );
-  const calculationValue = effect.calculation === 'fixed' ? Math.trunc(combined) : combined;
+  const calculationValue = effect.calculation === 'fixed' ? int32(combined) : combined;
   const additional = applyAdditionalBuff(state, 'attract', calculationValue, card);
-  let value = Math.trunc(additional.value);
+  let value = int32(additional.value);
   let next = additional.state;
   if (value > 0) {
     const action52 = applyAction52SkillBoostForCard(next, card, value);
     next = action52.state;
-    value = Math.trunc(action52.value);
+    value = int32(action52.value);
   }
 
   const baseCount =
@@ -50,7 +50,7 @@ export function createSkillHeartsFromEffect(
   const requestedCount = Math.fround(
     baseCount + Math.fround((baseCount * heartBoost.percent) / 100),
   );
-  const count = Math.max(1, Math.trunc(Math.fround(requestedCount * Math.fround(effectPower))));
+  const count = Math.max(1, int32(requestedCount * Math.fround(effectPower)));
   const lifetimeSeconds =
     effect.displayTime.kind === 'milliseconds'
       ? Math.fround(int32(effect.displayTime.value) / 1000)

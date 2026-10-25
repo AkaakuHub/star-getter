@@ -15,6 +15,7 @@ import { activateRecoverMentalSkill } from './recoverMentalSkill';
 import { activateAddVoltageSkill } from './addVoltageSkill';
 import { activateReshuffleSkill } from './reshuffleSkill';
 import { activateDrawSuccessInduce } from './drawSuccessInduce';
+import { activateSkillScoreUp } from './skillScoreUp';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -25,6 +26,8 @@ export function dispatchEarlyEffect(
   effectPower: number,
   apply: EffectApplier,
 ): GameState | undefined {
+  if (effect.kind === 'skill-score-up')
+    return activateSkillScoreUp(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'proxy-skill-forced-activation')
     return forceProxySkillActivation(state, effect.targetType);
   if (effect.kind === 'proxy-skill') return registerProxySkill(state, effect, card);

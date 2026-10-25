@@ -84,6 +84,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
         const scales =
           effect.kind === 'hearts' ||
           effect.kind === 'skill-hearts' ||
+          effect.kind === 'skill-score-up' ||
           effect.kind === 'boost' ||
           effect.kind === 'stamina' ||
           effect.kind === 'excitement';

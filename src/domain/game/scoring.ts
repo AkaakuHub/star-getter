@@ -27,6 +27,7 @@ export function collectionScore(
     : calculateStarGatherHeartRank(rankHeartCount, voltage, null);
   const bonusScoreValue =
     state.boosts.reduce((sum, boost) => sum + boost.percent, 0) +
+    state.skillScoreUps.reduce((sum, boost) => sum + boost.percent, 0) +
     state.temporaryScoreBoosts.reduce((sum, boost) => sum + boost.percent, 0);
   const base = calculateStarGatherClientScore(
     {

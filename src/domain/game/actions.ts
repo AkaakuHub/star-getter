@@ -140,6 +140,13 @@ function actInternal(state: GameState, action: Action): GameState {
       };
     case 'deactivate-skill-cost-change':
       return deactivateSkillCostChanges(state, action.deactivationKey);
+    case 'deactivate-skill-score-up':
+      return {
+        ...state,
+        skillScoreUps: state.skillScoreUps.filter(
+          (buff) => buff.deactivationKey !== action.deactivationKey,
+        ),
+      };
   }
 }
 

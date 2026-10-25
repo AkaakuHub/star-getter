@@ -64,6 +64,10 @@ export function collectHearts(state: GameState): GameState {
   );
   next = registerMissionHeartCollect(next, collected.collectCount);
   next = notifyHandHeartCollect(next, collected.collectCount, applyEffect);
+  next = {
+    ...next,
+    skillScoreUps: next.skillScoreUps.filter((boost) => !boost.removeOnHeartCollect),
+  };
   const abilities = advanceHandCollectionAbilities(next, collected.collectCount);
   let triggered = abilities.state;
   for (const card of abilities.activated) {

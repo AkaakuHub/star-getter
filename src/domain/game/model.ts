@@ -48,7 +48,7 @@ import type { HandMaxCardEffectState } from './handMaxCardTypes';
 import type { MentalShield } from './mentalShieldTypes';
 import type { FixedParameterExtend } from './fixedParameterExtendTypes';
 import type { BeatPointBuff } from './beatPointBuffTypes';
-import type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
+import type { Boost, ResourceBoost, SkillScoreUp, TargetBoost } from './boostTypes';
 export { rules } from './rules';
 export type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
 
@@ -293,6 +293,7 @@ export type GameState = Readonly<{
   automaticHeart: AutomaticHeartState;
   heartRandomSeed: number;
   boosts: readonly Boost[];
+  skillScoreUps: readonly SkillScoreUp[];
   amplification: number;
   sectionAmplification: number;
   targetBoosts: readonly TargetBoost[];

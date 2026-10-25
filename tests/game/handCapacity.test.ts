@@ -130,6 +130,36 @@ it('Action904は通常ドローで手札へ入った時点で子効果を発動�
   expect(drawn.activeHandPermanentCardIds).toContain(card.id);
 });
 
+it('Action904のAction2子効果は手札離脱時に解除する', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  if (!original) throw new Error('対象カードがありません。');
+  const card = {
+    ...original,
+    handPermanentEffects: [
+      {
+        kind: 'skill-score-up' as const,
+        calculation: 1,
+        amount: 200_000,
+        duration: { kind: 'full-end' as const, value: 0 },
+        disabledType: 0,
+      },
+    ],
+  };
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [card.id],
+    handEffectCardIds: [card.id],
+    drawPile: [],
+    discard: [],
+  };
+  const active = activateHandPermanentEffects(state, card);
+  expect(active.skillScoreUps).toHaveLength(1);
+  expect(disposeHandEffects(active, [card.id]).skillScoreUps).toHaveLength(0);
+});
+
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
   const state = { ...game(), amplification: 150 };
   const next = applyEffect(state, { kind: 'hand-limit', amount: 3 });

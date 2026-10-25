@@ -181,6 +181,8 @@ export function describeEffect(effect: Effect): string {
       return effect.calculation === 'fixed'
         ? '追加のきらめきを獲得する。'
         : 'ビートに応じた追加のきらめきを獲得する。';
+    case 'skill-score-up':
+      return 'スキルで獲得するSTARを増加する。';
     case 'energy':
       return `エナジーを${Math.abs(effect.amount)}${effect.amount < 0 ? '減らす' : '回復する'}。開花中は回復量と効果増幅に応じて開花プログレスを増加させる。`;
     case 'stamina':

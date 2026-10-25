@@ -67,6 +67,12 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
     };
     next = deactivateBeatPointBuffs(next, deactivationKey);
     next = deactivateHandLimitEffects(next, deactivationKey).state;
+    next = {
+      ...next,
+      skillScoreUps: next.skillScoreUps.filter(
+        (boost) => boost.deactivationKey !== deactivationKey,
+      ),
+    };
   }
   return {
     ...next,

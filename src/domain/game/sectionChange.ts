@@ -49,6 +49,11 @@ export function advanceSectionChange(state: GameState, applyEffect: EffectApplie
       const remainingSections = boost.remainingSections - 1;
       return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
     }),
+    skillScoreUps: next.skillScoreUps.flatMap((boost) => {
+      if (boost.remainingSections === null) return [boost];
+      const remainingSections = boost.remainingSections - 1;
+      return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
+    }),
     moodOffset: 0,
     sectionMentalProtected: false,
     sectionBeatHeartBonus: 0,

@@ -6,6 +6,15 @@ export type Boost = Readonly<{
   deactivationKey?: string | null;
 }>;
 
+export type SkillScoreUp = Readonly<{
+  percent: number;
+  untilTick: number;
+  remainingSeconds: number | null;
+  remainingSections: number | null;
+  removeOnHeartCollect: boolean;
+  deactivationKey: string | null;
+}>;
+
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina' | 'attract';
   members?: readonly MemberId[];

@@ -35,7 +35,7 @@ import type { GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import type { AddVoltageSkillEffect } from './addVoltageTypes';
 import type { ReshuffleSkillEffect } from './reshuffleSkillTypes';
 import type { DrawSuccessInduceEffect } from './drawSuccessInduceTypes';
-import type { SkillHeartsEffect } from './skillHeartTypes';
+import type { SkillActionEffect } from './skillActionTypes';
 export type { GaugeRegeneration, GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
@@ -186,7 +186,7 @@ type EffectShape =
       whenFalse: readonly Effect[];
     }>
   | Readonly<{ kind: 'hearts'; amount: number; moodBonus?: MoodBonus; lifetimeSeconds?: number }>
-  | SkillHeartsEffect
+  | SkillActionEffect
   | RecoverMentalSkillEffect
   | AddVoltageSkillEffect
   | ReshuffleSkillEffect

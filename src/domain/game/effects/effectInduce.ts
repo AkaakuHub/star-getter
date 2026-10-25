@@ -31,6 +31,7 @@ const deactivationActions: readonly ((deactivationKey: string) => import('../mod
   (deactivationKey) => ({ type: 'deactivate-gauge-regeneration', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-search', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-heart-boost', deactivationKey }),
+  (deactivationKey) => ({ type: 'deactivate-skill-score-up', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-voltage-up-additional-buff', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-cost-change', deactivationKey }),
 ];
@@ -116,8 +117,11 @@ function isEffectInducerActive(
   } else {
     const boosts = state.boosts.filter((boost) => boost.untilTick > state.tick);
     const temporaryBoosts = state.temporaryScoreBoosts;
-    if (!boosts.length && !temporaryBoosts.length) return false;
-    value = [...boosts, ...temporaryBoosts].reduce((sum, boost) => sum + boost.percent, 0);
+    if (!boosts.length && !state.skillScoreUps.length && !temporaryBoosts.length) return false;
+    value = [...boosts, ...state.skillScoreUps, ...temporaryBoosts].reduce(
+      (sum, boost) => sum + boost.percent,
+      0,
+    );
   }
   switch (inducer.threshold.kind) {
     case 'none':
@@ -161,6 +165,7 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
     case 'skill-cost-change':
     case 'stop-voltage-increase':
     case 'boost':
+    case 'skill-score-up':
     case 'amplify':
     case 'mood-change-skill':
       return { ...effect, deactivationKey };
@@ -192,6 +197,7 @@ export function deactivateInducedEffects(state: GameState, deactivationKey: stri
   next = {
     ...next,
     boosts: next.boosts.filter((boost) => boost.deactivationKey !== deactivationKey),
+    skillScoreUps: next.skillScoreUps.filter((boost) => boost.deactivationKey !== deactivationKey),
   };
   return deactivateMentalBarriers(next, deactivationKey);
 }

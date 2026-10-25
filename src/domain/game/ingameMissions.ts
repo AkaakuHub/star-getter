@@ -43,7 +43,7 @@ export function missionActionEffect(
   const actionType =
     effect.kind === 'hearts' || effect.kind === 'skill-hearts'
       ? 1
-      : effect.kind === 'boost'
+      : effect.kind === 'boost' || effect.kind === 'skill-score-up'
         ? 2
         : effect.kind === 'stamina'
           ? 5
@@ -77,7 +77,9 @@ export function missionActionEffect(
           ? starGatherHeartCount(state.hearts) - starGatherHeartCount(before.hearts)
           : 0
       : actionType === 2
-        ? (state.boosts.at(-1)?.percent ?? 0)
+        ? effect.kind === 'skill-score-up'
+          ? (state.skillScoreUps.at(-1)?.percent ?? 0)
+          : (state.boosts.at(-1)?.percent ?? 0)
         : actionType === 5
           ? Math.max(0, state.stamina - before.stamina)
           : actionType === 7

@@ -166,6 +166,7 @@ export function createGame(
     heartRandomSeed: seed,
     automaticHeart: { enabled: true, timerSeconds: 0 },
     boosts: [],
+    skillScoreUps: [],
     amplification: 100,
     sectionAmplification: 0,
     targetBoosts: [],
@@ -270,6 +271,12 @@ function advanceTick(state: GameState): GameState {
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
+    skillScoreUps: state.skillScoreUps.flatMap((boost) => {
+      if (boost.untilTick <= tick) return [];
+      if (boost.remainingSeconds === null) return [boost];
+      const remainingSeconds = Math.fround(boost.remainingSeconds - Math.fround(dt));
+      return remainingSeconds > 0 ? [{ ...boost, remainingSeconds }] : [];
+    }),
   });
   next = advanceSkillCooldownEffects(next, dt);
   next = advanceInducedSkillEffects(next, dt);
