@@ -84,6 +84,29 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   expect(thirdUse.useInduceActivationCounts[`${card.id}:induce-3`]).toBe(2);
 });
 
+it('ActionType906のRequireCountをC#のint32へ変換する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const effect = {
+    kind: 'use-count-induce' as const,
+    sourceEffectId: 'induce-4',
+    requireCount: 4_294_967_298,
+    limit: 0,
+    effects: [{ kind: 'energy' as const, amount: 1 }],
+  };
+  const activated = applyEffect(
+    {
+      ...initial,
+      energy: 0,
+      skillActivationCounts: { [card.id]: 3 },
+    },
+    effect,
+    card,
+  );
+  expect(activated.energy).toBeGreaterThan(0);
+});
+
 it('Action907は子効果のCheckDeckOutを実行する', () => {
   const initial = game();
   const source = initial.deck[0];
