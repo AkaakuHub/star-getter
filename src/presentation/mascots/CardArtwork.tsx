@@ -6,16 +6,20 @@ export function CardArtwork({ card }: Readonly<{ card: Card }>) {
   const palette = costumePalettes[card.costume];
   return (
     <span
-      className={'card-illustration motif-' + palette.motif}
+      className={'card-illustration scene-' + (card.token ?? card.costume)}
       style={{
-        '--costume-paper': palette.paper,
-        '--costume-fabric': palette.fabric,
-        '--costume-trim': palette.trim,
+        '--scene-paper': palette.paper,
+        '--scene-dark': palette.fabric,
+        '--scene-light': palette.trim,
       }}
       aria-hidden="true"
     >
-      <span className="costume-motif" />
-      <Mascot performer={card.performer} costume={card.costume} />
+      <span className="card-scenery">
+        <span />
+        <span />
+        <span />
+      </span>
+      <Mascot performer={card.performer} />
     </span>
   );
 }

@@ -1,0 +1,34 @@
+@import './cardScenes/day.css';
+@import './cardScenes/night.css';
+@import './cardScenes/reading.css';
+
+.card-illustration {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--scene-paper);
+}
+.card-scenery,
+.card-scenery > span {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+.card-scenery {
+  inset: 0;
+}
+.card-scenery > span {
+  background: var(--scene-dark);
+}
+.card-illustration > .mascot {
+  position: absolute;
+  z-index: 1;
+  width: 92%;
+  height: auto;
+  aspect-ratio: 1;
+  left: 4%;
+  top: 25%;
+}

@@ -1,0 +1,109 @@
+.scene-moon {
+  background: linear-gradient(#3c335e 0 72%, #615075 72%);
+}
+.scene-moon .card-scenery > span:nth-child(1) {
+  width: 53%;
+  aspect-ratio: 1;
+  top: 8%;
+  left: -10%;
+  border-radius: 50%;
+  background: #f6d795;
+}
+.scene-moon .card-scenery > span:nth-child(2) {
+  inset: 70% -5% 8%;
+  border-block: 4px solid #b294b4;
+  background: repeating-linear-gradient(90deg, #2c2a4c 0 13%, #b294b4 13% 17%);
+}
+.scene-moon > .mascot {
+  width: 108%;
+  left: 12%;
+  top: 24%;
+  transform: rotate(-10deg);
+}
+.scene-encore {
+  background: #ffe0a8;
+}
+.scene-encore .card-scenery > span:nth-child(1) {
+  inset: 0 66% 15% -8%;
+  border-radius: 0 0 80% 0;
+  background: #cb684d;
+}
+.scene-encore .card-scenery > span:nth-child(2) {
+  inset: 0 -8% 15% 66%;
+  border-radius: 0 0 0 80%;
+  background: #cb684d;
+}
+.scene-encore .card-scenery > span:nth-child(3) {
+  inset: 77% -5% 0;
+  background: linear-gradient(#a76347 0 18%, #dd975f 18%);
+}
+.scene-encore > .mascot {
+  top: 24%;
+  width: 88%;
+  left: 6%;
+}
+.scene-witch {
+  background: #b4abe0;
+}
+.scene-witch .card-scenery > span:nth-child(1) {
+  inset: 43% 47% 0 -8%;
+  background: repeating-linear-gradient(0deg, #625985 0 15%, #eee1a9 15% 22%, #625985 22% 30%);
+  transform: rotate(-8deg);
+}
+.scene-witch .card-scenery > span:nth-child(2) {
+  inset: 62% -4% 0 52%;
+  background: #75608c;
+  transform: rotate(8deg);
+}
+.scene-witch > .mascot {
+  width: 105%;
+  top: 10%;
+  left: -24%;
+  transform: rotate(-15deg);
+}
+.scene-space {
+  background: #4c587f;
+}
+.scene-space .card-scenery > span:nth-child(1) {
+  width: 65%;
+  aspect-ratio: 1;
+  top: -12%;
+  left: -20%;
+  border-radius: 50%;
+  background: #ada1d1;
+}
+.scene-space .card-scenery > span:nth-child(2) {
+  width: 112%;
+  height: 18%;
+  top: 18%;
+  left: -36%;
+  border: 5px solid #dfd3f0;
+  border-radius: 50%;
+  background: transparent;
+  transform: rotate(-32deg);
+}
+.scene-space > .mascot {
+  width: 91%;
+  top: 26%;
+  left: 25%;
+  transform: rotate(20deg);
+}
+.scene-ensemble {
+  background: #efb4c1;
+}
+.scene-ensemble .card-scenery > span:nth-child(1) {
+  inset: -12% 45% 7% -15%;
+  border: 10px solid #aa6886;
+  border-radius: 50% 50% 0 0;
+  background: #ffe0b3;
+}
+.scene-ensemble .card-scenery > span:nth-child(2) {
+  inset: 72% -5% 0;
+  background: #a86883;
+}
+.scene-ensemble > .mascot {
+  width: 133%;
+  top: 12%;
+  left: 0;
+  transform: rotate(14deg);
+}

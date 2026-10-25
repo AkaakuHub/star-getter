@@ -1,3 +1,5 @@
+@import './cardScenes.css';
+
 .mascot {
   position: relative;
   display: block;
@@ -58,91 +60,8 @@
   border-top: 0;
   border-radius: 0 0 50% 50%;
 }
-.weather-accessory {
-  position: absolute;
-  top: 6%;
-  right: 9%;
-  display: grid;
-  place-items: center;
-  width: 29%;
-  aspect-ratio: 1;
-  padding: 4%;
-  border: 2px solid var(--costume-trim);
-  border-radius: 28%;
-  background: var(--costume-fabric);
-  color: var(--costume-trim);
-  transform: rotate(12deg);
-}
-.weather-accessory svg {
-  width: 100%;
-  height: 100%;
-}
 .portrait {
   background: #f7f0e8;
-}
-.card-illustration {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: var(--costume-paper);
-}
-.card-illustration::before {
-  content: '';
-  position: absolute;
-  top: -8%;
-  left: -20%;
-  width: 140%;
-  height: 36%;
-  transform: rotate(-12deg);
-  background: var(--costume-fabric);
-  opacity: 0.25;
-}
-.card-illustration .mascot {
-  position: relative;
-  z-index: 1;
-  padding: 2% 0 0;
-}
-.costume-motif {
-  position: absolute;
-  top: 28%;
-  right: 4%;
-  width: 20%;
-  aspect-ratio: 1;
-  background: var(--costume-trim);
-  opacity: 0.9;
-}
-.motif-star .costume-motif {
-  clip-path: polygon(
-    50% 0%,
-    61% 35%,
-    98% 35%,
-    68% 57%,
-    79% 94%,
-    50% 72%,
-    21% 94%,
-    32% 57%,
-    2% 35%,
-    39% 35%
-  );
-}
-.motif-circle .costume-motif {
-  border: 3px solid var(--costume-fabric);
-  border-radius: 50%;
-  background: transparent;
-}
-.motif-diamond .costume-motif {
-  transform: rotate(45deg);
-}
-.motif-stripe .costume-motif {
-  width: 100%;
-  height: 13%;
-  top: 55%;
-  right: 0;
-  transform: rotate(-12deg);
-  background: var(--costume-fabric);
-  opacity: 0.2;
 }
 .concert-backdrop {
   position: absolute;
