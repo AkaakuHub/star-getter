@@ -142,4 +142,29 @@ describe('ゲージの継続回復', () => {
     expect(inactive.stamina).toBe(40);
     expect(inactive.gaugeRegenerations).toHaveLength(1);
   });
+
+  it('Action11の熱気継続加算にも特殊誘発の解除制御を適用する', () => {
+    const active = applyEffect(
+      { ...game(), excitement: 20 },
+      {
+        kind: 'gauge-regeneration',
+        gauge: 'voltage',
+        calculationType: 1,
+        amount: 5,
+        intervalType: 1,
+        intervalMilliseconds: 100,
+        duration: { kind: 'milliseconds', value: 500 },
+        invocationType: 0x38b,
+        deactivationKey: 'voltage-regen',
+      },
+    );
+    const advanced = advanceTo(active, 0.61);
+    expect(advanced.gaugeRegenerations).toHaveLength(1);
+    expect(
+      act(advanced, {
+        type: 'deactivate-gauge-regeneration',
+        deactivationKey: 'voltage-regen',
+      }).gaugeRegenerations,
+    ).toHaveLength(0);
+  });
 });
