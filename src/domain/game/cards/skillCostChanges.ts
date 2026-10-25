@@ -73,7 +73,9 @@ export function initializeHandCardStats(state: GameState, ids: readonly string[]
     handCardStats[id] = {
       isActive: true,
       enteredSectionIndex: sectionIndex,
-      cardUseCountsAtEntry: state.cardUseCounts,
+      skillUseCountsByMember: {},
+      skillUseCountsByIcon: {},
+      skillUseCountsByUnit: {},
     };
   }
   return { ...state, handCardStats };
@@ -85,8 +87,6 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
     const card = state.deck.find((item) => item.id === id);
     return card ? [card] : [];
   });
-  const useCount = (card: Card) =>
-    (state.cardUseCounts[card.id] ?? 0) - (stats?.cardUseCountsAtEntry[card.id] ?? 0);
   switch (change.conditionType) {
     case 1:
       return 1;
@@ -99,15 +99,9 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
     case 5:
       return stats ? state.track.sections.indexOf(sectionAt(state)) - stats.enteredSectionIndex : 0;
     case 6:
-      return currentHand.reduce(
-        (sum, card) => sum + (card.member === change.conditionId ? useCount(card) : 0),
-        0,
-      );
+      return stats?.skillUseCountsByMember[change.conditionId] ?? 0;
     case 7:
-      return currentHand.reduce(
-        (sum, card) => sum + (card.skillIcon === change.conditionId ? useCount(card) : 0),
-        0,
-      );
+      return stats?.skillUseCountsByIcon[change.conditionId] ?? 0;
     case 8:
       return currentHand.filter((card) => card.mainEffect === change.conditionId).length;
     case 9:
@@ -131,10 +125,7 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
             : -mood;
     }
     case 13:
-      return currentHand.reduce(
-        (sum, card) => sum + (card.unit === change.conditionId ? useCount(card) : 0),
-        0,
-      );
+      return stats?.skillUseCountsByUnit[change.conditionId] ?? 0;
     case 14:
       return currentHand.filter((card) => card.unit === change.conditionId).length;
     case 15:

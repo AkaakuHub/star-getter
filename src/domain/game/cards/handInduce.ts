@@ -3,7 +3,8 @@ import type { HandUseTrigger } from './cardTypes';
 import type { EffectApplier } from '../effects/induceSkillEffect';
 
 export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectApplier): GameState {
-  return activateHandInducers(state, apply, (trigger) => {
+  const withUpdatedStats = updateHandCardSkillUseStats(state, used);
+  return activateHandInducers(withUpdatedStats, apply, (trigger) => {
     switch (trigger.kind) {
       case 'member':
         return int32(trigger.member) === used.member;
@@ -22,6 +23,36 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
         return false;
     }
   });
+}
+
+function updateHandCardSkillUseStats(state: GameState, used: Card): GameState {
+  const handCardStats = Object.fromEntries(
+    Object.entries(state.handCardStats).map(([id, stats]) => [
+      id,
+      stats.isActive
+        ? {
+            ...stats,
+            skillUseCountsByMember: incrementCount(stats.skillUseCountsByMember, used.member),
+            ...(used.skillIcon === undefined
+              ? {}
+              : {
+                  skillUseCountsByIcon: incrementCount(stats.skillUseCountsByIcon, used.skillIcon),
+                }),
+            ...(used.unit === null
+              ? {}
+              : { skillUseCountsByUnit: incrementCount(stats.skillUseCountsByUnit, used.unit) }),
+          }
+        : stats,
+    ]),
+  );
+  return { ...state, handCardStats };
+}
+
+function incrementCount(
+  counts: Readonly<Record<number, number>>,
+  key: number,
+): Readonly<Record<number, number>> {
+  return { ...counts, [key]: int32((counts[key] ?? 0) + 1) };
 }
 
 export function notifyHandCardBeforeUse(

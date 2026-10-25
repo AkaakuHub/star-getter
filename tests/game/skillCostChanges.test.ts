@@ -3,6 +3,9 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { cardCost } from '../../src/domain/game/cards/cost';
 import { act } from '../../src/domain/game/actions';
 import { advanceTo } from '../../src/domain/game/simulation';
+import { initializeHandCardStats } from '../../src/domain/game/cards/skillCostChanges';
+import { notifyHandSkillUse } from '../../src/domain/game/cards/handInduce';
+import type { GameState } from '../../src/domain/game/model';
 import { game } from './support/game';
 
 it('条件1から15までのコスト変化を対応する現在値から計算する', () => {
@@ -31,14 +34,26 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
   ];
   const sourceCard = cards[0];
   if (!sourceCard) throw new Error('発動元カードがありません。');
-  const state = {
+  const state: GameState = {
     ...initial,
     deck: cards,
     cardPool: [...cards, poolCard],
     hand: cards.map((card) => card.id),
     handCardStats: {
-      [source.id]: { isActive: true, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
-      [other.id]: { isActive: true, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
+      [source.id]: {
+        isActive: true,
+        enteredSectionIndex: 0,
+        skillUseCountsByMember: { 1030: 2 },
+        skillUseCountsByIcon: { 700: 2 },
+        skillUseCountsByUnit: { 2: 2 },
+      },
+      [other.id]: {
+        isActive: true,
+        enteredSectionIndex: 0,
+        skillUseCountsByMember: {},
+        skillUseCountsByIcon: {},
+        skillUseCountsByUnit: {},
+      },
     },
     cardUseCounts: { [source.id]: 2, [other.id]: 2 },
     stamina: 50,
@@ -116,6 +131,36 @@ it('Action17の条件4は最大元気に対する整数元気割合を使う', (
     source,
   );
   expect(cardCost(changed, source) - cardCost(initial, source)).toBe(5);
+});
+
+it('Action17のメンバー使用数は使用カードが手札を離れた後も手札統計に残す', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  const used = initial.deck.find((card) => card.id === 'rain-preparation');
+  if (!source || !used) throw new Error('検証用カードがありません。');
+  const hand = {
+    ...initial,
+    hand: [source.id],
+    handEffectCardIds: [],
+    handCardStats: {},
+  };
+  const withStats = initializeHandCardStats(hand, [source.id]);
+  const withCostChange = applyEffect(
+    withStats,
+    {
+      kind: 'skill-cost-change',
+      amount: 10,
+      minimum: 0,
+      maximum: 100,
+      conditionType: 6,
+      conditionId: used.member,
+    },
+    source,
+  );
+  const afterUse = notifyHandSkillUse(withCostChange, used, applyEffect);
+  expect(afterUse.hand).toEqual([source.id]);
+  expect(afterUse.handCardStats[source.id]?.skillUseCountsByMember[used.member]).toBe(1);
+  expect(cardCost(afterUse, source) - cardCost(withCostChange, source)).toBe(10);
 });
 
 it('Action17は負数をActionType52で増幅してint32化する', () => {

@@ -58,7 +58,13 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
       sourceId: card.id,
       usedCards: [card.id],
       handCardStatsAtUse: {
-        [card.id]: { isActive: false, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
+        [card.id]: {
+          isActive: false,
+          enteredSectionIndex: 0,
+          skillUseCountsByMember: {},
+          skillUseCountsByIcon: {},
+          skillUseCountsByUnit: {},
+        },
       },
       allHand: false,
       recoverDiscard: false,
@@ -104,7 +110,13 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
       sourceId: card.id,
       usedCards: [card.id],
       handCardStatsAtUse: {
-        [card.id]: { isActive: false, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
+        [card.id]: {
+          isActive: false,
+          enteredSectionIndex: 0,
+          skillUseCountsByMember: {},
+          skillUseCountsByIcon: {},
+          skillUseCountsByUnit: {},
+        },
       },
       allHand: false,
       recoverDiscard: false,
