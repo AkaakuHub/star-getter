@@ -33,7 +33,10 @@ export function activateInfinityGauge(
   if (!firstActivation) return next;
   if (effect.gauge === 'ap') return { ...next, energy: next.maxEnergy };
   if (effect.gauge === 'mental' && !state.resting)
-    return induceMentalHearts({ ...next, stamina: 100, mentalTimerSeconds: 0 }, 100);
+    return induceMentalHearts(
+      { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
+      next.maximumMental,
+    );
   if (effect.gauge === 'voltage')
     next = { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
   return next;

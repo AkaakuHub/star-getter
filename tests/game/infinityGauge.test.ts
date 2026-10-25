@@ -57,6 +57,31 @@ describe('無限ゲージ', () => {
     expect(ended.mentalTimerSeconds).toBe(0);
   });
 
+  it('元気上限の拡張値を元気無限開始時の誘発ハート計算へ渡す', () => {
+    const initial = {
+      ...game(),
+      maximumMental: 150,
+      hearts: { ...game().hearts, heartLimit: 500 },
+    };
+    const inducing = applyEffect(initial, {
+      kind: 'mental-heart-induce',
+      num: 10_000,
+      heartDuration: { kind: 'stage', value: 0 },
+      duration: { kind: 'milliseconds', value: 5_000 },
+      disabledType: 0,
+      disabledValue: 0,
+    });
+    const active = applyEffect(inducing, {
+      kind: 'infinity-gauge',
+      gauge: 'mental',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    const generated =
+      active.hearts.stageHearts.length +
+      active.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);
+    expect(generated).toBe(150);
+  });
+
   it('期限抑止された効果はDeactivatorまで残り、解除時に最後のゲージ値へ戻す', () => {
     const initial = { ...game(), excitement: 100 };
     const active = applyEffect(initial, {
