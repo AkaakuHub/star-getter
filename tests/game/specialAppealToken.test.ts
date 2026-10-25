@@ -89,7 +89,7 @@ it('初期クールタイムを音楽GenerationsIdと一致する既存トーク
   expect(next.specialAppealTokens[1]?.remainingCoolTime).toBe(6);
 });
 
-it('トークン共鳴を使うと同じセットのクールタイムを開始する', () => {
+it('トークン共鳴を使うと同じGenerationsIdのクールタイムを個別に開始する', () => {
   const state = game();
   const base = state.deck.find((card) => card.special);
   if (!base?.special) throw new Error('共鳴カードがありません。');
@@ -106,12 +106,35 @@ it('トークン共鳴を使うと同じセットのクールタイムを開始�
     coolTime: 12,
     remainingCoolTime: 0,
   };
-  const ready = { ...state, energy: 20, specialAppealTokens: [token] };
+  const sameGenerationOtherSet = {
+    ...token,
+    recordId: 2,
+    tokenSetId: 9,
+    targetMember: 1021 as const,
+    coolTime: 6,
+    remainingCoolTime: 0,
+  };
+  const otherGeneration = {
+    ...token,
+    recordId: 3,
+    targetMember: 1022 as const,
+    coolTime: 18,
+    remainingCoolTime: 0,
+  };
+  const ready = {
+    ...state,
+    energy: 20,
+    specialAppealTokens: [token, sameGenerationOtherSet, otherGeneration],
+  };
   expect(canUseSpecial(ready, '201')).toBe(true);
   const used = act(ready, { type: 'special', cardId: '201' });
   expect(used.specialAppealTokens[0]?.remainingCoolTime).toBe(
     Math.fround((12 * state.track.songTime) / 10_000),
   );
+  expect(used.specialAppealTokens[1]?.remainingCoolTime).toBe(
+    Math.fround((6 * state.track.songTime) / 10_000),
+  );
+  expect(used.specialAppealTokens[2]?.remainingCoolTime).toBe(0);
   expect(used.specialUsed).not.toContain('201');
   expect(canUseSpecial(used, '201')).toBe(false);
 });

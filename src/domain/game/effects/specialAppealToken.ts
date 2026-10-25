@@ -83,12 +83,17 @@ export function startSpecialAppealTokenCooldown(
   token: SpecialAppealToken,
 ): GameState {
   const timeRatio = Math.fround(Math.fround(state.track.songTime) / 10_000);
-  const cooldown = Math.fround(Math.fround(token.coolTime) * timeRatio);
   return {
     ...state,
     specialAppealTokens: state.specialAppealTokens.map((current) =>
-      current.tokenSetId === token.tokenSetId && current.remainingCoolTime <= cooldown
-        ? { ...current, remainingCoolTime: cooldown }
+      current.targetMember === token.targetMember
+        ? {
+            ...current,
+            remainingCoolTime: Math.max(
+              current.remainingCoolTime,
+              Math.fround(Math.fround(current.coolTime) * timeRatio),
+            ),
+          }
         : current,
     ),
   };
