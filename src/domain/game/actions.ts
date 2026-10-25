@@ -20,6 +20,10 @@ import { deactivateMentalHeartInducers } from './effects/mentalHeartInduce';
 import { deactivateComboInducer, notifyComboSkillPoint } from './effects/comboInduce';
 import { deactivateHeartLimitBuffs } from './effects/heartLimit';
 import { deactivateVoltageIncreaseStops } from './effects/stopVoltageIncrease';
+import {
+  deactivateAdditionalHeartInducers,
+  induceAdditionalHearts,
+} from './effects/additionalHeart';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -55,6 +59,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateHeartLimitBuffs(state, action.deactivationKey);
     case 'deactivate-voltage-increase':
       return deactivateVoltageIncreaseStops(state, action.deactivationKey);
+    case 'deactivate-additional-heart':
+      return deactivateAdditionalHeartInducers(state, action.deactivationKey);
   }
 }
 
@@ -84,6 +90,7 @@ function activateCard(
   allHand: boolean,
 ): GameState {
   if (!state.activation) throw new Error('カードの使用処理がありません。');
+  const usedSkillCost = cardCost(state, card);
   let next: GameState = {
     ...state,
     activation: { ...state.activation, usedCards: [...state.activation.usedCards, card.id] },
@@ -130,6 +137,7 @@ function activateCard(
     cardCost(state, card),
     applyEffect,
   );
+  next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
   return notifyHandSkillUse(next, card);
 }
 

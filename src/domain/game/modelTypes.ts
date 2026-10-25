@@ -1,10 +1,10 @@
 import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
-import type { VoltageConvertEffect } from './voltageConversionTypes';
-import type { StopVoltageIncreaseEffect } from './voltageConversionTypes';
+import type { StopVoltageIncreaseEffect, VoltageConvertEffect } from './voltageConversionTypes';
 import type { Action52BuffEffect } from './skillBoostTypes';
 import type { MentalHeartInduceEffect } from './mentalHeartInduceTypes';
+import type { AdditionalHeartInduceEffect } from './additionalHeartTypes';
 
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -220,8 +220,9 @@ type EffectShape =
       whenTrue: readonly Effect[];
       whenFalse: readonly Effect[];
     }>
+  | Readonly<{ kind: 'hearts'; amount: number; moodBonus?: MoodBonus; lifetimeSeconds?: number }>
   | Readonly<{
-      kind: 'hearts' | 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
+      kind: 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
       amount: number;
       moodBonus?: MoodBonus;
     }>
@@ -295,6 +296,7 @@ type EffectShape =
     }>
   | VoltageConvertEffect
   | MentalHeartInduceEffect
+  | AdditionalHeartInduceEffect
   | ComboInduceEffect
   | Action52BuffEffect
   | ResetSpecial

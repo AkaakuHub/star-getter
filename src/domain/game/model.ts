@@ -13,6 +13,7 @@ import type { TemporaryScoreBoost, VoltageConversion } from './voltageConversion
 import type { Action52Buff } from './skillBoostTypes';
 import type { MentalHeartInducer } from './mentalHeartInduceTypes';
 import type { ComboInducer } from './comboInduceTypes';
+import type { AdditionalHeartInducer } from './additionalHeartTypes';
 import type {
   GaugeInfinity,
   GaugeRegeneration,
@@ -64,6 +65,7 @@ export type Card = Readonly<{
   performer: PerformerId;
   member: MemberId;
   unit: UnitId | null;
+  mainEffect?: number;
   cost: number;
   style?: number;
   appeal: StarGatherCardAppealParameters;
@@ -259,6 +261,8 @@ export type GameState = Readonly<{
   action52Buffs: readonly Action52Buff[];
   mentalHeartInducers: readonly MentalHeartInducer[];
   nextMentalHeartInducerId: number;
+  additionalHeartInducers: readonly AdditionalHeartInducer[];
+  nextAdditionalHeartInducerId: number;
   comboInducer: ComboInducer | null;
   apTimerSeconds: number;
   mentalTimerSeconds: number;
@@ -327,7 +331,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

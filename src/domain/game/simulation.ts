@@ -36,6 +36,10 @@ import {
   advanceVoltageIncreaseStops,
   expireVoltageIncreaseStopSections,
 } from './effects/stopVoltageIncrease';
+import {
+  advanceAdditionalHeartInducers,
+  expireAdditionalHeartInducerSections,
+} from './effects/additionalHeart';
 import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
 import {
   advanceVoltageConversions,
@@ -112,6 +116,8 @@ export function createGame(
     action52Buffs: [],
     mentalHeartInducers: [],
     nextMentalHeartInducerId: 1,
+    additionalHeartInducers: [],
+    nextAdditionalHeartInducerId: 1,
     comboInducer: null,
     nextVoltageConversionId: 1,
     nextAction52BuffId: 1,
@@ -251,6 +257,7 @@ function advanceTick(state: GameState): GameState {
   next = elapsedHandLimit.state;
   next = advanceHeartLimitBuffs(next, dt);
   next = advanceVoltageIncreaseStops(next, dt);
+  next = advanceAdditionalHeartInducers(next, dt);
   if (elapsedHandLimit.handAdjustment > 0) {
     next = restoreHandLimitCount(next, elapsedHandLimit.handAdjustment);
   }
@@ -267,6 +274,7 @@ function advanceTick(state: GameState): GameState {
     next = expireMentalHeartInducerSections(next);
     next = expireComboInducerSections(next);
     next = expireHeartLimitBuffSections(next);
+    next = expireAdditionalHeartInducerSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;

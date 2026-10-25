@@ -36,6 +36,7 @@ import { activateVoltageConversion } from './effects/voltageConversion';
 import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
 import { activateComboInduce } from './effects/comboInduce';
 import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
+import { activateAdditionalHeartInduce } from './effects/additionalHeart';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -58,6 +59,8 @@ export function applyEffect(
     return activateComboInduce(state, effect, card, multiplier, addValue);
   if (effect.kind === 'heart-limit-change')
     return activateHeartLimitChange(state, effect, card, multiplier, addValue, effectPower);
+  if (effect.kind === 'additional-heart-induce')
+    return activateAdditionalHeartInduce(state, effect, card, multiplier, addValue);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);
@@ -117,7 +120,14 @@ export function applyEffect(
       };
     }
     case 'hearts':
-      return createHeartsFromEffect(state, value(effect.amount), card, false, effectPower);
+      return createHeartsFromEffect(
+        state,
+        value(effect.amount),
+        card,
+        false,
+        effectPower,
+        effect.lifetimeSeconds,
+      );
     case 'beat-hearts':
       return createHeartsFromEffect(state, value(effect.amount), card, true);
     case 'tokens':

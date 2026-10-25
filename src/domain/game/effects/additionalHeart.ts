@@ -1,0 +1,113 @@
+import type { AdditionalHeartInducer, AdditionalHeartInduceEffect } from '../additionalHeartTypes';
+import type { Card, Effect, GameState } from '../model';
+import { matchesAdditionalHeartCondition } from '../additionalHeartTypes';
+
+type ApplyEffect = (
+  state: GameState,
+  effect: Effect,
+  card?: Card,
+  multiplier?: number,
+  addValue?: number,
+  effectPower?: number,
+) => GameState;
+
+export function activateAdditionalHeartInduce(
+  state: GameState,
+  effect: AdditionalHeartInduceEffect,
+  card: Card | undefined,
+  multiplier: number,
+  addValue: number,
+): GameState {
+  if (!card) return state;
+  if (
+    (effect.duration.kind === 'milliseconds' || effect.duration.kind === 'sections') &&
+    effect.duration.value === 0
+  )
+    return state;
+  const indefinite = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
+  const inducer: AdditionalHeartInducer = {
+    id: state.nextAdditionalHeartInducerId,
+    sourceCardId: card.id,
+    condition: effect.condition,
+    apPower: effect.apPower,
+    heartEffect: effect.heartEffect,
+    addValue,
+    multiplier,
+    remainingSeconds:
+      indefinite || effect.duration.kind !== 'milliseconds'
+        ? null
+        : Math.fround(effect.duration.value / 1000),
+    remainingSections:
+      indefinite || effect.duration.kind !== 'sections' ? null : effect.duration.value,
+    deactivationKey: effect.deactivationKey ?? null,
+  };
+  return {
+    ...state,
+    additionalHeartInducers: [...state.additionalHeartInducers, inducer],
+    nextAdditionalHeartInducerId: state.nextAdditionalHeartInducerId + 1,
+  };
+}
+
+export function induceAdditionalHearts(
+  state: GameState,
+  usedCard: Card,
+  skillCost: number,
+  apply: ApplyEffect,
+): GameState {
+  let next = state;
+  for (const original of state.additionalHeartInducers) {
+    const inducer = next.additionalHeartInducers.find((item) => item.id === original.id);
+    if (!inducer || !matchesAdditionalHeartCondition(inducer.condition, usedCard)) continue;
+    const product = BigInt.asIntN(64, BigInt(Math.trunc(inducer.apPower)) * BigInt(skillCost));
+    const effectPower = Math.fround(Math.fround(Math.fround(Number(product)) / 10_000) + 1);
+    const sourceCard = next.cardPool.find((item) => item.id === inducer.sourceCardId);
+    if (!sourceCard) continue;
+    next = apply(
+      next,
+      inducer.heartEffect,
+      sourceCard,
+      inducer.multiplier,
+      inducer.addValue,
+      effectPower,
+    );
+    if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
+  }
+  return next;
+}
+
+export function advanceAdditionalHeartInducers(
+  state: GameState,
+  elapsedSeconds: number,
+): GameState {
+  return {
+    ...state,
+    additionalHeartInducers: state.additionalHeartInducers.flatMap((inducer) => {
+      if (inducer.remainingSeconds === null) return [inducer];
+      const remainingSeconds = Math.fround(inducer.remainingSeconds - Math.fround(elapsedSeconds));
+      return remainingSeconds > 0 ? [{ ...inducer, remainingSeconds }] : [];
+    }),
+  };
+}
+
+export function expireAdditionalHeartInducerSections(state: GameState): GameState {
+  return {
+    ...state,
+    additionalHeartInducers: state.additionalHeartInducers.flatMap((inducer) => {
+      if (inducer.remainingSections === null) return [inducer];
+      const remainingSections = inducer.remainingSections - 1;
+      return remainingSections > 0 ? [{ ...inducer, remainingSections }] : [];
+    }),
+  };
+}
+
+export function deactivateAdditionalHeartInducers(
+  state: GameState,
+  deactivationKey: string,
+): GameState {
+  return {
+    ...state,
+    additionalHeartInducers: state.additionalHeartInducers.filter(
+      (inducer) => inducer.deactivationKey !== deactivationKey,
+    ),
+  };
+}

@@ -1,4 +1,5 @@
 import { type Card, type Effect, costumeIds, rules } from './model';
+import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
 
 export function validateDeck(deck: readonly Card[]): void {
   if (
@@ -20,6 +21,7 @@ export function validateCard(card: Card): void {
     !costumeIds.includes(card.costume) ||
     !Number.isInteger(card.cost) ||
     card.cost < 0 ||
+    (card.mainEffect !== undefined && !Number.isSafeInteger(card.mainEffect)) ||
     Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
     card.effects.length === 0 ||
     (card.relay !== undefined &&
@@ -220,6 +222,11 @@ function validateEffect(effect: Effect): void {
     for (const child of effect.effects) validateEffect(child);
     return;
   }
+  if (effect.kind === 'additional-heart-induce') {
+    validateAdditionalHeartInduceEffect(effect);
+    validateEffect(effect.heartEffect);
+    return;
+  }
   if (effect.kind === 'heart-limit-change') {
     if (
       ![1, 2].includes(effect.calculationType) ||
@@ -318,6 +325,12 @@ function validateEffect(effect: Effect): void {
       throw new Error('アクション間隔が正しくありません。');
     return;
   }
+  if (
+    effect.kind === 'hearts' &&
+    effect.lifetimeSeconds !== undefined &&
+    !Number.isFinite(effect.lifetimeSeconds)
+  )
+    throw new Error('きらめき寿命が正しくありません。');
   if (effect.kind === 'bloom') {
     if (!Number.isFinite(effect.strength) || effect.strength < 0)
       throw new Error('開花の効果量が正しくありません。');
