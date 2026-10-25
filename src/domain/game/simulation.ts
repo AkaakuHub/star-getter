@@ -198,7 +198,7 @@ function validateTrack(track: Track): void {
     track.beats > 2000 ||
     track.sections[0]?.startBeat !== 0
   )
-    throw new Error('楽曲の設定が正しくありません。');
+    throw new Error('ステージの設定が正しくありません。');
   let previous = -1;
   for (const section of track.sections) {
     if (

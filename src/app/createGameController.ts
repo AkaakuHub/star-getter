@@ -7,7 +7,7 @@ import { GameController } from './gameController';
 export function createGameController(routeId: RouteId, heartShowLimit: number): GameController {
   const route = routes[routeId];
   const track = tracks[0];
-  if (!track) throw new Error('楽曲がありません。');
+  if (!track) throw new Error('ステージがありません。');
   const random = new Uint32Array(1);
   crypto.getRandomValues(random);
   const value = random[0];

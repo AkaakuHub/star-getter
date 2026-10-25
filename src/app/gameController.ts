@@ -250,7 +250,7 @@ export class GameController {
   }
 
   private fail(error: unknown): void {
-    this.error = error instanceof Error ? error.message : '音声の再生に失敗しました。';
+    this.error = error instanceof Error ? error.message : 'ゲームを進行できませんでした。';
     this.notify();
   }
 }
