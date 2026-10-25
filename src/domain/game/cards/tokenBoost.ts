@@ -33,9 +33,12 @@ export function boostTokenRequests(
   if (sourceId !== null && !source) throw new Error('追加カードを生成するカードがありません。');
   const used = new Set<number>();
   const counts = requests.map((request) => {
-    const matching = state.tokenBoosts.flatMap((boost, index) =>
-      matches(boost, source, request) ? [{ boost, index }] : [],
-    );
+    const matching =
+      request.count > 0
+        ? state.tokenBoosts.flatMap((boost, index) =>
+            matches(boost, source, request) ? [{ boost, index }] : [],
+          )
+        : [];
     for (const { index } of matching) used.add(index);
     let value = request.count;
     for (const { boost } of matching) {
