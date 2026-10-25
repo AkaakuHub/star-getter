@@ -74,6 +74,13 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateMentalBarrierAdditionalBuffs(state, action.deactivationKey);
     case 'deactivate-mental-down':
       return deactivateDisableMentalDownEffects(state, action.deactivationKey);
+    case 'deactivate-token-boost':
+      return {
+        ...state,
+        tokenBoosts: state.tokenBoosts.filter(
+          (boost) => boost.deactivationKey !== action.deactivationKey,
+        ),
+      };
   }
 }
 

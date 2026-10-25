@@ -13,6 +13,7 @@ import { activateBloom } from './bloom';
 import { collectHearts } from './hearts';
 import { type Card, type Effect, type GameState } from './model';
 import { applyTokenCardEffect, requestTokens } from './cards/tokens';
+import { activateTokenBoost } from './effects/tokenBoost';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
@@ -135,31 +136,8 @@ export function applyEffect(
       return requestTokens(state, effect.token, effect.count, card?.id ?? null, effect.seriesIds);
     case 'token-card':
       return applyTokenCardEffect(state, effect, card?.id ?? null);
-    case 'token-boost': {
-      const base = Math.fround(
-        (Math.fround(effect.num / 10_000) + (effect.addValue ?? 0) + addValue) * multiplier,
-      );
-      if (base <= 0) return state;
-      const boosted = skillValue(state, base, { kind: 'amplify', percent: base }, card);
-      return {
-        ...state,
-        tokenBoosts: [
-          ...state.tokenBoosts,
-          {
-            calculation: effect.calculation,
-            value: boosted,
-            target: effect.target,
-            ...(effect.seriesIds ? { seriesIds: effect.seriesIds } : {}),
-            remainingUses: effect.uses ?? null,
-            remainingSeconds:
-              effect.duration?.kind === 'milliseconds'
-                ? Math.fround(effect.duration.value / 1000)
-                : null,
-            remainingSections: effect.duration?.kind === 'sections' ? effect.duration.value : null,
-          },
-        ],
-      };
-    }
+    case 'token-boost':
+      return activateTokenBoost(state, effect, card, multiplier, addValue);
     case 'hand-limit':
       return applyHandLimit(state, effect, card, multiplier, addValue);
     case 'heart-limit':

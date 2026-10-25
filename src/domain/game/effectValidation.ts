@@ -70,7 +70,9 @@ export function validateEffect(effect: Effect): void {
       (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
       (effect.uses !== undefined && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
       (effect.duration !== undefined &&
-        (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0))
+        (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )
       throw new Error('追加カード増幅の設定が正しくありません。');
     return;

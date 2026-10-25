@@ -6,6 +6,7 @@ import {
   requestTokens,
 } from '../../src/domain/game/cards/tokens';
 import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '../../src/domain/game/actions';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
@@ -59,21 +60,31 @@ it('追加カードの増幅は対象カードと生成効果のシリーズ指�
 
 it('追加カードの増幅は時間またはパート期限で解除する', () => {
   const initial = game('library');
-  const timed = applyEffect(initial, {
-    kind: 'token-boost',
-    calculation: 'add',
-    num: 10_000,
-    target: { kind: 'all' },
-    duration: { kind: 'milliseconds', value: 500 },
-  });
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const timed = applyEffect(
+    initial,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: 10_000,
+      target: { kind: 'all' },
+      duration: { kind: 'milliseconds', value: 500 },
+    },
+    source,
+  );
   expect(advanceTo(timed, 0.6).tokenBoosts).toHaveLength(0);
-  const section = applyEffect(initial, {
-    kind: 'token-boost',
-    calculation: 'add',
-    num: 10_000,
-    target: { kind: 'all' },
-    duration: { kind: 'sections', value: 1 },
-  });
+  const section = applyEffect(
+    initial,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: 10_000,
+      target: { kind: 'all' },
+      duration: { kind: 'sections', value: 1 },
+    },
+    source,
+  );
   const nextSection = initial.track.sections[1];
   if (!nextSection) throw new Error('パートがありません。');
   expect(
@@ -156,4 +167,37 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
   state = finishTokenGeneration(state, source.id);
   expect(state.deck.filter((card) => card.id.startsWith('action28-template-'))).toHaveLength(2);
   expect(state.tokenBoosts).toHaveLength(0);
+});
+
+it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocationTypeを反映する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('発動元カードがありません。');
+  const skillBoost = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0 },
+      uses: 1,
+    },
+    source,
+  );
+  const effect = {
+    kind: 'token-boost',
+    calculation: 'add',
+    num: 500_000,
+    target: { kind: 'all' },
+    duration: { kind: 'milliseconds', value: 500 },
+    invocationType: 0x388,
+    deactivationKey: 'token-boost',
+  } as const;
+  const active = applyEffect(skillBoost, effect, source);
+  expect(active.tokenBoosts[0]?.value).toBe(75);
+  expect(active.action52Buffs).toHaveLength(0);
+  expect(advanceTo(active, 0.6).tokenBoosts).toHaveLength(1);
+  expect(
+    act(active, { type: 'deactivate-token-boost', deactivationKey: 'token-boost' }).tokenBoosts,
+  ).toHaveLength(0);
 });

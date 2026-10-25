@@ -161,6 +161,7 @@ export type TokenBoost = Readonly<{
   remainingUses: number | null;
   remainingSeconds: number | null;
   remainingSections: number | null;
+  deactivationKey: string | null;
 }>;
 export type ProxyAbsorption = Readonly<{
   id: number;
@@ -235,6 +236,8 @@ type EffectShape =
       seriesIds?: readonly number[];
       uses?: number;
       duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+      invocationType?: number;
+      deactivationKey?: string;
     }>
   | Readonly<{
       kind: 'hand-limit';
