@@ -19,7 +19,9 @@ export function activateVoltageConversion(
   if (!card) return state;
   if (effect.displayDuration.kind === 'sections' && effect.displayDuration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  const base = Math.fround(Math.fround(effect.num + addValue) * Math.fround(multiplier));
+  const base = Math.fround(
+    Math.fround(Math.trunc(effect.num) + addValue) * Math.fround(multiplier),
+  );
   const boosted = applyAction52SkillBoost(state, card, base);
   const num =
     boosted.value === Number.POSITIVE_INFINITY ? -2_147_483_648 : Math.trunc(boosted.value);

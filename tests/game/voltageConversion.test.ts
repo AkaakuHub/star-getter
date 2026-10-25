@@ -52,6 +52,14 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
   expect(changeResource({ ...latest, excitement: 10 }, 'excitement', -10n).excitement).toBe(0);
 });
 
+it('ActionType22はActionType52適用前に変換数を整数化する', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(initial, { ...conversion, num: 1.9 }, source);
+  expect(active.voltageConversions[0]?.num).toBe(1);
+});
+
 it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で解除する', () => {
   const initial = unboostedGame();
   const source = initial.deck[0];
