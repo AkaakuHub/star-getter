@@ -75,33 +75,6 @@ export function applyAction52SkillBoost(
   return { state: { ...state, action52Buffs }, value: adjusted };
 }
 
-export function action52BuffsForCard(
-  state: GameState,
-  card: Card | undefined,
-  skillTokenSeriesIds?: readonly number[],
-): GameState['action52Buffs'] {
-  return state.action52Buffs.filter(
-    (buff) =>
-      matchesTarget(buff.target, card) &&
-      (buff.skillTokenSeriesIds === null ||
-        (skillTokenSeriesIds !== undefined &&
-          buff.skillTokenSeriesIds.some((seriesId) => skillTokenSeriesIds.includes(seriesId)))),
-  );
-}
-
-export function consumeAction52SkillBoosts(
-  state: GameState,
-  buffIds: ReadonlySet<number>,
-): GameState {
-  return {
-    ...state,
-    action52Buffs: state.action52Buffs.flatMap((buff) => {
-      if (!buffIds.has(buff.id) || buff.remainingUses === null) return [buff];
-      return buff.remainingUses > 1 ? [{ ...buff, remainingUses: buff.remainingUses - 1 }] : [];
-    }),
-  };
-}
-
 export function applyAction52SkillBoostForCard(
   state: GameState,
   card: Card | undefined,
