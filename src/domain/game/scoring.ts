@@ -1,3 +1,4 @@
+import { scoreMultipliers } from '../../content/scoring';
 import { type GameState, rules } from './model';
 import { durationSeconds } from './projection';
 import { calculateLoveGatherClientScore } from './live/clientScore';
@@ -34,8 +35,9 @@ export function collectionScore(state: GameState, count: number, missed: boolean
     },
     {
       valueToFactor: loveGatherValueToFactor,
-      getAddScoreMax: (collectCount) => calculateLoveGatherAddScoreMax(collectCount, []),
+      getAddScoreMax: (collectCount) =>
+        calculateLoveGatherAddScoreMax(collectCount, scoreMultipliers),
     },
   );
-  return limitValue(base * state.growthMultiplier);
+  return base;
 }

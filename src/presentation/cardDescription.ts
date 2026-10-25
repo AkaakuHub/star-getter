@@ -32,8 +32,6 @@ function describeEffect(effect: Effect): string {
       return `${effect.seconds}秒間、獲得するLOVEを${Math.round((effect.multiplier - 1) * 100)}%増加させる。この効果は重複し、効果増幅の対象となる。`;
     case 'amplify':
       return `このステージ中、あらゆるスキルの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
-    case 'growth':
-      return `このステージ中、LOVEの成長倍率を${formatScore(effect.multiplier)}倍にする。現在の成長倍率に乗算し、再使用するたびに複利で増える。`;
     case 'bloom':
       return 'ムードが−100%のときに使用できる。このステージ中、開花を発動し、ハートをフラワーに変化させる。AP・ボルテージ・メンタルの増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のLOVEが増加する。発動時のゲージを保持し、開花中はAP残量に関係なくスキルを使用できる。';
     case 'resource-boost':

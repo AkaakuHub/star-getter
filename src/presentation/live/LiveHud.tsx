@@ -133,7 +133,9 @@ export function LiveHud({
           <strong>{formatScore(state.bloom.progress)}</strong>
         </div>
       )}
-      <div className="live-amplification">成長×{formatScore(state.growthMultiplier)}</div>
+      <div className="live-amplification">
+        スキル効果+{formatScore(state.amplification - 100n)}%
+      </div>
     </>
   );
 }

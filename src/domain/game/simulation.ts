@@ -58,7 +58,6 @@ export function createGame(
     automaticHeart: { enabled: true, timerSeconds: 0 },
     boosts: [],
     amplification: 100n,
-    growthMultiplier: 1n,
     resourceBoosts: [],
     bloom: null,
     relayUsed: [],

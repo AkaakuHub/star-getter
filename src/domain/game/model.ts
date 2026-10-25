@@ -24,7 +24,6 @@ export type Effect =
   | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
   | Readonly<{ kind: 'amplify'; percent: number }>
-  | Readonly<{ kind: 'growth'; multiplier: number }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'shuffle' | 'use-hand' }>
@@ -122,7 +121,6 @@ export type GameState = Readonly<{
   heartRandomSeed: number;
   boosts: readonly Boost[];
   amplification: bigint;
-  growthMultiplier: bigint;
   resourceBoosts: readonly ResourceBoost[];
   bloom: Bloom | null;
   relayUsed: readonly string[];

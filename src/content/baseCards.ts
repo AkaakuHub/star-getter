@@ -36,7 +36,6 @@ export const baseCards: readonly Card[] = [
     appeal: { smile: 145, pure: 145, cool: 145 },
     effects: [
       { kind: 'amplify', percent: 50 },
-      { kind: 'growth', multiplier: 10_000_000 },
       { kind: 'boost', multiplier: 2, seconds: 30 },
       { kind: 'hearts', amount: 4 },
     ],
@@ -104,7 +103,6 @@ export const baseCards: readonly Card[] = [
     appeal: { smile: 140, pure: 140, cool: 140 },
     effects: [
       { kind: 'amplify', percent: 50 },
-      { kind: 'growth', multiplier: 10_000_000 },
       { kind: 'stamina', amount: 24 },
     ],
   },
@@ -166,7 +164,6 @@ export const baseCards: readonly Card[] = [
     appeal: { smile: 125, pure: 125, cool: 125 },
     effects: [
       { kind: 'amplify', percent: 50 },
-      { kind: 'growth', multiplier: 10_000_000 },
       { kind: 'excitement', amount: 12 },
       { kind: 'stamina', amount: 10 },
     ],

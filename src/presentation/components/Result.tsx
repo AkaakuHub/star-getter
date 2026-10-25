@@ -1,6 +1,6 @@
 import { RotateCcw, Share2 } from 'lucide-preact';
 import { routes, type RouteId } from '../../content/routes';
-import { type GameState, rules } from '../../domain/game/model';
+import { type GameState } from '../../domain/game/model';
 import { formatScore } from '../cardDescription';
 import { shareScoreUrl } from '../results/shareScore';
 
@@ -15,10 +15,6 @@ export function Result({
       <h2>{routes[route].name}</h2>
       <p className="result-score">{formatScore(state.score)}</p>
       <dl className="result-stats">
-        <div>
-          <dt>目標LOVE</dt>
-          <dd>{formatScore(rules.maxScore)}</dd>
-        </div>
         <div>
           <dt>カード使用</dt>
           <dd>{state.stats.cardsUsed}</dd>

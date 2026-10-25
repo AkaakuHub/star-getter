@@ -32,7 +32,6 @@ export const routeTokens: readonly Card[] = [
       { kind: 'heart-limit', amount: 36 },
       { kind: 'boost', multiplier: 4, seconds: 30 },
       { kind: 'excitement', amount: 100 },
-      { kind: 'growth', multiplier: 10_000_000 },
     ],
   },
   {

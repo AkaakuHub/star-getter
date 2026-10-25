@@ -43,15 +43,6 @@ export function validateCard(card: Card): void {
         throw new Error('上限の増加量が正しくありません。');
       continue;
     }
-    if (effect.kind === 'growth') {
-      if (
-        !Number.isSafeInteger(effect.multiplier) ||
-        effect.multiplier < 2 ||
-        effect.multiplier > 1_000_000_000
-      )
-        throw new Error('成長倍率が正しくありません。');
-      continue;
-    }
     if (effect.kind === 'amplify' || effect.kind === 'resource-boost') {
       if (!Number.isSafeInteger(effect.percent) || effect.percent <= 0 || effect.percent > 300)
         throw new Error('増幅率が正しくありません。');
