@@ -9,17 +9,18 @@ import { fillHand } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
-import { moodValue, sectionAt } from '../../src/domain/game/projection';
+import { cardCooldownTicks, moodValue, sectionAt } from '../../src/domain/game/projection';
 import { tracks } from '../../src/content/tracks';
 import { game, withHand } from './support/game';
 
 it('自然な空模様に雨100%はなく、準備カードの使用で最初のパート中に段階的に下げる', () => {
   expect(tracks.flatMap((track) => track.moodKeys).every((key) => key.keyValue > -100)).toBe(true);
   let state = { ...game(), apIntervalFactor: 1 };
-  for (const [index, expected] of [-50, -100].entries()) {
-    state = withHand({ ...state, energy: 20, maxEnergy: 20, tick: (index + 1) * 20 }, [
-      'rain-preparation',
-    ]);
+  for (const expected of [-50, -100]) {
+    state = withHand(
+      { ...state, energy: 20, maxEnergy: 20, tick: state.tick + cardCooldownTicks(state) },
+      ['rain-preparation'],
+    );
     state = act(state, { type: 'card', index: 0 });
     expect(moodValue(state)).toBe(expected);
     expect(sectionAt(state)).toBe(state.track.sections[0]);

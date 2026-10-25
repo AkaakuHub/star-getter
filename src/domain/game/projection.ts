@@ -38,12 +38,15 @@ export function canUseCard(state: GameState, index: number): boolean {
     index >= 0 &&
     index < state.hand.length &&
     !state.resting &&
-    state.tick - state.lastActionTick >=
-      Math.ceil(
-        (state.skillCooldownSeconds ??
-          calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000))) *
-          rules.ticksPerSecond,
-      ) &&
+    state.tick - state.lastActionTick >= cardCooldownTicks(state) &&
     (state.bloom !== null || state.energy >= cardCost(state, cardAt(state, index)))
+  );
+}
+
+export function cardCooldownTicks(state: GameState): number {
+  return Math.ceil(
+    (state.skillCooldownSeconds ??
+      calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000))) *
+      rules.ticksPerSecond,
   );
 }

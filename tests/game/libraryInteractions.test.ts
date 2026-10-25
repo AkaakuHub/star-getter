@@ -4,8 +4,8 @@ import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
 import { cardCost } from '../../src/domain/game/cards/cost';
 import { addTokens } from '../../src/domain/game/cards/tokens';
-import type { Card, GameState, TokenKind } from '../../src/domain/game/model';
-import { moodValue } from '../../src/domain/game/projection';
+import { rules, type Card, type GameState, type TokenKind } from '../../src/domain/game/model';
+import { cardCooldownTicks, moodValue } from '../../src/domain/game/projection';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game, withHand } from './support/game';
 
@@ -30,10 +30,8 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
     story.id,
   ]);
   const play = (first: Card, second: Card) => {
-    const state = advanceTo(
-      act(initial, { type: 'card', index: initial.hand.indexOf(first.id) }),
-      0.3,
-    );
+    const used = act(initial, { type: 'card', index: initial.hand.indexOf(first.id) });
+    const state = advanceTo(used, (used.tick + cardCooldownTicks(used)) / rules.ticksPerSecond);
     return act(state, { type: 'card', index: state.hand.indexOf(second.id) });
   };
   const prepared = play(clock, story),
@@ -156,9 +154,16 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
   );
   const source = token(state, 'shadow');
   for (let count = 1; count <= 14; count++) {
-    state = withHand({ ...state, tick: count * 20, energy: 20, maxEnergy: 20, resting: false }, [
-      source.id,
-    ]);
+    state = withHand(
+      {
+        ...state,
+        tick: state.tick + cardCooldownTicks(state),
+        energy: 20,
+        maxEnergy: 20,
+        resting: false,
+      },
+      [source.id],
+    );
     state = act(state, { type: 'card', index: 0 });
     expect(state.cardUseCounts[source.id]).toBe(count);
     expect(state.deck.some((item) => item.id === source.id)).toBe(count < 14);

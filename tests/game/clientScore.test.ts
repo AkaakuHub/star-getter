@@ -29,12 +29,12 @@ describe('スターギャザーの回収得点', () => {
     ).toBe(0.375);
   });
 
-  it('60秒・各属性125の編成できらめき10個は11250となる', () => {
-    expect(collectionScore(game(), 10, false, 10)).toBe(11250n);
+  it('90秒では平均アピールの端数を切り捨ててきらめき10個が7490となる', () => {
+    expect(collectionScore(game(), 10, false, 10)).toBe(7490n);
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(22500n);
+    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(14980n);
   });
 
   it('STAR増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
@@ -43,7 +43,7 @@ describe('スターギャザーの回収得点', () => {
       { percent: 100, untilTick: 100 },
       { percent: 100, untilTick: 100 },
     ];
-    expect(collectionScore({ ...base, boosts }, 10, false, 10)).toBe(33750n);
+    expect(collectionScore({ ...base, boosts }, 10, false, 10)).toBe(22470n);
     expect(
       collectionScore(
         {
@@ -58,7 +58,7 @@ describe('スターギャザーの回収得点', () => {
         false,
         10,
       ),
-    ).toBe(11258n);
+    ).toBe(7495n);
   });
 
   it('回収回数や山場だけでは独自の得点倍率を付けない', () => {

@@ -4,6 +4,7 @@ import { act } from '../../src/domain/game/actions';
 import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 import { game, withHand } from './support/game';
 import { activateBloom } from '../../src/domain/game/bloom';
+import { cardCooldownTicks } from '../../src/domain/game/projection';
 
 it('空模様0でも20APを支払って開花し、支払後のAPを保持する', () => {
   const state = { ...game(), energy: 20, maxEnergy: 20 };
@@ -61,7 +62,9 @@ it('停止中も性能画面で使用条件を確認できるが、使用操作�
 it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用済みのまま維持する', () => {
   let state: GameState = { ...game('library'), specialUsed: ['library-pages', 'library-ensemble'] };
   for (let count = 1; count <= 3; count++) {
-    state = withHand({ ...state, energy: 20, tick: count * 20 }, ['class']);
+    state = withHand({ ...state, energy: 20, tick: state.tick + cardCooldownTicks(state) }, [
+      'class',
+    ]);
     state = act(state, { type: 'card', index: 0 });
     expect(state.cardUseCounts.class).toBe(count);
     expect(state.deck.some((card) => card.id === 'class')).toBe(count < 3);

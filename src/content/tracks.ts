@@ -8,7 +8,7 @@ export const tracks: readonly Track[] = [
     id: 'weather-stage',
     name: '空模様',
     bpm: stageTiming.bpm,
-    songTime: 5000,
+    songTime: (stageTiming.durationSeconds * 1000) / 12,
     beats: (stageTiming.durationSeconds * stageTiming.bpm) / 60,
     stage: standardStage,
     moodKeys: weatherTimeline,

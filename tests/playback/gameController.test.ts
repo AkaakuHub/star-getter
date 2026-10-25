@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
+import { canUseCard, cardCooldownTicks, durationSeconds } from '../../src/domain/game/projection';
+import { rules } from '../../src/domain/game/model';
 import { session } from './gameSession';
 
 describe('ゲーム時計とゲームの同期', () => {
@@ -134,7 +135,7 @@ describe('カード使用可能時の自動停止', () => {
     expect(frames.pending).toBe(1);
   });
 
-  it('使用後は0.35秒待ち、残りの手札が使用可能なら再び停止する', async () => {
+  it('使用後は0.35秒以上待ち、残りの手札が使用可能になったら再び停止する', async () => {
     const { controller, clock, frames } = session();
     await controller.toggleWaitMode();
     const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
@@ -145,6 +146,9 @@ describe('カード使用可能時の自動停止', () => {
     expect(controller.waiting).toBe(false);
     clock.seconds = 0.35;
     frames.run(350);
+    expect(controller.waiting).toBe(false);
+    clock.seconds = cardCooldownTicks(controller.state) / rules.ticksPerSecond;
+    frames.run(clock.seconds * 1000);
     expect(controller.state.hand.some((_, slot) => canUseCard(controller.state, slot))).toBe(true);
     expect(controller.waiting).toBe(true);
     expect(frames.pending).toBe(0);
