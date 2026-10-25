@@ -13,6 +13,7 @@ import {
 test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到達する', () => {
   const driver = new GameDriver('library');
   driver.report('開始');
+  expect(driver.state.storyAmplification).toBe(0);
   prepare(driver);
   driver.report('準備完了');
   expect(driver.seconds).toBeLessThan(25);
@@ -20,6 +21,7 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   for (const token of ['story', 'clock', 'bookmark'])
     expect(driver.state.deck.some((card) => card.token === token)).toBe(true);
   expect(driver.state.stats.cardsUsed).toBeGreaterThan(driver.cardActions);
+  expect(driver.state.storyAmplification).toBeGreaterThan(0);
   const measurementTick = driver.state.tick;
   const unplanned = new GameDriver('library');
   playUnplanned(unplanned);

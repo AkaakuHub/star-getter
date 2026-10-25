@@ -29,8 +29,8 @@ function markdown(label: string, recording: GameRecording): string {
     '',
     '編成:' + routes[recording.route].name + ' / seed:' + recording.seed,
     '',
-    '|秒|tick|操作|スター前→後|専用値前→後|デッキ前→後|',
-    '|---:|---:|---|---:|---:|---:|',
+    '|秒|tick|操作|スター前→後|専用値前→後|デッキ前→後|上限前→後|貝がら蓄積増幅前→後|',
+    '|---:|---:|---|---:|---:|---:|---:|---:|',
   ];
   for (let index = 0; index < recording.inputs.length; index++) {
     const first = recording.inputs[index];
@@ -74,6 +74,14 @@ function markdown(label: string, recording: GameRecording): string {
         first.before.deckSize +
         '→' +
         last.after.deckSize +
+        '|' +
+        first.before.heartLimit +
+        '→' +
+        last.after.heartLimit +
+        '|' +
+        first.before.storyAmplification +
+        '→' +
+        last.after.storyAmplification +
         '|',
     );
   }

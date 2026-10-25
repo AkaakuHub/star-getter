@@ -112,7 +112,8 @@ export class GameDriver {
       if (index === undefined) continue;
       const card = cardAt(this.state, index);
       const before = this.state;
-      this.controller.command({ type: 'card', index });
+      this.controller.tapCard(index);
+      this.controller.activateSelected();
       this.recording.record(
         { kind: 'card', card: { instanceId: card.id, name: card.name, handIndex: index } },
         before,

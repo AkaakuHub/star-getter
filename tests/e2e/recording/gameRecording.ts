@@ -1,6 +1,8 @@
 import { afterEach } from 'vite-plus/test';
 import type { RouteId } from '../../../src/content/routes';
 import { type GameState, rules } from '../../../src/domain/game/model';
+import { heartCount } from '../../../src/domain/game/hearts';
+import { moodValue } from '../../../src/domain/game/projection';
 import { writeRecordings } from './writeRecordings';
 
 type CardReference = Readonly<{ instanceId: string; name: string; handIndex: number | null }>;
@@ -8,7 +10,22 @@ export type RecordedInput =
   | Readonly<{ kind: 'card' | 'special'; card: CardReference }>
   | Readonly<{ kind: 'collect' }>
   | Readonly<{ kind: 'automatic-hearts'; enabled: boolean }>;
-type Snapshot = Readonly<{ score: string; gauge: string | null; deckSize: number; energy: number }>;
+type Snapshot = Readonly<{
+  score: string;
+  gauge: string | null;
+  deckSize: number;
+  energy: number;
+  hearts: number;
+  heartLimit: number;
+  storyAmplification: number;
+  mood: number;
+  hand: readonly Readonly<{
+    instanceId: string;
+    name: string;
+    collectedCount: number;
+    collectionUsed: boolean;
+  }>[];
+}>;
 export type InputRecord = Readonly<{
   sequence: number;
   route: RouteId;
@@ -26,6 +43,20 @@ function snapshot(state: GameState): Snapshot {
     gauge: state.bloom?.progress.toString() ?? null,
     deckSize: state.deck.length,
     energy: state.energy,
+    hearts: heartCount(state),
+    heartLimit: state.hearts.heartLimit,
+    storyAmplification: state.storyAmplification,
+    mood: moodValue(state),
+    hand: state.hand.map((id) => {
+      const card = state.deck.find((candidate) => candidate.id === id);
+      if (!card) throw new Error('記録対象の手札がありません。');
+      return {
+        instanceId: id,
+        name: card.name,
+        collectedCount: state.handHeartCollectCounts[id] ?? 0,
+        collectionUsed: state.relayUsed.includes(id),
+      };
+    }),
   };
 }
 
