@@ -6,6 +6,7 @@ import {
 import { applyEffect } from '../effects';
 import { deactivateBeatPointBuffs } from '../effects/beatPointBuff';
 import { deactivateHandLimitEffects } from '../effects/handLimit';
+import { deactivateAction52SkillBoosts } from '../effects/action52SkillBoost';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -20,7 +21,9 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
             next,
             effect.kind === 'hand-limit'
               ? { ...effect, invocationType: 0x388, deactivationKey }
-              : { ...effect, deactivationKey },
+              : effect.kind === 'skill-boost'
+                ? { ...effect, invocationType: 0x388, deactivationKey }
+                : { ...effect, deactivationKey },
             card,
           );
   }
@@ -67,6 +70,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
     };
     next = deactivateBeatPointBuffs(next, deactivationKey);
     next = deactivateHandLimitEffects(next, deactivationKey).state;
+    next = deactivateAction52SkillBoosts(next, deactivationKey);
     next = {
       ...next,
       skillScoreUps: next.skillScoreUps.filter(

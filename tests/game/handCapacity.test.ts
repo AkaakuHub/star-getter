@@ -11,6 +11,7 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 import { advanceHandLimitEffects } from '../../src/domain/game/effects/handLimit';
+import { advanceAction52SkillBoosts } from '../../src/domain/game/effects/action52SkillBoost';
 import {
   advanceHandMaxCardEffects,
   expireHandMaxCardSections,
@@ -158,6 +159,40 @@ it('Action904のAction2子効果は手札離脱時に解除する', () => {
   const active = activateHandPermanentEffects(state, card);
   expect(active.skillScoreUps).toHaveLength(1);
   expect(disposeHandEffects(active, [card.id]).skillScoreUps).toHaveLength(0);
+});
+
+it('Action904のAction52子効果は手札中に残り、手札離脱時に解除する', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  if (!original) throw new Error('対象カードがありません。');
+  const card = {
+    ...original,
+    handPermanentEffects: [
+      {
+        kind: 'skill-boost' as const,
+        num: 200_000,
+        target: { kind: 'all' as const },
+        duration: { kind: 'milliseconds' as const, value: 100 },
+        uses: null,
+      },
+    ],
+  };
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [card.id],
+    handEffectCardIds: [card.id],
+    drawPile: [],
+    discard: [],
+  };
+
+  const active = activateHandPermanentEffects(state, card);
+
+  expect(active.action52Buffs).toHaveLength(1);
+  const afterTime = advanceAction52SkillBoosts(active, 1);
+  expect(afterTime.action52Buffs).toHaveLength(1);
+  expect(disposeHandEffects(afterTime, [card.id]).action52Buffs).toHaveLength(0);
 });
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
