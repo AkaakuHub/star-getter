@@ -124,7 +124,7 @@ it('ActionType27はlong積をfloat32へ直接変換する', () => {
   expect(effectPowers).toEqual([900_720_033_792]);
 });
 
-it('Action27の0ミリ秒期限は誘発を登録し、次の更新で解除する', () => {
+it('Action27の0ミリ秒期限は誘発を登録しない', () => {
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');
@@ -139,6 +139,6 @@ it('Action27の0ミリ秒期限は誘発を登録し、次の更新で解除す�
     },
     source,
   );
-  expect(armed.additionalHeartInducers).toHaveLength(1);
+  expect(armed.additionalHeartInducers).toHaveLength(0);
   expect(advanceAdditionalHeartInducers(armed, 1 / 60).additionalHeartInducers).toHaveLength(0);
 });
