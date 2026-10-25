@@ -5,7 +5,7 @@ import { EffectDetails } from './EffectDetails';
 import { unitCardNames } from './targetNames';
 
 export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
-  const { drawEffects, handUse, ...traitsCard } = card;
+  const { drawEffects, handUse, collectionEffects, ...traitsCard } = card;
   const traits = describeCardTraits(traitsCard);
   return (
     <div className="card-performance">
@@ -46,6 +46,13 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
             <h3>手札にある間</h3>
             <p>{unitCardNames(handUse.unit)}を使用したとき</p>
             <EffectDetails effects={handUse.effects} />
+          </section>
+        )}
+        {collectionEffects && (
+          <section>
+            <h3>手札内で累計{collectionEffects.threshold.toLocaleString('ja-JP')}個回収したとき</h3>
+            <EffectDetails effects={collectionEffects.effects} />
+            <p>手札にある間に1回発動し、引き直すと再発動できる。</p>
           </section>
         )}
         {traits.length > 0 && (
