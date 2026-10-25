@@ -29,11 +29,10 @@ export function activateLoveUpAdditionalBuff(
     Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
       Math.fround(multiplier),
   );
-  const value = toInt32(base);
-  if (value <= 0) return state;
-  if (!source) throw new Error('STAR追加バフの発動元カードがありません。');
-  const boosted = applyAction52SkillBoost(state, source, value);
-  const percent = toInt32(boosted.value);
+  const value = Math.fround(roundToEven(base));
+  const boosted =
+    value > 0 && source ? applyAction52SkillBoost(state, source, value) : { state, value };
+  const percent = value > 0 && source ? toInt32(boosted.value) : value;
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['loveUpAdditionalBuffs'][number] = {
     id: boosted.state.nextSkillAdditionalBuffId,
@@ -128,6 +127,14 @@ function matches(target: LoveUpAdditionalBuffTarget, card: Card): boolean {
     case 'token-series':
       return card.tokenSeriesIds?.includes(target.seriesId) === true;
   }
+}
+
+function roundToEven(value: number): number {
+  const lower = Math.floor(value);
+  const fraction = value - lower;
+  if (fraction < 0.5) return lower;
+  if (fraction > 0.5) return lower + 1;
+  return lower % 2 === 0 ? lower : lower + 1;
 }
 
 function toInt32(value: number): number {

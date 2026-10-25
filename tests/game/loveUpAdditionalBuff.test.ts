@@ -126,3 +126,37 @@ it('ActionType30の登録値にActionType52を適用し、回数を消費する'
   expect(additional.loveUpAdditionalBuffs[0]?.percent).toBe(75);
   expect(additional.action52Buffs).toHaveLength(0);
 });
+
+it('ActionType30は小数の追加率をC#のMathf.Roundで丸めて登録する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const positive = applyEffect(
+    initial,
+    {
+      kind: 'love-up-additional-buff',
+      calculation: 1,
+      num: 6_000,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0 },
+      disabledType: 0,
+      disabledCount: 0,
+    },
+    source,
+  );
+  const negative = applyEffect(
+    initial,
+    {
+      kind: 'love-up-additional-buff',
+      calculation: 1,
+      num: -6_000,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0 },
+      disabledType: 0,
+      disabledCount: 0,
+    },
+    source,
+  );
+  expect(positive.loveUpAdditionalBuffs[0]?.percent).toBe(1);
+  expect(negative.loveUpAdditionalBuffs[0]?.percent).toBe(-1);
+});
