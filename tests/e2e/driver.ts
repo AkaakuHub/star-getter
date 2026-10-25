@@ -6,7 +6,7 @@ import { cardAt, canUseCard, moodValue } from '../../src/domain/game/projection'
 import { canUseSpecial } from '../../src/domain/game/special';
 import { heartCount } from '../../src/domain/game/hearts';
 import { type GameState, type Card, rules } from '../../src/domain/game/model';
-import { GameRecording } from './recording/gameRecording';
+import { GameRecording, type InputRecord } from './recording/gameRecording';
 
 export class GameDriver {
   private readonly controller: GameController;
@@ -44,6 +44,10 @@ export class GameDriver {
 
   get seconds(): number {
     return this.state.tick / rules.ticksPerSecond;
+  }
+
+  get inputs(): readonly InputRecord[] {
+    return this.recording.inputs;
   }
 
   toggleAutomaticHearts(): void {

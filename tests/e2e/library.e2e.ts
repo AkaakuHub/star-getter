@@ -34,6 +34,24 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   const lateStartTick = driver.state.tick;
   const lateRun = runCollections(driver, durationSeconds(driver.state), 15);
   driver.report('連鎖停止時だけカードで再始動し手動回収主体で60秒終了');
+  const firstStory = driver.inputs.find(
+    (row) => row.input.kind === 'card' && row.input.card.instanceId.startsWith('story-'),
+  );
+  if (!firstStory) throw new Error('増幅後の貝がら使用がありません。');
+  const earlierRedraws = driver.inputs.filter(
+    (row) =>
+      row.sequence < firstStory.sequence &&
+      row.input.kind === 'collect' &&
+      row.before.hand.map((card) => card.instanceId).join() !==
+        row.after.hand.map((card) => card.instanceId).join(),
+  );
+  expect(firstStory.before.deckSize).toBeGreaterThanOrEqual(95);
+  expect(earlierRedraws.length).toBeGreaterThanOrEqual(5);
+  const firstRedraw = earlierRedraws[0];
+  if (!firstRedraw) throw new Error('貝がら使用前の回収リドローがありません。');
+  expect(firstStory.before.storyAmplification).toBeGreaterThan(
+    firstRedraw.before.storyAmplification,
+  );
   expect(lateRun.collections).toBeGreaterThan(lateRun.cards);
   expect(lateRun.redraws).toBeGreaterThan(0);
   expect(lateRun.collectionGain).toBeGreaterThan(lateRun.cardGain);
@@ -42,6 +60,20 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   expect(driver.state.score).toBeGreaterThan(unplanned.state.score);
   expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
 });
+
+for (const seed of [456, 1234]) {
+  test(`うなばら:別の初期手札でも準備から回収連鎖へ移行する（seed ${seed}）`, () => {
+    const driver = new GameDriver('library', seed);
+    prepare(driver);
+    amplifyAndWiden(driver);
+    const run = runCollections(driver, durationSeconds(driver.state), 15);
+    expect(driver.state.phase).toBe('finished');
+    expect(driver.state.hearts.heartLimit).toBe(10_000_000);
+    expect(run.redraws).toBeGreaterThan(0);
+    expect(run.collections).toBeGreaterThan(run.cards);
+    expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
+  });
+}
 
 test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', () => {
   const prepared = new GameDriver('library');

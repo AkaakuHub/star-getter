@@ -58,13 +58,13 @@ export function prepare(driver: GameDriver): void {
               'class',
               'library-invitation',
               'library-ensemble',
-              'library-pages',
-              'story',
               'bookmark',
-              'camera',
               'ensemble',
               'clock',
               'aurora-ensemble',
+              'camera',
+              'library-pages',
+              'story',
             ]
           : [
               'class',
@@ -93,15 +93,15 @@ function hasAvailableBookmark(state: GameState): boolean {
 
 function restoreDeck(driver: GameDriver): void {
   driver.useFirst([
-    'library-pages',
     'library-invitation',
-    'library-ensemble',
-    'bookmark',
-    'clock',
-    'story',
     'ensemble',
-    'camera',
+    'library-ensemble',
+    'clock',
+    'bookmark',
     'aurora-ensemble',
+    'library-pages',
+    'camera',
+    'story',
   ]);
   if (driver.state.tick % 6 === 0) driver.collect();
 }
@@ -125,15 +125,15 @@ function maintainLoop(driver: GameDriver): void {
     ]);
   } else if (heartCount(driver.state) < 500_000) {
     driver.useFirst([
-      'story',
+      'bookmark',
+      'clock',
       'ensemble',
       'library-ensemble',
       'aurora-ensemble',
-      'clock',
-      'bookmark',
       'library-invitation',
       'library-pages',
       'camera',
+      'story',
     ]);
   }
   if (driver.state.tick % 6 === 0) driver.collect();
@@ -219,21 +219,21 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
   let maximumStreak = 0;
   while (driver.state.phase === 'playing' && driver.state.tick < until) {
     if ((driver.state.tick - start) % interval === 0) {
-      if (heartCount(driver.state) === 0) {
+      if (heartCount(driver.state) === 0 || driver.state.deck.length < 95) {
         const cardBefore = driver.state.score;
         const deckBefore = driver.state.deck.length;
         const used =
           driver.state.deck.length <= 96
             ? driver.useFirst([
-                'library-pages',
                 'library-invitation',
-                'library-ensemble',
-                'bookmark',
-                'clock',
-                'story',
                 'ensemble',
-                'camera',
+                'library-ensemble',
+                'clock',
+                'bookmark',
                 'aurora-ensemble',
+                'library-pages',
+                'camera',
+                'story',
               ])
             : driver.useFirst(
                 hasAvailableBookmark(driver.state)
