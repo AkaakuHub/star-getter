@@ -1,8 +1,9 @@
+import { finalizeStarGatherSkillCost } from '../live/skillCost';
 import type { Card, GameState } from '../model';
 
 export function cardCost(state: GameState, card: Card): number {
   if (card.token !== 'ensemble')
-    return Math.max(0, card.cost - (state.costReductions[card.id] ?? 0));
+    return finalizeStarGatherSkillCost(card.cost, -(state.costReductions[card.id] ?? 0));
   const total = state.hand.reduce((sum, id) => {
     const other = state.deck.find((item) => item.id === id);
     return (

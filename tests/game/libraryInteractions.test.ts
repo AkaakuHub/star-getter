@@ -90,7 +90,7 @@ it('山札を育ててから招待状を引くと、対応カードの消費量�
   const story = token(state, 'story');
   expect(cardCost(state, story)).toBe(5);
   const drawn = applyDrawAbility(state, invitation);
-  expect(cardCost(drawn, story)).toBe(0);
+  expect(cardCost(drawn, story)).toBe(1);
   expect(cardCost(drawn, other)).toBe(cardCost(state, other));
 });
 

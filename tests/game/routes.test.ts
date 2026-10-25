@@ -47,7 +47,7 @@ describe('固定プリセット', () => {
     );
     const source = state.deck.find((card) => card.id === state.hand[index]);
     if (!source) throw new Error('共演カードがありません。');
-    expect(cardCost(state, source)).toBe(0);
+    expect(cardCost(state, source)).toBe(1);
     const before = state.stats.cardsUsed;
     state = act(state, { type: 'card', index });
     expect(state.stats.cardsUsed - before).toBe(5);
