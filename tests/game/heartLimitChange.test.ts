@@ -73,6 +73,28 @@ it('乗算変更はC#のSkillグループ倍率式で基礎上限へ適用する
   expect(expireHeartLimitBuffSections(changed).hearts.heartLimit).toBe(5000);
 });
 
+it('ActionType25は追加バフ対象外の負数をそのまま上限変更へ渡す', () => {
+  const state = game();
+  const card = state.deck[0];
+  if (!card) throw new Error('きらめき上限変更の発動元カードがありません。');
+  const changed = applyEffect(
+    state,
+    {
+      kind: 'heart-limit-change',
+      calculationType: 1,
+      num: 10_000n,
+      bonusMoodTarget: 0,
+      bonusMoodValue: 0n,
+      duration: { kind: 'stage' },
+    },
+    card,
+    1,
+    -2,
+  );
+  expect(changed.heartLimitBuffs[0]?.value).toBe(-1);
+  expect(changed.hearts.heartLimit).toBe(99);
+});
+
 it('パート期限と外部解除で上限変更を解除し、直接上限変更は基礎値に加える', () => {
   const state = game();
   const card = state.deck[0];

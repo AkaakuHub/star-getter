@@ -11,7 +11,6 @@ type HeartLimitChangeEffect = Extract<Effect, { kind: 'heart-limit-change' }>;
 type HeartLimitBuff = GameState['heartLimitBuffs'][number];
 
 const heartLimitMaximum = 10_000_000;
-const minimumInt32 = -2_147_483_648;
 
 export function applyHeartLimit(state: GameState, amount: number): GameState {
   return materializeHeartLimit(
@@ -77,7 +76,7 @@ export function activateHeartLimitChange(
     additional.value > 0
       ? applyAction52SkillBoostForCard(additional.state, card, additional.value)
       : { state: additional.state, value: additional.value };
-  const buffValue = additional.value > 0 ? Math.trunc(action52.value) : minimumInt32;
+  const buffValue = additional.value > 0 ? Math.trunc(action52.value) : additional.value;
   const buff: HeartLimitBuff = {
     id: state.nextHeartLimitBuffId,
     calculation: effect.calculationType === 1 ? 'add' : 'multiply',
