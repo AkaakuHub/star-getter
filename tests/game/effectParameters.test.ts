@@ -52,12 +52,12 @@ describe('カード効果の可変パラメータ', () => {
     expect(effectDetailArray(parameters, 'value')).toEqual([1n, 2n]);
     expect(effectDetailArray(parameters, 'default')).toBeNull();
   });
-  it('倍率適用後は0方向へ32bit整数に変換し、正の無限大は最小値にする', () => {
+  it('倍率適用後は正の無限大方向へ32bit整数に変換し、無限大は最小値にする', () => {
     expect(effectDetailValue(setParameterFactor(parameters, 12340123n, 0.125), 'value')).toBe(
       1250n,
     );
     expect(effectDetailValue(setParameterFactor(parameters, 12340123n, 0.123456), 'value')).toBe(
-      1234n,
+      1235n,
     );
     expect(effectDetailValue(setParameterFactor(parameters, 12340123n, -0.123456), 'value')).toBe(
       -1234n,
