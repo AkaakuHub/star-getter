@@ -3,6 +3,7 @@ import { cardCost } from './cards/cost';
 import { moodAtTime } from './live/moodTimeline';
 import { type Card, type GameState, type Section, rules } from './model';
 import { resolveModeSkill } from './live/modes';
+import { skillCooldownSeconds } from './effects/skillCooldown';
 
 export function sectionAt(state: GameState): Section {
   const beat = ((state.tick / rules.ticksPerSecond) * state.track.bpm) / 60;
@@ -52,9 +53,8 @@ export function canUseCard(state: GameState, index: number): boolean {
 }
 
 export function cardCooldownTicks(state: GameState): number {
-  return Math.ceil(
-    (state.skillCooldownSeconds ??
-      calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000))) *
-      rules.ticksPerSecond,
-  );
+  const seconds = state.skillCooldownEffects.length
+    ? Math.min(...state.skillCooldownEffects.map((effect) => skillCooldownSeconds(state, effect)))
+    : calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000));
+  return Math.ceil(seconds * rules.ticksPerSecond);
 }

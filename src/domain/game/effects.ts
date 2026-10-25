@@ -14,6 +14,7 @@ import { collectHearts } from './hearts';
 import { type Card, type Effect, type GameState } from './model';
 import { applyTokenCardEffect, requestTokens } from './cards/tokens';
 import { activateTokenBoost } from './effects/tokenBoost';
+import { activateSkillCooldown } from './effects/skillCooldown';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
@@ -279,18 +280,8 @@ export function applyEffect(
     case 'amplify': {
       return applyAmplifyEffect(state, effect);
     }
-    case 'skill-cooldown': {
-      const seconds = Math.fround(
-        Math.fround(Math.fround(effect.ratio / 10000) * Math.fround(state.track.songTime)) / 10000,
-      );
-      return {
-        ...state,
-        skillCooldownSeconds:
-          state.skillCooldownSeconds === null
-            ? seconds
-            : Math.min(state.skillCooldownSeconds, seconds),
-      };
-    }
+    case 'skill-cooldown':
+      return activateSkillCooldown(state, effect);
     case 'bloom': {
       const base = value(effect.strength);
       const boosted = applyAction52SkillBoostForCard(state, card, base);

@@ -47,6 +47,7 @@ import {
   expireVoltageConversionSections,
 } from './effects/voltageConversion';
 import { advanceTimedSkillBuffs, expireTimedSkillBuffSections } from './effects/timedSkillBuffs';
+import { advanceSkillCooldownEffects, expireSkillCooldownSections } from './effects/skillCooldown';
 
 export function createGame(
   track: Track,
@@ -178,7 +179,8 @@ export function createGame(
         Math.round(((track.beats * 60) / track.bpm) * 1000),
       ) * rules.ticksPerSecond,
     ),
-    skillCooldownSeconds: null,
+    skillCooldownEffects: [],
+    nextSkillCooldownEffectId: 1,
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],
@@ -260,6 +262,7 @@ function advanceTick(state: GameState): GameState {
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
+  next = advanceSkillCooldownEffects(next, dt);
   const elapsedHandLimit = advanceHandLimitEffects(next, dt);
   next = elapsedHandLimit.state;
   next = advanceHeartLimitBuffs(next, dt);
@@ -275,6 +278,7 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
+    next = expireSkillCooldownSections(next);
     next = expireApSpeedSections(next);
     next = expireVoltageConversionSections(next);
     next = expireTimedSkillBuffSections(next);

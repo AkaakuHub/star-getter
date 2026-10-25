@@ -1,3 +1,4 @@
+import type { SkillCooldownEffect } from './skillCooldownTypes';
 import type { DisableMentalDown } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
@@ -263,7 +264,8 @@ export type GameState = Readonly<{
   combo: number;
   lastCollectTick: number;
   lastActionTick: number;
-  skillCooldownSeconds: number | null;
+  skillCooldownEffects: readonly SkillCooldownEffect[];
+  nextSkillCooldownEffectId: number;
   lastPerformer: PerformerId | null;
   lastCardName: string;
   cardUses: readonly CardUse[];
@@ -289,7 +291,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-mental-barrier-additional-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-down'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

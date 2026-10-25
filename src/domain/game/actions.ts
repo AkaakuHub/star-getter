@@ -30,6 +30,7 @@ import { deactivateMentalRecoverAdditionalBuffs } from './effects/mentalRecoverA
 import { deactivateMentalBarrierAdditionalBuffs } from './effects/mentalBarrierAdditionalBuff';
 import { deactivateDisableMentalDownEffects } from './effects/disableMentalDown';
 import { deactivateGaugeInfinities } from './resources';
+import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -84,6 +85,8 @@ export function act(state: GameState, action: Action): GameState {
       };
     case 'deactivate-infinity-gauge':
       return deactivateGaugeInfinities(state, action.deactivationKey);
+    case 'deactivate-skill-cooldown':
+      return deactivateSkillCooldownEffects(state, action.deactivationKey);
   }
 }
 

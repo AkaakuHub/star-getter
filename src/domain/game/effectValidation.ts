@@ -1,3 +1,4 @@
+import { validateSkillCooldownEffect } from './skillCooldownTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
 import { validateSpecialEffect } from './effectSpecialValidation';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
@@ -278,11 +279,7 @@ export function validateEffect(effect: Effect): void {
       throw new Error('詳細値変更の設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'skill-cooldown') {
-    if (!Number.isFinite(effect.ratio) || effect.ratio < 0)
-      throw new Error('アクション間隔が正しくありません。');
-    return;
-  }
+  if (effect.kind === 'skill-cooldown') return validateSkillCooldownEffect(effect);
   if (
     effect.kind === 'hearts' &&
     effect.lifetimeSeconds !== undefined &&

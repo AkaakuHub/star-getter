@@ -1,3 +1,4 @@
+import type { SkillCooldownEffectInput } from './skillCooldownTypes';
 import type { DisableMentalDownEffect } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
@@ -270,7 +271,7 @@ type EffectShape =
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
-  | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
+  | SkillCooldownEffectInput
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
   | Readonly<{
