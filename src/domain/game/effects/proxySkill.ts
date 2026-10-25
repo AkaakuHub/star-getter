@@ -137,7 +137,9 @@ export function absorbSkillEffect(
     const absorbedAmount =
       actionType === 48 && absorption.isAbsoluteAdd && amount < 0n ? -amount : amount;
     const effects = absorption.effects.map((item, index) =>
-      index === effectIndex ? { ...item, totalAmount: item.totalAmount + absorbedAmount } : item,
+      index === effectIndex
+        ? { ...item, totalAmount: BigInt.asIntN(64, item.totalAmount + absorbedAmount) }
+        : item,
     );
     const proxyAbsorptions = state.proxyAbsorptions.map((item, index) =>
       index === absorptionIndex ? { ...item, effects } : item,
