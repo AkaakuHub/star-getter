@@ -1,3 +1,5 @@
+import { createRangeRandom } from '../random';
+import { drawCandidate } from './drawLottery';
 import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
 import type { GameState } from '../model';
@@ -33,13 +35,20 @@ export function fillHand(state: GameState): GameState {
       next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
       candidates = next.drawPile.filter(eligible);
     }
-    const priority = candidates.find(
-      (id) => next.deck.find((card) => card.id === id)?.drawRule?.priority,
-    );
-    const drawn = priority ?? candidates[0] ?? next.drawPile[0];
+    const random = createRangeRandom(next.randomSeed);
+    const randomIndex = (maximumExclusive: number) => Math.floor(random.range(0, maximumExclusive));
+    const drawn =
+      drawCandidate(
+        candidates.map((id) => ({
+          id,
+          weight: next.deck.find((card) => card.id === id)?.drawRule?.priority ? -1 : 1,
+        })),
+        randomIndex,
+      ) ?? next.drawPile[randomIndex(next.drawPile.length)];
     if (!drawn) break;
     next = {
       ...next,
+      randomSeed: random.seed,
       hand: [...next.hand, drawn],
       drawPile: next.drawPile.filter((id) => id !== drawn),
       relayUsed: next.relayUsed.filter((id) => id !== drawn),
