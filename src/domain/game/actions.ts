@@ -210,7 +210,7 @@ function activateCard(
       },
     ],
   };
-  next = notifyHandCardBeforeUse(next, card, applyEffect);
+  next = notifyHandCardBeforeUse(next, card, 2, applyEffect);
   next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
   next = notifyComboSkillPoint(next, card, usedSkillCost);
   for (const effect of card.effects) {

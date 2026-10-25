@@ -101,9 +101,9 @@ it('Action903のUSEは発動前に発動元かつSkillType2の使用だけ反映
     cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
     handEffectCardIds: [source.id],
   };
-  const skillTypeOne = notifyHandCardBeforeUse(state, { ...handCard, skillType: 1 }, applyEffect);
+  const skillTypeOne = notifyHandCardBeforeUse(state, handCard, 1, applyEffect);
   expect(skillTypeOne.handUseActivationCounts[source.id]).toBeUndefined();
-  const skillTypeTwo = notifyHandCardBeforeUse(state, { ...handCard, skillType: 2 }, applyEffect);
+  const skillTypeTwo = notifyHandCardBeforeUse(state, handCard, 2, applyEffect);
   expect(skillTypeTwo.moodOffset).toBe(
     applyEffect(state, { kind: 'mood', amount: 1 }, handCard).moodOffset,
   );
@@ -117,7 +117,6 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
   const branchMood = moodValue(initial) + 1;
   const card = {
     ...source,
-    skillType: 2,
     effects: [
       {
         kind: 'branch' as const,

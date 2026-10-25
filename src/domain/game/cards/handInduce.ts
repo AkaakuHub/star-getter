@@ -27,13 +27,13 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
 export function notifyHandCardBeforeUse(
   state: GameState,
   used: Card,
+  skillType: number,
   apply: EffectApplier,
 ): GameState {
   return activateHandInducers(
     state,
     apply,
-    (trigger, source) =>
-      trigger.kind === 'same-card' && source.id === used.id && used.skillType === 2,
+    (trigger, source) => trigger.kind === 'same-card' && source.id === used.id && skillType === 2,
   );
 }
 

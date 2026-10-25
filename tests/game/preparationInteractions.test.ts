@@ -95,10 +95,15 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
     const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
     const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
     const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
-    const currentUsed = trigger.kind === 'same-card' ? { ...handCard, skillType: 2 } : used;
-    const notify = trigger.kind === 'same-card' ? notifyHandCardBeforeUse : notifyHandSkillUse;
-    const first = notify(state, currentUsed, applyEffect);
-    const second = notify(first, currentUsed, applyEffect);
+    const currentUsed = trigger.kind === 'same-card' ? handCard : used;
+    const first =
+      trigger.kind === 'same-card'
+        ? notifyHandCardBeforeUse(state, currentUsed, 2, applyEffect)
+        : notifyHandSkillUse(state, currentUsed, applyEffect);
+    const second =
+      trigger.kind === 'same-card'
+        ? notifyHandCardBeforeUse(first, currentUsed, 2, applyEffect)
+        : notifyHandSkillUse(first, currentUsed, applyEffect);
     expect(first.energy).toBe(1);
     expect(second.energy).toBe(1);
     expect(second.handUseActivationCounts[source.id]).toBe(1);
