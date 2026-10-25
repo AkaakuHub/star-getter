@@ -9,10 +9,13 @@ export function applyMentalBarrier(
   effect: MentalBarrierEffect,
   card: Card | undefined,
   multiplier: number,
+  addValue = 0,
+  effectPower = 1,
 ): GameState {
   const value = (amount: number) =>
-    Math.fround(skillValue(state, amount, effect, card) * multiplier);
-  const endurance = effect.enduranceType === 'infinite' ? 0 : value(effect.endurance);
+    Math.fround(Math.fround(skillValue(state, amount, effect, card) + addValue) * multiplier);
+  const endurance =
+    effect.enduranceType === 'infinite' ? 0 : Math.fround(value(effect.endurance) * effectPower);
   const boosted = card
     ? applyAction52SkillBoost(state, card, endurance)
     : { state, value: endurance };

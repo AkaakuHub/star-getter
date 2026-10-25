@@ -201,6 +201,21 @@ function validateEffect(effect: Effect): void {
       throw new Error('精神力連動ハート生成の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'combo-induce') {
+    const duration = effect.duration;
+    if (
+      effect.members.some((member) => !Number.isSafeInteger(member)) ||
+      !Number.isSafeInteger(effect.apPower) ||
+      ![0, 1, 2].includes(effect.repeatAction) ||
+      !['milliseconds', 'sections', 'stage'].includes(duration.kind) ||
+      !Number.isSafeInteger(duration.value) ||
+      (duration.kind === 'sections' && duration.value === 0) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('コンボ誘発の設定が正しくありません。');
+    for (const child of effect.effects) validateEffect(child);
+    return;
+  }
   if (effect.kind === 'skill-boost') {
     const duration = effect.duration;
     if (

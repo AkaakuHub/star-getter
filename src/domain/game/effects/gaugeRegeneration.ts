@@ -9,8 +9,14 @@ export function applyGaugeRegeneration(
   effect: GaugeRegenerationEffect,
   card: Card | undefined,
   multiplier: number,
+  addValue = 0,
+  effectPower = 1,
 ): GameState {
-  const base = Math.fround(skillValue(state, effect.amount, effect, card) * multiplier);
+  const base = Math.fround(
+    Math.fround(
+      Math.fround(skillValue(state, effect.amount, effect, card) + addValue) * multiplier,
+    ) * effectPower,
+  );
   const boosted = card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
   return startGaugeRegeneration(
     boosted.state,

@@ -34,6 +34,7 @@ import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
 import { activateVoltageConversion } from './effects/voltageConversion';
 import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
+import { activateComboInduce } from './effects/comboInduce';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -42,11 +43,25 @@ export function applyEffect(
   card?: Card,
   multiplier = 1,
   addValue = 0,
+  effectPower = 1,
 ): GameState {
   effect = resolveEffectParameterDetails(state, card, effect);
   if (effect.kind === 'proxy-skill-forced-activation')
     return forceProxySkillActivation(state, effect.targetType);
   if (effect.kind === 'proxy-skill') return registerProxySkill(state, effect, card);
+  if (effect.kind === 'voltage-convert')
+    return activateVoltageConversion(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'mental-heart-induce')
+    return activateMentalHeartInduce(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'combo-induce')
+    return activateComboInduce(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
+  if (effect.kind === 'ap-speed')
+    return applyApSpeedPercent(state, effect.percent, effect.duration);
+  if (effect.kind === 'voltage-tier')
+    return applyVoltageTier(state, effect, card, multiplier, addValue, applyEffect, effectPower);
+  if (effect.kind === 'ap-speed-change')
+    return applyApSpeedChange(state, effect, card, multiplier, addValue);
   const value = (amount: number) =>
     Math.fround(
       skillValue(state, Math.fround(Math.fround(amount + addValue) * multiplier), effect, card),
@@ -63,7 +78,7 @@ export function applyEffect(
             ? effect.whenTrue
             : effect.whenFalse;
       return effects.reduce(
-        (next, child) => applyEffect(next, child, card, multiplier, addValue),
+        (next, child) => applyEffect(next, child, card, multiplier, addValue, effectPower),
         state,
       );
     }
@@ -86,12 +101,12 @@ export function applyEffect(
                   : sectionAt(state) === state.track.sections.at(-1)
       )
         ? effect.effects.reduce(
-            (next, item) => applyEffect(next, item, card, multiplier, addValue),
+            (next, item) => applyEffect(next, item, card, multiplier, addValue, effectPower),
             state,
           )
         : state;
     case 'mood': {
-      const base = value(effect.amount);
+      const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
       return {
         ...boosted.state,
@@ -99,7 +114,7 @@ export function applyEffect(
       };
     }
     case 'hearts':
-      return createHeartsFromEffect(state, value(effect.amount), card, false);
+      return createHeartsFromEffect(state, value(effect.amount), card, false, effectPower);
     case 'beat-hearts':
       return createHeartsFromEffect(state, value(effect.amount), card, true);
     case 'tokens':
@@ -132,7 +147,7 @@ export function applyEffect(
     case 'hand-limit':
       return applyHandLimit(state, effect, card, multiplier, addValue);
     case 'heart-limit': {
-      const base = value(effect.amount);
+      const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
       return applyHeartLimit(boosted.state, Math.trunc(boosted.value));
     }
@@ -176,7 +191,7 @@ export function applyEffect(
       };
     }
     case 'energy': {
-      const base = value(effect.amount);
+      const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
       return changeResource(boosted.state, 'energy', BigInt(Math.trunc(boosted.value)));
     }
@@ -188,7 +203,7 @@ export function applyEffect(
     case 'reset-special':
       return applySpecialReset(state, effect, card);
     case 'mental-shield': {
-      const base = value(effect.amount);
+      const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
       return {
         ...boosted.state,
@@ -267,27 +282,13 @@ export function applyEffect(
     case 'infinity-gauge':
       return activateInfinityGauge(state, effect);
     case 'gauge-regeneration':
-      return applyGaugeRegeneration(state, effect, card, multiplier);
+      return applyGaugeRegeneration(state, effect, card, multiplier, addValue, effectPower);
     case 'mental-barrier':
-      return applyMentalBarrier(state, effect, card, multiplier);
-    case 'voltage-tier': {
-      return applyVoltageTier(state, effect, card, multiplier, addValue, applyEffect);
-    }
-    case 'ap-speed': {
-      return applyApSpeedPercent(state, effect.percent, effect.duration);
-    }
-    case 'ap-speed-change': {
-      return applyApSpeedChange(state, effect, card, multiplier, addValue);
-    }
-    case 'voltage-convert':
-      return activateVoltageConversion(state, effect, card, multiplier, addValue);
-    case 'mental-heart-induce':
-      return activateMentalHeartInduce(state, effect, card, multiplier, addValue);
-    case 'skill-boost':
-      return activateAction52SkillBoost(state, effect);
+      return applyMentalBarrier(state, effect, card, multiplier, addValue, effectPower);
     case 'stamina':
     case 'excitement': {
-      const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);
+      const base = Math.fround(Math.trunc(value(effect.amount)) * effectPower);
+      const boosted = applyAdditionalBuff(state, effect.kind, base, card);
       const action52 = applyAction52SkillBoostForCard(
         boosted.state,
         card,

@@ -12,6 +12,7 @@ import type { Effect } from './modelTypes';
 import type { TemporaryScoreBoost, VoltageConversion } from './voltageConversionTypes';
 import type { Action52Buff } from './skillBoostTypes';
 import type { MentalHeartInducer } from './mentalHeartInduceTypes';
+import type { ComboInducer } from './comboInduceTypes';
 import type {
   GaugeInfinity,
   GaugeRegeneration,
@@ -248,6 +249,7 @@ export type GameState = Readonly<{
   action52Buffs: readonly Action52Buff[];
   mentalHeartInducers: readonly MentalHeartInducer[];
   nextMentalHeartInducerId: number;
+  comboInducer: ComboInducer | null;
   apTimerSeconds: number;
   mentalTimerSeconds: number;
   voltageTimerSeconds: number;
@@ -309,7 +311,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

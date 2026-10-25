@@ -30,6 +30,7 @@ import { initializeHandCardStats } from './cards/skillCostChanges';
 import { initializeParameterValueFactors } from './parameters/parameterValueChange';
 import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/proxySkill';
 import { applyEffect } from './effects';
+import { advanceComboInducer, expireComboInducerSections } from './effects/comboInduce';
 import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
 import {
   advanceVoltageConversions,
@@ -103,6 +104,7 @@ export function createGame(
     action52Buffs: [],
     mentalHeartInducers: [],
     nextMentalHeartInducerId: 1,
+    comboInducer: null,
     nextVoltageConversionId: 1,
     nextAction52BuffId: 1,
     temporaryScoreBoosts: [],
@@ -223,8 +225,9 @@ function advanceTick(state: GameState): GameState {
     dt,
   );
   const proxyPeriodState = advanceProxySkillPeriods(gauges, dt, applyEffect);
+  const comboState = advanceComboInducer(proxyPeriodState, dt, applyEffect);
   let next: GameState = advanceHearts({
-    ...advanceHeartBoosts(proxyPeriodState, dt),
+    ...advanceHeartBoosts(comboState, dt),
     tick,
     voltageStops: state.voltageStops.flatMap((stop) => {
       if (stop.remainingSeconds === null) return [stop];
@@ -256,6 +259,7 @@ function advanceTick(state: GameState): GameState {
     next = expireVoltageConversionSections(next);
     next = expireAction52SkillBoostSections(next);
     next = expireMentalHeartInducerSections(next);
+    next = expireComboInducerSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;

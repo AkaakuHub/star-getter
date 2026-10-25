@@ -17,6 +17,7 @@ import { deactivateVoltageConversions } from './effects/voltageConversion';
 import { deactivateAction52SkillBoosts } from './effects/action52SkillBoost';
 import { restoreHandLimitCount } from './cards/drawing';
 import { deactivateMentalHeartInducers } from './effects/mentalHeartInduce';
+import { deactivateComboInducer, notifyComboSkillPoint } from './effects/comboInduce';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -46,6 +47,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateAction52SkillBoosts(state, action.deactivationKey);
     case 'deactivate-mental-heart-induce':
       return deactivateMentalHeartInducers(state, action.deactivationKey);
+    case 'deactivate-combo-induce':
+      return deactivateComboInducer(state, action.deactivationKey);
   }
 }
 
@@ -100,6 +103,7 @@ function activateCard(
     ],
   };
   next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
+  next = notifyComboSkillPoint(next, card, cardCost(state, card));
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') {
       if (allHand) continue;

@@ -22,6 +22,7 @@ export function createHeartsFromEffect(
   amount: number,
   card: Card | undefined,
   byBeat: boolean,
+  effectPower = 1,
 ): GameState {
   const percent = state.deck.reduce(
     (sum, item) =>
@@ -40,8 +41,11 @@ export function createHeartsFromEffect(
   const action52 = applyAction52SkillBoostForCard(state, card, base);
   const heartBase = Math.trunc(action52.value);
   const boosted = consumeHeartBoosts(action52.state, card, heartBase);
-  return addHearts(
-    boosted.state,
-    Math.ceil(Math.fround(heartBase + (heartBase * boosted.percent) / 100)),
+  const count = Math.max(
+    1,
+    Math.trunc(
+      Math.fround(Math.fround(heartBase + (heartBase * boosted.percent) / 100) * effectPower),
+    ),
   );
+  return addHearts(boosted.state, count);
 }

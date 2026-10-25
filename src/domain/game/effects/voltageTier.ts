@@ -8,6 +8,7 @@ type ApplyEffect = (
   card?: Card,
   multiplier?: number,
   addValue?: number,
+  effectPower?: number,
 ) => GameState;
 
 export function applyVoltageTier(
@@ -17,12 +18,13 @@ export function applyVoltageTier(
   multiplier: number,
   addValue: number,
   applyEffect: ApplyEffect,
+  effectPower: number,
 ): GameState {
   if (state.bloom)
     return effect.tiers.reduceRight(
       (next, tier) =>
         tier.reduce(
-          (current, child) => applyEffect(current, child, card, multiplier, addValue),
+          (current, child) => applyEffect(current, child, card, multiplier, addValue, effectPower),
           next,
         ),
       state,
@@ -35,5 +37,8 @@ export function applyVoltageTier(
       )
     ];
   if (!tier) throw new Error('熱気の段階に対応する効果がありません。');
-  return tier.reduce((next, child) => applyEffect(next, child, card, multiplier, addValue), state);
+  return tier.reduce(
+    (next, child) => applyEffect(next, child, card, multiplier, addValue, effectPower),
+    state,
+  );
 }

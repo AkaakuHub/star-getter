@@ -55,6 +55,15 @@ export type MentalBarrierEffect = Readonly<{
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
     | Readonly<{ kind: 'stage' }>;
 }>;
+export type ComboInduceEffect = Readonly<{
+  kind: 'combo-induce';
+  members: readonly MemberId[];
+  apPower: number;
+  repeatAction: 0 | 1 | 2;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  effects: readonly Effect[];
+  deactivationKey?: string;
+}>;
 type ResetSpecial = Readonly<{
   kind: 'reset-special';
   scope: 'normal' | 'extra' | 'all';
@@ -273,6 +282,7 @@ type EffectShape =
     }>
   | VoltageConvertEffect
   | MentalHeartInduceEffect
+  | ComboInduceEffect
   | Action52BuffEffect
   | ResetSpecial
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
