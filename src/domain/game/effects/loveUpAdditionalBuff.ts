@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   LoveUpAdditionalBuffEffect,
@@ -29,7 +30,8 @@ export function activateLoveUpAdditionalBuff(
     Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
       Math.fround(multiplier),
   );
-  const value = Math.fround(roundToEven(base));
+  const value = roundToEvenFloat32(base);
+  if (value > 0 && !source) throw new Error('STAR追加バフの発動元カードがありません。');
   const boosted =
     value > 0 && source ? applyAction52SkillBoost(state, source, value) : { state, value };
   const percent = value > 0 && source ? toInt32(boosted.value) : value;
@@ -127,14 +129,6 @@ function matches(target: LoveUpAdditionalBuffTarget, card: Card): boolean {
     case 'token-series':
       return card.tokenSeriesIds?.includes(target.seriesId) === true;
   }
-}
-
-function roundToEven(value: number): number {
-  const lower = Math.floor(value);
-  const fraction = value - lower;
-  if (fraction < 0.5) return lower;
-  if (fraction > 0.5) return lower + 1;
-  return lower % 2 === 0 ? lower : lower + 1;
 }
 
 function toInt32(value: number): number {

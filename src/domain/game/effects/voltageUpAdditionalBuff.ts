@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   VoltageUpAdditionalBuffEffect,
@@ -26,13 +27,14 @@ export function activateVoltageUpAdditionalBuff(
     : 0;
   const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
   const base = Math.fround(
-    roundToEven(
+    roundToEvenFloat32(
       Math.fround(
         Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
           Math.fround(multiplier),
       ),
     ),
   );
+  if (base > 0 && !source) throw new Error('熱気追加バフの発動元カードがありません。');
   const boosted =
     base > 0 && source ? applyAction52SkillBoost(state, source, base) : { state, value: base };
   const percent = base > 0 && source ? toInt32(boosted.value) : base;
@@ -86,14 +88,6 @@ export function expireVoltageUpAdditionalBuffSections(state: GameState): GameSta
       return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
     }),
   };
-}
-
-function roundToEven(value: number): number {
-  const lower = Math.floor(value);
-  const fraction = value - lower;
-  if (fraction < 0.5) return lower;
-  if (fraction > 0.5) return lower + 1;
-  return lower % 2 === 0 ? lower : lower + 1;
 }
 
 function matches(target: VoltageUpAdditionalBuffTarget, card: Card): boolean {

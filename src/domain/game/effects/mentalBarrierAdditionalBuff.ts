@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   MentalBarrierAdditionalBuffEffect,
@@ -25,19 +26,17 @@ export function activateMentalBarrierAdditionalBuff(
       )
     : 0;
   const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
-  let percent = toInt32(
+  const value = roundToEvenFloat32(
     Math.fround(
       Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
         Math.fround(multiplier),
     ),
   );
-  let next = state;
-  if (percent > 0) {
-    if (!source) throw new Error('元気バリア追加バフの発動元カードがありません。');
-    const boosted = applyAction52SkillBoost(state, source, percent);
-    percent = toInt32(boosted.value);
-    next = boosted.state;
-  }
+  if (value > 0 && !source) throw new Error('元気バリア追加バフの発動元カードがありません。');
+  const boosted =
+    value > 0 && source ? applyAction52SkillBoost(state, source, value) : { state, value };
+  const percent = value > 0 && source ? toInt32(boosted.value) : value;
+  const next = boosted.state;
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['mentalBarrierAdditionalBuffs'][number] = {
     id: next.nextSkillAdditionalBuffId,

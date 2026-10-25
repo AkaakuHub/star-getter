@@ -131,32 +131,21 @@ it('ActionType30は小数の追加率をC#のMathf.Roundで丸めて登録する
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
-  const positive = applyEffect(
-    initial,
-    {
-      kind: 'love-up-additional-buff',
-      calculation: 1,
-      num: 6_000,
-      target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      disabledType: 0,
-      disabledCount: 0,
-    },
-    source,
+  const percentages = [6_000, -6_000, 5_000, 15_000].map(
+    (num) =>
+      applyEffect(
+        initial,
+        {
+          kind: 'love-up-additional-buff',
+          calculation: 1,
+          num,
+          target: { kind: 'all' },
+          duration: { kind: 'stage', value: 0 },
+          disabledType: 0,
+          disabledCount: 0,
+        },
+        source,
+      ).loveUpAdditionalBuffs[0]?.percent,
   );
-  const negative = applyEffect(
-    initial,
-    {
-      kind: 'love-up-additional-buff',
-      calculation: 1,
-      num: -6_000,
-      target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      disabledType: 0,
-      disabledCount: 0,
-    },
-    source,
-  );
-  expect(positive.loveUpAdditionalBuffs[0]?.percent).toBe(1);
-  expect(negative.loveUpAdditionalBuffs[0]?.percent).toBe(-1);
+  expect(percentages).toEqual([1, -1, 0, 2]);
 });

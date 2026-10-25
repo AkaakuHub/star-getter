@@ -91,7 +91,7 @@ it('ActionType31は正負の小数追加率をC#のMathf.Roundで登録する', 
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
-  const percentages = [6_000, -6_000].map((num) => {
+  const percentages = [6_000, -6_000, 5_000, 15_000].map((num) => {
     const changed = applyEffect(
       initial,
       {
@@ -107,5 +107,5 @@ it('ActionType31は正負の小数追加率をC#のMathf.Roundで登録する', 
     );
     return changed.voltageUpAdditionalBuffs[0]?.percent;
   });
-  expect(percentages).toEqual([1, -1]);
+  expect(percentages).toEqual([1, -1, 0, 2]);
 });

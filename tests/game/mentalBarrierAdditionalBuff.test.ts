@@ -65,3 +65,26 @@ it('ActionType33の期限とInvocationType 0x388の期限抑止を適用する',
       .mentalBarrierAdditionalBuffs,
   ).toHaveLength(1);
 });
+
+it('ActionType33は負数と小数の追加率をC#のMathf.Roundで登録する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const percentages = [6_000, -6_000, 5_000, 15_000].map((num) => {
+    const changed = applyEffect(
+      initial,
+      {
+        kind: 'mental-barrier-additional-buff',
+        calculation: 1,
+        num,
+        target: { kind: 'all' },
+        duration: { kind: 'stage', value: 0 },
+        disabledType: 0,
+        disabledCount: 0,
+      },
+      source,
+    );
+    return changed.mentalBarrierAdditionalBuffs[0]?.percent;
+  });
+  expect(percentages).toEqual([1, -1, 0, 2]);
+});

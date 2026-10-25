@@ -104,3 +104,26 @@ it('ActionType32の登録値にActionType52を適用する', () => {
   expect(additional.mentalRecoverAdditionalBuffs[0]?.percent).toBe(75);
   expect(additional.action52Buffs).toHaveLength(0);
 });
+
+it('ActionType32は正負の小数追加率をC#のMathf.Roundで登録する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const percentages = [6_000, -6_000, 5_000, 15_000].map((num) => {
+    const changed = applyEffect(
+      initial,
+      {
+        kind: 'recover-mental-additional-buff',
+        calculation: 1,
+        num,
+        target: { kind: 'all' },
+        duration: { kind: 'stage', value: 0 },
+        disabledType: 0,
+        disabledCount: 0,
+      },
+      source,
+    );
+    return changed.mentalRecoverAdditionalBuffs[0]?.percent;
+  });
+  expect(percentages).toEqual([1, -1, 0, 2]);
+});

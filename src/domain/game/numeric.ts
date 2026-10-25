@@ -16,3 +16,11 @@ export function int64ToFloat32(value: bigint): number {
   }
   return Math.fround(sign * Number(significand) * 2 ** shift);
 }
+
+export function roundToEvenFloat32(value: number): number {
+  const lower = Math.floor(value);
+  const fraction = value - lower;
+  const rounded =
+    fraction < 0.5 ? lower : fraction > 0.5 ? lower + 1 : lower % 2 === 0 ? lower : lower + 1;
+  return Math.fround(rounded);
+}
