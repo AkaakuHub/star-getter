@@ -80,6 +80,11 @@ it('Action50の詳細値をC#のint32へ変換してからNumToValueを計算す
   expect(wrapped.moodValueAdditionalBuffs[0]?.value).toBe(-214_748.359375);
 });
 
+it('Action50のMultiply2値はC#のMathf.Roundと同じ偶数丸めを行う', () => {
+  const state = applyEffect(game('library'), additiveBoost({ calculationType: 1, num: 15_000 }));
+  expect(state.moodValueAdditionalBuffs[0]?.value).toBe(2);
+});
+
 it('Action50の対象とTokenCardSeriesパラメーターをC#の検索条件通りに扱う', () => {
   const initial = game('library');
   const card = initial.deck[0];
