@@ -3,6 +3,7 @@ import {
   advanceWaitMode,
   createWaitMode,
   releaseWaitMode,
+  notifyWaitModeSkillUse,
 } from '../../src/domain/game/live/waitMode';
 
 const available = {
@@ -66,4 +67,28 @@ describe('本家のカード待ち状態遷移', () => {
     expect(next.kind).toBe('initial');
     expect(next.previousAvailableCards).toBe(0);
   });
+});
+
+it('停止中でなくても通常カード使用後は0.35秒を設定し、同じ手札も再判定する', () => {
+  const initial = {
+    ...createWaitMode(),
+    kind: 'initial' as const,
+    previousAvailableCards: 3,
+    previousSkillPoint: 10,
+  };
+  const used = notifyWaitModeSkillUse(initial, true);
+  expect(used.kind).toBe('force-reserved');
+  expect(used.remainingCoolTimeSeconds).toBe(0.35);
+  const below = advanceWaitMode(used, { ...available, deltaTimeSeconds: 0.34 });
+  expect(below.kind).toBe('force-reserved');
+  expect(advanceWaitMode(below, { ...available, deltaTimeSeconds: 0.02 }).kind).toBe('waiting');
+});
+
+it('待ちOFFの通常カードは待ちを有効化せず、停止中でない共鳴は待ち時間を変更しない', () => {
+  const disabled = notifyWaitModeSkillUse(createWaitMode(), true);
+  expect(disabled.kind).toBe('disabled');
+  expect(disabled.remainingCoolTimeSeconds).toBe(0.35);
+  const initial = { ...createWaitMode(), kind: 'initial' as const };
+  expect(notifyWaitModeSkillUse(initial, false)).toBe(initial);
+  expect(notifyWaitModeSkillUse(waiting(), false).kind).toBe('force-reserved');
 });

@@ -7,6 +7,7 @@ import {
   advanceWaitMode,
   createWaitMode,
   releaseWaitMode,
+  notifyWaitModeSkillUse,
   type WaitModeState,
 } from '../domain/game/live/waitMode';
 import { advanceTo } from '../domain/game/simulation';
@@ -178,13 +179,11 @@ export class GameController {
     const previousUses = this.currentState.stats.cardsUsed;
     const previousSpecials = this.currentState.stats.specialsUsed;
     this.applyState(act(this.currentState, action));
-    if (
-      this.waiting &&
-      (this.currentState.stats.cardsUsed > previousUses ||
-        this.currentState.stats.specialsUsed > previousSpecials)
-    ) {
-      this.waitState = releaseWaitMode(this.waitState, true);
-      void this.resumeFromWait();
+    const normalSkill = this.currentState.stats.cardsUsed > previousUses;
+    if (normalSkill || this.currentState.stats.specialsUsed > previousSpecials) {
+      const wasWaiting = this.waiting;
+      this.waitState = notifyWaitModeSkillUse(this.waitState, normalSkill);
+      if (wasWaiting) void this.resumeFromWait();
     }
     if (this.selection !== null && !this.currentState.hand.includes(this.selection))
       this.selection = null;

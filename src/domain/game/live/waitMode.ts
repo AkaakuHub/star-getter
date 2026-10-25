@@ -1,3 +1,5 @@
+const waitModeCooldownSeconds = 0.35;
+
 export type WaitModeState = Readonly<{
   kind: 'disabled' | 'initial' | 'reserved' | 'force-reserved' | 'waiting';
   remainingCoolTimeSeconds: number;
@@ -18,7 +20,17 @@ export function releaseWaitMode(state: WaitModeState, skillUsed: boolean): WaitM
   return {
     ...state,
     kind: skillUsed ? 'force-reserved' : 'initial',
-    remainingCoolTimeSeconds: 0.35,
+    remainingCoolTimeSeconds: waitModeCooldownSeconds,
+  };
+}
+
+export function notifyWaitModeSkillUse(state: WaitModeState, normalSkill: boolean): WaitModeState {
+  if (state.kind === 'waiting') return releaseWaitMode(state, true);
+  if (!normalSkill) return state;
+  return {
+    ...state,
+    kind: state.kind === 'initial' ? 'force-reserved' : state.kind,
+    remainingCoolTimeSeconds: waitModeCooldownSeconds,
   };
 }
 
