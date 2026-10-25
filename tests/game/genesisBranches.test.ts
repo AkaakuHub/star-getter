@@ -63,3 +63,14 @@ it('開花中の50万回収は通常の元気と熱気が未達でも枝と検�
   expect(next.bloom?.progress).toBeLessThan(1_000_000n);
   expect(next.hand).not.toEqual(state.hand);
 });
+
+it('熱気増幅の対象は小鈴を含むDOLLCHESTRA全員になる', () => {
+  const state = game();
+  const pulse = state.deck.find((card) => card.id === 'frost-pulse');
+  if (!pulse) throw new Error('凍空の鼓動がありません。');
+  const next = pulse.effects.reduce((current, effect) => applyEffect(current, effect, pulse), {
+    ...state,
+    moodOffset: -100,
+  });
+  expect(next.targetBoosts.some((boost) => boost.members.includes(1042))).toBe(true);
+});

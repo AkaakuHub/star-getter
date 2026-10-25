@@ -45,7 +45,7 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <section>
             <h3>手札にある間</h3>
             <p>
-              {handUse.trigger === 'any' ? '他のカード' : unitCardNames(handUse.trigger)}
+              {unitCardNames(handUse.trigger)}
               を使用したとき
             </p>
             <EffectDetails effects={handUse.effects} />

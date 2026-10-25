@@ -141,7 +141,7 @@ export const bloomCards: readonly Card[] = [
             {
               kind: 'amplify',
               percent,
-              members: [1022, 1032],
+              members: [1022, 1032, 1042],
               moodBonus: { target: 3, perPoint: percent * 0.005 },
             },
           ]),
