@@ -2,6 +2,18 @@ import type { ConditionContext, GameCondition } from './model';
 
 export function evaluateCondition(condition: GameCondition, context: ConditionContext): boolean {
   switch (condition.kind) {
+    case 'always':
+      return true;
+    case 'mental-at-most':
+      return context.mentalFraction <= condition.fraction;
+    case 'mood-at-most':
+      return context.moodValue <= condition.value;
+    case 'voltage-level-at-most':
+      return context.heatLevel <= condition.level;
+    case 'part-at-most':
+      return context.partIndex + 1 <= condition.number;
+    case 'relative-part':
+      return context.partNumber === condition.number;
     case 'heat':
       return context.heatLevel >= condition.minimum;
     case 'stamina':

@@ -103,7 +103,10 @@ export function applyEffect(
     case 'branch': {
       const context = conditionContext(state);
       const resourceBranch =
-        effect.condition.kind === 'heat' || effect.condition.kind === 'stamina';
+        effect.condition.kind === 'heat' ||
+        effect.condition.kind === 'stamina' ||
+        effect.condition.kind === 'mental-at-most' ||
+        effect.condition.kind === 'voltage-level-at-most';
       const effects =
         context.bloomActive && resourceBranch
           ? [...effect.whenTrue, ...effect.whenFalse]

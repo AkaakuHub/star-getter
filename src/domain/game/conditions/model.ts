@@ -1,4 +1,9 @@
 export type GameCondition =
+  | Readonly<{ kind: 'always' }>
+  | Readonly<{ kind: 'mental-at-most'; fraction: number }>
+  | Readonly<{ kind: 'mood-at-most'; value: number }>
+  | Readonly<{ kind: 'voltage-level-at-most'; level: number }>
+  | Readonly<{ kind: 'part-at-most' | 'relative-part'; number: number }>
   | Readonly<{ kind: 'heat'; minimum: number }>
   | Readonly<{ kind: 'stamina'; minimumPercent: number }>
   | Readonly<{ kind: 'weather'; minimum: number }>
@@ -11,6 +16,8 @@ export type GameCondition =
 
 export type ConditionContext = Readonly<{
   heatLevel: number;
+  mentalFraction: number;
+  moodValue: number;
   staminaPercent: number;
   weather: number;
   partIndex: number;

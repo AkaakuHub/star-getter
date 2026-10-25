@@ -7,6 +7,8 @@ import { game } from './support/game';
 
 const context: ConditionContext = {
   heatLevel: 950,
+  mentalFraction: 0.3,
+  moodValue: -100,
   staminaPercent: 30,
   weather: -100,
   partIndex: 2,
@@ -20,6 +22,23 @@ const context: ConditionContext = {
 
 describe('カード共通の条件判定', () => {
   const cases: readonly Readonly<{ condition: GameCondition; less: GameCondition }>[] = [
+    {
+      condition: { kind: 'mental-at-most', fraction: 0.3 },
+      less: { kind: 'mental-at-most', fraction: 0.29 },
+    },
+    {
+      condition: { kind: 'mood-at-most', value: -100 },
+      less: { kind: 'mood-at-most', value: -101 },
+    },
+    {
+      condition: { kind: 'voltage-level-at-most', level: 950 },
+      less: { kind: 'voltage-level-at-most', level: 949 },
+    },
+    { condition: { kind: 'part-at-most', number: 3 }, less: { kind: 'part-at-most', number: 2 } },
+    {
+      condition: { kind: 'relative-part', number: 99 },
+      less: { kind: 'relative-part', number: 3 },
+    },
     { condition: { kind: 'heat', minimum: 950 }, less: { kind: 'heat', minimum: 951 } },
     {
       condition: { kind: 'stamina', minimumPercent: 30 },
@@ -54,6 +73,9 @@ describe('カード共通の条件判定', () => {
       expect(evaluateCondition(condition, context)).toBe(true);
       expect(evaluateCondition(less, context)).toBe(false);
     });
+  it('無条件分岐は常に成立する', () => {
+    expect(evaluateCondition({ kind: 'always' }, context)).toBe(true);
+  });
   it('複数系列に一致する追加カードも1枚として数える', () => {
     expect(evaluateCondition({ kind: 'token-series', series: [1, 2], minimum: 3 }, context)).toBe(
       false,
@@ -70,6 +92,17 @@ describe('カード共通の条件判定', () => {
     expect(applyEffect(initial, effect).maxEnergy).toBe(initial.maxEnergy + 2);
     const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
     expect(applyEffect(bloom, effect).maxEnergy).toBe(initial.maxEnergy + 3);
+  });
+  it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
+    const initial = game();
+    const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
+    const result = applyEffect(bloom, {
+      kind: 'branch',
+      condition: { kind: 'mental-at-most', fraction: 0.5 },
+      whenTrue: [{ kind: 'energy-limit', amount: 1 }],
+      whenFalse: [{ kind: 'energy-limit', amount: 2 }],
+    });
+    expect(result.maxEnergy).toBe(bloom.maxEnergy + 3);
   });
   it('開花中も空模様分岐は両側を発動しない', () => {
     const bloom = applyEffect(game(), { kind: 'bloom', strength: 1 });

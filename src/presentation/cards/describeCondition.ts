@@ -3,6 +3,18 @@ import { formatNumber } from '../score/formatNumber';
 
 export function describeCondition(condition: GameCondition): string {
   switch (condition.kind) {
+    case 'always':
+      return '常に成立';
+    case 'mental-at-most':
+      return `元気が${formatNumber(condition.fraction * 100)}%以下`;
+    case 'mood-at-most':
+      return `気分値が${formatNumber(condition.value)}以下`;
+    case 'voltage-level-at-most':
+      return `熱気が${formatNumber(condition.level)}段階以下`;
+    case 'part-at-most':
+      return `パート${condition.number}まで`;
+    case 'relative-part':
+      return condition.number === 99 ? '山場' : `パート${condition.number}`;
     case 'heat':
       return `熱気が${formatNumber(condition.minimum)}段階以上`;
     case 'stamina':

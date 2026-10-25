@@ -8,6 +8,8 @@ export function conditionContext(state: GameState): ConditionContext {
   const partIndex = state.track.sections.indexOf(sectionAt(state));
   return {
     heatLevel: voltageLevel(state.excitement, state.maximumVoltageLevel),
+    mentalFraction: state.stamina / state.maximumMental,
+    moodValue: moodValue(state),
     staminaPercent: Math.trunc((state.stamina * 100) / state.maximumMental),
     weather: moodValue(state),
     partIndex,
