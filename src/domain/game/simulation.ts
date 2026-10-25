@@ -64,6 +64,7 @@ export function createGame(
     apTimerSeconds: 0,
     mentalTimerSeconds: 0,
     voltageTimerSeconds: 0,
+    voltageStops: [],
     moodOffset: 0,
     costReductions: {},
     storyAmplification: 0,
@@ -153,6 +154,11 @@ function advanceTick(state: GameState): GameState {
   let next: GameState = advanceHearts({
     ...gauges,
     tick,
+    voltageStops: state.voltageStops.flatMap((stop) => {
+      if (stop.remainingSeconds === null) return [stop];
+      const remainingSeconds = Math.fround(stop.remainingSeconds - Math.fround(dt));
+      return remainingSeconds > 0 ? [{ ...stop, remainingSeconds }] : [];
+    }),
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
@@ -165,6 +171,11 @@ function advanceTick(state: GameState): GameState {
   if (sectionAt(next) !== sectionAt(state))
     next = fillHand({
       ...next,
+      voltageStops: next.voltageStops.flatMap((stop) => {
+        if (stop.remainingSections === null) return [stop];
+        const remainingSections = stop.remainingSections - 1;
+        return remainingSections > 0 ? [{ ...stop, remainingSections }] : [];
+      }),
       handLimit: rules.handSize,
       moodOffset: 0,
       sectionMentalProtected: false,

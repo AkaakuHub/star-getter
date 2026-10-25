@@ -60,6 +60,10 @@ export function describeEffect(effect: Effect): string {
       return `次の${effect.uses}回のきらめき獲得効果を${effect.percent}%増幅する。`;
     case 'voltage-set':
       return `熱気を${effect.amount.toLocaleString('ja-JP')}にする。`;
+    case 'stop-voltage-increase':
+      return effect.duration.kind === 'milliseconds'
+        ? `${effect.duration.value}ミリ秒間、熱気の自然増加を停止する。`
+        : `${effect.duration.value}パートの間、熱気の自然増加を停止する。`;
     case 'voltage-limit':
       return `熱気Lv.上限を${effect.amount}増加する。`;
     case 'beat-hearts':

@@ -91,6 +91,11 @@ function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
+  if (effect.kind === 'stop-voltage-increase') {
+    if (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)
+      throw new Error('熱気停止の期限が正しくありません。');
+    return;
+  }
   if (
     effect.kind === 'amplify' ||
     effect.kind === 'resource-boost' ||

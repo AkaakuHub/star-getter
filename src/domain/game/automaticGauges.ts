@@ -25,9 +25,15 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
   next = {
     ...next,
     apTimerSeconds: ap.timerSeconds,
-    voltageTimerSeconds: Math.fround(Math.fround(state.voltageTimerSeconds) + Math.fround(dt)),
+    voltageTimerSeconds:
+      state.voltageStops.length > 0
+        ? state.voltageTimerSeconds
+        : Math.fround(Math.fround(state.voltageTimerSeconds) + Math.fround(dt)),
   };
-  while (stage.voltageIncreaseIntervalSeconds < next.voltageTimerSeconds) {
+  while (
+    next.voltageStops.length === 0 &&
+    stage.voltageIncreaseIntervalSeconds < next.voltageTimerSeconds
+  ) {
     next = changeResource(
       {
         ...next,

@@ -84,6 +84,10 @@ export type Effect =
     }>
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | Readonly<{
+      kind: 'stop-voltage-increase';
+      duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    }>
+  | Readonly<{
       kind: 'resource-boost';
       target: 'excitement' | 'stamina' | 'attract';
       percent: number;
@@ -257,6 +261,10 @@ export type GameState = Readonly<{
   apTimerSeconds: number;
   mentalTimerSeconds: number;
   voltageTimerSeconds: number;
+  voltageStops: readonly Readonly<{
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+  }>[];
   moodOffset: number;
   costReductions: Readonly<Record<string, number>>;
   storyAmplification: number;

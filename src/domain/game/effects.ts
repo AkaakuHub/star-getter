@@ -165,6 +165,21 @@ export function applyEffect(
         'excitement',
         BigInt(Math.trunc(Math.fround(effect.amount)) - Math.trunc(state.excitement)),
       );
+    case 'stop-voltage-increase':
+      if (effect.duration.value === 0) return state;
+      return {
+        ...state,
+        voltageStops: [
+          ...state.voltageStops,
+          {
+            remainingSeconds:
+              effect.duration.kind === 'milliseconds'
+                ? Math.fround(Math.fround(effect.duration.value) / 1000)
+                : null,
+            remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
+          },
+        ],
+      };
     case 'voltage-tier': {
       if (state.bloom)
         return effect.tiers.reduceRight(

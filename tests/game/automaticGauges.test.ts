@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
 import { activateBloom } from '../../src/domain/game/bloom';
+import { applyEffect } from '../../src/domain/game/effects';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
@@ -58,4 +59,46 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   expect(normal.excitement).toBe(initial.excitement);
   expect(normal.bloom?.progress).toBe(initial.bloom?.progress);
   expect(protectedAfter.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 2n);
+});
+
+it('熱気の自然増加停止を重ねると、すべての停止期限が切れるまでタイマーも停止する', () => {
+  const initial = game('library');
+  expect(
+    applyEffect(initial, {
+      kind: 'stop-voltage-increase',
+      duration: { kind: 'milliseconds', value: 0 },
+    }),
+  ).toBe(initial);
+  const first = applyEffect(initial, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'milliseconds', value: 500 },
+  });
+  const overlapping = applyEffect(first, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'milliseconds', value: 1000 },
+  });
+  const half = advanceTo(overlapping, 0.5);
+  expect(half.voltageStops).toHaveLength(1);
+  expect(half.voltageTimerSeconds).toBe(0);
+  const expired = advanceTo(half, 1 + 1 / 60);
+  expect(expired.voltageStops).toHaveLength(0);
+  expect(expired.voltageTimerSeconds).toBe(0);
+  expect(advanceTo(expired, 1.6).excitement).toBe(1);
+});
+
+it('パート数で指定した熱気停止は指定回数の切替まで継続する', () => {
+  const initial = game('library');
+  const stops = applyEffect(initial, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'sections', value: 2 },
+  });
+  const firstSection = initial.track.sections[1];
+  const secondSection = initial.track.sections[2];
+  if (!firstSection || !secondSection) throw new Error('パートが不足しています。');
+  const first = advanceTo(stops, (firstSection.startBeat * 60) / initial.track.bpm);
+  expect(first.voltageStops[0]?.remainingSections).toBe(1);
+  expect(first.excitement).toBe(0);
+  const second = advanceTo(first, (secondSection.startBeat * 60) / initial.track.bpm + 1 / 60);
+  expect(second.voltageStops).toHaveLength(0);
+  expect(second.excitement).toBe(0);
 });
