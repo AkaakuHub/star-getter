@@ -5,6 +5,7 @@ import { applyParameterValueChange } from './parameterValueChange';
 import { applyDeckSkillCostChange } from '../cards/deckSkillCostChange';
 import { activateLoveUpAdditionalBuff } from '../effects/loveUpAdditionalBuff';
 import { activateVoltageUpAdditionalBuff } from '../effects/voltageUpAdditionalBuff';
+import { activateMentalRecoverAdditionalBuff } from '../effects/mentalRecoverAdditionalBuff';
 
 type ParameterEffect = Extract<
   Effect,
@@ -15,7 +16,8 @@ type ParameterEffect = Extract<
       | 'parameter-value-change'
       | 'deck-skill-cost-change'
       | 'love-up-additional-buff'
-      | 'voltage-up-additional-buff';
+      | 'voltage-up-additional-buff'
+      | 'recover-mental-additional-buff';
   }
 >;
 
@@ -27,6 +29,7 @@ export function isParameterEffect(effect: Effect): effect is ParameterEffect {
     'deck-skill-cost-change',
     'love-up-additional-buff',
     'voltage-up-additional-buff',
+    'recover-mental-additional-buff',
   ].includes(effect.kind);
 }
 
@@ -50,5 +53,7 @@ export function applyParameterEffect(
       return activateLoveUpAdditionalBuff(state, effect, card, multiplier, addValue);
     case 'voltage-up-additional-buff':
       return activateVoltageUpAdditionalBuff(state, effect, card, multiplier, addValue);
+    case 'recover-mental-additional-buff':
+      return activateMentalRecoverAdditionalBuff(state, effect, card, multiplier, addValue);
   }
 }

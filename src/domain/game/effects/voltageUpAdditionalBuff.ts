@@ -33,7 +33,7 @@ export function activateVoltageUpAdditionalBuff(
   const percent = toInt32(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['voltageUpAdditionalBuffs'][number] = {
-    id: boosted.state.nextVoltageUpAdditionalBuffId,
+    id: boosted.state.nextSkillAdditionalBuffId,
     percent,
     target: effect.target,
     remainingSeconds:
@@ -46,7 +46,7 @@ export function activateVoltageUpAdditionalBuff(
   return {
     ...boosted.state,
     voltageUpAdditionalBuffs: [...boosted.state.voltageUpAdditionalBuffs, buff],
-    nextVoltageUpAdditionalBuffId: boosted.state.nextVoltageUpAdditionalBuffId + 1,
+    nextSkillAdditionalBuffId: boosted.state.nextSkillAdditionalBuffId + 1,
   };
 }
 

@@ -1,3 +1,4 @@
+import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
 import type { VoltageUpAdditionalBuff } from './voltageUpAdditionalBuffTypes';
 import type { LoveUpAdditionalBuff } from './loveUpAdditionalBuffTypes';
 import type { DrawProbabilityRule } from './cards/drawProbability';
@@ -277,8 +278,8 @@ export type GameState = Readonly<{
   nextAction52BuffId: number;
   loveUpAdditionalBuffs: readonly LoveUpAdditionalBuff[];
   voltageUpAdditionalBuffs: readonly VoltageUpAdditionalBuff[];
-  nextLoveUpAdditionalBuffId: number;
-  nextVoltageUpAdditionalBuffId: number;
+  mentalRecoverAdditionalBuffs: readonly MentalRecoverAdditionalBuff[];
+  nextSkillAdditionalBuffId: number;
   temporaryScoreBoosts: readonly TemporaryScoreBoost[];
   gaugeInfinities: readonly GaugeInfinity[];
   gaugeRegenerations: readonly GaugeRegeneration[];
@@ -337,7 +338,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-love-up-additional-buff'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-love-up-additional-buff'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-mental-recover-additional-buff'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

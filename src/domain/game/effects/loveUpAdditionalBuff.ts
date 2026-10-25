@@ -34,7 +34,7 @@ export function activateLoveUpAdditionalBuff(
   const percent = toInt32(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['loveUpAdditionalBuffs'][number] = {
-    id: boosted.state.nextLoveUpAdditionalBuffId,
+    id: boosted.state.nextSkillAdditionalBuffId,
     percent,
     target: effect.target,
     remainingSeconds:
@@ -49,7 +49,7 @@ export function activateLoveUpAdditionalBuff(
   return {
     ...boosted.state,
     loveUpAdditionalBuffs: [...boosted.state.loveUpAdditionalBuffs, buff],
-    nextLoveUpAdditionalBuffId: boosted.state.nextLoveUpAdditionalBuffId + 1,
+    nextSkillAdditionalBuffId: boosted.state.nextSkillAdditionalBuffId + 1,
   };
 }
 
