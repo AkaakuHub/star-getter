@@ -111,6 +111,7 @@ describe('無限ゲージ', () => {
     expect(active.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
     const finished = finishBloom(active);
     expect(finished.gaugeInfinities[0]?.suspended).toBe(false);
+    expect(finished.energy).toBe(finished.maxEnergy);
     expect(changeResource(finished, 'energy', -1n).energy).toBe(finished.energy);
   });
 
@@ -123,5 +124,40 @@ describe('無限ゲージ', () => {
     });
     expect(next.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
     expect(next.gaugeInfinities[0]?.suspended).toBe(true);
+  });
+
+  it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {
+    const base = game('bloom');
+    const initial = {
+      ...base,
+      maximumMental: 150,
+      hearts: { ...base.hearts, heartLimit: 500 },
+    };
+    const inducing = applyEffect(initial, {
+      kind: 'mental-heart-induce',
+      num: 10_000,
+      heartDuration: { kind: 'stage', value: 0 },
+      duration: { kind: 'milliseconds', value: 5_000 },
+      disabledType: 0,
+      disabledValue: 0,
+    });
+    const blooming = activateBloom(inducing, 1);
+    const voltage = applyEffect(blooming, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    const mental = applyEffect(voltage, {
+      kind: 'infinity-gauge',
+      gauge: 'mental',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    const finished = finishBloom(mental);
+    const generated =
+      finished.hearts.stageHearts.length +
+      finished.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);
+    expect(finished.excitement).toBe(voltageThreshold(finished.maximumVoltageLevel));
+    expect(finished.stamina).toBe(150);
+    expect(generated).toBe(150);
   });
 });

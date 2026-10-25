@@ -1,5 +1,7 @@
 import type { GameState } from './model';
 import { voltageLevel } from './live/voltageLevel';
+import { voltageThreshold } from './live/voltageLevel';
+import { induceMentalHearts } from './effects/mentalHeartInduce';
 import {
   calculateStarGatherInitialGenesisGauge,
   calculateStarGatherGenesisGaugeDelta,
@@ -54,10 +56,19 @@ export function changeBloomResource(
 
 export function finishBloom(state: GameState): GameState {
   if (!state.bloom) return state;
-  return {
+  let next: GameState = {
     ...state,
     ...state.bloom.rollback,
     gaugeInfinities: state.gaugeInfinities.map((infinity) => ({ ...infinity, suspended: false })),
     bloom: null,
   };
+  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'ap'))
+    next = { ...next, energy: next.maxEnergy };
+  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage'))
+    next = { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
+  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'mental')) {
+    next = { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 };
+    next = induceMentalHearts(next, next.maximumMental);
+  }
+  return next;
 }
