@@ -10,7 +10,7 @@ export const tracks: readonly Track[] = [
     stage: standardStage,
     sections: [
       { name: 'イントロ', startBeat: 0, mood: 'warm', moodValue: 50, climax: false },
-      { name: 'ウェーブ', startBeat: 24, mood: 'cool', moodValue: -100, climax: false },
+      { name: 'ウェーブ', startBeat: 24, mood: 'cool', moodValue: 0, climax: false },
       { name: 'ライジング', startBeat: 48, mood: 'bright', moodValue: 0, climax: false },
       { name: '山場', startBeat: 72, mood: 'warm', moodValue: 50, climax: true },
       { name: 'フィナーレ', startBeat: 96, mood: 'bright', moodValue: 0, climax: false },

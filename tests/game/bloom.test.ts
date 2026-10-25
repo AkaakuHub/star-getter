@@ -8,7 +8,10 @@ import { canUseSpecial } from '../../src/domain/game/special';
 import { game } from './support/game';
 
 function active() {
-  return activateBloom({ ...advanceTo(game(), 12), energy: 0, excitement: 40, stamina: 80 }, 1);
+  return activateBloom(
+    { ...advanceTo(game(), 12), moodOffset: -100, energy: 0, excitement: 40, stamina: 80 },
+    1,
+  );
 }
 
 describe('開花の専用ゲージ', () => {
@@ -44,7 +47,7 @@ describe('開花の専用ゲージ', () => {
 
   it('通常カードの使用では発動せず、空模様−100%の共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
-    state = { ...state, energy: 20, maxEnergy: 20, hand: ['horizon'] };
+    state = { ...state, moodOffset: -100, energy: 20, maxEnergy: 20, hand: ['horizon'] };
     expect(canUseSpecial(state, 'horizon')).toBe(true);
     const changed = act(state, { type: 'special', cardId: 'horizon' });
     expect(changed.bloom?.strength).toBe(3.5);
@@ -70,7 +73,7 @@ describe('開花の専用ゲージ', () => {
   });
 
   it('発動前の増幅だけが強度を増やし、発動後の増幅はすでに決まった強度を変えない', () => {
-    const initial = { ...advanceTo(game(), 12), hand: ['horizon'] };
+    const initial = { ...advanceTo(game(), 12), moodOffset: -100, hand: ['horizon'] };
     const prepared = applyEffect(applyEffect(initial, { kind: 'amplify', percent: 50 }), {
       kind: 'bloom',
       strength: 3.5,

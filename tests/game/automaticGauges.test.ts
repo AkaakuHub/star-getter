@@ -17,6 +17,7 @@ it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化�
 it('開花中も通常APが上限未満なら自然回復を専用値へ変換し、通常APを保持する', () => {
   const initial = {
     ...advanceTo(game(), 12),
+    moodOffset: -100,
     hand: ['horizon'],
     mentalProtected: true,
     apTimerSeconds: 0,
@@ -37,6 +38,7 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   const initial = activateBloom(
     {
       ...advanceTo(game(), 12),
+      moodOffset: -100,
       hand: ['horizon'],
       energy: 10,
       apTimerSeconds: 0,

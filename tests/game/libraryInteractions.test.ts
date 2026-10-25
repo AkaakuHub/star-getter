@@ -121,7 +121,9 @@ it('100枚の状態で鍵を使うと、生成判定が先なので追加でき�
 
 it('手札中の対象増幅と熱気回復増幅を掛け合わせ、同じ見た目の別所属には適用しない', () => {
   let state = game();
-  state = withHand({ ...state, tick: 720, energy: 0, excitement: 0 }, ['perennial']);
+  state = withHand({ ...state, tick: 720, moodOffset: -100, energy: 0, excitement: 0 }, [
+    'perennial',
+  ]);
   const effect = { kind: 'excitement', amount: 10 } as const;
   expect(skillValue(state, 10, effect, card(state, 'horizon'))).toBe(55);
   expect(skillValue(state, 10, effect, card(state, 'camera'))).toBe(10);
