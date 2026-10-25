@@ -306,7 +306,7 @@ it('手札最大化は手札を8枚まで補充し、期限後も保持した手
   };
   const expanded = applyEffect(shortHand, {
     kind: 'hand-max-card',
-    duration: { kind: 'sections', value: 1 },
+    duration: { kind: 'sections', value: 1n },
   });
   expect(expanded.hand).toHaveLength(8);
   expect(handCapacity(expanded)).toBe(8);
@@ -319,7 +319,7 @@ it('手札最大化は手札を8枚まで補充し、期限後も保持した手
 it('重複した手札最大化は他の期限が残る間だけ継続する', () => {
   const first = applyEffect(game(), {
     kind: 'hand-max-card',
-    duration: { kind: 'milliseconds', value: 100 },
+    duration: { kind: 'milliseconds', value: 100n },
   });
   const second = applyEffect(first, {
     kind: 'hand-max-card',
@@ -335,7 +335,7 @@ it('InvocationType 0x388と0x38bは手動解除まで手札最大化を保つ', 
     const deactivationKey = `hand-max-${invocationType}`;
     const activated = applyEffect(game(), {
       kind: 'hand-max-card',
-      duration: { kind: 'milliseconds', value: 100 },
+      duration: { kind: 'milliseconds', value: 100n },
       invocationType,
       deactivationKey,
     });
