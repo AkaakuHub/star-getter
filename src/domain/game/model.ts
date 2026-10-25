@@ -346,7 +346,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-heart-limit-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mood-value-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-beat-point-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-gauge-regeneration'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-gauge-regeneration'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-search'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

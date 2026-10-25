@@ -91,7 +91,7 @@ type ResetSpecial = Readonly<{
     | Readonly<{ kind: 'unit'; unit: UnitId }>;
 }>;
 export type SearchTarget =
-  | Readonly<{ kind: 'icon'; icon: number }>
+  | Readonly<{ kind: 'main-effect'; actionType: number }>
   | Readonly<{ kind: 'member'; member: MemberId }>
   | Readonly<{ kind: 'unit'; unit: UnitId }>
   | Readonly<{ kind: 'token-series'; seriesId: number }>
@@ -99,6 +99,7 @@ export type SearchTarget =
 export type SearchRequest = Readonly<{
   scope: 'grade' | 'section' | 'skill';
   target: SearchTarget;
+  deactivationKey: string | null;
 }>;
 export type TokenBoostTarget =
   | Readonly<{ kind: 'all' }>
@@ -253,7 +254,13 @@ type EffectShape =
   | Readonly<{ kind: 'shuffle'; recoverDiscard: boolean; destination: 'draw' | 'discard' }>
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
-  | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
+  | Readonly<{
+      kind: 'search';
+      scope: SearchRequest['scope'];
+      target: SearchTarget;
+      count: number;
+      deactivationKey?: string;
+    }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | SkillCooldownEffectInput
   | InduceSkillEffectInput

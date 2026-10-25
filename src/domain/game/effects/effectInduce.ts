@@ -29,6 +29,7 @@ const deactivationActions: readonly ((deactivationKey: string) => import('../mod
   (deactivationKey) => ({ type: 'deactivate-mood-value-boost', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-beat-point-buff', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-gauge-regeneration', deactivationKey }),
+  (deactivationKey) => ({ type: 'deactivate-search', deactivationKey }),
 ];
 
 export function activateEffectInduce(

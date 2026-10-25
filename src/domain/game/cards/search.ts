@@ -3,8 +3,8 @@ import type { Card, GameState, SearchRequest, SearchTarget } from '../model';
 
 function matches(card: Card, target: SearchTarget): boolean {
   switch (target.kind) {
-    case 'icon':
-      return card.skillIcon === target.icon;
+    case 'main-effect':
+      return card.mainEffect === target.actionType;
     case 'member':
       return card.member === target.member;
     case 'unit':
@@ -60,4 +60,16 @@ export function consumeSearch(
     };
   }
   return { state: next, selected: null };
+}
+
+export function deactivateSearchRequests(state: GameState, deactivationKey: string): GameState {
+  return {
+    ...state,
+    deckActions: {
+      ...state.deckActions,
+      searches: state.deckActions.searches.filter(
+        (search) => search.deactivationKey !== deactivationKey,
+      ),
+    },
+  };
 }

@@ -201,6 +201,7 @@ function applyEffectInternal(
             ...Array.from({ length: effect.count }, () => ({
               scope: effect.kind === 'search' ? effect.scope : ('skill' as const),
               target,
+              deactivationKey: effect.kind === 'search' ? (effect.deactivationKey ?? null) : null,
             })),
           ],
         },

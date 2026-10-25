@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { drawCandidate, drawWeight } from '../../src/domain/game/cards/drawLottery';
 import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '../../src/domain/game/actions';
 import { fillHand, fillHandToCount } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { game, withHand } from './support/game';
@@ -138,7 +139,7 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
   state = applyEffect(state, {
     kind: 'search',
     scope: 'grade',
-    target: { kind: 'icon', icon: 987654 },
+    target: { kind: 'main-effect', actionType: 987654 },
     count: 1,
   });
   state = applyEffect(state, {
@@ -150,6 +151,37 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
   const drawn = fillHandToCount(state, 1);
   expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
   expect(drawn.deckActions.searches).toHaveLength(0);
+});
+
+it('スキル検索はアイコンではなくカードのMainEffectを照合する', () => {
+  const initial = withHand(game(), []);
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) =>
+      card.id === 'camera' ? { ...card, mainEffect: 987654 } : card,
+    ),
+    drawContext: 'skill' as const,
+    drawPile: ['camera'],
+  };
+  const searching = applyEffect(state, {
+    kind: 'search',
+    scope: 'skill',
+    target: { kind: 'main-effect', actionType: 987654 },
+    count: 1,
+  });
+  expect(fillHandToCount(searching, 1).hand).toEqual(['camera']);
+});
+
+it('解除キーが一致する未消費の検索指定を除去する', () => {
+  let state = applyEffect(withHand(game(), []), {
+    kind: 'search',
+    scope: 'grade',
+    target: { kind: 'member', member: 1053 },
+    count: 1,
+    deactivationKey: 'search-key',
+  });
+  state = act(state, { type: 'deactivate-search', deactivationKey: 'search-key' });
+  expect(state.deckActions.searches).toEqual([]);
 });
 
 it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {

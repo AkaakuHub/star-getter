@@ -17,6 +17,12 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('検索回数が正しくありません。');
+    if (
+      effect.kind === 'search' &&
+      effect.deactivationKey !== undefined &&
+      typeof effect.deactivationKey !== 'string'
+    )
+      throw new Error('検索解除キーが正しくありません。');
     return;
   }
   if (effect.kind === 'mode' || effect.kind === 'mode-reaction') {
