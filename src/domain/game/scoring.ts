@@ -40,5 +40,5 @@ export function collectionScore(state: GameState, count: number, missed: boolean
         calculateStarGatherAddScoreMax(collectCount, scoreMultipliers),
     },
   );
-  return base;
+  return base * state.scoreMultiplier;
 }

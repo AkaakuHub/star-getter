@@ -195,6 +195,7 @@ export type GameState = Readonly<{
   maximumVoltageLevel: number;
   specialUsed: readonly string[];
   score: bigint;
+  scoreMultiplier: bigint;
   scoreHistory: readonly ScoreSample[];
   moodHistory: readonly MoodSample[];
   hearts: StarGatherHeartRuntimeState;

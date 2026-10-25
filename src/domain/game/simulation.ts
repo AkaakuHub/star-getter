@@ -72,6 +72,7 @@ export function createGame(
     maximumVoltageLevel: 1000,
     specialUsed: [],
     score: 0n,
+    scoreMultiplier: 1n,
     scoreHistory: [{ timeMilliseconds: 0, totalScore: 0n }],
     moodHistory: [{ timeMilliseconds: 0, moodValue: firstSection.moodValue }],
     hearts: {
