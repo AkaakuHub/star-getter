@@ -6,11 +6,11 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
   return activateHandInducers(state, apply, (trigger, source) => {
     switch (trigger.kind) {
       case 'member':
-        return trigger.member === used.member;
+        return int32(trigger.member) === used.member;
       case 'skill-icon':
-        return trigger.icon === used.skillIcon;
+        return int32(trigger.icon) === used.skillIcon;
       case 'unit':
-        return trigger.unit === used.unit;
+        return int32(trigger.unit) === used.unit;
       case 'heart-quantity-count':
         return false;
       case 'same-card':
@@ -38,17 +38,19 @@ export function notifyHandHeartCollect(
     const handUse = card.handUse;
     const trigger = handUse?.trigger;
     if (!handUse?.effects.length || trigger?.kind !== 'heart-quantity-count') continue;
-    const count = (collectionCounts[id] ?? 0) + collectedCount;
+    const count = int32((collectionCounts[id] ?? 0) + int32(collectedCount));
     collectionCounts[id] = count;
-    const activationCount = activationCounts[id] ?? 0;
+    const activationCount = int32(activationCounts[id] ?? 0);
     if (
-      (handUse.limit !== undefined && handUse.limit !== 0 && handUse.limit <= activationCount) ||
-      count < trigger.count
+      (handUse.limit !== undefined &&
+        int32(handUse.limit) !== 0 &&
+        int32(handUse.limit) <= activationCount) ||
+      count < int32(trigger.count)
     )
       continue;
     collectionCounts[id] = 0;
     next = applyEffects(next, handUse.effects, card, apply);
-    activationCounts[id] = activationCount + 1;
+    activationCounts[id] = int32(activationCount + 1);
   }
   return {
     ...next,
@@ -85,13 +87,21 @@ function activateHandInducers(
     if (!card) throw new Error('手札効果のカードがありません。');
     const handUse = card.handUse;
     if (!handUse || !handUse.effects.length || !matches(handUse.trigger, card)) continue;
-    const activationCount = activationCounts[id] ?? 0;
-    if (handUse.limit !== undefined && handUse.limit !== 0 && handUse.limit <= activationCount)
+    const activationCount = int32(activationCounts[id] ?? 0);
+    if (
+      handUse.limit !== undefined &&
+      int32(handUse.limit) !== 0 &&
+      int32(handUse.limit) <= activationCount
+    )
       continue;
     next = applyEffects(next, handUse.effects, card, apply);
-    activationCounts[id] = activationCount + 1;
+    activationCounts[id] = int32(activationCount + 1);
   }
   return { ...next, handUseActivationCounts: activationCounts };
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 function applyEffects(

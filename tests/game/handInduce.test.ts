@@ -54,3 +54,27 @@ it('Action903は子効果がないとき回収数の監視を登録しない', (
   expect(unchanged.handUseActivationCounts[source.id]).toBeUndefined();
   expect(unchanged.handUseHeartCollectionCounts[source.id]).toBeUndefined();
 });
+
+it('Action903の回収閾値と発動上限をC#のint32へ変換する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'heart-quantity-count' as const, count: 4_294_967_296 },
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+      limit: 4_294_967_296,
+    },
+  };
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
+    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
+    handEffectCardIds: [source.id],
+  };
+  const first = notifyHandHeartCollect(state, 1, applyEffect);
+  const second = notifyHandHeartCollect(first, 1, applyEffect);
+  expect(second.moodOffset).toBe(2);
+  expect(second.handUseActivationCounts[source.id]).toBe(2);
+});
