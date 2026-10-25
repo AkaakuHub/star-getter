@@ -9,11 +9,11 @@
 .score-display {
   display: flex;
   flex-direction: column;
-  justify-content: end;
-  width: 52.037cqw;
-  min-height: 20.648cqw;
+  justify-content: center;
+  width: 58cqw;
+  min-height: 18cqw;
   margin: 0 auto;
-  padding: 1.5cqw 1.5cqw 0;
+  padding: 2cqw 1.5cqw 1cqw;
   border: 1px solid #ffffffb3;
   border-top: 0;
   border-radius: 0 0 4cqw 4cqw;
@@ -23,9 +23,9 @@
   pointer-events: none;
 }
 .score-display > span {
-  font-size: 2.2cqw;
+  font-size: 2.7cqw;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
 }
 .score-value {
   font-variant-numeric: tabular-nums;
@@ -231,7 +231,7 @@
 }
 .collection-combo,
 .collection-gain {
-  position: absolute;
+  position: relative;
   z-index: 10;
   width: 100%;
   text-align: center;
@@ -246,13 +246,13 @@
   animation: collection-pop 0.2s ease-out;
 }
 .collection-combo {
-  top: 18%;
+  margin-top: 1cqw;
 }
 .collection-combo strong {
   font-size: 8cqw;
 }
 .collection-gain {
-  top: 25%;
+  margin-top: 0.5cqw;
   font-size: 4.5cqw;
 }
 .is-blooming .collect-number {

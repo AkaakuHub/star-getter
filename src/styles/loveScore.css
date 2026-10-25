@@ -1,31 +1,22 @@
-.love-number {
-  display: grid;
-  grid-template-columns: repeat(var(--love-columns), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--love-rows), 8.5cqw);
-  align-items: start;
-  padding-top: 1cqw;
+.star-number {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 0.25cqw;
+  padding: 0.8cqw 0 1cqw;
   font-family: ui-monospace, monospace;
-  font-size: 4.5cqw;
-  font-weight: 800;
-  line-height: 1;
+  font-size: 5.6cqw;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
 }
-.love-digit {
-  position: relative;
-  min-width: 0;
-  text-align: center;
-}
-.love-comma {
-  position: absolute;
-  top: 0;
-  right: -0.1em;
-}
-.love-unit {
-  position: absolute;
-  top: calc(100% + 0.4cqw);
-  right: -0.2em;
-  color: #51445e;
-  font-family: var(--font-sans);
-  font-size: 2.7cqw;
-  font-weight: 700;
+.star-line {
   white-space: nowrap;
+}
+.star-leading {
+  color: #a89ba9;
+  font-weight: 500;
+}
+.star-comma {
+  color: #8e7b96;
 }

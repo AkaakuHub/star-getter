@@ -31,17 +31,17 @@ export function LiveHud({
             {formatTime(seconds)} / {formatTime(durationSeconds(state))}
           </time>
         </div>
+        {state.combo > 0 && (
+          <div className="collection-combo" key={state.lastCollectTick} role="status">
+            <strong>{state.combo}</strong> CHAIN
+          </div>
+        )}
+        {state.lastGain > 0n && state.tick - state.lastCollectTick < 45 && (
+          <div className="collection-gain" key={'gain-' + state.lastCollectTick}>
+            +{formatScore(state.lastGain)}
+          </div>
+        )}
       </div>
-      {state.combo > 0 && (
-        <div className="collection-combo" key={state.lastCollectTick} role="status">
-          <strong>{state.combo}</strong> CHAIN
-        </div>
-      )}
-      {state.lastGain > 0n && state.tick - state.lastCollectTick < 45 && (
-        <div className="collection-gain" key={'gain-' + state.lastCollectTick}>
-          +{formatScore(state.lastGain)}
-        </div>
-      )}
       <button
         type="button"
         className="special-portrait"
