@@ -70,6 +70,16 @@ it('Action50の正値はActionType52で整数化し、回数を1回消費する'
   expect(moodValueWithoutLimit(second)).toBe(6);
 });
 
+it('Action50の詳細値をC#のint32へ変換してからNumToValueを計算する', () => {
+  const initial = game('library');
+  const wrapped = applyEffect(
+    initial,
+    additiveBoost({ calculationType: 2, num: 2_147_483_648 }),
+    undefined,
+  );
+  expect(wrapped.moodValueAdditionalBuffs[0]?.value).toBe(-214_748.359375);
+});
+
 it('Action50の対象とTokenCardSeriesパラメーターをC#の検索条件通りに扱う', () => {
   const initial = game('library');
   const card = initial.deck[0];

@@ -12,17 +12,20 @@ export function activateMoodValueBoost(
   multiplier: number,
   addValue: number,
 ): GameState {
-  const num = Math.fround(effect.num / 10_000);
+  const intNum = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.num))));
+  const num = Math.fround(Math.fround(intNum) / Math.fround(10_000));
   let mood =
     effect.bonusMoodTarget === 0
       ? 0
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          Math.fround(effect.bonusMoodValue / 10_000),
+          Math.fround(Math.fround(effect.bonusMoodValue) / Math.fround(10_000)),
         );
   if (num < 0) mood = Math.fround(-mood);
-  let value = Math.fround(Math.fround(Math.fround(mood + num) + addValue) * multiplier);
+  let value = Math.fround(
+    Math.fround(Math.fround(mood + num) + Math.fround(addValue)) * Math.fround(multiplier),
+  );
   if (effect.calculationType === 1) value = toSignedInt32(value);
   if (value > 0) {
     const boosted = applyAction52SkillBoostForCard(state, card, value);
