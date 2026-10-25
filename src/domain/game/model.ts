@@ -67,6 +67,7 @@ export type Card = Readonly<{
     off: readonly ParameterValueChangeEffect[];
     on: readonly ParameterValueChangeEffect[];
   }>;
+  handPermanentParameterChanges?: readonly ParameterValueChangeEffect[];
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
@@ -172,6 +173,7 @@ export type GameState = Readonly<{
   cardPool: readonly Card[];
   hand: readonly string[];
   handEffectCardIds: readonly string[];
+  activeHandPermanentCardIds: readonly string[];
   proxyCards: readonly string[];
   drawPile: readonly string[];
   deckOutCount: number;

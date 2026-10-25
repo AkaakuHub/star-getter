@@ -5,6 +5,7 @@ import {
   initializeParameterValueFactors,
 } from '../../src/domain/game/parameters/parameterValueChange';
 import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
+import { fillHand, removeRandomHandCards } from '../../src/domain/game/cards/drawing';
 import { createModes } from '../../src/domain/game/live/modes';
 import { game } from './support/game';
 
@@ -194,4 +195,52 @@ it('モード変更で前の能力を解除し、新しい能力の詳細値変�
   expect(disabled.activeModeParameterChanges).toEqual([
     { cardId: card.id, modeId: 8, isOn: false },
   ]);
+});
+
+it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除する', () => {
+  const initial = game();
+  const source = initial.deck.find((item) => item.id === 'class');
+  if (!source) throw new Error('検証用カードがありません。');
+  const effect = {
+    kind: 'parameter-value-change',
+    sourceEffectId: 'hand-permanent-change',
+    targetDetailId: 202141300101n,
+    calculation: 'add',
+    base: 20_000,
+    increment: 0,
+  } as const;
+  const card = { ...source, handPermanentParameterChanges: [effect] } as const;
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [],
+    handEffectCardIds: [],
+    drawPile: [card.id],
+    discard: [],
+    drawContext: 'skill' as const,
+  };
+  const unrelated = applyParameterValueChange(state, card, {
+    ...effect,
+    sourceEffectId: 'unrelated-change',
+  });
+  const inactiveLeft = disposeHandEffects(unrelated, [card.id]);
+  expect(
+    inactiveLeft.parameterValueFactors.some(
+      (factor) => factor.sourceEffectId === 'unrelated-change',
+    ),
+  ).toBe(true);
+  const active = fillHand(state);
+  expect(active.activeHandPermanentCardIds).toEqual([card.id]);
+  expect(
+    active.parameterValueFactors.find((factor) => factor.sourceEffectId === effect.sourceEffectId)
+      ?.factor,
+  ).toBe(2);
+  const disposed = removeRandomHandCards(active, 1);
+  expect(disposed.activeHandPermanentCardIds).toHaveLength(0);
+  expect(
+    disposed.parameterValueFactors.some(
+      (factor) => factor.sourceEffectId === effect.sourceEffectId,
+    ),
+  ).toBe(false);
 });

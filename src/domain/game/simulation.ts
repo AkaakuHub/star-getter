@@ -55,6 +55,7 @@ export function createGame(
     deck: [...deck],
     cardPool: [...deck],
     hand: [lead.id],
+    activeHandPermanentCardIds: [],
     proxyCards: [],
     handCardStats: {},
     skillCostChanges: [],
