@@ -3,7 +3,7 @@ import type { Card } from '../../domain/game/model';
 export const setupCards: readonly Card[] = [
   {
     id: 'camera',
-    name: '光を集める係',
+    name: '灯台の光',
     performer: 'nova',
     member: 1053,
     unit: null,
@@ -25,7 +25,7 @@ export const setupCards: readonly Card[] = [
   },
   {
     id: 'class',
-    name: '空をつなぐ三重奏',
+    name: '乗船の準備',
     performer: 'nova',
     member: 1030,
     unit: null,
@@ -43,7 +43,7 @@ export const setupCards: readonly Card[] = [
   },
   {
     id: 'aurora-ensemble',
-    name: '極光の共演',
+    name: '追い風',
     performer: 'tetra',
     member: 1021,
     unit: 1,

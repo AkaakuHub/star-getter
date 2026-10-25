@@ -80,7 +80,7 @@ function preparedLibrary(): GameState {
   );
 }
 
-it('書架は累積50万回収から引き直し、ドロー時のきらめきを同じ時刻の次のタッチで回収する', () => {
+it('うなばらは累積50万回収から引き直し、ドロー時のきらめきを同じ時刻の次のタッチで回収する', () => {
   let state = preparedLibrary();
   state = act(state, { type: 'collect' });
   expect(state.tick).toBe(0);
@@ -93,7 +93,7 @@ it('書架は累積50万回収から引き直し、ドロー時のきらめき�
   expect(next.stats.cardsUsed).toBe(0);
 });
 
-it('仕込んだ書架では手動連打の回収回数が0.3秒間隔の自動回収を上回る', () => {
+it('仕込んだうなばらでは手動連打の回収回数が0.3秒間隔の自動回収を上回る', () => {
   const initial = preparedLibrary();
   let manual = initial;
   for (let tap = 0; tap < 3; tap++) manual = act(manual, { type: 'collect' });

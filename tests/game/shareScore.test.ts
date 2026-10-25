@@ -16,7 +16,7 @@ it('画像共有の本文に正確なスコア・ハッシュタグを含め、�
 });
 
 it('小さなスコアも省略せず、3桁の区切りで共有する', () => {
-  expect(resultShareData(1_234_567n, '書架', 'https://example.com/').text).toBe(
-    'スターギャザー「書架」で1,234,567スター\n#スターギャザー',
+  expect(resultShareData(1_234_567n, 'うなばら', 'https://example.com/').text).toBe(
+    'スターギャザー「うなばら」で1,234,567スター\n#スターギャザー',
   );
 });

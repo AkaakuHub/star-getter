@@ -56,7 +56,7 @@ function prepare(driver: GameDriver): void {
   });
 }
 
-test('書架:3種類を生成し95枚を準備して連打、巻き込み後に修復する', () => {
+test('うなばら:3種類を生成し95枚を準備して連打、巻き込み後に修復する', () => {
   const driver = new GameDriver('library');
   driver.report('開始');
   prepare(driver);
@@ -130,7 +130,7 @@ test('書架:3種類を生成し95枚を準備して連打、巻き込み後に�
   expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
 });
 
-test('書架:同じ曲で未準備の回収と準備後の回収を比較する', () => {
+test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', () => {
   const prepared = new GameDriver('library');
   prepare(prepared);
   const start = prepared.seconds;
@@ -156,7 +156,7 @@ test('書架:同じ曲で未準備の回収と準備後の回収を比較する'
   expect(preparedGain).toBeGreaterThan(plainGain);
 });
 
-test('書架:同じ時刻の手動回収でも次の反応を回収できる', () => {
+test('うなばら:同じ時刻の手動回収でも次の反応を回収できる', () => {
   const driver = new GameDriver('library');
   prepare(driver);
   const tick = driver.state.tick;

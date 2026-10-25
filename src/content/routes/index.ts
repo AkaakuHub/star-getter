@@ -13,7 +13,7 @@ type Route = Readonly<{
 export const routes: Readonly<Record<RouteId, Route>> = {
   library: {
     id: 'library',
-    name: '書架',
+    name: 'うなばら',
     tokens: routeTokens,
     deck: resolveDeck([
       'library-pages',

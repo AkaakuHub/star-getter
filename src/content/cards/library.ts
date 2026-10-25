@@ -4,7 +4,7 @@ import { ensembleEffects } from '../routes/tokens';
 export const libraryCards: readonly Card[] = [
   {
     id: 'library-pages',
-    name: '花の記録',
+    name: '潮の便り',
     performer: 'nova',
     member: 1031,
     unit: 1,
@@ -36,7 +36,7 @@ export const libraryCards: readonly Card[] = [
   },
   {
     id: 'library-invitation',
-    name: '書架の招待状',
+    name: '港の待ち合わせ',
     performer: 'tetra',
     member: 1041,
     unit: 1,
@@ -49,7 +49,7 @@ export const libraryCards: readonly Card[] = [
   },
   {
     id: 'library-ensemble',
-    name: '共演の記録',
+    name: '船出の合図',
     performer: 'tetra',
     member: 1021,
     unit: 1,

@@ -47,7 +47,7 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
   );
 });
 
-it('80枚で風車を引いた増幅は折り紙だけに適用する', () => {
+it('80枚で舵を引いた増幅は貝がらだけに適用する', () => {
   let state = addTokens(addTokens(game('library'), 'clock', 1), 'story', 1);
   state = addTokens(state, 'story', 80 - state.deck.length);
   const clock = token(state, 'clock'),
@@ -109,7 +109,7 @@ it('共演の一斉使用は元の手札を順に使用し、子カードの生�
   expect(used.deck.some((item) => item.id === ensemble.id)).toBe(true);
 });
 
-it('100枚の状態で鍵を使うと、生成判定が先なので追加できず除外後99枚になる', () => {
+it('100枚の状態で浮き輪を使うと、生成判定が先なので追加できず除外後99枚になる', () => {
   let state = addTokens(game('library'), 'bookmark', 1);
   state = addTokens(state, 'story', 100 - state.deck.length);
   const source = token(state, 'bookmark');
