@@ -24,6 +24,7 @@ import {
   deactivateAdditionalHeartInducers,
   induceAdditionalHearts,
 } from './effects/additionalHeart';
+import { deactivateLoveUpAdditionalBuffs } from './effects/loveUpAdditionalBuff';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -61,6 +62,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateVoltageIncreaseStops(state, action.deactivationKey);
     case 'deactivate-additional-heart':
       return deactivateAdditionalHeartInducers(state, action.deactivationKey);
+    case 'deactivate-love-up-additional-buff':
+      return deactivateLoveUpAdditionalBuffs(state, action.deactivationKey);
   }
 }
 

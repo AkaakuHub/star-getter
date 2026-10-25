@@ -1,3 +1,4 @@
+import type { LoveUpAdditionalBuff } from './loveUpAdditionalBuffTypes';
 import type { DrawProbabilityRule } from './cards/drawProbability';
 import type { ScoreLimitSettings } from './live/scoreLimit';
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
@@ -273,6 +274,8 @@ export type GameState = Readonly<{
   nextVoltageStopId: number;
   nextVoltageConversionId: number;
   nextAction52BuffId: number;
+  loveUpAdditionalBuffs: readonly LoveUpAdditionalBuff[];
+  nextLoveUpAdditionalBuffId: number;
   temporaryScoreBoosts: readonly TemporaryScoreBoost[];
   gaugeInfinities: readonly GaugeInfinity[];
   gaugeRegenerations: readonly GaugeRegeneration[];
@@ -330,7 +333,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-love-up-additional-buff'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

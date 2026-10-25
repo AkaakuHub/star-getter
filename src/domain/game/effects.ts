@@ -25,7 +25,7 @@ import {
 import { addHeartBoost } from './live/heartBoosts';
 import { createHeartsFromEffect } from './effects/heartCreation';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
-import { applyParameterEffect } from './parameters/applyParameterEffect';
+import { applyParameterEffect, isParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
 import { activateHeartLimitChange, applyHeartLimitEffect } from './effects/heartLimit';
 import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
@@ -67,6 +67,8 @@ export function applyEffect(
     return applyVoltageTier(state, effect, card, multiplier, addValue, applyEffect, effectPower);
   if (effect.kind === 'ap-speed-change')
     return applyApSpeedChange(state, effect, card, multiplier, addValue);
+  if (isParameterEffect(effect))
+    return applyParameterEffect(state, effect, card, multiplier, addValue);
   const value = (amount: number) =>
     Math.fround(
       skillValue(state, Math.fround(Math.fround(amount + addValue) * multiplier), effect, card),
@@ -221,11 +223,6 @@ export function applyEffect(
         mentalShield: boosted.state.mentalShield + Math.trunc(boosted.value),
       };
     }
-    case 'cost-reduction':
-    case 'skill-cost-change':
-    case 'deck-skill-cost-change':
-    case 'parameter-value-change':
-      return applyParameterEffect(state, effect, card, multiplier, addValue);
     case 'protect-mental':
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }

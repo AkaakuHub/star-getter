@@ -1,3 +1,4 @@
+import { validateLoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
 import { validateDeckSkillCostChange } from './skillCostChangeTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
 import { type Card, type Effect, costumeIds, rules } from './model';
@@ -292,6 +293,7 @@ function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'deck-skill-cost-change') return validateDeckSkillCostChange(effect);
+  if (effect.kind === 'love-up-additional-buff') return validateLoveUpAdditionalBuffEffect(effect);
   if (effect.kind === 'skill-cost-change') {
     if (
       !Number.isFinite(effect.amount) ||

@@ -45,10 +45,7 @@ import {
   advanceVoltageConversions,
   expireVoltageConversionSections,
 } from './effects/voltageConversion';
-import {
-  advanceAction52SkillBoosts,
-  expireAction52SkillBoostSections,
-} from './effects/action52SkillBoost';
+import { advanceTimedSkillBuffs, expireTimedSkillBuffSections } from './effects/timedSkillBuffs';
 
 export function createGame(
   track: Track,
@@ -121,6 +118,8 @@ export function createGame(
     comboInducer: null,
     nextVoltageConversionId: 1,
     nextAction52BuffId: 1,
+    loveUpAdditionalBuffs: [],
+    nextLoveUpAdditionalBuffId: 1,
     temporaryScoreBoosts: [],
     apTimerSeconds: 0,
     mentalTimerSeconds: 0,
@@ -219,7 +218,7 @@ function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
   const gauges = advanceMentalHeartInducers(
-    advanceAction52SkillBoosts(
+    advanceTimedSkillBuffs(
       advanceVoltageConversions(
         advanceApSpeedEffects(
           removeExhaustedMentalBarriers(
@@ -271,7 +270,7 @@ function advanceTick(state: GameState): GameState {
   if (sectionAt(next) !== sectionAt(state)) {
     next = expireApSpeedSections(next);
     next = expireVoltageConversionSections(next);
-    next = expireAction52SkillBoostSections(next);
+    next = expireTimedSkillBuffSections(next);
     next = expireMentalHeartInducerSections(next);
     next = expireComboInducerSections(next);
     next = expireHeartLimitBuffSections(next);
