@@ -55,7 +55,9 @@ export function enqueueHandShuffle(
           ? [
               ...new Set([
                 ...activation.returnToDraw,
-                ...[...activation.usedCards, ...state.hand].filter((id) => id !== sourceId),
+                ...[...activation.usedCards, ...state.hand].filter(
+                  (id) => id !== sourceId && state.skillUseDestinations[id] !== 'proxy',
+                ),
               ]),
             ]
           : activation.returnToDraw,

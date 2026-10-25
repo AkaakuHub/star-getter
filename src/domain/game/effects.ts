@@ -21,9 +21,10 @@ import { applyMentalBarrier } from './effects/mentalBarrier';
 import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect } from './parameters/applyParameterEffect';
-
-import { changeStarGatherHeartLimit } from './live/heartLimit';
 import { applyHandLimit } from './effects/handLimit';
+import { applyHeartLimit } from './effects/heartLimit';
+import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
+import { applyVoltageTier } from './effects/voltageTier';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -31,10 +32,16 @@ export function applyEffect(
   effect: Effect,
   card?: Card,
   multiplier = 1,
+  addValue = 0,
 ): GameState {
   effect = resolveEffectParameterDetails(state, card, effect);
+  if (effect.kind === 'proxy-skill-forced-activation')
+    return forceProxySkillActivation(state, effect.targetType);
+  if (effect.kind === 'proxy-skill') return registerProxySkill(state, effect, card);
   const value = (amount: number) =>
-    Math.fround(skillValue(state, amount, effect, card) * multiplier);
+    Math.fround(
+      skillValue(state, Math.fround(Math.fround(amount + addValue) * multiplier), effect, card),
+    );
   switch (effect.kind) {
     case 'branch': {
       const context = conditionContext(state);
@@ -46,7 +53,10 @@ export function applyEffect(
           : evaluateCondition(effect.condition, context)
             ? effect.whenTrue
             : effect.whenFalse;
-      return effects.reduce((next, child) => applyEffect(next, child, card), state);
+      return effects.reduce(
+        (next, child) => applyEffect(next, child, card, multiplier, addValue),
+        state,
+      );
     }
     case 'mode':
       return changeMode(state, effect, applyEffect);
@@ -66,7 +76,10 @@ export function applyEffect(
                   ? sectionAt(state) === state.track.sections[0]
                   : sectionAt(state) === state.track.sections.at(-1)
       )
-        ? effect.effects.reduce((next, item) => applyEffect(next, item, card), state)
+        ? effect.effects.reduce(
+            (next, item) => applyEffect(next, item, card, multiplier, addValue),
+            state,
+          )
         : state;
     case 'mood':
       return { ...state, moodOffset: state.moodOffset + Math.ceil(value(effect.amount)) };
@@ -96,7 +109,7 @@ export function applyEffect(
       return requestTokens(state, effect.token, effect.count, card?.id ?? null, effect.seriesIds);
     case 'token-boost': {
       const base = Math.fround(
-        (Math.fround(effect.num / 10_000) + (effect.addValue ?? 0)) * multiplier,
+        (Math.fround(effect.num / 10_000) + (effect.addValue ?? 0) + addValue) * multiplier,
       );
       if (base <= 0) return state;
       const boosted = skillValue(state, base, { kind: 'amplify', percent: base }, card);
@@ -120,15 +133,9 @@ export function applyEffect(
       };
     }
     case 'hand-limit':
-      return applyHandLimit(state, effect.amount, card, multiplier, effect.duration);
+      return applyHandLimit(state, effect.amount, card, multiplier, effect.duration, addValue);
     case 'heart-limit':
-      return {
-        ...state,
-        hearts: changeStarGatherHeartLimit(
-          state.hearts,
-          Math.min(10_000_000, state.hearts.heartLimit + Math.ceil(value(effect.amount))),
-        ).state,
-      };
+      return applyHeartLimit(state, value(effect.amount));
     case 'shuffle':
       return enqueueHandShuffle(state, effect, card?.id ?? null);
     case 'search-unit':
@@ -157,7 +164,12 @@ export function applyEffect(
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'card-move': {
-      if (!card || state.skillUseDestinations[card.id] === 'exclusion') return state;
+      if (
+        !card ||
+        state.skillUseDestinations[card.id] === 'exclusion' ||
+        state.skillUseDestinations[card.id] === 'proxy'
+      )
+        return state;
       return {
         ...state,
         skillUseDestinations: { ...state.skillUseDestinations, [card.id]: effect.destination },
@@ -241,20 +253,7 @@ export function applyEffect(
     case 'mental-barrier':
       return applyMentalBarrier(state, effect, card, multiplier);
     case 'voltage-tier': {
-      if (state.bloom)
-        return effect.tiers.reduceRight(
-          (next, tier) => tier.reduce((current, child) => applyEffect(current, child, card), next),
-          state,
-        );
-      const tier =
-        effect.tiers[
-          Math.min(
-            effect.tiers.length - 1,
-            Math.floor(voltageLevel(state.excitement, state.maximumVoltageLevel) / effect.step),
-          )
-        ];
-      if (!tier) throw new Error('熱気の段階に対応する効果がありません。');
-      return tier.reduce((next, child) => applyEffect(next, child, card), state);
+      return applyVoltageTier(state, effect, card, multiplier, addValue, applyEffect);
     }
     case 'ap-speed': {
       const field = effect.duration === 'stage' ? 'apStageIntervalFactor' : 'apIntervalFactor';

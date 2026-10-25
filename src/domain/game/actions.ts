@@ -10,6 +10,7 @@ import { cardCost } from './cards/cost';
 import { finishCardActivation } from './cards/cardZones';
 import { useSpecial } from './special';
 import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
+import { advanceProxySkillUses } from './effects/proxySkill';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -93,7 +94,12 @@ function activateCard(
       next = applyEffect(next, effect, card);
     }
   }
-  next = applyUseAbility(finishTokenGeneration(next, card.id), card);
+  next = advanceProxySkillUses(
+    applyUseAbility(finishTokenGeneration(next, card.id), card),
+    card.id,
+    cardCost(state, card),
+    applyEffect,
+  );
   return notifyHandSkillUse(next, card);
 }
 

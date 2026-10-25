@@ -28,6 +28,10 @@ export function describeEffect(effect: Effect): string {
       return `追加カードの生成枚数を${effect.calculation === 'add' ? '加算' : '割合増幅'}する。`;
     case 'hand-limit':
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
+    case 'proxy-skill':
+      return 'Proxyスキルを発動する。';
+    case 'proxy-skill-forced-activation':
+      return '対象のProxyスキルを強制発動する。';
     case 'heart-limit':
       return `このステージ中、きらめき上限を${effect.amount}個増加する。`;
     case 'search-token':

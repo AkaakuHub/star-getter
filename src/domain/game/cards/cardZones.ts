@@ -13,6 +13,9 @@ export function finishCardActivation(state: GameState): GameState {
     ...activation.excluded,
     ...activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'exclusion'),
   ]);
+  const proxyIds = new Set(
+    activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'proxy'),
+  );
   const returnToDrawIds = new Set([
     ...activation.returnToDraw,
     ...activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'deck'),
@@ -35,6 +38,15 @@ export function finishCardActivation(state: GameState): GameState {
     ],
   };
   next = flushDeckActions(next);
+  if (proxyIds.size > 0) {
+    next = {
+      ...next,
+      hand: next.hand.filter((id) => !proxyIds.has(id)),
+      drawPile: next.drawPile.filter((id) => !proxyIds.has(id)),
+      discard: next.discard.filter((id) => !proxyIds.has(id)),
+      proxyCards: [...new Set([...next.proxyCards, ...proxyIds])],
+    };
+  }
   const handCountChange = activation.handCountChanges[source.id] ?? 0;
   const handReady: GameState = {
     ...next,
@@ -56,11 +68,13 @@ export function finishCardActivation(state: GameState): GameState {
     next = fillHand(handReady);
   }
   next = disposeHandEffects(next, [source.id]);
-  next = excludedIds.has(source.id)
-    ? excludeCards(next, [source.id])
-    : returnToDrawIds.has(source.id)
-      ? { ...next, drawPile: [...next.drawPile, source.id] }
-      : { ...next, discard: [...next.discard, source.id] };
+  next = proxyIds.has(source.id)
+    ? next
+    : excludedIds.has(source.id)
+      ? excludeCards(next, [source.id])
+      : returnToDrawIds.has(source.id)
+        ? { ...next, drawPile: [...next.drawPile, source.id] }
+        : { ...next, discard: [...next.discard, source.id] };
   return {
     ...next,
     skillUseDestinations: Object.fromEntries(
@@ -85,6 +99,7 @@ function excludeCards(state: GameState, ids: readonly string[]): GameState {
     activeModeParameterChanges: state.activeModeParameterChanges.filter(
       (item) => !ids.includes(item.cardId),
     ),
+    proxyCards: state.proxyCards.filter((id) => !ids.includes(id)),
     skillUseDestinations: Object.fromEntries(
       Object.entries(state.skillUseDestinations).filter(([id]) => !ids.includes(id)),
     ),

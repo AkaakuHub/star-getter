@@ -24,6 +24,8 @@ import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/ment
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
 import { initializeHandCardStats } from './cards/skillCostChanges';
 import { initializeParameterValueFactors } from './parameters/parameterValueChange';
+import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/proxySkill';
+import { applyEffect } from './effects';
 
 export function createGame(
   track: Track,
@@ -53,6 +55,7 @@ export function createGame(
     deck: [...deck],
     cardPool: [...deck],
     hand: [lead.id],
+    proxyCards: [],
     handCardStats: {},
     skillCostChanges: [],
     parameterValueFactors: [],
@@ -69,6 +72,7 @@ export function createGame(
     tokenBoosts: [],
     handLimit: rules.handSize,
     proxyAbsorptions: [],
+    nextProxyAbsorptionId: 1,
     handLimitEffects: [],
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
@@ -186,8 +190,9 @@ function advanceTick(state: GameState): GameState {
       dt,
     ),
   );
+  const proxyPeriodState = advanceProxySkillPeriods(gauges, dt, applyEffect);
   let next: GameState = advanceHearts({
-    ...advanceHeartBoosts(gauges, dt),
+    ...advanceHeartBoosts(proxyPeriodState, dt),
     tick,
     voltageStops: state.voltageStops.flatMap((stop) => {
       if (stop.remainingSeconds === null) return [stop];
@@ -215,6 +220,7 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
+    next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;
     if (expiredHandLimit.handAdjustment > 0) {

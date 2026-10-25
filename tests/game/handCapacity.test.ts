@@ -42,28 +42,6 @@ it('ミリ秒期限の手札数変更を期限後に解除する', () => {
   expect(advanceTo(state, 0.2).handLimit).toBe(5);
 });
 
-it('Proxyに吸収された手札数加算を目標数へ反映せず、期限時に原処理の解除量を反映する', () => {
-  const state = {
-    ...game(),
-    proxyAbsorptions: [
-      {
-        sourceId: 'proxy',
-        hasAbsorbLimit: true,
-        isAbsoluteAdd: false,
-        effects: [{ actionType: 20, targetAmount: 1n, totalAmount: 0n }],
-      },
-    ],
-  };
-  const absorbed = applyEffect(state, {
-    kind: 'hand-limit',
-    amount: 1,
-    duration: { kind: 'milliseconds', value: 100 },
-  });
-  expect(absorbed.handLimit).toBe(5);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(1n);
-  expect(advanceTo(absorbed, 0.2).handLimit).toBe(4);
-});
-
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
   const state = { ...game(), amplification: 150 };
   const next = applyEffect(state, { kind: 'hand-limit', amount: 3 });

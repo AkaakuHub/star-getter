@@ -172,6 +172,7 @@ export type GameState = Readonly<{
   cardPool: readonly Card[];
   hand: readonly string[];
   handEffectCardIds: readonly string[];
+  proxyCards: readonly string[];
   drawPile: readonly string[];
   deckOutCount: number;
   discard: readonly string[];
@@ -188,6 +189,7 @@ export type GameState = Readonly<{
   tokenBoosts: readonly TokenBoost[];
   handLimit: number;
   proxyAbsorptions: readonly ProxyAbsorption[];
+  nextProxyAbsorptionId: number;
   handLimitEffects: readonly Readonly<{
     amount: number;
     expirationAmount: number;
@@ -212,7 +214,7 @@ export type GameState = Readonly<{
     modeId: number;
     isOn: boolean;
   }>[];
-  skillUseDestinations: Readonly<Record<string, 'deck' | 'exclusion'>>;
+  skillUseDestinations: Readonly<Record<string, 'deck' | 'exclusion' | 'proxy'>>;
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];

@@ -1,5 +1,6 @@
 import type { Card, GameState } from '../model';
 import { skillValue } from './skillValue';
+import { isProxyTargetReached } from './proxySkill';
 
 export function applyHandLimit(
   state: GameState,
@@ -7,13 +8,13 @@ export function applyHandLimit(
   card: Card | undefined,
   multiplier: number,
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }> | undefined,
+  addValue = 0,
 ): GameState {
   if (duration?.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
+  const scaledAmount = Math.trunc(Math.fround((baseAmount + addValue) * multiplier));
   const amount = Math.trunc(
-    Math.fround(
-      skillValue(state, baseAmount, { kind: 'hand-limit', amount: baseAmount }, card) * multiplier,
-    ),
+    skillValue(state, scaledAmount, { kind: 'hand-limit', amount: baseAmount }, card),
   );
   const absorption = amount >= 0 ? absorbHandLimit(state, amount) : null;
   const appliedAmount = absorption?.absorbed ? 0 : amount;
@@ -102,7 +103,7 @@ function absorbHandLimit(
       const effect = absorption.effects[effectIndex];
       if (!effect) continue;
       if (effect.actionType !== 20) continue;
-      if (absorption.hasAbsorbLimit && isAbsorptionTargetReached(absorption, effect))
+      if (absorption.hasAbsorbLimit && isProxyTargetReached(absorption, effect))
         return { absorptions: state.proxyAbsorptions, absorbed: true };
       const totalAmount = effect.totalAmount + BigInt(amount);
       const effects = absorption.effects.map((item, index) =>
@@ -115,13 +116,4 @@ function absorbHandLimit(
     }
   }
   return null;
-}
-
-function isAbsorptionTargetReached(
-  absorption: GameState['proxyAbsorptions'][number],
-  effect: GameState['proxyAbsorptions'][number]['effects'][number],
-): boolean {
-  if (effect.actionType === 48 && !absorption.isAbsoluteAdd && effect.targetAmount < 0n)
-    return effect.totalAmount <= effect.targetAmount;
-  return effect.totalAmount >= effect.targetAmount;
 }
