@@ -27,6 +27,8 @@ export const costumeIds = [
   'ribbon',
 ] as const;
 export type CostumeId = (typeof costumeIds)[number];
+export type HandShuffle = Readonly<{ recoverDiscard: boolean; destination: 'draw' | 'discard' }>;
+
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark' | 'shadow';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
@@ -57,7 +59,8 @@ export type Effect =
     }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
-  | Readonly<{ kind: 'shuffle' | 'use-hand' }>
+  | Readonly<{ kind: 'use-hand' }>
+  | (Readonly<{ kind: 'shuffle' }> & HandShuffle)
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
@@ -220,7 +223,7 @@ export type GameState = Readonly<{
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
-    shuffles: readonly (string | null)[];
+    shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];
     searches: readonly (
       | Readonly<{ kind: 'unit'; unit: UnitId }>
       | Readonly<{ kind: 'token'; token: TokenKind }>
@@ -233,7 +236,7 @@ export type GameState = Readonly<{
     sourceId: string;
     usedCards: readonly string[];
     allHand: boolean;
-    shuffle: boolean;
+    shuffle: HandShuffle | null;
     excluded: readonly string[];
   }> | null;
   randomSeed: number;

@@ -38,7 +38,7 @@ export const setupCards: readonly Card[] = [
       { kind: 'energy', amount: 30 },
       { kind: 'hand-limit', amount: 3 },
       { kind: 'amplify', percent: 30, duration: 'section' },
-      { kind: 'shuffle' },
+      { kind: 'shuffle', recoverDiscard: true, destination: 'draw' },
     ],
   },
   {

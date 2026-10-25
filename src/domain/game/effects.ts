@@ -101,12 +101,27 @@ export function applyEffect(
       };
     case 'shuffle':
       return state.activation?.allHand
-        ? { ...state, activation: { ...state.activation, shuffle: true } }
+        ? {
+            ...state,
+            activation: {
+              ...state.activation,
+              shuffle: {
+                recoverDiscard: Boolean(
+                  state.activation.shuffle?.recoverDiscard || effect.recoverDiscard,
+                ),
+                destination:
+                  state.activation.shuffle?.destination === 'draw' ? 'draw' : effect.destination,
+              },
+            },
+          }
         : {
             ...state,
             deckActions: {
               ...state.deckActions,
-              shuffles: [...state.deckActions.shuffles, card?.id ?? null],
+              shuffles: [
+                ...state.deckActions.shuffles,
+                { sourceId: card?.id ?? null, options: effect },
+              ],
             },
           };
     case 'search-unit':

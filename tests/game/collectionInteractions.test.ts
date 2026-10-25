@@ -51,7 +51,7 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
   state = act(state, { type: 'collect' });
   expect(heartCount(state)).toBe(0);
   const redrawn = fillHand({
-    ...shuffleHand(state),
+    ...shuffleHand(state, { recoverDiscard: true, destination: 'draw' }),
     drawPile: ['horizon', ...state.deck.map((card) => card.id).filter((id) => id !== 'horizon')],
   });
   expect(redrawn.hand).toContain('horizon');
@@ -94,6 +94,44 @@ it('うなばらは累積50万回収から引き直し、ドロー時のきら�
   expect(next.score).toBeGreaterThan(state.score);
   expect(next.stats.heartsCollected).toBeGreaterThan(state.stats.heartsCollected);
   expect(next.stats.cardsUsed).toBe(0);
+});
+
+it('上限1000万でも回収49万9999個では引き直さず、累計50万個で残りの山札から引く', () => {
+  const prepared = preparedLibrary();
+  const initial = {
+    ...prepared,
+    hearts: { ...prepared.hearts, stageHearts: [], hiddenHeartBatches: [] },
+  };
+  const below = act(addHearts(initial, 499_999), { type: 'collect' });
+  expect(below.hand).toEqual(initial.hand);
+  for (const id of initial.hand) expect(below.handHeartCollectCounts[id]).toBe(499_999);
+  const reached = act(addHearts(below, 1), { type: 'collect' });
+  expect(reached.stats.heartsCollected).toBe(500_000);
+  expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
+  for (const id of initial.hand) expect(reached.discard).toContain(id);
+  expect(reached.hearts.heartLimit).toBe(10_000_000);
+});
+
+it('1000万個を一度に回収しても50万個以上の条件が成立して引き直す', () => {
+  const initial = preparedLibrary();
+  const reached = act(addHearts(initial, 10_000_000), { type: 'collect' });
+  expect(reached.stats.heartsCollected).toBe(10_000_000);
+  expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
+  for (const id of initial.hand) expect(reached.discard).toContain(id);
+});
+
+it('94枚では回収50万個を満たしても供給も引き直しも発動しない', () => {
+  const prepared = preparedLibrary();
+  const removed = prepared.drawPile.slice(0, prepared.deck.length - 94);
+  const initial = {
+    ...prepared,
+    deck: prepared.deck.filter((card) => !removed.includes(card.id)),
+    drawPile: prepared.drawPile.filter((id) => !removed.includes(id)),
+  };
+  expect(initial.deck).toHaveLength(94);
+  const reached = act(initial, { type: 'collect' });
+  expect(reached.hand).toEqual(initial.hand);
+  expect(heartCount(reached)).toBe(0);
 });
 
 it('仕込んだうなばらでは手動連打の回収回数が0.3秒間隔の自動回収を上回る', () => {

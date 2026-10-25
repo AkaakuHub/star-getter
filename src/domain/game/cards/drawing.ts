@@ -3,7 +3,7 @@ import { drawCandidate, drawWeight } from './drawLottery';
 import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
-import type { Card, GameState } from '../model';
+import type { Card, GameState, HandShuffle } from '../model';
 
 export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
@@ -104,14 +104,19 @@ function drawUntil(state: GameState, count: number): GameState {
   return { ...next, drawContext: 'idle' };
 }
 
-export function shuffleHand(state: GameState): GameState {
-  const shuffled = shuffle([...state.hand, ...state.drawPile, ...state.discard], state.randomSeed);
+export function shuffleHand(state: GameState, options: HandShuffle): GameState {
+  const recovered = options.recoverDiscard ? state.discard : [];
+  const returned = options.destination === 'draw' ? state.hand : [];
+  const shuffled = shuffle([...state.drawPile, ...recovered, ...returned], state.randomSeed);
   return {
     ...state,
     hand: [],
     handEffectCardIds: state.handEffectCardIds.filter((id) => !state.hand.includes(id)),
     drawPile: shuffled.items,
-    discard: [],
+    discard: [
+      ...(options.recoverDiscard ? [] : state.discard),
+      ...(options.destination === 'discard' ? state.hand : []),
+    ],
     randomSeed: shuffled.seed,
     relayUsed: [],
     handHeartCollectCounts: {},

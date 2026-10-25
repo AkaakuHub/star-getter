@@ -98,7 +98,7 @@ export const routeTokens: readonly Card[] = [
     drawAbility: 'bookmark',
     useEffects: [{ kind: 'tokens', token: 'story', count: 1 }],
     effects: [
-      { kind: 'shuffle' },
+      { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
       { kind: 'search-token', token: 'clock', count: 1 },
       { kind: 'search-unit', unit: 1, count: 1 },
       { kind: 'search-token', token: 'clock', count: 1 },
@@ -119,6 +119,9 @@ export const routeTokens: readonly Card[] = [
     drawRule: { unit: 2, priority: 'always' },
     drawAbility: 'shadow',
     useAbility: 'shadow',
-    effects: [{ kind: 'shuffle' }, { kind: 'energy', amount: -99 }],
+    effects: [
+      { kind: 'shuffle', recoverDiscard: true, destination: 'draw' },
+      { kind: 'energy', amount: -99 },
+    ],
   },
 ];

@@ -23,7 +23,7 @@ export const sunriseCard: Card = {
   beatPoint: 100,
   effects: [
     { kind: 'heart-boost', percent: 100, uses: 1, moodBonus: { target: 3, perPoint: 0.5 } },
-    { kind: 'shuffle' },
+    { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
     drained([
       {
         kind: 'resource-boost',

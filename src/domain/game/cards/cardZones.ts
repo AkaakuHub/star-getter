@@ -15,7 +15,12 @@ export function finishCardActivation(state: GameState): GameState {
   );
   const activeChildren = children.filter((id) => next.deck.some((card) => card.id === id));
   next = activation.shuffle
-    ? shuffleHand({ ...next, drawPile: [...next.drawPile, ...activeChildren] })
+    ? shuffleHand(
+        activation.shuffle.destination === 'draw'
+          ? { ...next, drawPile: [...next.drawPile, ...activeChildren] }
+          : { ...next, discard: [...next.discard, ...activeChildren] },
+        activation.shuffle,
+      )
     : { ...next, discard: [...next.discard, ...activeChildren] };
   next = flushDeckActions(next);
   next = fillHand({

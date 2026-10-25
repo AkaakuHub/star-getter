@@ -82,8 +82,8 @@ it('シールドは負の回復効果を防ぎ、自然減少は防がない', (
 
 it('同時に登録した引き直しをまとめず全回実行し、後登録の検索を先に4回消費する', () => {
   let state = game();
-  state = applyEffect(state, { kind: 'shuffle' });
-  state = applyEffect(state, { kind: 'shuffle' });
+  state = applyEffect(state, { kind: 'shuffle', recoverDiscard: false, destination: 'discard' });
+  state = applyEffect(state, { kind: 'shuffle', recoverDiscard: false, destination: 'discard' });
   state = applyEffect(state, { kind: 'search-unit', unit: 2, count: 4 });
   expect(state.deckActions.shuffles).toHaveLength(2);
   expect(state.deckActions.searches).toHaveLength(4);
@@ -130,7 +130,11 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
   let state = withHand({ ...game(), handLimit: 8 }, ['frost-echo', 'camera']);
   const source = state.deck.find((card) => card.id === 'frost-echo');
   if (!source) throw new Error('発動元がありません。');
-  state = applyEffect(state, { kind: 'shuffle' }, source);
+  state = applyEffect(
+    state,
+    { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
+    source,
+  );
   const replaced = flushDeckActions(state);
   expect(replaced.hand).toHaveLength(2);
   expect(replaced.lastUsedMember).toBe(source.member);

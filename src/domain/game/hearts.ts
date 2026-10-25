@@ -81,7 +81,11 @@ export function collectHearts(state: GameState): GameState {
         (voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 950 &&
           Math.trunc(triggered.stamina) === 0)
       ) {
-        triggered = applyEffect(triggered, { kind: 'shuffle' }, card);
+        triggered = applyEffect(
+          triggered,
+          { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
+          card,
+        );
         triggered = applyEffect(triggered, { kind: 'search-unit', unit: 2, count: 4 }, card);
         triggered = applyEffect(triggered, { kind: 'excitement', amount: -1_400_000 }, card);
         if (
@@ -98,7 +102,11 @@ export function collectHearts(state: GameState): GameState {
               { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
               card,
             )
-          : applyEffect(triggered, { kind: 'shuffle' }, card);
+          : applyEffect(
+              triggered,
+              { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
+              card,
+            );
     }
   }
   return flushDeckActions(triggered);
