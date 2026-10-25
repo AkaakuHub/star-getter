@@ -13,15 +13,5 @@ export const tracks: readonly Track[] = [
       { name: '山場', startBeat: 36, mood: 'warm', moodValue: 50, climax: true },
       { name: 'フィナーレ', startBeat: 48, mood: 'bright', moodValue: 0, climax: false },
     ],
-    melody: [
-      72, 76, 79, 76, 74, 72, 67, 69, 72, 74, 76, 79, 81, 79, 76, 74, 65, 69, 72, 76, 74, 72, 69,
-      67, 67, 71, 74, 79, 77, 74, 71, 67,
-    ],
-    chords: [
-      [48, 52, 55],
-      [45, 48, 52],
-      [41, 45, 48],
-      [43, 47, 50],
-    ],
   },
 ];

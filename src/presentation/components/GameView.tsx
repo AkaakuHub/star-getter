@@ -1,4 +1,4 @@
-import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
+import { Pause, Menu, List, Layers, Star } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
@@ -21,8 +21,6 @@ export function GameView({
   onHand,
   onDeck,
   busy,
-  muted,
-  onMuted,
 }: Readonly<{
   controller: GameController;
   state: GameState;
@@ -33,8 +31,6 @@ export function GameView({
   onHand: () => void;
   onDeck: () => void;
   busy: boolean;
-  muted: boolean;
-  onMuted: () => void;
 }>) {
   return (
     <main className={'idol-game' + (state.bloom ? ' is-blooming' : '')} aria-label="ライブ">
@@ -82,19 +78,6 @@ export function GameView({
         >
           <Star size={20} aria-hidden="true" />
           <span>100</span>
-        </button>
-        <button
-          type="button"
-          className="live-tool live-sound-button"
-          aria-label={muted ? '音声をオンにする' : '音声をオフにする'}
-          aria-pressed={!muted}
-          onClick={onMuted}
-        >
-          {muted ? (
-            <VolumeX size={20} aria-hidden="true" />
-          ) : (
-            <Volume2 size={20} aria-hidden="true" />
-          )}
         </button>
         <button
           type="button"

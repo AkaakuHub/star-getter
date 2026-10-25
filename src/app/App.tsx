@@ -11,10 +11,7 @@ import { useGameControls } from './useGameControls';
 export function App() {
   const [route, setRoute] = useState(() => initialRoute(location.href));
   const [heartShowLimit, setHeartShowLimit] = useState(() => readHeartShowLimit(localStorage));
-  const [muted, setMuted] = useState(false);
-  const [controller, setController] = useState(() =>
-    createGameController(route, muted, heartShowLimit),
-  );
+  const [controller, setController] = useState(() => createGameController(route, heartShowLimit));
   const [panel, setPanel] = useState<'menu' | 'hand' | 'deck' | null>(null);
   const [resumeAfterPanel, setResumeAfterPanel] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -34,7 +31,7 @@ export function App() {
     setBusy(true);
     try {
       await controller.dispose();
-      const next = createGameController(nextRoute, muted, heartShowLimit);
+      const next = createGameController(nextRoute, heartShowLimit);
       const url = new URL(location.href);
       url.searchParams.set('route', nextRoute);
       history.replaceState(null, '', url);
@@ -91,11 +88,6 @@ export function App() {
         onHand={() => void openPanel('hand')}
         onDeck={() => void openPanel('deck')}
         busy={busy}
-        muted={muted}
-        onMuted={() => {
-          controller.setMuted(!muted);
-          setMuted(!muted);
-        }}
       />
       {panel === 'menu' && (
         <GameMenu

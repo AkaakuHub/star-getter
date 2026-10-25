@@ -9,7 +9,7 @@ import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 export class GameController {
   error = '';
   private currentState: GameState;
-  private readonly audio: PlaybackClock;
+  private readonly clock: PlaybackClock;
   private readonly frames: FrameScheduler;
   private readonly listeners = new Set<() => void>();
   private frame = 0;
@@ -61,7 +61,7 @@ export class GameController {
     });
     if (!this.waiting) return;
     this.stopFrames();
-    this.waitPause = this.audio.pause().catch((error: unknown) => this.fail(error));
+    this.waitPause = this.clock.pause().catch((error: unknown) => this.fail(error));
     this.notify();
   }
 
@@ -71,7 +71,7 @@ export class GameController {
     try {
       await this.waitPause;
       if (this.disposed || this.currentState.phase !== 'playing') return;
-      await this.audio.resume();
+      await this.clock.resume();
       if (!this.disposed) this.requestFrame();
     } catch (error) {
       this.fail(error);
@@ -81,10 +81,10 @@ export class GameController {
     }
   }
 
-  constructor(state: GameState, audio: PlaybackClock, frames: FrameScheduler) {
+  constructor(state: GameState, clock: PlaybackClock, frames: FrameScheduler) {
     if (state.phase !== 'ready') throw new Error('開始前のライブを指定してください。');
     this.currentState = act(state, { type: 'start' });
-    this.audio = audio;
+    this.clock = clock;
     this.frames = frames;
     this.requestFrame();
   }
@@ -154,13 +154,13 @@ export class GameController {
       await this.waitPause;
       if (this.disposed) return;
       if (this.currentState.phase === 'playing') {
-        if (!this.waiting) await this.audio.pause();
+        if (!this.waiting) await this.clock.pause();
         if (this.disposed) return;
         this.advance();
         this.currentState = act(this.currentState, { type: 'pause' });
         this.stopFrames();
       } else if (this.currentState.phase === 'paused') {
-        if (!this.waiting) await this.audio.resume();
+        if (!this.waiting) await this.clock.resume();
         if (this.disposed) return;
         this.currentState = act(this.currentState, { type: 'resume' });
         if (!this.waiting) this.requestFrame();
@@ -183,10 +183,6 @@ export class GameController {
     this.notify();
   }
 
-  setMuted(muted: boolean): void {
-    if (!this.disposed) this.audio.setMuted(muted);
-  }
-
   toggleAutomaticHearts(): void {
     if (this.disposed || this.currentState.phase === 'finished') return;
     this.currentState = {
@@ -201,7 +197,7 @@ export class GameController {
     this.disposed = true;
     this.stopFrames();
     this.listeners.clear();
-    await this.closeAudio();
+    await this.closeClock();
   }
 
   private readonly update = (timestamp: number): void => {
@@ -213,12 +209,6 @@ export class GameController {
       return;
     }
     if (this.waiting) return;
-    if (this.audio.interrupted && !this.busy) {
-      this.currentState = act(this.currentState, { type: 'pause' });
-      void this.audio.pause().catch((failure: unknown) => this.fail(failure));
-      this.notify();
-      return;
-    }
     if (timestamp - this.lastNotification >= 100) {
       this.lastNotification = timestamp;
       this.notify();
@@ -229,19 +219,19 @@ export class GameController {
   private advance(): GameState {
     if (this.waiting) return this.currentState;
     const previousTick = this.currentState.tick;
-    this.currentState = advanceTo(this.currentState, this.audio.seconds);
+    this.currentState = advanceTo(this.currentState, this.clock.seconds);
     if (!this.busy)
       this.synchronizeWaitMode((this.currentState.tick - previousTick) / rules.ticksPerSecond);
     if (this.currentState.phase === 'finished') {
       this.selection = null;
       this.stopFrames();
-      void this.closeAudio().catch((error: unknown) => this.fail(error));
+      void this.closeClock().catch((error: unknown) => this.fail(error));
     }
     return this.currentState;
   }
 
-  private closeAudio(): Promise<void> {
-    if (!this.closing) this.closing = this.audio.close();
+  private closeClock(): Promise<void> {
+    if (!this.closing) this.closing = this.clock.close();
     return this.closing;
   }
 

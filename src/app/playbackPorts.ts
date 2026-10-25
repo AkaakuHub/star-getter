@@ -1,7 +1,5 @@
 export interface PlaybackClock {
   readonly seconds: number;
-  readonly interrupted: boolean;
-  setMuted(muted: boolean): void;
   pause(): Promise<void>;
   resume(): Promise<void>;
   close(): Promise<void>;

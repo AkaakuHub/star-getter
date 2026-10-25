@@ -79,8 +79,6 @@ export type Track = Readonly<{
   bpm: number;
   beats: number;
   sections: readonly Section[];
-  melody: readonly number[];
-  chords: readonly (readonly [number, number, number])[];
 }>;
 
 export type CardUse = Readonly<{
