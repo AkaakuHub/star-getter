@@ -182,6 +182,27 @@ function validateEffect(effect: Effect): void {
       throw new Error('熱気変換の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'skill-boost') {
+    const duration = effect.duration;
+    if (
+      !Number.isSafeInteger(effect.num) ||
+      (effect.target.kind === 'member' && !Number.isSafeInteger(effect.target.member)) ||
+      (effect.target.kind === 'unit' && ![1, 2, 3].includes(effect.target.unit)) ||
+      (effect.target.kind === 'token-series' && !Number.isSafeInteger(effect.target.seriesId)) ||
+      (effect.moodBonus !== undefined &&
+        (!Number.isFinite(effect.moodBonus.perPoint) ||
+          ![1, 2, 3].includes(effect.moodBonus.target))) ||
+      !['stage', 'milliseconds', 'sections'].includes(duration.kind) ||
+      !Number.isSafeInteger(duration.value) ||
+      duration.value < 0 ||
+      (effect.uses !== null && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
+      effect.skillTokenSeriesIds?.some((seriesId) => !Number.isSafeInteger(seriesId)) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('ActionType52の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'heart-boost') {
     const target = effect.target;
     if (

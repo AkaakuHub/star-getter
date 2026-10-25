@@ -2,6 +2,7 @@ import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
 import type { VoltageConvertEffect } from './voltageConversionTypes';
+import type { Action52BuffEffect } from './skillBoostTypes';
 
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -270,6 +271,7 @@ type EffectShape =
       deactivationKey?: string;
     }>
   | VoltageConvertEffect
+  | Action52BuffEffect
   | ResetSpecial
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>

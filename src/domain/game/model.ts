@@ -10,6 +10,7 @@ import type { ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
 import type { Effect } from './modelTypes';
 import type { TemporaryScoreBoost, VoltageConversion } from './voltageConversionTypes';
+import type { Action52Buff } from './skillBoostTypes';
 import type {
   GaugeInfinity,
   GaugeRegeneration,
@@ -243,6 +244,7 @@ export type GameState = Readonly<{
     deactivationKey: string | null;
   }>[];
   voltageConversions: readonly VoltageConversion[];
+  action52Buffs: readonly Action52Buff[];
   apTimerSeconds: number;
   mentalTimerSeconds: number;
   voltageTimerSeconds: number;
@@ -251,6 +253,7 @@ export type GameState = Readonly<{
     remainingSections: number | null;
   }>[];
   nextVoltageConversionId: number;
+  nextAction52BuffId: number;
   temporaryScoreBoosts: readonly TemporaryScoreBoost[];
   gaugeInfinities: readonly GaugeInfinity[];
   gaugeRegenerations: readonly GaugeRegeneration[];
@@ -301,6 +304,7 @@ export type Action =
   | Readonly<{ type: 'card'; index: number }>
   | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>;
 
 export const rules = {

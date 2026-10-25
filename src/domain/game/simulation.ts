@@ -31,6 +31,10 @@ import {
   advanceVoltageConversions,
   expireVoltageConversionSections,
 } from './effects/voltageConversion';
+import {
+  advanceAction52SkillBoosts,
+  expireAction52SkillBoostSections,
+} from './effects/action52SkillBoost';
 
 export function createGame(
   track: Track,
@@ -92,7 +96,9 @@ export function createGame(
     maxEnergy: track.stage.maxEnergy,
     apTimeEffects: [],
     voltageConversions: [],
+    action52Buffs: [],
     nextVoltageConversionId: 1,
+    nextAction52BuffId: 1,
     temporaryScoreBoosts: [],
     apTimerSeconds: 0,
     mentalTimerSeconds: 0,
@@ -188,17 +194,20 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = advanceVoltageConversions(
-    advanceApSpeedEffects(
-      removeExhaustedMentalBarriers(
-        expireMentalBarriers(
-          advanceGaugeRegenerations(
-            expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+  const gauges = advanceAction52SkillBoosts(
+    advanceVoltageConversions(
+      advanceApSpeedEffects(
+        removeExhaustedMentalBarriers(
+          expireMentalBarriers(
+            advanceGaugeRegenerations(
+              expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+              dt,
+            ),
+            'milliseconds',
             dt,
           ),
-          'milliseconds',
-          dt,
         ),
+        dt,
       ),
       dt,
     ),
@@ -236,6 +245,7 @@ function advanceTick(state: GameState): GameState {
   if (sectionAt(next) !== sectionAt(state)) {
     next = expireApSpeedSections(next);
     next = expireVoltageConversionSections(next);
+    next = expireAction52SkillBoostSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;

@@ -18,6 +18,7 @@ import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
+import { activateAction52SkillBoost } from './effects/action52SkillBoost';
 import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect } from './parameters/applyParameterEffect';
@@ -266,6 +267,8 @@ export function applyEffect(
     }
     case 'voltage-convert':
       return activateVoltageConversion(state, effect, card, multiplier, addValue);
+    case 'skill-boost':
+      return activateAction52SkillBoost(state, effect);
     case 'stamina':
     case 'excitement': {
       const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);

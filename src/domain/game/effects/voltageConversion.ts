@@ -3,7 +3,7 @@ import type { VoltageConversion, VoltageConvertEffect } from '../voltageConversi
 import { addHearts } from '../hearts';
 import { addMentalBarrier } from '../live/mentalBarriers';
 import { applyAdditionalBuff } from './additionalBuff';
-import { skillValue } from './skillValue';
+import { applyAction52SkillBoost } from './action52SkillBoost';
 import { changeResource } from '../resources';
 
 export function activateVoltageConversion(
@@ -17,7 +17,9 @@ export function activateVoltageConversion(
   if (effect.displayDuration.kind === 'sections' && effect.displayDuration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const base = Math.fround(Math.fround(effect.num + addValue) * Math.fround(multiplier));
-  const num = Math.trunc(skillValue(state, base, { kind: 'energy', amount: base }, card));
+  const boosted = applyAction52SkillBoost(state, card, base);
+  const num =
+    boosted.value === Number.POSITIVE_INFINITY ? -2_147_483_648 : Math.trunc(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const conversion: VoltageConversion = {
     id: state.nextVoltageConversionId,
@@ -39,9 +41,9 @@ export function activateVoltageConversion(
     deactivationKey: effect.deactivationKey ?? null,
   };
   return {
-    ...state,
-    voltageConversions: [...state.voltageConversions, conversion],
-    nextVoltageConversionId: state.nextVoltageConversionId + 1,
+    ...boosted.state,
+    voltageConversions: [...boosted.state.voltageConversions, conversion],
+    nextVoltageConversionId: boosted.state.nextVoltageConversionId + 1,
   };
 }
 

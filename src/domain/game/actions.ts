@@ -14,6 +14,7 @@ import { advanceProxySkillUses } from './effects/proxySkill';
 import { deactivateHandLimitEffects } from './effects/handLimit';
 import { deactivateApSpeedEffects } from './effects/apSpeed';
 import { deactivateVoltageConversions } from './effects/voltageConversion';
+import { deactivateAction52SkillBoosts } from './effects/action52SkillBoost';
 import { restoreHandLimitCount } from './cards/drawing';
 
 export function act(state: GameState, action: Action): GameState {
@@ -40,6 +41,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateApSpeedEffects(state, action.deactivationKey);
     case 'deactivate-voltage-convert':
       return deactivateVoltageConversions(state, action.deactivationKey);
+    case 'deactivate-skill-boost':
+      return deactivateAction52SkillBoosts(state, action.deactivationKey);
   }
 }
 
