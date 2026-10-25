@@ -6,6 +6,7 @@ import { flushDeckActions } from './cards/boardActions';
 import { fillHand } from './cards/drawing';
 import { resolveModeSkill } from './live/modes';
 import { startSpecialAppealTokenCooldown } from './effects/specialAppealToken';
+import { notifyHandSkillUse } from './cards/handInduce';
 
 export function specialCards(state: GameState): readonly Card[] {
   const regularCards = state.deck
@@ -74,6 +75,7 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   };
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   next = finishTokenGeneration(next, card.id);
+  next = notifyHandSkillUse(next, card, applyEffect);
   if (token) next = startSpecialAppealTokenCooldown(next, token);
   const completed = flushDeckActions({
     ...next,
