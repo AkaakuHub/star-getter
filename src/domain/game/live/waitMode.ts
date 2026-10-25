@@ -48,7 +48,12 @@ export function advanceWaitMode(
     remainingCoolTimeSeconds,
     previousSkillPoint: input.skillPoint,
   };
-  if (state.kind !== 'reserved' && state.previousSkillPoint === input.skillPoint) return next;
+  if (
+    state.kind !== 'reserved' &&
+    state.kind !== 'force-reserved' &&
+    state.previousSkillPoint === input.skillPoint
+  )
+    return next;
   if (remainingCoolTimeSeconds > 0 || !input.ableUseSkill || input.mentalDown) {
     return { ...next, kind: state.kind === 'force-reserved' ? 'force-reserved' : 'reserved' };
   }

@@ -183,6 +183,15 @@ export class GameController {
     this.notify();
   }
 
+  collectFromInput(): 'collect' | 'wait-cancel' {
+    if (this.waiting) {
+      this.cancelWait();
+      return 'wait-cancel';
+    }
+    this.command({ type: 'collect' });
+    return 'collect';
+  }
+
   cancelWait(): void {
     if (this.disposed || this.busy || !this.waiting || this.currentState.phase !== 'playing')
       return;

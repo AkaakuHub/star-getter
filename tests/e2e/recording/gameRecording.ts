@@ -15,6 +15,7 @@ export type RecordedInput =
     }>
   | Readonly<{ kind: 'card-cancel'; card: CardReference }>
   | Readonly<{ kind: 'collect' }>
+  | Readonly<{ kind: 'wait-cancel' }>
   | Readonly<{ kind: 'automatic-hearts'; enabled: boolean }>
   | Readonly<{ kind: 'wait-mode'; enabled: boolean }>;
 type Snapshot = Readonly<{

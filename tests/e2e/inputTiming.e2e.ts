@@ -26,3 +26,24 @@ for (const waitMode of [false, true]) {
     await driver.setWaitMode(false);
   });
 }
+
+test('操作時間:使用間隔中に次の手札を確認し、発動時は本体の使用間隔を守る', async () => {
+  const driver = await GameDriver.create('library');
+  await driver.until(
+    (state) => state.hand.some((id, index) => id === 'class' && canUseCard(state, index)),
+    () => Promise.resolve(),
+  );
+  expect((await driver.useFirst(['class']))?.id).toBe('class');
+  const first = driver.inputs.findLast((row) => row.input.kind === 'card');
+  const count = driver.inputs.length;
+  expect((await driver.useFirst(['class']))?.id).toBe('class');
+  const secondInputs = driver.inputs.slice(count);
+  const inspection = secondInputs.find((row) => row.input.kind === 'card-inspect');
+  const activation = secondInputs.find((row) => row.input.kind === 'card');
+  if (!first || !inspection || !activation) throw new Error('連続使用の記録がありません。');
+  expect(inspection.tick).toBe(first.tick);
+  expect(activation.tick - first.tick).toBeGreaterThanOrEqual(activation.before.skillCooldownTicks);
+  expect(activation.wallSeconds - inspection.wallSeconds).toBeGreaterThanOrEqual(
+    driver.timing.decisionSeconds.minimum + driver.timing.confirmationSeconds.minimum,
+  );
+});

@@ -1,3 +1,4 @@
+import { cardCost } from '../../src/domain/game/cards/cost';
 import type { RouteId } from '../../src/content/routes';
 import { createPresetGame } from '../../src/app/createPresetGame';
 import { GameController } from '../../src/app/gameController';
@@ -60,6 +61,10 @@ export class GameDriver {
 
   get inputs(): readonly InputRecord[] {
     return this.recording.inputs;
+  }
+
+  get inputTick(): number {
+    return this.elapsedTicks;
   }
 
   get wallSeconds(): number {
@@ -126,10 +131,10 @@ export class GameDriver {
     const before = this.state.stats.heartsCollected;
     const hand = this.state.hand.join(',');
     const amplification = this.state.storyAmplification;
-    this.controller.command({ type: 'collect' });
-    this.recording.record({ kind: 'collect' }, previous, this.state, this.elapsedTicks);
+    const kind = this.controller.collectFromInput();
+    this.recording.record({ kind }, previous, this.state, this.elapsedTicks);
     this.pointer();
-    this.collections++;
+    if (kind === 'collect') this.collections++;
     if (this.state.stats.heartsCollected > before) this.successfulCollections++;
     if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
     this.collectionAmplification += this.state.storyAmplification - amplification;
@@ -177,7 +182,13 @@ export class GameDriver {
   async useFirst(priority: readonly string[]): Promise<Card | undefined> {
     const available = this.state.hand
       .map((_, index) => index)
-      .filter((index) => canUseCard(this.state, index));
+      .filter(
+        (index) =>
+          this.state.phase === 'playing' &&
+          !this.state.resting &&
+          (this.state.bloom !== null ||
+            this.state.energy >= cardCost(this.state, cardAt(this.state, index))),
+      );
     for (const key of priority) {
       const index = available.find((candidate) => {
         const card = cardAt(this.state, candidate);

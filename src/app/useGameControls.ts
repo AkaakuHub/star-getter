@@ -25,7 +25,7 @@ export function useGameControls(
         !(event.target instanceof Element && event.target.closest('button'))
       ) {
         event.preventDefault();
-        controller.command({ type: 'collect' });
+        controller.collectFromInput();
       }
       if (
         event.key.toLowerCase() === 's' ||

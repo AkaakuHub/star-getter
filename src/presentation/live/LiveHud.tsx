@@ -74,19 +74,21 @@ export function LiveHud({
         onPointerDown={(event) => {
           if (event.button === 0) {
             event.preventDefault();
-            controller.command({ type: 'collect' });
+            controller.collectFromInput();
           }
         }}
         onClick={(event) => {
-          if (event.detail === 0) controller.command({ type: 'collect' });
+          if (event.detail === 0) controller.collectFromInput();
         }}
         aria-label={
-          heartCount(state) +
-          '個の' +
-          (state.bloom ? '結晶' : 'きらめき') +
-          'を回収、上限' +
-          state.hearts.heartLimit +
-          '個'
+          controller.waiting
+            ? 'カード使用待ちを解除'
+            : heartCount(state) +
+              '個の' +
+              (state.bloom ? '結晶' : 'きらめき') +
+              'を回収、上限' +
+              state.hearts.heartLimit +
+              '個'
         }
       >
         <CollectIcon

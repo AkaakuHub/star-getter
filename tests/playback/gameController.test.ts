@@ -135,7 +135,7 @@ describe('カード使用可能時の自動停止', () => {
     expect(frames.pending).toBe(1);
   });
 
-  it('使用後はクールタイム中のAP変化では停止せず、次のAP変化で再び停止する', async () => {
+  it('使用後はクールタイムと0.35秒を守り、APが変わらなくても再び停止する', async () => {
     const { controller, clock, frames } = session();
     await controller.toggleWaitMode();
     const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
@@ -150,9 +150,6 @@ describe('カード使用可能時の自動停止', () => {
     clock.seconds = cardCooldownTicks(controller.state) / rules.ticksPerSecond;
     frames.run(clock.seconds * 1000);
     expect(controller.state.hand.some((_, slot) => canUseCard(controller.state, slot))).toBe(true);
-    expect(controller.waiting).toBe(false);
-    clock.seconds = 1.2;
-    frames.run(1200);
     expect(controller.waiting).toBe(true);
     expect(frames.pending).toBe(0);
   });
@@ -261,4 +258,20 @@ describe('カード待ちの解除操作', () => {
     frames.run(2500);
     expect(controller.waiting).toBe(false);
   });
+});
+
+it('回収領域は待ち中なら解除に使い、次の入力から回収する', async () => {
+  const { controller, clock, frames } = session();
+  clock.seconds = 1;
+  frames.run(1000);
+  controller.toggleAutomaticHearts();
+  await controller.toggleWaitMode();
+  expect(controller.waiting).toBe(true);
+  const before = controller.state.stats.heartsCollected;
+  expect(controller.collectFromInput()).toBe('wait-cancel');
+  expect(controller.state.stats.heartsCollected).toBe(before);
+  expect(controller.waiting).toBe(false);
+  await vi.waitFor(() => expect(clock.paused).toBe(false));
+  expect(controller.collectFromInput()).toBe('collect');
+  expect(controller.state.stats.heartsCollected).toBeGreaterThan(before);
 });

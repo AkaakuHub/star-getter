@@ -9,7 +9,7 @@ export function Stage({
   controller,
   state,
 }: Readonly<{ controller: GameController; state: GameState }>) {
-  const collect = () => controller.command({ type: 'collect' });
+  const collect = () => controller.collectFromInput();
   return (
     <div className="absolute inset-0 overflow-hidden">
       <div className="concert-backdrop" aria-hidden="true">
@@ -30,7 +30,9 @@ export function Stage({
       <button
         type="button"
         className="heart-field"
-        aria-label={heartCount(state) + '個のきらめきを回収'}
+        aria-label={
+          controller.waiting ? 'カード使用待ちを解除' : heartCount(state) + '個のきらめきを回収'
+        }
         disabled={state.phase !== 'playing'}
         onPointerDown={(event) => {
           if (event.button === 0) {

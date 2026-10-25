@@ -8,6 +8,7 @@ import { rules } from '../../../src/domain/game/model';
 function describe(record: InputRecord): string {
   const input = record.input;
   if (input.kind === 'collect') return 'スターを回収';
+  if (input.kind === 'wait-cancel') return '回収領域の入力でカード使用待ちを解除';
   if (input.kind === 'automatic-hearts') return '自動回収を' + (input.enabled ? 'ON' : 'OFF');
   if (input.kind === 'wait-mode')
     return 'カード使用可能時の自動停止を' + (input.enabled ? 'ON' : 'OFF');

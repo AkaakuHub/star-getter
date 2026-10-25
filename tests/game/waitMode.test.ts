@@ -47,7 +47,7 @@ describe('本家のカード待ち状態遷移', () => {
       skillPoint: 9,
       deltaTimeSeconds: 0.2,
     });
-    expect(noPointChange.kind).toBe('force-reserved');
+    expect(noPointChange.kind).toBe('waiting');
     expect(advanceWaitMode(noPointChange, { ...available, skillPoint: 10 }).kind).toBe('waiting');
   });
   it('メンタルダウン中は使用可能なカードがあっても停止しない', () => {
