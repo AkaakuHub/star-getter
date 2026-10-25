@@ -50,30 +50,37 @@ export const bloomCards: readonly Card[] = [
       {
         kind: 'voltage-tier',
         step: 200,
-        tiers: voltageHearts.map((amount, index) => {
-          const points = voltagePoints[index],
-            score = scorePercents[index],
-            limit = heartLimits[index];
-          if (points === undefined || score === undefined || limit === undefined)
-            throw new Error('段階の効果がありません。');
-          return [
-            { kind: 'beat-hearts', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
-            {
-              kind: 'excitement',
-              amount: points,
-              moodBonus: { target: 3, perPoint: points * 0.005 },
-            },
-            mellow([
-              {
-                kind: 'boost',
-                multiplier: 1 + score / 100,
-                moodBonus: { target: 3, perPoint: score * 0.005 },
-              },
-              { kind: 'heart-limit', amount: limit },
-            ]),
-          ];
-        }),
+        tiers: voltageHearts.map<readonly Effect[]>((amount) => [
+          { kind: 'beat-hearts', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+        ]),
       },
+      {
+        kind: 'voltage-tier',
+        step: 200,
+        tiers: voltagePoints.map<readonly Effect[]>((amount) => [
+          { kind: 'excitement', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+        ]),
+      },
+      mellow([
+        {
+          kind: 'voltage-tier',
+          step: 200,
+          tiers: scorePercents.map<readonly Effect[]>((percent) => [
+            {
+              kind: 'boost',
+              multiplier: 1 + percent / 100,
+              moodBonus: { target: 3, perPoint: percent * 0.005 },
+            },
+          ]),
+        },
+      ]),
+      mellow([
+        {
+          kind: 'voltage-tier',
+          step: 200,
+          tiers: heartLimits.map<readonly Effect[]>((amount) => [{ kind: 'heart-limit', amount }]),
+        },
+      ]),
     ],
   },
   {
@@ -112,22 +119,24 @@ export const bloomCards: readonly Card[] = [
       {
         kind: 'voltage-tier',
         step: 200,
-        tiers: voltageGains.map((amount, index) => {
-          const percent = targetPercents[index];
-          if (percent === undefined) throw new Error('段階の効果がありません。');
-          return [
-            { kind: 'excitement', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
-            mellow([
-              {
-                kind: 'amplify',
-                percent,
-                members: [1022, 1032],
-                moodBonus: { target: 3, perPoint: percent * 0.005 },
-              },
-            ]),
-          ];
-        }),
+        tiers: voltageGains.map<readonly Effect[]>((amount) => [
+          { kind: 'excitement', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+        ]),
       },
+      mellow([
+        {
+          kind: 'voltage-tier',
+          step: 200,
+          tiers: targetPercents.map<readonly Effect[]>((percent) => [
+            {
+              kind: 'amplify',
+              percent,
+              members: [1022, 1032],
+              moodBonus: { target: 3, perPoint: percent * 0.005 },
+            },
+          ]),
+        },
+      ]),
     ],
   },
   {

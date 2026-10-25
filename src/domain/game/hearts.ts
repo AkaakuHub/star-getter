@@ -77,14 +77,17 @@ export function collectHearts(state: GameState): GameState {
         triggered = applyEffect(triggered, effect, card);
     } else if (card.collectionAbility) {
       if (
-        voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 950 &&
-        triggered.stamina / 100 < Math.fround(1 / 1_000_000)
+        triggered.bloom ||
+        (voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 950 &&
+          Math.trunc(triggered.stamina) === 0)
       ) {
         triggered = applyEffect(triggered, { kind: 'shuffle' }, card);
-        if (card.collectionAbility === 'icy-kosuzu')
-          triggered = applyEffect(triggered, { kind: 'search-unit', unit: 2, count: 4 }, card);
+        triggered = applyEffect(triggered, { kind: 'search-unit', unit: 2, count: 4 }, card);
         triggered = applyEffect(triggered, { kind: 'excitement', amount: -1_400_000 }, card);
-        if (voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 1000)
+        if (
+          triggered.bloom ||
+          voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 1000
+        )
           triggered = applyEffect(triggered, { kind: 'excitement', amount: -14_000_000 }, card);
       }
     } else if (state.deck.length >= 95) {

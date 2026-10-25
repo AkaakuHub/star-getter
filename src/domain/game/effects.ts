@@ -138,6 +138,11 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
         BigInt(Math.trunc(Math.fround(effect.amount)) - Math.trunc(state.excitement)),
       );
     case 'voltage-tier': {
+      if (state.bloom)
+        return effect.tiers.reduceRight(
+          (next, tier) => tier.reduce((current, child) => applyEffect(current, child, card), next),
+          state,
+        );
       const tier =
         effect.tiers[
           Math.min(

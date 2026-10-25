@@ -1,4 +1,4 @@
-import type { Card } from '../../domain/game/model';
+import type { Card, Effect } from '../../domain/game/model';
 
 const hearts = [8, 12, 15, 30, 60, 90, 120, 150, 225, 300, 375] as const;
 const boosts = [2, 3, 4, 8, 16, 24, 32, 40, 60, 80, 100] as const;
@@ -25,19 +25,21 @@ export const preparationCards: readonly Card[] = [
       {
         kind: 'voltage-tier',
         step: 100,
-        tiers: hearts.map((amount, index) => {
-          const percent = boosts[index];
-          if (percent === undefined) throw new Error('段階の効果がありません。');
-          return [
-            { kind: 'beat-hearts', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
-            {
-              kind: 'amplify',
-              members: [1032],
-              percent,
-              moodBonus: { target: 2, perPoint: percent * 0.005 },
-            },
-          ];
-        }),
+        tiers: hearts.map<readonly Effect[]>((amount) => [
+          { kind: 'beat-hearts', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+        ]),
+      },
+      {
+        kind: 'voltage-tier',
+        step: 100,
+        tiers: boosts.map<readonly Effect[]>((percent) => [
+          {
+            kind: 'amplify',
+            members: [1032],
+            percent,
+            moodBonus: { target: 2, perPoint: percent * 0.005 },
+          },
+        ]),
       },
     ],
     handUse: {
