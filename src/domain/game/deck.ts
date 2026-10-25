@@ -81,11 +81,15 @@ function validateEffect(effect: Effect): void {
   if (
     effect.kind === 'collect' ||
     effect.kind === 'shuffle' ||
-    effect.kind === 'use-hand' ||
     effect.kind === 'reset-special' ||
     effect.kind === 'protect-mental'
   )
     return;
+  if (effect.kind === 'use-hand') {
+    if (effect.addAp !== undefined && !Number.isSafeInteger(effect.addAp))
+      throw new Error('一斉使用の追加消費量が正しくありません。');
+    return;
+  }
   if (effect.kind === 'tokens') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('追加カードの枚数が正しくありません。');

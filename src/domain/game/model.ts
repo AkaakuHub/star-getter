@@ -84,7 +84,7 @@ export type Effect =
       duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
     }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
-  | Readonly<{ kind: 'use-hand' }>
+  | Readonly<{ kind: 'use-hand'; addAp?: number }>
   | (Readonly<{ kind: 'shuffle' }> & HandShuffle)
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>

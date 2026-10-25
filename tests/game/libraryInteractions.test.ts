@@ -78,7 +78,7 @@ for (const count of [79, 80]) {
     let state = game('library');
     state = addTokens(state, 'story', count - state.deck.length);
     const source = card(state, 'library-ensemble');
-    state = withHand(state, [source.id]);
+    state = withHand({ ...state, energy: 1 }, [source.id]);
     const used = act(state, { type: 'card', index: 0 });
     expect(used.stats.cardsUsed).toBe(1);
     expect(used.deck.some((item) => item.id === source.id)).toBe(true);
@@ -179,7 +179,7 @@ it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を�
   state = addTokens(state, 'bookmark', 80 - state.deck.length);
   const source = card(state, 'library-ensemble'),
     story = token(state, 'story');
-  state = withHand(state, [source.id, story.id]);
+  state = withHand({ ...state, energy: 1 }, [source.id, story.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(used.deck).toHaveLength(88);
@@ -210,7 +210,7 @@ it('ヨットの生成は使用終了時に確定し、巻き込んだ船出の�
   let state = addTokens(game('library'), 'ensemble', 1);
   state = addTokens(state, 'story', 79 - state.deck.length);
   const source = token(state, 'ensemble');
-  state = withHand(state, [source.id, 'library-ensemble']);
+  state = withHand({ ...state, energy: 1 }, [source.id, 'library-ensemble']);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(used.deck).toHaveLength(84);
@@ -246,9 +246,31 @@ for (const [count, baseReduction, tokenReduction] of [
     ]);
     expect(cardCost(state, card(state, 'library-ensemble'))).toBe(82 - baseReduction);
     state = withHand(state, [generated.id, ...others]);
-    expect(cardCost(state, generated)).toBe(Math.max(0, 82 - tokenReduction));
+    expect(cardCost(state, generated)).toBe(Math.max(1, 82 - tokenReduction));
   });
 }
+
+it('一斉使用の追加APを全手札コストへ加え、最終コストを1以上にする', () => {
+  const initial = game('library');
+  const source = card(initial, 'library-ensemble');
+  const effects = source.effects.map((effect) =>
+    effect.kind === 'use-hand' ? { ...effect, addAp: 7 } : effect,
+  );
+  const updated = { ...source, effects };
+  const deck = initial.deck.map((item) => (item.id === source.id ? updated : item));
+  const otherIds = deck
+    .filter((item) => item.id !== source.id)
+    .slice(0, 2)
+    .map(({ id }) => id);
+  const state = withHand(
+    { ...initial, deck, cardPool: deck, energy: 100, costReductions: { [source.id]: 1000 } },
+    [source.id, ...otherIds],
+  );
+  expect(cardCost(state, updated)).toBe(1);
+
+  const withoutReduction = { ...state, costReductions: {} };
+  expect(cardCost(withoutReduction, updated)).toBe(cardCost(withoutReduction, source) + 7);
+});
 
 it('招待状自身を使用すると、生成した帆船を優先検索して補充する', () => {
   const initial = game('library');
@@ -263,7 +285,7 @@ it('招待状自身を使用すると、生成した帆船を優先検索して�
 it('生成帆船自身を使用した後に折り紙を2回検索し、他カードの使用では検索しない', () => {
   let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 2);
   const source = token(state, 'ensemble');
-  state = withHand(state, [source.id]);
+  state = withHand({ ...state, energy: 1 }, [source.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(
     used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),

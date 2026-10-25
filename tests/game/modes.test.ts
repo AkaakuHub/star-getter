@@ -86,7 +86,7 @@ describe('モード切替と切替時効果', () => {
       { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
-      { ...original, deck: cards, cardPool: cards, energy: 10 },
+      { ...original, deck: cards, cardPool: cards, energy: 100 },
       reaction,
     );
     const state = act(
