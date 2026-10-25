@@ -93,13 +93,13 @@ function hasAvailableBookmark(state: GameState): boolean {
 
 function restoreDeck(driver: GameDriver): void {
   driver.useFirst([
-    'ensemble',
+    'library-pages',
     'library-invitation',
     'library-ensemble',
-    'library-pages',
-    'clock',
     'bookmark',
+    'clock',
     'story',
+    'ensemble',
     'camera',
     'aurora-ensemble',
   ]);
@@ -171,7 +171,6 @@ export function amplifyAndWiden(driver: GameDriver): void {
   expect(driver.state.hearts.heartLimit).toBe(10_000_000);
   expect(driver.collectionRedraws).toBeGreaterThanOrEqual(5);
   expect(driver.collectionAmplification).toBeGreaterThan(0);
-  driver.until(isPrepared, () => maintainLoop(driver));
 }
 
 export function armAutomaticCollection(driver: GameDriver): void {
@@ -226,13 +225,13 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
         const used =
           driver.state.deck.length <= 96
             ? driver.useFirst([
-                'ensemble',
-                'library-invitation',
                 'library-pages',
+                'library-invitation',
                 'library-ensemble',
                 'bookmark',
                 'clock',
                 'story',
+                'ensemble',
                 'camera',
                 'aurora-ensemble',
               ])
