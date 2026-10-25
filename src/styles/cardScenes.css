@@ -1,6 +1,7 @@
 @import './cardScenes/day.css';
 @import './cardScenes/night.css';
 @import './cardScenes/reading.css';
+@import './cardScenes/tokens.css';
 
 .card-illustration {
   position: relative;

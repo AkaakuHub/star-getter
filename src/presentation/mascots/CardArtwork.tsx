@@ -1,12 +1,14 @@
 import type { Card } from '../../domain/game/model';
 import { costumePalettes } from './appearance';
 import { Mascot } from './Mascot';
+import { TokenArtwork } from './TokenArtwork';
 
 export function CardArtwork({ card }: Readonly<{ card: Card }>) {
+  if (card.token) return <TokenArtwork kind={card.token} />;
   const palette = costumePalettes[card.costume];
   return (
     <span
-      className={'card-illustration scene-' + (card.token ?? card.costume)}
+      className={'card-illustration scene-' + card.costume}
       style={{
         '--scene-paper': palette.paper,
         '--scene-dark': palette.fabric,
