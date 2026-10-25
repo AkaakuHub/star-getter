@@ -1,3 +1,4 @@
+import { energyMaximum } from './parameters/maximum';
 import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
 import { calculateSkillMoodCorrection } from './live/skillMood';
@@ -135,7 +136,10 @@ export function applyEffect(
     case 'energy':
       return changeResource(state, 'energy', BigInt(Math.trunc(value(effect.amount))));
     case 'energy-limit':
-      return { ...state, maxEnergy: state.maxEnergy + effect.amount };
+      return {
+        ...state,
+        maxEnergy: energyMaximum(state.maxEnergy, [{ calculation: 'add', value: effect.amount }]),
+      };
     case 'reset-special':
       return {
         ...state,
