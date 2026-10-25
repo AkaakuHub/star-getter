@@ -4,6 +4,7 @@ import {
   activateModeParameterChanges,
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
+import { int64ToFloat32 } from '../numeric';
 
 type ApplyEffect = (
   state: GameState,
@@ -59,7 +60,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
       .map((reaction, index) => ({ reaction, index }))
       .filter(({ reaction }) => reaction.modeId === modeId);
     for (const { reaction, index } of listeners) {
-      const count = reaction.count + 1;
+      const count = Number(BigInt.asIntN(32, BigInt(reaction.count + 1)));
       next = {
         ...next,
         modes: {
@@ -78,7 +79,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
           : next.cardPool.find((card) => card.id === reaction.sourceId);
       for (let slot = 0; slot < reaction.thresholds.length; slot++) {
         const threshold = reaction.thresholds[slot];
-        if (threshold === undefined || count % threshold !== 0) continue;
+        if (threshold === undefined || BigInt(count) % threshold !== 0n) continue;
         const effect = reaction.effects[slot];
         if (!effect) break;
         const scales =
@@ -88,9 +89,9 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
           effect.kind === 'boost' ||
           effect.kind === 'stamina' ||
           effect.kind === 'excitement';
-        const product = BigInt.asIntN(64, BigInt(reaction.buffNum) * BigInt(count));
+        const product = BigInt.asIntN(64, reaction.buffNum * BigInt(count));
         const effectPower = scales
-          ? Math.trunc(Math.fround(Math.fround(Number(product)) / Math.fround(10_000)))
+          ? float32ToInt32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
           : 1;
         next = apply(next, effect, source, 1, 0, effectPower);
         if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
@@ -98,6 +99,13 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
     }
   }
   return { ...next, modes: { ...next.modes, changing: false } };
+}
+
+function float32ToInt32(value: number): number {
+  const rounded = Math.fround(value);
+  return !Number.isFinite(rounded) || rounded < -2_147_483_648 || rounded > 2_147_483_647
+    ? -2_147_483_648
+    : Math.trunc(rounded);
 }
 
 export function changeMode(

@@ -125,9 +125,9 @@ export type GameState = Readonly<{
   modeReactions: readonly Readonly<{
     sourceId: string | null;
     modeId: number;
-    thresholds: readonly number[];
+    thresholds: readonly bigint[];
     effects: readonly Effect[];
-    buffNum: number;
+    buffNum: bigint;
     count: number;
   }>[];
   phase: 'ready' | 'playing' | 'paused' | 'finished';

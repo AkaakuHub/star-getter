@@ -16,12 +16,12 @@ const off: Effect = { kind: 'mode', modeId: 1, change: 'off' };
 const reaction: Effect = {
   kind: 'mode-reaction',
   modeId: 1,
-  thresholds: [1, 2],
+  thresholds: [1n, 2n],
   effects: [
     { kind: 'excitement', amount: 10 },
     { kind: 'energy-limit', amount: 1 },
   ],
-  buffNum: 10000,
+  buffNum: 10000n,
 };
 
 describe('モード切替と切替時効果', () => {
@@ -110,9 +110,9 @@ describe('モード切替と切替時効果', () => {
     let state = applyEffect(initial, {
       kind: 'mode-reaction',
       modeId: 1,
-      thresholds: [2],
+      thresholds: [2n],
       effects: [{ kind: 'boost', multiplier: 1.01, moodBonus: { target: 1, perPoint: 1 } }],
-      buffNum: 10_000,
+      buffNum: 10_000n,
     });
     state = applyEffect(state, on);
     state = applyEffect(state, off);
@@ -125,9 +125,9 @@ describe('モード切替と切替時効果', () => {
       applyEffect(state, {
         kind: 'mode-reaction',
         modeId: 1,
-        thresholds: [1],
+        thresholds: [1n],
         effects: [],
-        buffNum: 10_000,
+        buffNum: 10_000n,
       }),
     ).toBe(state);
   });
@@ -137,9 +137,9 @@ describe('モード切替と切替時効果', () => {
       {
         kind: 'mode-reaction',
         modeId: 1,
-        thresholds: [1],
+        thresholds: [1n],
         effects: [{ kind: 'energy-limit', amount: 1 }],
-        buffNum: 0,
+        buffNum: 0n,
       },
     );
     state = applyEffect(state, on);
@@ -149,16 +149,16 @@ describe('モード切替と切替時効果', () => {
     let state = applyEffect(modeGame(), {
       kind: 'mode-reaction',
       modeId: 1,
-      thresholds: [1],
+      thresholds: [1n],
       effects: [{ kind: 'mode', modeId: 2, change: 'on' }],
-      buffNum: 0,
+      buffNum: 0n,
     });
     state = applyEffect(state, {
       kind: 'mode-reaction',
       modeId: 2,
-      thresholds: [1],
+      thresholds: [1n],
       effects: [{ kind: 'energy-limit', amount: 2 }],
-      buffNum: 0,
+      buffNum: 0n,
     });
     state = applyEffect(state, on);
     expect(state.modes.entries.every((entry) => entry.on)).toBe(true);

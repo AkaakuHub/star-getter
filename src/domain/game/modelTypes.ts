@@ -320,9 +320,9 @@ type EffectShape =
   | Readonly<{
       kind: 'mode-reaction';
       modeId: number;
-      thresholds: readonly number[];
+      thresholds: readonly bigint[];
       effects: readonly Effect[];
-      buffNum: number;
+      buffNum: bigint;
     }>
   | Readonly<{ kind: 'collect' }>
   | ProxySkillEffect
