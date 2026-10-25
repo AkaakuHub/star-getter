@@ -9,6 +9,7 @@ import {
   expireHeartLimitBuffSections,
 } from '../../src/domain/game/effects/heartLimit';
 import { game } from './support/game';
+import { validateEffect } from '../../src/domain/game/effectValidation';
 
 it('加算変更は期限後に解除し、既存の基礎上限へ戻る', () => {
   const state = game();
@@ -19,9 +20,9 @@ it('加算変更は期限後に解除し、既存の基礎上限へ戻る', () =
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 20_000,
+      num: 20_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'milliseconds', value: 1000 },
     },
     card,
@@ -29,6 +30,26 @@ it('加算変更は期限後に解除し、既存の基礎上限へ戻る', () =
   expect(changed.hearts.heartLimit).toBe(102);
   expect(changed.heartLimitBuffs[0]?.value).toBe(2);
   expect(advanceHeartLimitBuffs(changed, 1).hearts.heartLimit).toBe(100);
+});
+
+it('ActionType25の表示期限0パートは次のパート変更で解除する', () => {
+  const state = game();
+  const card = state.deck[0];
+  if (!card) throw new Error('きらめき上限変更の発動元カードがありません。');
+  const effect = {
+    kind: 'heart-limit-change',
+    calculationType: 1,
+    num: 10_000n,
+    bonusMoodTarget: 0,
+    bonusMoodValue: 0n,
+    duration: { kind: 'sections', value: 0 },
+  } as const;
+
+  validateEffect(effect);
+  const changed = applyEffect(state, effect, card);
+
+  expect(changed.hearts.heartLimit).toBe(101);
+  expect(expireHeartLimitBuffSections(changed).hearts.heartLimit).toBe(100);
 });
 
 it('乗算変更はC#のSkillグループ倍率式で基礎上限へ適用する', () => {
@@ -40,9 +61,9 @@ it('乗算変更はC#のSkillグループ倍率式で基礎上限へ適用する
     {
       kind: 'heart-limit-change',
       calculationType: 2,
-      num: 15_000,
+      num: 15_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'stage' },
     },
     card,
@@ -61,9 +82,9 @@ it('パート期限と外部解除で上限変更を解除し、直接上限変�
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 20_000,
+      num: 20_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'sections', value: 1 },
       deactivationKey: 'limit',
     },
@@ -76,9 +97,9 @@ it('パート期限と外部解除で上限変更を解除し、直接上限変�
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 20_000,
+      num: 20_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'stage' },
       deactivationKey: 'limit',
     },
@@ -108,9 +129,9 @@ it('Action49の加算・割合バフをAction25の効果へ順に適用する', 
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 20_000,
+      num: 20_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'stage' },
     },
     card,
@@ -133,9 +154,9 @@ it('Action49の加算・割合バフをAction25の効果へ順に適用する', 
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 20_000,
+      num: 20_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'stage' },
     },
     card,
@@ -185,9 +206,9 @@ it('Action49の対象と使用回数をAction25の発動カードで判定する
   const change = {
     kind: 'heart-limit-change' as const,
     calculationType: 1 as const,
-    num: 20_000,
+    num: 20_000n,
     bonusMoodTarget: 0 as const,
-    bonusMoodValue: 0,
+    bonusMoodValue: 0n,
     duration: { kind: 'stage' as const },
   };
   const first = applyEffect(buff, change, card);
@@ -219,9 +240,9 @@ it('Action49のParamValuesはParamがNoneのためAction25で条件に使わな�
     {
       kind: 'heart-limit-change',
       calculationType: 1,
-      num: 10_000,
+      num: 10_000n,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
       duration: { kind: 'stage' },
     },
     target,

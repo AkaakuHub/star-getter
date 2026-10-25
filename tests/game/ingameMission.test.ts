@@ -3,9 +3,11 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { act } from '../../src/domain/game/actions';
 import {
   advanceIngameMission,
+  missionActionEffect,
   registerMissionAction,
   registerMissionHeartCollect,
   registerMissionMember,
+  startIngameMission,
 } from '../../src/domain/game/ingameMissions';
 import { game } from './support/game';
 
@@ -126,4 +128,47 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   };
   const used = act(state, { type: 'card', index: 0 });
   expect(used.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('ActionType25ミッションは上限の実変化量を加算する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const state = {
+    ...initial,
+    track: {
+      ...initial.track,
+      ingameMissionGroups: [
+        {
+          id: 25,
+          records: [
+            {
+              missionType: 2 as const,
+              probability: 100,
+              rare: false,
+              param1: 100,
+              param2: 25,
+              addParam: 0,
+              baseScore: 0,
+              addScore: 0,
+              text: 'きらめき上限を$TargetValue$増加',
+            },
+          ],
+        },
+      ],
+    },
+  };
+  const active = startIngameMission(state, 25);
+  const effect = {
+    kind: 'heart-limit-change',
+    calculationType: 1,
+    num: 20_000n,
+    bonusMoodTarget: 0,
+    bonusMoodValue: 0n,
+    duration: { kind: 'stage' },
+  } as const;
+  const changed = applyEffect(active, effect, card);
+  const notified = missionActionEffect(changed, effect, active);
+
+  expect(notified.ingameMission?.count).toBe(2);
 });

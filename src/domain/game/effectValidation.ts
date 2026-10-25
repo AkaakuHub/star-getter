@@ -16,6 +16,7 @@ import { validateAddVoltageSkillEffect } from './addVoltageTypes';
 import { validateHeartBoostEffect } from './heartBoostTypes';
 import { validateSkillHeartsEffect } from './skillHeartTypes';
 import { validateSkillScoreUpEffect } from './skillScoreUpTypes';
+import { isInt64 } from './numeric';
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'add-voltage-skill') return validateAddVoltageSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -235,12 +236,11 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'heart-limit-change') {
     if (
       ![1, 2].includes(effect.calculationType) ||
-      !Number.isSafeInteger(effect.num) ||
+      !isInt64(effect.num) ||
       ![0, 1, 2, 3].includes(effect.bonusMoodTarget) ||
-      !Number.isSafeInteger(effect.bonusMoodValue) ||
+      !isInt64(effect.bonusMoodValue) ||
       !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
       (effect.duration.kind !== 'stage' && !Number.isSafeInteger(effect.duration.value)) ||
-      (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

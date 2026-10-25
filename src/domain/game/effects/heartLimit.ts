@@ -4,6 +4,7 @@ import { moodValue } from '../projection';
 import { absorbSkillEffect } from './proxySkill';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { applyHeartLimitBoosts } from './heartLimitBoost';
+import { int64ToFloat32 } from '../numeric';
 import type { Card, Effect, GameState } from '../model';
 
 type HeartLimitChangeEffect = Extract<Effect, { kind: 'heart-limit-change' }>;
@@ -13,8 +14,18 @@ const heartLimitMaximum = 10_000_000;
 const minimumInt32 = -2_147_483_648;
 
 export function applyHeartLimit(state: GameState, amount: number): GameState {
-  const base = state.heartLimitBuffs.length === 0 ? state.hearts.heartLimit : state.heartLimitBase;
-  return materializeHeartLimit(state, base + Math.ceil(amount), state.heartLimitBuffs);
+  return materializeHeartLimit(
+    state,
+    state.heartLimitBase + Math.ceil(amount),
+    state.heartLimitBuffs,
+  );
+}
+
+export function heartLimitValueWithoutLimit(state: GameState): number {
+  return Math.max(
+    0,
+    Math.trunc(calculateHeartLimitWithoutLimit(state.heartLimitBase, state.heartLimitBuffs)),
+  );
 }
 
 export function applyHeartLimitEffect(
@@ -37,20 +48,16 @@ export function activateHeartLimitChange(
   effectPower: number,
 ): GameState {
   if (!card) return state;
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
-    throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-
   const moodBonus =
     effect.bonusMoodTarget === 0
       ? 0
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          effect.bonusMoodValue,
+          int64ToFloat32(effect.bonusMoodValue),
         );
-  const num = Math.fround(Math.fround(effect.num) / 10_000);
-  const baseLimit =
-    state.heartLimitBuffs.length === 0 ? state.hearts.heartLimit : state.heartLimitBase;
+  const num = Math.fround(int64ToFloat32(effect.num) / Math.fround(10_000));
+  const baseLimit = state.heartLimitBase;
   const oldLimitWithoutLimit = Math.trunc(
     calculateHeartLimitWithoutLimit(baseLimit, state.heartLimitBuffs),
   );

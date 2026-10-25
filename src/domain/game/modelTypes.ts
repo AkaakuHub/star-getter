@@ -230,9 +230,9 @@ type EffectShape =
   | Readonly<{
       kind: 'heart-limit-change';
       calculationType: 1 | 2;
-      num: number;
+      num: bigint;
       bonusMoodTarget: 0 | 1 | 2 | 3;
-      bonusMoodValue: number;
+      bonusMoodValue: bigint;
       duration:
         | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
         | Readonly<{ kind: 'stage' }>;

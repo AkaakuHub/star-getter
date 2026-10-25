@@ -5,6 +5,7 @@ import { rules, type GameState, type MemberId } from './model';
 import type { IngameMission, IngameMissionRecord } from './ingameMissionTypes';
 import type { Effect } from './modelTypes';
 import { starGatherHeartCount } from './live/heartState';
+import { heartLimitValueWithoutLimit } from './effects/heartLimit';
 
 export function startIngameMission(state: GameState, groupId: number): GameState {
   const group = state.track.ingameMissionGroups.find((item) => item.id === groupId);
@@ -99,7 +100,7 @@ export function missionActionEffect(
                       : effect.kind === 'ap-speed-change'
                         ? effect.num
                         : effect.kind === 'heart-limit-change'
-                          ? effect.num
+                          ? heartLimitValueWithoutLimit(state) - heartLimitValueWithoutLimit(before)
                           : effect.kind === 'genesis-skill'
                             ? effect.effectBaseNum
                             : 0;
