@@ -278,6 +278,7 @@ export type GameState = Readonly<{
   gaugeRegenerations: readonly GaugeRegeneration[];
   moodOffset: number;
   costReductions: Readonly<Record<string, number>>;
+  onceSkillCostChanges: Readonly<Record<string, number>>;
   storyAmplification: number;
   stamina: number;
   resting: boolean;

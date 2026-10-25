@@ -1,3 +1,9 @@
+import type {
+  DeckSkillCostChangeEffect,
+  SkillCostChangeEffect,
+  SkillCostConditionType,
+} from './skillCostChangeTypes';
+export type { SkillCostChangeEffect, SkillCostConditionType } from './skillCostChangeTypes';
 import type { TokenCardEffect } from './tokenRequestTypes';
 import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
@@ -111,32 +117,6 @@ export type HeartBoostState = Readonly<{
 export type HandCardStats = Readonly<{
   enteredSectionIndex: number;
   cardUseCountsAtEntry: Readonly<Record<string, number>>;
-}>;
-export type SkillCostConditionType =
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15;
-export type SkillCostChangeEffect = Readonly<{
-  kind: 'skill-cost-change';
-  amount: number;
-  minimum: number;
-  maximum: number;
-  conditionType: SkillCostConditionType;
-  conditionId?: number;
-  addValue?: number;
-  duration?: Readonly<{ sections: number }>;
 }>;
 export type SkillCostChange = Readonly<{
   sourceId: string;
@@ -323,6 +303,7 @@ type EffectShape =
     }>
   | SkillCostChangeEffect
   | ParameterValueChangeEffect
+  | DeckSkillCostChangeEffect
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | GaugeEffect
   | StopVoltageIncreaseEffect

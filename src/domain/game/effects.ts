@@ -223,8 +223,9 @@ export function applyEffect(
     }
     case 'cost-reduction':
     case 'skill-cost-change':
+    case 'deck-skill-cost-change':
     case 'parameter-value-change':
-      return applyParameterEffect(state, effect, card, multiplier);
+      return applyParameterEffect(state, effect, card, multiplier, addValue);
     case 'protect-mental':
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }

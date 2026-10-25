@@ -131,6 +131,7 @@ export function createGame(
     gaugeRegenerations: [],
     moodOffset: 0,
     costReductions: {},
+    onceSkillCostChanges: {},
     storyAmplification: 0,
     stamina: 100,
     resting: false,

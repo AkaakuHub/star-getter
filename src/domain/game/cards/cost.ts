@@ -7,7 +7,9 @@ export function cardCost(state: GameState, card: Card): number {
   if (!useHand)
     return finalizeStarGatherSkillCost(
       card.cost,
-      -(state.costReductions[card.id] ?? 0) + skillCostDelta(state, card),
+      -(state.costReductions[card.id] ?? 0) +
+        skillCostDelta(state, card) +
+        (state.onceSkillCostChanges[card.id] ?? 0),
     );
   const total = state.hand.reduce((sum, id) => {
     const other = state.deck.find((item) => item.id === id);
@@ -18,7 +20,9 @@ export function cardCost(state: GameState, card: Card): number {
         ? card.cost + (useHand.addAp ?? 0)
         : finalizeStarGatherSkillCost(
             other.cost,
-            -(state.costReductions[other.id] ?? 0) + skillCostDelta(state, other),
+            -(state.costReductions[other.id] ?? 0) +
+              skillCostDelta(state, other) +
+              (state.onceSkillCostChanges[other.id] ?? 0),
           ))
     );
   }, 0);
@@ -28,7 +32,11 @@ export function cardCost(state: GameState, card: Card): number {
   );
   return Math.max(
     1,
-    total - reduction - (state.costReductions[card.id] ?? 0) + skillCostDelta(state, card),
+    total -
+      reduction -
+      (state.costReductions[card.id] ?? 0) +
+      skillCostDelta(state, card) +
+      (state.onceSkillCostChanges[card.id] ?? 0),
   );
 }
 

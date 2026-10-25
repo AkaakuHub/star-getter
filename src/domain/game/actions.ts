@@ -93,6 +93,9 @@ function activateCard(
   const usedSkillCost = cardCost(state, card);
   let next: GameState = {
     ...state,
+    onceSkillCostChanges: Object.fromEntries(
+      Object.entries(state.onceSkillCostChanges).filter(([id]) => id !== card.id),
+    ),
     activation: { ...state.activation, usedCards: [...state.activation.usedCards, card.id] },
     lastActionTick: state.tick,
     lastPerformer: card.performer,

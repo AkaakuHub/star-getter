@@ -17,11 +17,12 @@ export type TokenCardEffect = Readonly<{
   seriesIds?: readonly number[];
 }>;
 
-export function validateTokenCardEffect(effect: TokenCardEffect): void {
+export function validateTokenCardEffect(effect: TokenCardEffect): undefined {
   if (
     !effect.templateId ||
     !Number.isSafeInteger(effect.count) ||
     effect.seriesIds?.some((id) => !Number.isSafeInteger(id))
   )
     throw new Error('追加カードデータの設定が正しくありません。');
+  return undefined;
 }

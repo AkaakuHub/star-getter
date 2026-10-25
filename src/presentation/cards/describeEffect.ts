@@ -82,6 +82,8 @@ export function describeEffect(effect: Effect): string {
       return `対象カードの消費エナジーを${effect.amount}減少させる。`;
     case 'skill-cost-change':
       return '条件に応じて発動元カードの消費エナジーを変化させる。';
+    case 'deck-skill-cost-change':
+      return '対象カードの次回消費エナジーを変化させる。';
     case 'parameter-value-change':
       return '指定されたカード効果の詳細値を変化させる。';
     case 'protect-mental':

@@ -1,3 +1,4 @@
+import { validateDeckSkillCostChange } from './skillCostChangeTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
 import { type Card, type Effect, costumeIds, rules } from './model';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
@@ -117,10 +118,7 @@ function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
-  if (effect.kind === 'token-card') {
-    validateTokenCardEffect(effect);
-    return;
-  }
+  if (effect.kind === 'token-card') return validateTokenCardEffect(effect);
   if (effect.kind === 'token-boost') {
     if (
       !Number.isSafeInteger(effect.num) ||
@@ -293,6 +291,7 @@ function validateEffect(effect: Effect): void {
       throw new Error('自然発生ビートポイントの設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'deck-skill-cost-change') return validateDeckSkillCostChange(effect);
   if (effect.kind === 'skill-cost-change') {
     if (
       !Number.isFinite(effect.amount) ||

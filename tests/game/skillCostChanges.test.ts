@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { cardCost } from '../../src/domain/game/cards/cost';
+import { act } from '../../src/domain/game/actions';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
@@ -81,4 +82,53 @@ it('セクション期限のスキルコスト変化を期限後に除去する'
   if (!nextSection) throw new Error('次のパートがありません。');
   const expired = advanceTo(state, (nextSection.startBeat * 60) / state.track.bpm);
   expect(expired.skillCostChanges).toHaveLength(0);
+});
+
+it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変更する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  const targetId = initial.hand[0];
+  const target = initial.deck.find((card) => card.id === targetId);
+  if (!source || !target) throw new Error('検証用カードがありません。');
+  const changed = applyEffect(
+    initial,
+    {
+      kind: 'deck-skill-cost-change',
+      num: 20_000,
+      targetRange: 2,
+      target: 'member',
+      targetId: target.member,
+    },
+    source,
+  );
+  expect(changed.onceSkillCostChanges[target.id]).toBe(2);
+  expect(cardCost(changed, target)).toBe(cardCost(initial, target) + 2);
+  const used = act(
+    { ...changed, energy: 1000 },
+    { type: 'card', index: initial.hand.indexOf(target.id) },
+  );
+  expect(used.onceSkillCostChanges[target.id]).toBeUndefined();
+});
+
+it('ActionType29は山札上の対象カードだけに適用し、負数をActionType52で増幅する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  const targetId = initial.drawPile[0];
+  const target = initial.deck.find((card) => card.id === targetId);
+  if (!source || !target) throw new Error('検証用カードがありません。');
+  const boosted = applyEffect(initial, {
+    kind: 'skill-boost',
+    num: 1_000_000,
+    target: { kind: 'all' },
+    duration: { kind: 'stage', value: 0 },
+    uses: 1,
+  });
+  const changed = applyEffect(
+    boosted,
+    { kind: 'deck-skill-cost-change', num: -20_000, targetRange: 3, target: 'all', targetId: 0 },
+    source,
+  );
+  expect(changed.onceSkillCostChanges[target.id]).toBe(-4);
+  expect(changed.onceSkillCostChanges[initial.hand[0] ?? '']).toBeUndefined();
+  expect(changed.action52Buffs).toHaveLength(0);
 });
