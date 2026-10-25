@@ -58,7 +58,6 @@ export function Mascot({
         <span className="weather-face">
           <span className="weather-smile" />
         </span>
-        <span className="weather-scarf" />
         <span className="weather-accessory">
           <Accessory strokeWidth={2} />
         </span>

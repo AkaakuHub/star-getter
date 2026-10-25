@@ -58,23 +58,6 @@
   border-top: 0;
   border-radius: 0 0 50% 50%;
 }
-.weather-scarf {
-  position: absolute;
-  top: 67%;
-  left: 32%;
-  width: 36%;
-  height: 7%;
-  border: 1px solid var(--costume-trim);
-  border-radius: 40%;
-  background: var(--costume-fabric);
-  transform: rotate(-8deg);
-}
-.weather-lumen .weather-scarf {
-  top: 54%;
-}
-.weather-tetra .weather-scarf {
-  top: 66%;
-}
 .weather-accessory {
   position: absolute;
   top: 6%;
