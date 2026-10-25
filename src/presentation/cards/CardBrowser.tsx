@@ -29,7 +29,7 @@ export function CardBrowser({
   return (
     <Modal
       title={selected ? selected.name : 'カード確認'}
-      onClose={selected ? () => setSelected(null) : onClose}
+      onClose={onClose}
       className="card-browser"
     >
       <div hidden={selected !== null}>
@@ -56,7 +56,18 @@ export function CardBrowser({
           ))}
         </div>
       </div>
-      {selected && <CardPerformance card={selected} cost={cardCost(state, selected)} />}
+      {selected && (
+        <>
+          <button
+            type="button"
+            className="button card-browser-back"
+            onClick={() => setSelected(null)}
+          >
+            一覧に戻る
+          </button>
+          <CardPerformance card={selected} cost={cardCost(state, selected)} />
+        </>
+      )}
     </Modal>
   );
 }

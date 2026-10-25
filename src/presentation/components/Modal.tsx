@@ -1,4 +1,3 @@
-import { X } from 'lucide-preact';
 import type { ComponentChildren } from 'preact';
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 
@@ -14,6 +13,7 @@ export function Modal({
   className?: string;
 }>) {
   const ref = useRef<HTMLDialogElement>(null);
+  const backdropPressed = useRef(false);
   useLayoutEffect(() => {
     ref.current?.scrollTo({ top: 0 });
   }, [title]);
@@ -28,6 +28,27 @@ export function Modal({
       ref={ref}
       className={`modal ${className}`}
       aria-label={title}
+      onPointerDown={(event) => {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        backdropPressed.current =
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom;
+      }}
+      onPointerCancel={() => {
+        backdropPressed.current = false;
+      }}
+      onClick={(event) => {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const outside =
+          event.clientX < bounds.left ||
+          event.clientX > bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY > bounds.bottom;
+        if (backdropPressed.current && outside) onClose?.();
+        backdropPressed.current = false;
+      }}
       onCancel={(event) => {
         event.preventDefault();
         onClose?.();
@@ -35,11 +56,6 @@ export function Modal({
     >
       <div className="modal-heading">
         <h2>{title}</h2>
-        {onClose && (
-          <button type="button" className="icon-button" aria-label="閉じる" onClick={onClose}>
-            <X aria-hidden="true" />
-          </button>
-        )}
       </div>
       {children}
     </dialog>

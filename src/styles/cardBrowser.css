@@ -50,6 +50,9 @@
   align-items: center;
   gap: 20px;
 }
+.card-browser-back {
+  margin-bottom: 20px;
+}
 .card-performance-art {
   aspect-ratio: 3 / 4;
   overflow: hidden;
