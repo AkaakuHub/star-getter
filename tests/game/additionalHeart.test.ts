@@ -1,7 +1,10 @@
 import { expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
-import { induceAdditionalHearts } from '../../src/domain/game/effects/additionalHeart';
+import {
+  advanceAdditionalHeartInducers,
+  induceAdditionalHearts,
+} from '../../src/domain/game/effects/additionalHeart';
 import { heartCount } from '../../src/domain/game/hearts';
 import { matchesAdditionalHeartCondition } from '../../src/domain/game/additionalHeartTypes';
 import { game } from './support/game';
@@ -119,4 +122,23 @@ it('ActionType27はlong積をfloat32へ直接変換する', () => {
   );
 
   expect(effectPowers).toEqual([900_720_033_792]);
+});
+
+it('Action27の0ミリ秒期限は誘発を登録し、次の更新で解除する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');
+  const armed = applyEffect(
+    initial,
+    {
+      kind: 'additional-heart-induce',
+      condition: { kind: 'all' },
+      apPower: 10_000n,
+      heartEffect: { kind: 'hearts', amount: 1 },
+      duration: { kind: 'milliseconds', value: 0 },
+    },
+    source,
+  );
+  expect(armed.additionalHeartInducers).toHaveLength(1);
+  expect(advanceAdditionalHeartInducers(armed, 1 / 60).additionalHeartInducers).toHaveLength(0);
 });

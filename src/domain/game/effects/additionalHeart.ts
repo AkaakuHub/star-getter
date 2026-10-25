@@ -20,11 +20,6 @@ export function activateAdditionalHeartInduce(
   addValue: number,
 ): GameState {
   if (!card) return state;
-  if (
-    (effect.duration.kind === 'milliseconds' || effect.duration.kind === 'sections') &&
-    effect.duration.value === 0
-  )
-    return state;
   const indefinite = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const inducer: AdditionalHeartInducer = {
     id: state.nextAdditionalHeartInducerId,
