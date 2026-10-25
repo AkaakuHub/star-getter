@@ -11,6 +11,8 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
         return trigger.icon === used.skillIcon;
       case 'unit':
         return trigger.unit === used.unit;
+      case 'heart-quantity-count':
+        return false;
       case 'same-card':
         return source.id === used.id;
       case 'any-skill':
@@ -20,6 +22,39 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
         return false;
     }
   });
+}
+
+export function notifyHandHeartCollect(
+  state: GameState,
+  collectedCount: number,
+  apply: EffectApplier,
+): GameState {
+  let next = state;
+  const activationCounts = { ...state.handUseActivationCounts };
+  const collectionCounts = { ...state.handUseHeartCollectionCounts };
+  for (const id of state.handEffectCardIds) {
+    const card = state.cardPool.find((item) => item.id === id);
+    if (!card) throw new Error('手札効果のカードがありません。');
+    const handUse = card.handUse;
+    const trigger = handUse?.trigger;
+    if (!handUse || !trigger || trigger.kind !== 'heart-quantity-count') continue;
+    const count = (collectionCounts[id] ?? 0) + collectedCount;
+    collectionCounts[id] = count;
+    const activationCount = activationCounts[id] ?? 0;
+    if (
+      (handUse.limit !== undefined && handUse.limit !== 0 && handUse.limit <= activationCount) ||
+      count < trigger.count
+    )
+      continue;
+    collectionCounts[id] = 0;
+    next = applyEffects(next, handUse.effects, card, apply);
+    activationCounts[id] = activationCount + 1;
+  }
+  return {
+    ...next,
+    handUseActivationCounts: activationCounts,
+    handUseHeartCollectionCounts: collectionCounts,
+  };
 }
 
 export function notifyHandVoltageIncrease(

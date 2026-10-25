@@ -23,6 +23,8 @@ export function handUseTriggerDescription(trigger: HandUseTrigger): string {
       return `スキル記号${trigger.icon}を使用したとき`;
     case 'unit':
       return `${unitCardNames(trigger.unit)}を使用したとき`;
+    case 'heart-quantity-count':
+      return `${trigger.count}個のハートを回収したとき`;
     case 'same-card':
       return 'このカードのスキルを使用したとき';
     case 'any-skill':

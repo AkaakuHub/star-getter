@@ -13,6 +13,7 @@ export function createInitialEffectState(
   | 'mentalShields'
   | 'handCollectionActivationCounts'
   | 'handUseActivationCounts'
+  | 'handUseHeartCollectionCounts'
 > {
   return {
     fixedParameterBase: { ap: track.stage.maxEnergy, voltage: 1000, mental: 100 },
@@ -24,5 +25,6 @@ export function createInitialEffectState(
     mentalShields: [],
     handCollectionActivationCounts: {},
     handUseActivationCounts: {},
+    handUseHeartCollectionCounts: {},
   };
 }

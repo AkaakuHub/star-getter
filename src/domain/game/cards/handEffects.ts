@@ -89,5 +89,8 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
         return state.deck.find((card) => card.id === id)?.handUse?.limitMemory === 'retain';
       }),
     ),
+    handUseHeartCollectionCounts: Object.fromEntries(
+      Object.entries(state.handUseHeartCollectionCounts).filter(([id]) => !ids.includes(id)),
+    ),
   };
 }
