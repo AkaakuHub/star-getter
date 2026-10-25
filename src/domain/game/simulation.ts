@@ -52,6 +52,7 @@ import {
   advanceInducedSkillEffects,
   expireInducedSkillEffectSections,
 } from './effects/induceSkillEffect';
+import { advanceTokenDeckSplit, expireTokenDeckSplitSections } from './effects/tokenDeckSplit';
 
 export function createGame(
   track: Track,
@@ -92,6 +93,7 @@ export function createGame(
     skillUseDestinations: {},
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
+    tokenDeckSplit: null,
     deckOutCount: 0,
     discard: [],
     tokenCatalog,
@@ -255,7 +257,8 @@ function advanceTick(state: GameState): GameState {
     ),
     dt,
   );
-  const proxyPeriodState = advanceProxySkillPeriods(gauges, dt, applyEffect);
+  const tokenDeckState = advanceTokenDeckSplit(gauges, dt);
+  const proxyPeriodState = advanceProxySkillPeriods(tokenDeckState, dt, applyEffect);
   const comboState = advanceComboInducer(proxyPeriodState, dt, applyEffect);
   let next: GameState = advanceHearts({
     ...advanceHeartBoosts(comboState, dt),
@@ -286,6 +289,7 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
+    next = expireTokenDeckSplitSections(next);
     next = expireSkillCooldownSections(next);
     next = expireInducedSkillEffectSections(next);
     next = expireApSpeedSections(next);

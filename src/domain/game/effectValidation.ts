@@ -65,6 +65,17 @@ export function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
+  if (effect.kind === 'token-deck-split') {
+    if (
+      (effect.seriesIds !== null && effect.seriesIds.some((id) => !Number.isSafeInteger(id))) ||
+      !Number.isSafeInteger(effect.duration.value) ||
+      effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('トークンカードデッキ切替の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'infinity-gauge') {
     if (
       (effect.duration.kind === 'sections' && effect.duration.value === 0) ||

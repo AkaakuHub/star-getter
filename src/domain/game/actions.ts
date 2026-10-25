@@ -32,6 +32,7 @@ import { deactivateDisableMentalDownEffects } from './effects/disableMentalDown'
 import { deactivateGaugeInfinities } from './resources';
 import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
+import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -47,6 +48,10 @@ export function act(state: GameState, action: Action): GameState {
       return useSpecial(state, action.cardId);
     case 'card':
       return useCard(state, action.index);
+    case 'switch-token-deck':
+      return switchTokenDeck(state);
+    case 'deactivate-token-deck':
+      return deactivateTokenDeck(state, action.deactivationKey);
     case 'deactivate-hand-limit': {
       const expired = deactivateHandLimitEffects(state, action.deactivationKey);
       return expired.handAdjustment > 0

@@ -171,6 +171,20 @@ export type TokenBoost = Readonly<{
   remainingSections: number | null;
   deactivationKey: string | null;
 }>;
+export type TokenDeckZones = Readonly<{
+  hand: readonly string[];
+  drawPile: readonly string[];
+  discard: readonly string[];
+}>;
+export type TokenDeckSplit = Readonly<{
+  seriesIds: readonly number[] | null;
+  main: TokenDeckZones;
+  sub: TokenDeckZones;
+  active: 'main' | 'sub';
+  remainingSeconds: number | null;
+  remainingSections: number | null;
+  deactivationKey: string | null;
+}>;
 type EffectShape =
   | Readonly<{
       kind: 'branch';
@@ -200,6 +214,13 @@ type EffectShape =
       effects: readonly Effect[];
     }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
+  | Readonly<{
+      kind: 'token-deck-split';
+      seriesIds: readonly number[] | null;
+      duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+      invocationType?: number;
+      deactivationKey?: string;
+    }>
   | Readonly<{
       kind: 'token-boost';
       calculation: TokenBoost['calculation'];

@@ -32,6 +32,7 @@ import type {
   SkillCostChange,
   ParameterValueFactor,
   TokenBoost,
+  TokenDeckSplit,
 } from './modelTypes';
 import type { ProxyAbsorption } from './proxySkillTypes';
 
@@ -135,6 +136,7 @@ export type GameState = Readonly<{
   activeHandPermanentCardIds: readonly string[];
   proxyCards: readonly string[];
   drawPile: readonly string[];
+  tokenDeckSplit: TokenDeckSplit | null;
   deckOutCount: number;
   discard: readonly string[];
   tokenCatalog: readonly Card[];
@@ -280,6 +282,8 @@ export type Action =
   | Readonly<{ type: 'start' | 'pause' | 'resume' | 'collect' }>
   | Readonly<{ type: 'special'; cardId: string }>
   | Readonly<{ type: 'card'; index: number }>
+  | Readonly<{ type: 'switch-token-deck' }>
+  | Readonly<{ type: 'deactivate-token-deck'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>

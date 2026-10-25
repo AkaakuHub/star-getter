@@ -114,12 +114,39 @@ function addTokenCards(
     { length: Math.min(Math.max(0, Math.trunc(count)), addable) },
     (_, index) => ({ ...template, id: `${template.id}-${state.nextTokenId + index}` }),
   );
+  const split = state.tokenDeckSplit;
+  const splitMatches = (card: (typeof generated)[number]) =>
+    split?.seriesIds !== null &&
+    split?.seriesIds !== undefined &&
+    (card.tokenSeriesIds ?? []).some((id) => split.seriesIds?.includes(id));
+  const activeMatches = generated.filter(splitMatches);
+  const activeOther = generated.filter((card) => !splitMatches(card));
+  const activeIds = [...activeMatches, ...activeOther]
+    .filter((card) => !split || split.active === (splitMatches(card) ? 'sub' : 'main'))
+    .map((card) => card.id);
+  const inactiveIds = generated
+    .filter((card) => split && split.active !== (splitMatches(card) ? 'sub' : 'main'))
+    .map((card) => card.id);
+  const tokenDeckSplit = split
+    ? {
+        ...split,
+        [split.active]: {
+          ...split[split.active],
+          drawPile: [...split[split.active].drawPile, ...activeIds],
+        },
+        [split.active === 'main' ? 'sub' : 'main']: {
+          ...split[split.active === 'main' ? 'sub' : 'main'],
+          drawPile: [...split[split.active === 'main' ? 'sub' : 'main'].drawPile, ...inactiveIds],
+        },
+      }
+    : null;
   return initializeParameterValueFactors(
     {
       ...state,
       deck: [...state.deck, ...generated],
       cardPool: [...state.cardPool, ...generated],
-      drawPile: [...state.drawPile, ...generated.map((card) => card.id)],
+      drawPile: [...state.drawPile, ...activeIds],
+      tokenDeckSplit,
       nextTokenId: state.nextTokenId + generated.length,
     },
     generated,
