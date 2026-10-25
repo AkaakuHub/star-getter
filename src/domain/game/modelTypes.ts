@@ -11,6 +11,26 @@ export type InfinityGaugeEffect = Readonly<{
   gauge: 'ap' | 'voltage' | 'mental';
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
 }>;
+export type GaugeRegeneration = Readonly<{
+  gauge: 'mental' | 'voltage';
+  amount: number;
+  intervalType: 1 | 2;
+  intervalSeconds: number;
+  elapsedSeconds: number;
+  durationSeconds: number | null;
+  durationElapsedSeconds: number;
+  remainingSections: number | null;
+  remainingHeartEvents: number | null;
+}>;
+export type GaugeRegenerationEffect = Readonly<{
+  kind: 'gauge-regeneration';
+  gauge: GaugeRegeneration['gauge'];
+  amount: number;
+  intervalType: 1 | 2;
+  intervalMilliseconds: number;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+}>;
+export type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect;
 export type ResetSpecial = Readonly<{
   kind: 'reset-special';
   scope: 'normal' | 'extra' | 'all';

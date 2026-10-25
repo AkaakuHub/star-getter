@@ -17,6 +17,7 @@ import { requestTokens } from './cards/tokens';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
+import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -232,6 +233,8 @@ export function applyEffect(
       };
     case 'infinity-gauge':
       return activateInfinityGauge(state, effect);
+    case 'gauge-regeneration':
+      return applyGaugeRegeneration(state, effect, card, multiplier);
     case 'voltage-tier': {
       if (state.bloom)
         return effect.tiers.reduceRight(

@@ -18,6 +18,7 @@ import {
   resolveStarGatherHeartDrawCount,
 } from './live/heartPresentation';
 import { expireGaugeInfinities } from './resources';
+import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
 
 export function createGame(
   track: Track,
@@ -68,6 +69,7 @@ export function createGame(
     voltageTimerSeconds: 0,
     voltageStops: [],
     gaugeInfinities: [],
+    gaugeRegenerations: [],
     moodOffset: 0,
     costReductions: {},
     storyAmplification: 0,
@@ -154,7 +156,10 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt);
+  const gauges = advanceGaugeRegenerations(
+    expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+    dt,
+  );
   let next: GameState = advanceHearts({
     ...gauges,
     tick,
@@ -174,11 +179,13 @@ function advanceTick(state: GameState): GameState {
   });
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
-  if (beat !== previousBeat && beat % 2 === 0 && !next.resting) {
-    next = addHearts(next, beatHeartCount(next));
+  if (beat !== previousBeat && beat % 2 === 0) {
+    if (!next.resting) next = addHearts(next, beatHeartCount(next));
+    next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
     next = expireGaugeInfinities(next, 'sections', 1);
+    next = expireGaugeRegenerations(next, 'sections');
     next = fillHand({
       ...next,
       voltageStops: next.voltageStops.flatMap((stop) => {

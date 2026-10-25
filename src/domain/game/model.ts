@@ -9,7 +9,7 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
-import type { GaugeInfinity, InfinityGaugeEffect } from './modelTypes';
+import type { GaugeEffect, GaugeInfinity, GaugeRegeneration } from './modelTypes';
 import type {
   MoodBonus,
   ResetSpecial,
@@ -19,14 +19,8 @@ import type {
   TokenBoostTarget,
 } from './modelTypes';
 
-export type {
-  MoodBonus,
-  ResetSpecial,
-  SearchRequest,
-  SearchTarget,
-  TokenBoost,
-  TokenBoostTarget,
-} from './modelTypes';
+export type { MoodBonus, ResetSpecial, SearchRequest } from './modelTypes';
+export type { SearchTarget, TokenBoost, TokenBoostTarget } from './modelTypes';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
@@ -120,7 +114,7 @@ export type Effect =
         | Readonly<{ kind: 'token'; token: TokenKind }>;
     }>
   | Readonly<{ kind: 'voltage-set'; amount: number }>
-  | InfinityGaugeEffect
+  | GaugeEffect
   | Readonly<{
       kind: 'stop-voltage-increase';
       duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
@@ -306,6 +300,7 @@ export type GameState = Readonly<{
     remainingSections: number | null;
   }>[];
   gaugeInfinities: readonly GaugeInfinity[];
+  gaugeRegenerations: readonly GaugeRegeneration[];
   moodOffset: number;
   costReductions: Readonly<Record<string, number>>;
   storyAmplification: number;
