@@ -1,8 +1,10 @@
 import { finalizeStarGatherSkillCost } from '../live/skillCost';
 import type { Card, Effect, GameState } from '../model';
 import { skillCostDelta } from './skillCostChanges';
+import { resolveModeSkill } from '../live/modes';
 
 export function cardCost(state: GameState, card: Card): number {
+  card = resolveModeSkill(card, state.modes);
   const useHand = card.effects.find((effect) => effect.kind === 'use-hand');
   if (!useHand)
     return finalizeStarGatherSkillCost(
@@ -12,8 +14,9 @@ export function cardCost(state: GameState, card: Card): number {
         (state.onceSkillCostChanges[card.id] ?? 0),
     );
   const total = state.hand.reduce((sum, id) => {
-    const other = state.deck.find((item) => item.id === id);
-    if (!other) return sum;
+    const rawOther = state.deck.find((item) => item.id === id);
+    if (!rawOther) return sum;
+    const other = resolveModeSkill(rawOther, state.modes);
     return (
       sum +
       (other.id === card.id

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { drainModeChanges } from '../../src/domain/game/effects/modeChange';
+import { cardCost } from '../../src/domain/game/cards/cost';
+import { cardAt } from '../../src/domain/game/projection';
 import { createModes } from '../../src/domain/game/live/modes';
 import { act } from '../../src/domain/game/actions';
 import type { Card, Effect } from '../../src/domain/game/model';
@@ -52,6 +54,46 @@ describe('モード切替と切替時効果', () => {
       change: 'alternate',
     });
     expect(toggledOff.modes.entries.find((entry) => entry.id === 1)?.on).toBe(false);
+  });
+  it('Action36のモード別スキル詳細をAction35の切替に合わせて選ぶ', () => {
+    const initial = game();
+    const template = initial.deck[0];
+    if (!template) throw new Error('カードがありません。');
+    const card = {
+      ...template,
+      modeSkillChanges: {
+        modeId: 88,
+        off: {
+          cost: 1,
+          effects: [{ kind: 'excitement', amount: 1 }],
+          skillIcon: null,
+          special: null,
+        },
+        on: {
+          cost: 3,
+          effects: [{ kind: 'excitement', amount: 7 }],
+          skillIcon: null,
+          special: null,
+        },
+      },
+    } as const;
+    const cards = initial.deck.map((item) => (item.id === card.id ? card : item));
+    const state = {
+      ...initial,
+      deck: cards,
+      cardPool: cards,
+      modes: createModes([88]),
+      hand: [card.id],
+      phase: 'playing' as const,
+      energy: 100,
+    };
+    const enabled = applyEffect(state, { kind: 'mode', modeId: 88, change: 'on' });
+    expect(cardCost(state, card)).toBe(1);
+    expect(cardCost(enabled, card)).toBe(3);
+    expect(cardAt(enabled, 0).effects).toEqual([{ kind: 'excitement', amount: 7 }]);
+    const used = act(enabled, { type: 'card', index: 0 });
+    expect(used.excitement - enabled.excitement).toBe(28);
+    expect(used.cardUses[0]?.cost).toBe(3);
   });
   it('切替保留中は状態を変えず、解除後にFIFOで実行する', () => {
     let state = applyEffect(modeGame(), reaction);

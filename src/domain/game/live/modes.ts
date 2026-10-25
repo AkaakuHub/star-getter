@@ -1,3 +1,4 @@
+import type { Card } from '../model';
 export type ModeChange = Readonly<{ modeId: number; change: 'off' | 'on' | 'alternate' }>;
 export type ModeEntry = Readonly<{
   id: number;
@@ -53,4 +54,19 @@ export function takeModeChange(state: ModeState): Readonly<{
     };
   }
   return { state: { ...state, queue }, changed: null };
+}
+
+export function resolveModeSkill(card: Card, modes: ModeState): Card {
+  const changes = card.modeSkillChanges;
+  if (!changes) return card;
+  const mode = modes.entries.find((entry) => entry.id === changes.modeId);
+  if (!mode) return card;
+  const { special, skillIcon, ...variant } = mode.on ? changes.on : changes.off;
+  const { special: _special, skillIcon: _skillIcon, ...base } = card;
+  return {
+    ...base,
+    ...variant,
+    ...(special === null ? {} : { special }),
+    ...(skillIcon === null ? {} : { skillIcon }),
+  };
 }

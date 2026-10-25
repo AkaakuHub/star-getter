@@ -2,6 +2,7 @@ import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldow
 import { cardCost } from './cards/cost';
 import { moodAtTime } from './live/moodTimeline';
 import { type Card, type GameState, type Section, rules } from './model';
+import { resolveModeSkill } from './live/modes';
 
 export function sectionAt(state: GameState): Section {
   const beat = ((state.tick / rules.ticksPerSecond) * state.track.bpm) / 60;
@@ -25,7 +26,7 @@ export function cardAt(state: GameState, index: number): Card {
   const id = state.hand[index];
   const card = state.deck.find((item) => item.id === id);
   if (!card) throw new Error('手札にカードがありません。');
-  return card;
+  return resolveModeSkill(card, state.modes);
 }
 
 export function moodValue(state: GameState): number {

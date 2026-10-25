@@ -67,6 +67,7 @@ export function createGame(
       deck.flatMap((card) => [
         ...(card.modeIds ?? []),
         ...(card.modeParameterChanges ? [card.modeParameterChanges.modeId] : []),
+        ...(card.modeSkillChanges ? [card.modeSkillChanges.modeId] : []),
       ]),
     ),
     modeReactions: [],

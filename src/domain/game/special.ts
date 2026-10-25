@@ -4,9 +4,12 @@ import { applyEffect } from './effects';
 import { spendEnergy } from './resources';
 import { flushDeckActions } from './cards/boardActions';
 import { fillHand } from './cards/drawing';
+import { resolveModeSkill } from './live/modes';
 
 export function specialCards(state: GameState): readonly Card[] {
-  return state.deck.filter((card, index) => card.special && (index === 0 || card.special.extra));
+  return state.deck
+    .map((card) => resolveModeSkill(card, state.modes))
+    .filter((card, index) => card.special && (index === 0 || card.special.extra));
 }
 
 export function specialCost(card: Card): number {

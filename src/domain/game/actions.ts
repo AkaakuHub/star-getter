@@ -1,6 +1,7 @@
 import { beginTokenGeneration, finishTokenGeneration } from './cards/tokens';
 import { applyBeforeUseAbility } from './cards/beforeUse';
 import { drainModeChanges } from './effects/modeChange';
+import { resolveModeSkill } from './live/modes';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type GameState } from './model';
 import { applyEffect } from './effects';
@@ -139,7 +140,8 @@ function activateCard(
       const children = [...next.hand];
       for (const id of children) {
         const child = next.deck.find((item) => item.id === id);
-        if (child) next = activateCard(next, child, initialHand, true);
+        if (child)
+          next = activateCard(next, resolveModeSkill(child, next.modes), initialHand, true);
       }
       next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
     } else {
