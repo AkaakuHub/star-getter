@@ -1,7 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue } from '../projection';
-import { int64ToFloat32 } from '../numeric';
+import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
 
 type HeartLimitBoostEffect = Extract<Effect, { kind: 'heart-limit-boost' }>;
 
@@ -21,7 +21,7 @@ export function activateHeartLimitBoost(
           moodValue(state),
           Math.fround(int64ToFloat32(effect.bonusMoodValue) / Math.fround(10_000)),
         );
-  const value = toSignedInt32(
+  const value = roundToEvenFloat32(
     Math.fround(
       Math.fround(Math.fround(mood + num) + Math.fround(addValue)) * Math.fround(multiplier),
     ),
@@ -124,6 +124,11 @@ export function deactivateHeartLimitAdditionalBuffs(
   };
 }
 
+function toSignedInt32(value: number): number {
+  if (!Number.isFinite(value)) return -2_147_483_648;
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
+}
+
 function matchesTarget(
   target: GameState['heartLimitAdditionalBuffs'][number]['target'],
   card: Card,
@@ -138,9 +143,4 @@ function matchesTarget(
     case 'card-series':
       return card.tokenSeriesIds?.includes(target.seriesId) ?? false;
   }
-}
-
-function toSignedInt32(value: number): number {
-  if (!Number.isFinite(value)) return -2_147_483_648;
-  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
