@@ -6,6 +6,7 @@ export function baseGaugeIntervalSeconds(base: number, songTime: number): number
 }
 
 export type StageGauges = Readonly<{
+  maxEnergy: number;
   apIncreaseIntervalSeconds: number;
   mentalDecreaseIntervalSeconds: number;
   voltageIncreaseIntervalSeconds: number;

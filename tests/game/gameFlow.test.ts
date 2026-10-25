@@ -40,7 +40,7 @@ describe('ライブの進行', () => {
     const empty = { ...game(), energy: 0 };
     expect(advanceTo(empty, 0.5).energy).toBe(0);
     expect(advanceTo(empty, 1.3).energy).toBe(1);
-    expect(advanceTo(empty, 30).energy).toBe(10);
+    expect(advanceTo(empty, 30).energy).toBe(empty.maxEnergy);
   });
 
   it('スタミナが尽きると休憩し、回復してからカードを使用できる', () => {

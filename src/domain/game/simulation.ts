@@ -56,7 +56,7 @@ export function createGame(
     activation: null,
     randomSeed: shuffled.seed,
     energy: 0,
-    maxEnergy: rules.maxEnergy,
+    maxEnergy: track.stage.maxEnergy,
     apIntervalFactor: 1,
     apStageIntervalFactor: 1,
     apTimerSeconds: 0,

@@ -35,7 +35,7 @@ it('共鳴はセンターの通常効果と基本カードの追加効果だけ�
   ]);
 });
 
-it('初回の共鳴で30枚を生成し、追加の共鳴で上限を20へ増やして通常の共鳴を復帰させる', () => {
+it('初回の共鳴で30枚を生成し、追加の共鳴で上限を10増やして通常の共鳴を復帰させる', () => {
   const initial = { ...game('library'), energy: 10 };
   const prepared = act(initial, { type: 'special', cardId: 'library-pages' });
   expect(prepared.energy).toBe(7);
@@ -44,7 +44,7 @@ it('初回の共鳴で30枚を生成し、追加の共鳴で上限を20へ増や
   expect(act(prepared, { type: 'special', cardId: 'library-pages' })).toBe(prepared);
   const extended = act(prepared, { type: 'special', cardId: 'library-ensemble' });
   expect(extended.energy).toBe(4);
-  expect(extended.maxEnergy).toBe(20);
+  expect(extended.maxEnergy).toBe(initial.maxEnergy + 10);
   expect(extended.deck).toHaveLength(36);
   expect(extended.specialUsed).toEqual(['library-ensemble']);
   expect(canUseSpecial(extended, 'library-pages')).toBe(true);
