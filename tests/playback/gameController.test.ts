@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { GameController } from '../../src/app/gameController';
 import type { FrameScheduler, PlaybackClock } from '../../src/app/playbackPorts';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { createGame } from '../../src/domain/game/simulation';
@@ -52,7 +52,7 @@ function session(energy = 10) {
   const clock = new TestClock();
   const frames = new TestFrames();
   const controller = new GameController(
-    { ...createGame(track, resolveDeck(defaultDeckIds), 7), energy },
+    { ...createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), energy },
     clock,
     frames,
   );

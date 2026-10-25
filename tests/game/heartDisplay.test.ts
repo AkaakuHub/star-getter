@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
@@ -9,19 +9,20 @@ import { advanceTo, createGame } from '../../src/domain/game/simulation';
 function game(limit?: number) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  return act(createGame(track, resolveDeck(defaultDeckIds), 7, limit), { type: 'start' });
+  return act(createGame(track, routes.bloom.deck, 7, limit, routes.bloom.tokens), {
+    type: 'start',
+  });
 }
 
 function play(limit: number) {
   let state = game(limit);
-  for (let tick = 1; tick <= 1800; tick++) {
+  for (let tick = 1; tick <= 3600; tick++) {
     state = advanceTo(state, tick / 60);
     if (tick % 30 === 0) {
       const index = state.hand.findIndex((id, slot) => Boolean(id) && canUseCard(state, slot));
       if (index >= 0) state = act(state, { type: 'card', index });
     }
     if (tick % 20 === 0) state = act(state, { type: 'collect' });
-    state = act(state, { type: 'special' });
   }
   return {
     score: state.score,

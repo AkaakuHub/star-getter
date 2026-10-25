@@ -52,3 +52,41 @@
   margin: 0;
   font-weight: 800;
 }
+.special-options {
+  display: grid;
+  gap: 24px;
+}
+.special-selection .modal-heading {
+  position: sticky;
+  top: -26px;
+  z-index: 1;
+  padding-block: 8px;
+  background: var(--paper);
+}
+.special-option {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+.special-option-art {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+.special-option h3 {
+  align-self: center;
+  font-size: 1rem;
+}
+.special-option p,
+.special-option .button {
+  grid-column: 1 / -1;
+}
+.special-option p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.special-option .button {
+  padding-inline: 12px;
+}

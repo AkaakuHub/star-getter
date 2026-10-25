@@ -16,7 +16,7 @@ export function limitValue(value: bigint): bigint {
 }
 
 export function collectionScore(state: GameState, count: number, missed: boolean): bigint {
-  const voltage = voltageLevel(state.excitement);
+  const voltage = voltageLevel(state.excitement, state.maximumVoltageLevel);
   const rank = calculateStarGatherHeartRank(count, voltage, null);
   const base = calculateStarGatherClientScore(
     {

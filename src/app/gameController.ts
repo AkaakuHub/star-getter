@@ -132,7 +132,7 @@ export class GameController {
   }
 
   command(
-    action: Extract<Action, { type: 'card' }> | Readonly<{ type: 'collect' | 'special' }>,
+    action: Extract<Action, { type: 'card' | 'special' }> | Readonly<{ type: 'collect' }>,
   ): void {
     if (this.disposed || this.busy || this.currentState.phase !== 'playing') return;
     this.advance();

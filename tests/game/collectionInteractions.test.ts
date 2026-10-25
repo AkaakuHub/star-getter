@@ -21,16 +21,16 @@ it('手札の回収条件は複数回の合計で成立し、自動回収の0.3�
   const initial = game('bloom');
   let state: GameState = {
     ...initial,
-    hand: ['spark'],
+    hand: ['horizon'],
     hearts: { ...initial.hearts, heartLimit: 10_000 },
   };
   state = act(addHearts(state, 2_999), { type: 'collect' });
   expect(heartCount(state)).toBe(0);
-  expect(state.handHeartCollectCounts.spark).toBe(2_999);
+  expect(state.handHeartCollectCounts.horizon).toBe(2_999);
   state = act(addHearts(state, 1), { type: 'collect' });
   expect(state.tick).toBe(0);
   expect(heartCount(state)).toBeGreaterThanOrEqual(3_000);
-  expect(state.relayUsed).toContain('spark');
+  expect(state.relayUsed).toContain('horizon');
   const repeated = act(state, { type: 'collect' });
   expect(repeated.tick).toBe(0);
   expect(repeated.score).toBeGreaterThan(state.score);
@@ -41,19 +41,19 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
   const initial = game('bloom');
   let state: GameState = {
     ...initial,
-    hand: ['spark'],
+    hand: ['horizon'],
     hearts: { ...initial.hearts, heartLimit: 10_000 },
   };
   state = act(addHearts(state, 9_000), { type: 'collect' });
-  expect(state.handHeartCollectCounts.spark).toBe(0);
+  expect(state.handHeartCollectCounts.horizon).toBe(0);
   state = act(state, { type: 'collect' });
   expect(heartCount(state)).toBe(0);
   const redrawn = fillHand({
     ...shuffleHand(state),
-    drawPile: ['spark', ...state.deck.map((card) => card.id).filter((id) => id !== 'spark')],
+    drawPile: ['horizon', ...state.deck.map((card) => card.id).filter((id) => id !== 'horizon')],
   });
-  expect(redrawn.hand).toContain('spark');
-  expect(redrawn.relayUsed).not.toContain('spark');
+  expect(redrawn.hand).toContain('horizon');
+  expect(redrawn.relayUsed).not.toContain('horizon');
   expect(heartCount(act(addHearts(redrawn, 3_000), { type: 'collect' }))).toBeGreaterThan(0);
 });
 
@@ -112,7 +112,7 @@ for (const mood of [-100, 0, 100]) {
         ...initial.track,
         sections: initial.track.sections.map((section) => ({ ...section, moodValue: mood })),
       },
-      hand: ['spark'],
+      hand: ['horizon'],
       hearts: { ...initial.hearts, heartLimit: 1_000_000 },
     };
     const collected = act(addHearts(state, 3_000), { type: 'collect' });

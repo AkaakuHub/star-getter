@@ -1,10 +1,11 @@
-import { moodValue } from './projection';
 import { collectHearts } from './hearts';
-import { type Action, type Card, type GameState, rules } from './model';
+import { type Action, type Card, type GameState } from './model';
 import { applyEffect, changeResource } from './effects';
 import { canUseCard, cardAt } from './projection';
 import { cardCost } from './cards/cost';
 import { fillHand } from './cards/drawing';
+import { useSpecial } from './special';
+import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -17,7 +18,7 @@ export function act(state: GameState, action: Action): GameState {
     case 'collect':
       return state.phase === 'playing' ? collectHearts(state) : state;
     case 'special':
-      return useSpecial(state);
+      return useSpecial(state, action.cardId);
     case 'card':
       return useCard(state, action.index);
   }
@@ -26,63 +27,61 @@ export function act(state: GameState, action: Action): GameState {
 function useCard(state: GameState, index: number): GameState {
   if (!canUseCard(state, index)) return state;
   const source = cardAt(state, index);
-  const queue = source.effects.some((effect) => effect.kind === 'use-hand')
-    ? [source.id, ...state.hand.filter((id) => id !== source.id)]
-    : [source.id];
-  let next = state.bloom
+  const paid = state.bloom
     ? state
     : changeResource(state, 'energy', -BigInt(cardCost(state, source)));
-  for (const id of queue) {
-    const card = next.deck.find((item) => item.id === id);
-    if (!card) continue;
-    const handIndex = state.hand.indexOf(id);
-    next = {
-      ...next,
-      charge: Math.min(100, next.charge + 8),
-      lastActionTick: state.tick,
-      lastPerformer: card.performer,
-      lastCardName: card.name,
-      nextDrawPreference: card.drawPreference ?? next.nextDrawPreference,
-      stats: { ...next.stats, cardsUsed: next.stats.cardsUsed + 1 },
-      cardUses: [
-        ...next.cardUses,
-        {
-          key: next.stats.cardsUsed + 1,
-          card,
-          tick: state.tick,
-          handIndex,
-          handCount: state.hand.length,
-          cost: cardCost(state, card),
-        },
-      ],
-    };
-    next = retireCard(next, card);
-    if (card.useAbility === 'story-boost') {
-      const count = next.deck.length;
-      const percent =
-        count >= 100
-          ? 1001
-          : count >= 80
-            ? 700
-            : count >= 60
-              ? 500
-              : count >= 40
-                ? 300
-                : count >= 20
-                  ? 200
-                  : 100;
-      next = {
-        ...next,
-        storyAmplification: Math.fround(
-          next.storyAmplification + percent + Math.max(0, moodValue(next)) * percent * 0.005,
-        ),
-      };
+  const next = activateCard(paid, source, state.hand, false);
+  return fillHand({
+    ...next,
+    lastUsedMember: source.member,
+    lastUsedUnit: source.unit,
+    drawContext: 'skill',
+  });
+}
+
+function activateCard(
+  state: GameState,
+  card: Card,
+  initialHand: readonly string[],
+  allHand: boolean,
+): GameState {
+  let next: GameState = {
+    ...state,
+    lastActionTick: state.tick,
+    lastPerformer: card.performer,
+    lastUsedMember: card.member,
+    lastUsedUnit: card.unit,
+    drawContext: 'skill',
+    cardUseCounts: { ...state.cardUseCounts, [card.id]: (state.cardUseCounts[card.id] ?? 0) + 1 },
+    lastCardName: card.name,
+    stats: { ...state.stats, cardsUsed: state.stats.cardsUsed + 1 },
+    cardUses: [
+      ...state.cardUses,
+      {
+        key: state.stats.cardsUsed + 1,
+        card,
+        tick: state.tick,
+        handIndex: initialHand.indexOf(card.id),
+        handCount: initialHand.length,
+        cost: cardCost(state, card),
+      },
+    ],
+  };
+  next = retireCard(next, card);
+  for (const effect of card.effects) {
+    if (effect.kind === 'use-hand') {
+      if (allHand) continue;
+      const children = [...next.hand];
+      for (const id of children) {
+        const child = next.deck.find((item) => item.id === id);
+        if (child) next = activateCard(next, child, initialHand, true);
+      }
+    } else {
+      next = applyEffect(next, effect, card);
     }
-    for (const effect of card.effects)
-      if (effect.kind !== 'use-hand') next = applyEffect(next, effect, card);
-    if (card.exhausts) next = { ...next, deck: next.deck.filter((item) => item.id !== card.id) };
   }
-  return fillHand(next);
+  next = applyUseAbility(next, card);
+  return notifyHandSkillUse(next, card);
 }
 
 function retireCard(state: GameState, card: Card): GameState {
@@ -98,27 +97,4 @@ function retireCard(state: GameState, card: Card): GameState {
       Object.entries(state.handHeartCollectCounts).filter(([id]) => id !== card.id),
     ),
   };
-}
-
-function useSpecial(state: GameState): GameState {
-  if (state.phase !== 'playing' || state.charge < 100 || state.resting) return state;
-  const next = applyEffect(
-    applyEffect(
-      {
-        ...state,
-        charge: 0,
-        boosts: [
-          ...state.boosts,
-          {
-            percent: (80 * state.amplification) / 100,
-            untilTick: state.tick + 8 * rules.ticksPerSecond,
-          },
-        ],
-        stats: { ...state.stats, specialsUsed: state.stats.specialsUsed + 1 },
-      },
-      { kind: 'energy', amount: 3 },
-    ),
-    { kind: 'stamina', amount: 10 },
-  );
-  return applyEffect(next, { kind: 'hearts', amount: 8 });
 }

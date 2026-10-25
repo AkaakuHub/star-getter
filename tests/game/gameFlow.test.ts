@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import type { GameState, Track } from '../../src/domain/game/model';
-import { canUseCard, cardAt, durationSeconds } from '../../src/domain/game/projection';
+import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game(): GameState {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  return act(createGame(track, resolveDeck(defaultDeckIds), 12625), { type: 'start' });
+  return act(createGame(track, routes.bloom.deck, 12625, 100, routes.bloom.tokens), {
+    type: 'start',
+  });
 }
 
 describe('ライブの進行', () => {
@@ -35,8 +38,8 @@ describe('ライブの進行', () => {
 
   it('エネルギーが回復し、上限を超えない', () => {
     const empty = { ...game(), energy: 0 };
-    expect(advanceTo(empty, 0.5).energy).toBe(1);
-    expect(advanceTo(empty, 0.6).energy).toBe(1);
+    expect(advanceTo(empty, 0.5).energy).toBe(0);
+    expect(advanceTo(empty, 1.3).energy).toBe(1);
     expect(advanceTo(empty, 30).energy).toBe(10);
   });
 
@@ -72,11 +75,12 @@ describe('ライブの進行', () => {
 });
 
 describe('カードと編成', () => {
-  it('異なる9枚と3人の参加を必要とする', () => {
+  it('3〜100枚の重複しない編成を受け入れる', () => {
     const track = game().track;
-    expect(() => createGame(track, resolveDeck(defaultDeckIds.slice(1)), 7)).toThrow();
+    expect(() => createGame(track, resolveDeck(defaultDeckIds.slice(1)), 7)).not.toThrow();
+    expect(() => createGame(track, resolveDeck(defaultDeckIds.slice(0, 2)), 7)).toThrow();
     expect(() =>
-      createGame(track, resolveDeck(Array.from({ length: 9 }, () => 'spark')), 7),
+      createGame(track, resolveDeck(Array.from({ length: 8 }, () => 'horizon')), 7),
     ).toThrow();
     expect(() => createGame(track, resolveDeck(defaultDeckIds), 0)).toThrow();
   });
@@ -87,23 +91,6 @@ describe('カードと編成', () => {
     expect(act(state, { type: 'card', index: -1 })).toBe(state);
     expect(act(state, { type: 'card', index: 1.5 })).toBe(state);
     expect(act(state, { type: 'card', index: 5 })).toBe(state);
-  });
-
-  it('費用を消費して補充し、山札を繰り返してもカードが増減しない', () => {
-    let state = game();
-    for (let turn = 0; turn < 150; turn++) {
-      state = { ...state, energy: 10, tick: state.tick + 15 };
-      const index = turn % 5;
-      const card = cardAt(state, index);
-      const next = act(state, { type: 'card', index });
-      if (state.bloom) expect(next.energy).toBe(state.energy);
-      else expect(next.energy).toBeGreaterThanOrEqual(10 - card.cost);
-      expect(next.hand).toHaveLength(5);
-      const owned = [...next.hand, ...next.drawPile, ...next.discard];
-      expect(new Set(owned).size).toBe(9);
-      expect(owned.sort()).toEqual([...defaultDeckIds].sort());
-      state = next;
-    }
   });
 
   it('連打によるカードの重複使用を防ぐ', () => {

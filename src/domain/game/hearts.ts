@@ -8,6 +8,7 @@ import { starGatherHeartCount } from './live/heartState';
 import { createRangeRandom } from './random';
 import { advanceHandCollectionAbilities } from './cards/collectionAbilities';
 import { recordScoreHistory } from './scoreHistory';
+import { voltageLevel } from './live/voltageLevel';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -31,7 +32,6 @@ function awardHearts(state: GameState, count: number, missed: boolean): GameStat
     }),
     combo,
     lastCollectTick: missed ? state.lastCollectTick : state.tick,
-    charge: Math.min(100, state.charge + (missed ? 0 : count * 0.8)),
     lastGain: missed ? state.lastGain : score - state.score,
     stats: {
       ...state.stats,
@@ -66,6 +66,21 @@ export function collectHearts(state: GameState): GameState {
         },
         card,
       );
+    } else if (card.collectionAbility === 'icy-sayaka') {
+      if (voltageLevel(state.excitement, state.maximumVoltageLevel) >= 950 && state.stamina === 0) {
+        triggered = fillHand(shuffleHand(triggered));
+        triggered = applyEffect(
+          triggered,
+          {
+            kind: 'excitement',
+            amount:
+              voltageLevel(state.excitement, state.maximumVoltageLevel) >= 1000
+                ? -15_400_000
+                : -1_400_000,
+          },
+          card,
+        );
+      }
     } else if (state.deck.length >= 95) {
       triggered =
         card.token === 'story'

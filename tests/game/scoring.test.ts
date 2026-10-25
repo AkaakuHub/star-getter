@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { routes } from '../../src/content/routes';
+import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
-import { addHearts, heartCount } from '../../src/domain/game/hearts';
+import { addHearts, advanceHearts, heartCount } from '../../src/domain/game/hearts';
 import { type GameState, rules } from '../../src/domain/game/model';
 import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
@@ -10,16 +11,17 @@ import { advanceTo, createGame } from '../../src/domain/game/simulation';
 function game(): GameState {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  const state = act(createGame(track, resolveDeck(defaultDeckIds), 456), { type: 'start' });
+  const state = act(createGame(track, routes.bloom.deck, 456, 100, routes.bloom.tokens), {
+    type: 'start',
+  });
   return { ...state, relayUsed: [...state.hand] };
 }
 
 describe('きらめきと得点', () => {
-  it('回収すると得点とチャージを得て、同じきらめきを二重回収しない', () => {
+  it('回収すると得点を得て、同じきらめきを二重回収しない', () => {
     const state = addHearts(game(), 10);
     const collected = act(state, { type: 'collect' });
     expect(collected.score).toBeGreaterThan(0);
-    expect(collected.charge).toBe(8);
     expect(collected.stats.heartsCollected).toBe(10);
     expect(heartCount(collected)).toBe(0);
     expect(act(collected, { type: 'collect' })).toBe(collected);
@@ -28,7 +30,8 @@ describe('きらめきと得点', () => {
   it('時間切れの回収は基礎得点の20%になる', () => {
     const state = { ...addHearts(game(), 10), resting: true, stamina: 0, excitement: 100 };
     const normal = act(state, { type: 'collect' });
-    const expired = advanceTo(state, 10);
+    let expired = state;
+    for (let tick = 1; tick <= 600; tick++) expired = advanceHearts({ ...expired, tick });
     expect(expired.stats.heartsMissed).toBe(10);
     expect(expired.stats.heartsCollected).toBe(0);
     expect(expired.score).toBe(normal.score / 5n);
@@ -53,32 +56,22 @@ describe('きらめきと得点', () => {
       act(addHearts(unboosted, 10), { type: 'collect' }).score,
     );
   });
-
-  it('チャージが満ちた時だけ全員のアクションを使用できる', () => {
-    const state = game();
-    expect(act(state, { type: 'special' })).toBe(state);
-    const special = act({ ...state, charge: 100, energy: 2, stamina: 60 }, { type: 'special' });
-    expect(special.charge).toBe(0);
-    expect(special.energy).toBe(5);
-    expect(special.stamina).toBe(70);
-    expect(heartCount(special)).toBe(8);
-    expect(special.stats.specialsUsed).toBe(1);
-    expect(special.boosts).toHaveLength(1);
-    expect(act(special, { type: 'special' })).toBe(special);
-  });
 });
 
 describe('楽曲を最後まで遊べる', () => {
   for (const track of tracks) {
     it(`${track.name}でカード・回収・全員アクションを使って結果へ到達する`, () => {
-      let state = act(createGame(track, resolveDeck(defaultDeckIds), 1234), { type: 'start' });
+      let state = act(createGame(track, routes.bloom.deck, 1234, 100, routes.bloom.tokens), {
+        type: 'start',
+      });
       for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
         state = advanceTo(state, frame / 4);
         const cardIndex = state.hand.findIndex(
           (cardId, index) => Boolean(cardId) && canUseCard(state, index),
         );
         if (cardIndex >= 0) state = act(state, { type: 'card', index: cardIndex });
-        state = act(state, { type: 'special' });
+        const special = specialCards(state).find((card) => canUseSpecial(state, card.id));
+        if (special) state = act(state, { type: 'special', cardId: special.id });
         if (frame % 12 === 0) state = act(state, { type: 'collect' });
       }
       expect(state.phase).toBe('finished');

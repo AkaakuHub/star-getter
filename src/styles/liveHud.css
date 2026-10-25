@@ -51,7 +51,7 @@
   border-radius: 2cqw;
   background: #ffe4a4;
 }
-.special-portrait > .special-charge {
+.special-portrait > .special-cost {
   position: absolute;
   inset: auto 0 0;
   display: flex;
@@ -63,10 +63,6 @@
   font-size: 2.8cqw;
   font-weight: 800;
   white-space: nowrap;
-}
-.special-charge svg {
-  width: 3cqw;
-  height: 3cqw;
 }
 .special-portrait:disabled {
   filter: saturate(0.4);
@@ -161,6 +157,9 @@
   font-size: 5cqw;
   line-height: 1;
 }
+.resource-gauge strong small {
+  font-size: 3cqw;
+}
 .resource-gauge > span {
   font-size: 3cqw;
   font-weight: 800;
@@ -191,12 +190,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1cqw;
-  padding: 0 1cqw;
+  gap: 0.5cqw;
+  padding: 0 0.5cqw;
   background: transparent;
   color: #674375;
   font-size: 3cqw;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
   pointer-events: none;
+}
+.bloom-progress small {
+  font-size: 2.7cqw;
+  font-weight: 800;
 }
 .bloom-gauge {
   color: #9861d8;
@@ -206,16 +211,6 @@
 .bloom-gauge .vertical-meter {
   height: 14cqw;
   background: #d5c6e6;
-}
-.bloom-maximum {
-  position: absolute;
-  z-index: 13;
-  display: grid;
-  align-items: center;
-  font-size: 2.7cqw;
-  color: #674375;
-  font-weight: 800;
-  pointer-events: none;
 }
 .live-amplification {
   position: absolute;

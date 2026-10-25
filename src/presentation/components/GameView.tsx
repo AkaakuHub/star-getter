@@ -1,7 +1,7 @@
 import { Pause, Menu, List, Layers, Star } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
-import type { GameState } from '../../domain/game/model';
+import { type GameState, rules } from '../../domain/game/model';
 import { handCapacity } from '../../domain/game/cards/drawing';
 import { LiveHud } from '../live/LiveHud';
 import { liveLayout } from '../live/layout';
@@ -20,6 +20,7 @@ export function GameView({
   onMenu,
   onHand,
   onDeck,
+  onSpecial,
   busy,
 }: Readonly<{
   controller: GameController;
@@ -30,12 +31,13 @@ export function GameView({
   onMenu: () => void;
   onHand: () => void;
   onDeck: () => void;
+  onSpecial: () => void;
   busy: boolean;
 }>) {
   return (
     <main className={'idol-game' + (state.bloom ? ' is-blooming' : '')} aria-label="ライブ">
       <Stage controller={controller} state={state} />
-      <LiveHud controller={controller} state={state} />
+      <LiveHud controller={controller} state={state} onSpecial={onSpecial} busy={busy} />
       <nav aria-label="ライブ操作">
         <button
           type="button"
@@ -45,7 +47,9 @@ export function GameView({
           disabled={busy}
         >
           <List size={13} aria-hidden="true" />
-          手札 {state.hand.length}/{handCapacity(state)}
+          <span>
+            手札{state.hand.length}/{handCapacity(state)}・全{state.deck.length}/{rules.maxDeckSize}
+          </span>
         </button>
         <button
           type="button"

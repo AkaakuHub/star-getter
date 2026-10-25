@@ -29,12 +29,12 @@ describe('スターギャザーの回収得点', () => {
     ).toBe(0.375);
   });
 
-  it('30秒・各属性125の編成できらめき10個は22500となる', () => {
-    expect(collectionScore(game(), 10, false)).toBe(22500n);
+  it('60秒・各属性125の編成できらめき10個は11250となる', () => {
+    expect(collectionScore(game(), 10, false)).toBe(11250n);
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 601 }, 10, false)).toBe(45000n);
+    expect(collectionScore({ ...game(), excitement: 601 }, 10, false)).toBe(22500n);
   });
 
   it('STAR増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
@@ -43,7 +43,7 @@ describe('スターギャザーの回収得点', () => {
       { percent: 100, untilTick: 100 },
       { percent: 100, untilTick: 100 },
     ];
-    expect(collectionScore({ ...base, boosts }, 10, false)).toBe(67500n);
+    expect(collectionScore({ ...base, boosts }, 10, false)).toBe(33750n);
     expect(
       collectionScore(
         {
@@ -57,7 +57,7 @@ describe('スターギャザーの回収得点', () => {
         10,
         false,
       ),
-    ).toBe(22517n);
+    ).toBe(11258n);
   });
 
   it('回収回数や山場だけでは独自の得点倍率を付けない', () => {
@@ -68,9 +68,9 @@ describe('スターギャザーの回収得点', () => {
   });
 
   it('カード未使用なら放置しても回収だけを繰り返しても億へ到達しない', () => {
-    const idle = advanceTo(game(), 30);
+    const idle = advanceTo(game(), 60);
     let collecting = game();
-    for (let tick = 1; tick <= 1800; tick++) {
+    for (let tick = 1; tick <= 3600; tick++) {
       collecting = act(advanceTo(collecting, tick / 60), { type: 'collect' });
     }
     expect(idle.stats.cardsUsed).toBe(0);

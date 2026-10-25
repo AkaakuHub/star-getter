@@ -12,7 +12,11 @@ export function advanceHandCollectionAbilities(
     if (!card) throw new Error('手札のカードがありません。');
     const threshold =
       card.relay?.threshold ??
-      (card.token === 'story' || card.token === 'bookmark' ? 500_000 : null);
+      (card.token === 'story' ||
+      card.token === 'bookmark' ||
+      card.collectionAbility === 'icy-sayaka'
+        ? 500_000
+        : null);
     if (threshold === null) continue;
     const total = (counts[id] ?? 0) + count;
     counts[id] = total < threshold ? total : 0;

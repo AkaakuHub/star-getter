@@ -1,0 +1,62 @@
+import type { Card } from '../../domain/game/model';
+
+export const setupCards: readonly Card[] = [
+  {
+    id: 'camera',
+    name: '光を集める係',
+    performer: 'nova',
+    member: 1053,
+    unit: null,
+    costume: 'space',
+    cost: 6,
+    appeal: { smile: 4200, pure: 4200, cool: 4200 },
+    beatPoint: 100,
+    drawRule: { member: 1031 },
+    drawAbility: 'camera',
+    effects: [
+      { kind: 'ap-speed', percent: 30, duration: 'section' },
+      { kind: 'hand-limit', amount: 2 },
+      {
+        kind: 'conditional',
+        condition: 'last-section',
+        effects: [{ kind: 'amplify', percent: 1060, duration: 'section' }],
+      },
+    ],
+  },
+  {
+    id: 'class',
+    name: '空をつなぐ三重奏',
+    performer: 'nova',
+    member: 1030,
+    unit: null,
+    costume: 'encore',
+    cost: 1,
+    appeal: { smile: 4800, pure: 4800, cool: 4800 },
+    beatPoint: 100,
+    useAbility: 'class',
+    effects: [
+      { kind: 'energy', amount: 30 },
+      { kind: 'hand-limit', amount: 3 },
+      { kind: 'amplify', percent: 30, duration: 'section' },
+      { kind: 'shuffle' },
+    ],
+  },
+  {
+    id: 'aurora-ensemble',
+    name: '極光の共演',
+    performer: 'tetra',
+    member: 1021,
+    unit: 1,
+    costume: 'sailor',
+    cost: 0,
+    appeal: { smile: 5300, pure: 5300, cool: 5300 },
+    beatPoint: 100,
+    allHandCost: 'sum',
+    drawRule: { priority: true },
+    useAbility: 'aurora',
+    effects: [
+      { kind: 'use-hand' },
+      ...Array.from({ length: 9 }, () => ({ kind: 'beat-hearts', amount: 25 }) as const),
+    ],
+  },
+];

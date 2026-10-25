@@ -37,8 +37,8 @@ export function validateState(state: StarGatherHeartRuntimeState): void {
         !Number.isFinite(heart.collectElapsedSeconds) ||
         heart.collectElapsedSeconds < 0 ||
         !Number.isFinite(heart.collectMoveDurationSeconds) ||
-        heart.collectMoveDurationSeconds < 0.9 ||
-        heart.collectMoveDurationSeconds > 1.1 ||
+        heart.collectMoveDurationSeconds < Math.fround(0.9) ||
+        heart.collectMoveDurationSeconds > Math.fround(1.1) ||
         !Number.isFinite(heart.collectJumpHeight) ||
         heart.collectJumpHeight < 0.5 ||
         heart.collectJumpHeight > 1 ||

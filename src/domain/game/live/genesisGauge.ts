@@ -13,7 +13,7 @@ export function calculateStarGatherInitialGenesisGauge(input: {
   ) {
     throw new Error('StarGather initial Genesis gauge input is invalid');
   }
-  return Math.trunc(
+  return Math.ceil(
     Math.fround(
       Math.fround(input.currentMental * 0.25) +
         Math.fround((input.currentVoltageLevel + input.currentAp) * 5),
@@ -43,10 +43,10 @@ export function calculateStarGatherGenesisGaugeDelta(input: {
   const scale = genesisGaugeScale(input.gaugeType);
   if (scale === null) return 0;
   const delta = Math.fround(
-    Math.fround(magnitude / Math.sqrt(Math.fround(magnitude * scale))) *
+    Math.fround(magnitude / Math.fround(Math.sqrt(Math.fround(magnitude * Math.fround(scale))))) *
       Math.fround(input.currentGenesisEffectValue),
   );
-  return Math.trunc(delta) * sign;
+  return Math.ceil(delta) * sign;
 }
 
 function genesisGaugeScale(gaugeType: 0 | 1 | 2 | 3): number | null {

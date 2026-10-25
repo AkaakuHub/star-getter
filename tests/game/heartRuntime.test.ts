@@ -12,6 +12,14 @@ import { projectStarGatherHeartPresentations } from '../../src/domain/game/live/
 import { createRangeRandom } from '../../src/domain/game/random';
 
 describe('きらめきの生成と移動', () => {
+  it('回収時間のFloat32上端でも連打の次の更新を受け付ける', () => {
+    const maximum = (_minimum: number, upper: number) => upper;
+    const spawned = spawnStarGatherBeatHearts(createStarGatherHeartRuntimeState(30), 1, maximum);
+    const collected = collectStarGatherHeartRuntime(spawned.state, maximum);
+    expect(collected.state.stageHearts[0]?.collectMoveDurationSeconds).toBe(Math.fround(1.1));
+    expect(() => advanceStarGatherHeartRuntime(collected.state, 1 / 60, false)).not.toThrow();
+  });
+
   it('本家の生成範囲・飛び出す距離・時間を乱数で決める', () => {
     const random = createRangeRandom(7);
     const spawned = spawnStarGatherBeatHearts(

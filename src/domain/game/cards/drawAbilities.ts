@@ -1,4 +1,4 @@
-import type { Card, GameState } from '../model';
+import type { Card, Effect, GameState } from '../model';
 import { applyEffect, skillValue } from '../effects';
 import { moodValue } from '../projection';
 
@@ -6,6 +6,45 @@ export function applyDrawAbility(state: GameState, card: Card): GameState {
   if (!card.drawAbility) return state;
   const count = state.deck.length;
   const next = state;
+  if (card.drawAbility === 'camera' || card.drawAbility === 'perennial') {
+    const camera = card.drawAbility === 'camera';
+    return {
+      ...state,
+      costReductions: Object.fromEntries(
+        state.deck.map((item) => [
+          item.id,
+          (state.costReductions[item.id] ?? 0) +
+            (camera
+              ? 2 + (item.member === 1031 ? 4 : 0)
+              : item.member === 1031 || item.member === 1032
+                ? 5
+                : 0),
+        ]),
+      ),
+    };
+  }
+  if (card.drawAbility === 'shadow') {
+    const effects: readonly Effect[] = [
+      { kind: 'stamina', amount: -14, moodBonus: { target: 3, perPoint: -0.07 } },
+      { kind: 'ap-speed', percent: -14, duration: 'section' },
+      { kind: 'hand-limit', amount: -1 },
+    ];
+    return effects.reduce<GameState>(
+      (current, effect) => applyEffect(current, effect, card),
+      state,
+    );
+  }
+  if (card.drawAbility === 'genesis') {
+    const effects: readonly Effect[] = [
+      { kind: 'ap-speed', percent: -10, duration: 'section' },
+      { kind: 'excitement', amount: -100, moodBonus: { target: 2, perPoint: -0.5 } },
+      { kind: 'stamina', amount: -10, moodBonus: { target: 2, perPoint: -0.05 } },
+    ];
+    return effects.reduce<GameState>(
+      (current, effect) => applyEffect(current, effect, card),
+      state,
+    );
+  }
   if (card.drawAbility === 'library') {
     const amount =
       count >= 100
@@ -23,7 +62,7 @@ export function applyDrawAbility(state: GameState, card: Card): GameState {
       ...state,
       costReductions: state.deck.reduce(
         (costs, item) => {
-          if (item.token || item.performer !== 'lumen')
+          if (item.unit === 1 || (item.token && item.token !== 'shadow'))
             costs[item.id] = (costs[item.id] ?? 0) + amount;
           return costs;
         },

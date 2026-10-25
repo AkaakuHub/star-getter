@@ -6,7 +6,7 @@ import {
   calculateStarGatherGenesisGaugeDelta,
 } from './live/genesisGauge';
 
-const gaugeTypes = { energy: 1, stamina: 2, excitement: 3 } as const;
+const gaugeTypes = { energy: 3, stamina: 2, excitement: 1 } as const;
 
 export function activateBloom(state: GameState, strength: number): GameState {
   if (!canActivateBloom(state)) return state;
@@ -22,7 +22,7 @@ export function activateBloom(state: GameState, strength: number): GameState {
         calculateStarGatherInitialGenesisGauge({
           currentAp: Math.floor(state.energy),
           currentMental: Math.floor(state.stamina),
-          currentVoltageLevel: voltageLevel(state.excitement),
+          currentVoltageLevel: voltageLevel(state.excitement, state.maximumVoltageLevel),
         }),
       ),
       strength,

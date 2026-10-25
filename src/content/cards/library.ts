@@ -1,0 +1,72 @@
+import type { Card } from '../../domain/game/model';
+import { ensembleEffects } from '../routes/tokens';
+
+export const libraryCards: readonly Card[] = [
+  {
+    id: 'library-pages',
+    name: '花の記録',
+    performer: 'nova',
+    member: 1031,
+    unit: 1,
+    costume: 'blossom',
+    cost: 8,
+    appeal: { smile: 4950, pure: 6050, cool: 3400 },
+    beatPoint: 100,
+    useAbility: 'story-boost',
+    special: {
+      cost: 3,
+      extra: false,
+      effects: [
+        {
+          kind: 'conditional',
+          condition: 'first-section',
+          effects: [
+            { kind: 'ap-speed', percent: 80, duration: 'section' },
+            { kind: 'hand-limit', amount: 3 },
+            { kind: 'tokens', token: 'story', count: 30 },
+          ],
+        },
+      ],
+    },
+    effects: [
+      { kind: 'tokens', token: 'story', count: 8 },
+      { kind: 'tokens', token: 'clock', count: 1 },
+      { kind: 'tokens', token: 'bookmark', count: 1 },
+    ],
+  },
+  {
+    id: 'library-invitation',
+    name: '書架の招待状',
+    performer: 'tetra',
+    member: 1041,
+    unit: 1,
+    costume: 'ribbon',
+    cost: 8,
+    appeal: { smile: 5000, pure: 6100, cool: 3300 },
+    beatPoint: 100,
+    drawAbility: 'library',
+    effects: [{ kind: 'tokens', token: 'ensemble', count: 3 }],
+  },
+  {
+    id: 'library-ensemble',
+    name: '共演の記録',
+    performer: 'tetra',
+    member: 1021,
+    unit: 1,
+    costume: 'moon',
+    cost: 0,
+    appeal: { smile: 6950, pure: 5700, cool: 3550 },
+    beatPoint: 100,
+    allHandCost: 'library',
+    drawRule: { unit: 1 },
+    effects: ensembleEffects,
+    special: {
+      cost: 3,
+      extra: true,
+      effects: [
+        { kind: 'reset-special', unit: 1 },
+        { kind: 'energy-limit', amount: 10 },
+      ],
+    },
+  },
+];

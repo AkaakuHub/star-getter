@@ -1,7 +1,11 @@
 import { useEffect } from 'preact/hooks';
 import type { GameController } from './gameController';
 
-export function useGameControls(controller: GameController | null, helpOpen: boolean): void {
+export function useGameControls(
+  controller: GameController | null,
+  helpOpen: boolean,
+  onSpecial: () => void,
+): void {
   useEffect(() => {
     if (!controller) return;
     const keyboard = (event: KeyboardEvent) => {
@@ -23,9 +27,13 @@ export function useGameControls(controller: GameController | null, helpOpen: boo
         event.preventDefault();
         controller.command({ type: 'collect' });
       }
-      if (event.key.toLowerCase() === 's') {
+      if (
+        event.key.toLowerCase() === 's' ||
+        (event.key === 'Enter' &&
+          !(event.target instanceof Element && event.target.closest('button, a')))
+      ) {
         event.preventDefault();
-        controller.command({ type: 'special' });
+        onSpecial();
       }
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -41,5 +49,5 @@ export function useGameControls(controller: GameController | null, helpOpen: boo
       window.removeEventListener('keydown', keyboard);
       document.removeEventListener('visibilitychange', visibility);
     };
-  }, [controller, helpOpen]);
+  }, [controller, helpOpen, onSpecial]);
 }

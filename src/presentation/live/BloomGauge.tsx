@@ -12,9 +12,7 @@ export function BloomGauge({ progress }: Readonly<{ progress: bigint }>) {
         <Gem size={15} aria-hidden="true" />
         <span>開花</span>
         <strong>{progress.toLocaleString('ja-JP')}</strong>
-      </div>
-      <div className="bloom-maximum" style={liveLayout.bloomMaximum}>
-        /{rules.maxBloomGauge.toLocaleString('ja-JP')}
+        <small>/{rules.maxBloomGauge.toLocaleString('ja-JP')}</small>
       </div>
       {[liveLayout.bloomLeft, liveLayout.bloomRight].map((position, index) => (
         <div

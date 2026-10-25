@@ -1,5 +1,5 @@
 import { ResourceGauges } from './ResourceGauges';
-import { Gem, Star, Sparkles } from 'lucide-preact';
+import { Gem, Star } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { type GameState, rules } from '../../domain/game/model';
 import { durationSeconds } from '../../domain/game/projection';
@@ -9,13 +9,20 @@ import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { MoodGraph } from './MoodGraph';
 import { heartCount } from '../../domain/game/hearts';
+import { hasAvailableSpecial, specialButtonCard, specialCost } from '../../domain/game/special';
 
 export function LiveHud({
   controller,
   state,
-}: Readonly<{ controller: GameController; state: GameState }>) {
-  const lead = state.deck[0];
-  if (!lead) throw new Error('センターカードがありません。');
+  onSpecial,
+  busy,
+}: Readonly<{
+  controller: GameController;
+  state: GameState;
+  onSpecial: () => void;
+  busy: boolean;
+}>) {
+  const special = specialButtonCard(state);
   const seconds = state.tick / rules.ticksPerSecond;
   const CollectIcon = state.bloom ? Gem : Star;
   return (
@@ -42,20 +49,22 @@ export function LiveHud({
           </div>
         )}
       </div>
-      <button
-        type="button"
-        className="special-portrait"
-        style={liveLayout.special}
-        disabled={state.charge < 100 || state.phase !== 'playing' || state.resting}
-        onClick={() => controller.command({ type: 'special' })}
-        aria-label={'共鳴、チャージ' + Math.floor(state.charge) + '%'}
-      >
-        <CardArtwork card={lead} />
-        <span className="special-charge">
-          <Sparkles size={12} aria-hidden="true" />
-          共鳴 {Math.floor(state.charge)}%
-        </span>
-      </button>
+      {special && (
+        <button
+          type="button"
+          className="special-portrait"
+          style={liveLayout.special}
+          disabled={busy || state.phase !== 'playing' || !hasAvailableSpecial(state)}
+          onClick={onSpecial}
+          aria-label="共鳴を選択"
+          aria-haspopup="dialog"
+        >
+          <CardArtwork card={special} />
+          <span className="special-cost">
+            {state.specialUsed.includes(special.id) ? '使用済み' : '共鳴 ' + specialCost(special)}
+          </span>
+        </button>
+      )}
       <button
         type="button"
         className="collect-number"

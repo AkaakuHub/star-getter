@@ -1,47 +1,53 @@
-import type { Card } from '../../domain/game/model';
+import { tokenNames } from '../labels/tokens';
+import type { Card, Effect } from '../../domain/game/model';
 
 const appeal = { smile: 1, pure: 1, cool: 1 };
+
+export const ensembleEffects: readonly Effect[] = [
+  { kind: 'use-hand' },
+  {
+    kind: 'conditional',
+    condition: 'deck80',
+    effects: [
+      { kind: 'tokens', token: 'story', count: 3 },
+      { kind: 'tokens', token: 'clock', count: 3 },
+      { kind: 'tokens', token: 'bookmark', count: 3 },
+    ],
+  },
+];
 
 export const routeTokens: readonly Card[] = [
   {
     id: 'ensemble',
-    name: '共演の招待',
+    name: tokenNames.ensemble,
     performer: 'tetra',
+    member: 0,
+    unit: null,
     costume: 'ribbon',
     cost: 0,
     beatPoint: 0,
     appeal,
     token: 'ensemble',
-    drawPreference: 'story',
-    effects: [
-      { kind: 'use-hand' },
-      {
-        kind: 'conditional',
-        condition: 'deck80',
-        effects: [
-          { kind: 'tokens', token: 'story', count: 3 },
-          { kind: 'tokens', token: 'clock', count: 3 },
-          { kind: 'tokens', token: 'bookmark', count: 3 },
-        ],
-      },
-    ],
+    allHandCost: 'library',
+    effects: ensembleEffects,
   },
   {
     id: 'story',
-    name: '花のページ',
+    name: tokenNames.story,
     performer: 'nova',
+    member: 0,
+    unit: null,
     costume: 'blossom',
     cost: 5,
     beatPoint: 0,
     appeal,
     token: 'story',
     exhausts: true,
-    drawPreference: 'bookmark',
     drawAbility: 'story',
     effects: [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },
       { kind: 'heart-limit', amount: 36 },
-      { kind: 'boost', multiplier: 4, seconds: 30, moodBonus: { target: 1, perPoint: 1.5 } },
+      { kind: 'boost', multiplier: 4, moodBonus: { target: 1, perPoint: 1.5 } },
       { kind: 'excitement', amount: 100, moodBonus: { target: 1, perPoint: 0.5 } },
       {
         kind: 'conditional',
@@ -49,7 +55,7 @@ export const routeTokens: readonly Card[] = [
         effects: [
           { kind: 'beat-hearts', amount: 150, moodBonus: { target: 1, perPoint: 0.75 } },
           { kind: 'heart-limit', amount: 360 },
-          { kind: 'boost', multiplier: 31, seconds: 30, moodBonus: { target: 1, perPoint: 15 } },
+          { kind: 'boost', multiplier: 31, moodBonus: { target: 1, perPoint: 15 } },
           { kind: 'excitement', amount: 1000, moodBonus: { target: 1, perPoint: 5 } },
         ],
       },
@@ -57,15 +63,16 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'clock',
-    name: '時を刻む合図',
+    name: tokenNames.clock,
     performer: 'lumen',
+    member: 0,
+    unit: null,
     costume: 'prism',
     cost: 5,
     beatPoint: 0,
     appeal,
     token: 'clock',
     exhausts: true,
-    drawPreference: 'bookmark',
     drawAbility: 'clock',
     effects: [
       { kind: 'hand-limit', amount: 3 },
@@ -75,16 +82,33 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'bookmark',
-    name: '次の一幕',
+    name: tokenNames.bookmark,
     performer: 'tetra',
+    member: 0,
+    unit: null,
     costume: 'sunny',
     cost: 5,
     beatPoint: 0,
     appeal,
     token: 'bookmark',
     exhausts: true,
-    drawPreference: 'clock',
     drawAbility: 'bookmark',
     effects: [{ kind: 'shuffle' }, { kind: 'tokens', token: 'story', count: 1 }],
+  },
+  {
+    id: 'shadow',
+    name: tokenNames.shadow,
+    performer: 'lumen',
+    member: 0,
+    unit: null,
+    costume: 'witch',
+    cost: 14,
+    appeal,
+    beatPoint: 0,
+    token: 'shadow',
+    drawRule: { unit: 2 },
+    drawAbility: 'shadow',
+    useAbility: 'shadow',
+    effects: [{ kind: 'shuffle' }, { kind: 'set-energy', amount: 0 }],
   },
 ];

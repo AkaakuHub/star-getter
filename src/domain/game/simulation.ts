@@ -1,4 +1,4 @@
-import { advanceStarGatherApGauge } from './live/apGauge';
+import { advanceAutomaticGauges } from './automaticGauges';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { applyDrawAbility } from './cards/drawAbilities';
 import { beatHeartCount } from './beat';
@@ -42,24 +42,34 @@ export function createGame(
     tick: 0,
     track,
     deck: [...deck],
-    hand: ordered.slice(0, rules.handSize),
-    drawPile: ordered.slice(rules.handSize),
+    cardPool: [...deck],
+    hand: [lead.id],
+    drawPile: ordered.slice(1),
     discard: [],
     tokenCatalog,
     nextTokenId: 1,
     handLimit: rules.handSize,
-    nextDrawPreference: null,
+    drawContext: 'initial',
+    lastUsedMember: null,
+    lastUsedUnit: null,
+    cardUseCounts: {},
     randomSeed: shuffled.seed,
     energy: 10,
+    maxEnergy: rules.maxEnergy,
     apIntervalFactor: 1,
+    apStageIntervalFactor: 1,
     apTimerSeconds: 0,
+    mentalTimerSeconds: 0,
+    voltageTimerSeconds: 0,
     moodOffset: 0,
     costReductions: {},
     storyAmplification: 0,
     stamina: 100,
     resting: false,
+    mentalProtected: false,
     excitement: 0,
-    charge: 0,
+    maximumVoltageLevel: 1000,
+    specialUsed: [],
     score: 0n,
     scoreHistory: [{ timeMilliseconds: 0, totalScore: 0n }],
     moodHistory: [{ timeMilliseconds: 0, moodValue: firstSection.moodValue }],
@@ -73,6 +83,8 @@ export function createGame(
     automaticHeart: { enabled: true, timerSeconds: 0 },
     boosts: [],
     amplification: 100,
+    sectionAmplification: 0,
+    targetBoosts: [],
     resourceBoosts: [],
     bloom: null,
     relayUsed: [],
@@ -133,46 +145,29 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const stamina = state.bloom
-    ? state.stamina
-    : state.resting
-      ? Math.min(100, state.stamina + 4 * dt)
-      : Math.max(0, state.stamina - 0.9 * dt);
-  const resting = state.resting ? stamina < 40 : stamina <= 0;
-  const ap = state.bloom
-    ? { currentAp: state.energy, timerSeconds: state.apTimerSeconds }
-    : advanceStarGatherApGauge(
-        {
-          currentAp: Math.floor(state.energy),
-          maxAp: rules.maxEnergy,
-          timerSeconds: state.apTimerSeconds,
-        },
-        {
-          deltaTimeSeconds: dt,
-          mentalDown: resting,
-          increaseIntervalSeconds:
-            state.apIntervalFactor * (rules.energyTicksPerPoint / rules.ticksPerSecond),
-        },
-      ).state;
+  const gauges = advanceAutomaticGauges(state, dt);
   let next: GameState = advanceHearts({
-    ...state,
+    ...gauges,
     tick,
-    stamina,
-    resting,
-    energy: state.bloom ? state.energy : ap.currentAp,
-    apTimerSeconds: ap.timerSeconds,
-    excitement: state.bloom ? state.excitement : Math.min(100, state.excitement + dt * 0.25),
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
-  if (beat !== previousBeat && beat % 2 === 0 && !resting) {
+  if (beat !== previousBeat && beat % 2 === 0 && !next.resting) {
     next = addHearts(next, beatHeartCount(next));
   }
   if (sectionAt(next) !== sectionAt(state))
-    next = fillHand({ ...next, handLimit: rules.handSize, moodOffset: 0, apIntervalFactor: 1 });
+    next = fillHand({
+      ...next,
+      handLimit: rules.handSize,
+      moodOffset: 0,
+      apIntervalFactor: 1,
+      amplification: next.amplification - next.sectionAmplification,
+      sectionAmplification: 0,
+      targetBoosts: next.targetBoosts.filter((boost) => boost.duration === 'stage'),
+    });
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
   const collected = automatic.shouldCollect ? collectHearts(next) : next;

@@ -9,7 +9,7 @@ import { advanceTo, createGame } from '../../src/domain/game/simulation';
 function game() {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  return act(createGame(track, routes.library.deck, 7, 100, routes.library.tokens), {
+  return act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {
     type: 'start',
   });
 }
@@ -18,7 +18,9 @@ it('手札上限を増やすと8枚まで補充し、パート終了時に5枚�
   const expanded = fillHand(applyEffect(game(), { kind: 'hand-limit', amount: 3 }));
   expect(handCapacity(expanded)).toBe(8);
   expect(expanded.hand).toHaveLength(8);
-  const nextPart = advanceTo(expanded, 6);
+  const nextSection = expanded.track.sections[1];
+  if (!nextSection) throw new Error('次のパートがありません。');
+  const nextPart = advanceTo(expanded, (nextSection.startBeat * 60) / expanded.track.bpm);
   expect(handCapacity(nextPart)).toBe(5);
   expect(nextPart.hand).toHaveLength(5);
 });

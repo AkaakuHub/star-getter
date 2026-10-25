@@ -19,12 +19,24 @@ export function fillHand(state: GameState): GameState {
       const shuffled = shuffle(next.discard, next.randomSeed);
       next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
     }
-    const preferred = next.nextDrawPreference
-      ? next.drawPile.find((id) =>
-          next.deck.some((card) => card.id === id && card.token === next.nextDrawPreference),
-        )
-      : undefined;
-    const drawn = preferred ?? next.drawPile[0];
+    const eligible = (id: string) => {
+      const rule = next.deck.find((card) => card.id === id)?.drawRule;
+      if (rule?.member && (next.drawContext !== 'skill' || next.lastUsedMember !== rule.member))
+        return false;
+      if (rule?.unit && (next.drawContext !== 'skill' || next.lastUsedUnit !== rule.unit))
+        return false;
+      return true;
+    };
+    let candidates = next.drawPile.filter(eligible);
+    if (!candidates.length && next.discard.length) {
+      const shuffled = shuffle([...next.drawPile, ...next.discard], next.randomSeed);
+      next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
+      candidates = next.drawPile.filter(eligible);
+    }
+    const priority = candidates.find(
+      (id) => next.deck.find((card) => card.id === id)?.drawRule?.priority,
+    );
+    const drawn = priority ?? candidates[0] ?? next.drawPile[0];
     if (!drawn) break;
     next = {
       ...next,
@@ -50,7 +62,7 @@ export function fillHand(state: GameState): GameState {
       discard: [...next.discard, ...ordered.slice(limit)],
     };
   }
-  return { ...next, nextDrawPreference: null };
+  return { ...next, drawContext: 'idle' };
 }
 
 export function shuffleHand(state: GameState): GameState {
@@ -63,5 +75,6 @@ export function shuffleHand(state: GameState): GameState {
     randomSeed: shuffled.seed,
     relayUsed: [],
     handHeartCollectCounts: {},
+    drawContext: 'shuffle',
   };
 }
