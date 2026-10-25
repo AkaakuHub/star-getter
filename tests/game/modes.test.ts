@@ -119,6 +119,18 @@ describe('モード切替と切替時効果', () => {
     state = applyEffect(state, on);
     expect(state.boosts.at(-1)?.percent).toBe(4);
   });
+  it('ActionType45はC#のMathf.Roundと同じ偶数丸めで誘発値を渡す', () => {
+    const initial = modeGame();
+    const registered = applyEffect(initial, {
+      kind: 'mode-reaction',
+      modeId: 1,
+      thresholds: [1n],
+      effects: [{ kind: 'excitement', amount: 1 }],
+      buffNum: 15_000n,
+    });
+
+    expect(applyEffect(registered, on).excitement).toBe(2);
+  });
   it('ActionType45は子効果がない場合、表示・誘発を登録しない', () => {
     const state = modeGame();
     expect(

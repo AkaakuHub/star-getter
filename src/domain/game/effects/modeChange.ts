@@ -4,7 +4,7 @@ import {
   activateModeParameterChanges,
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
-import { int64ToFloat32 } from '../numeric';
+import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
 
 type ApplyEffect = (
   state: GameState,
@@ -91,7 +91,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
           effect.kind === 'excitement';
         const product = BigInt.asIntN(64, reaction.buffNum * BigInt(count));
         const effectPower = scales
-          ? float32ToInt32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
+          ? roundToEvenFloat32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
           : 1;
         next = apply(next, effect, source, 1, 0, effectPower);
         if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
@@ -99,13 +99,6 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
     }
   }
   return { ...next, modes: { ...next.modes, changing: false } };
-}
-
-function float32ToInt32(value: number): number {
-  const rounded = Math.fround(value);
-  return !Number.isFinite(rounded) || rounded < -2_147_483_648 || rounded > 2_147_483_647
-    ? -2_147_483_648
-    : Math.trunc(rounded);
 }
 
 export function changeMode(

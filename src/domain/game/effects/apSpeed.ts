@@ -168,7 +168,7 @@ function absorbApSpeed(
     for (let effectIndex = 0; effectIndex < absorption.effects.length; effectIndex++) {
       const target = absorption.effects[effectIndex];
       if (!target || target.actionType !== 21) continue;
-      if (absorption.hasAbsorbLimit && isProxyTargetReached(absorption, target))
+      if (absorption.hasAbsorbLimit && isProxyTargetReached(target))
         return { absorptions: state.proxyAbsorptions, absorbed: true };
       const effects = absorption.effects.map((item, index) =>
         index === effectIndex ? { ...item, totalAmount: item.totalAmount + BigInt(amount) } : item,

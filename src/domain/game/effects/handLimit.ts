@@ -141,7 +141,7 @@ function absorbHandLimit(
       const effect = absorption.effects[effectIndex];
       if (!effect) continue;
       if (effect.actionType !== 20) continue;
-      if (absorption.hasAbsorbLimit && isProxyTargetReached(absorption, effect))
+      if (absorption.hasAbsorbLimit && isProxyTargetReached(effect))
         return { absorptions: state.proxyAbsorptions, absorbed: true };
       const totalAmount = effect.totalAmount + BigInt(amount);
       const effects = absorption.effects.map((item, index) =>
