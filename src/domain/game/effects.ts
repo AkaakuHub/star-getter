@@ -48,7 +48,7 @@ import { activateGenesisSkill } from './effects/genesisSkill';
 import { activateSpecialAppealToken } from './effects/specialAppealToken';
 import { activateHandMaxCard } from './effects/handMaxCard';
 import { activateMentalShield } from './effects/mentalShield';
-import { activateUseInduce } from './effects/useInduce';
+import { activateUseCountInduce, activateUseInduce } from './effects/useInduce';
 import {
   activateFixedParameterExtend,
   changeFixedParameterBase,
@@ -88,6 +88,8 @@ export function applyEffect(
   if (effect.kind === 'induce-skill-effect')
     return activateInducedSkillEffect(state, effect, card, multiplier, addValue);
   if (effect.kind === 'use-induce') return activateUseInduce(state, effect, card, applyEffect);
+  if (effect.kind === 'use-count-induce')
+    return activateUseCountInduce(state, effect, card, applyEffect);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);

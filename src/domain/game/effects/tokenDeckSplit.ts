@@ -2,7 +2,7 @@ import type { Card } from '../cards/cardTypes';
 import { activateHandPermanentEffects, disposeHandEffects } from '../cards/handEffects';
 import { fillHandToCount } from '../cards/drawing';
 import type { GameState } from '../model';
-import type { TokenDeckSplit, TokenDeckZones } from '../modelTypes';
+import type { TokenDeckSplit, TokenDeckZones } from '../tokenDeckSplitTypes';
 
 function zones(state: GameState): TokenDeckZones {
   return { hand: state.hand, drawPile: state.drawPile, discard: state.discard };

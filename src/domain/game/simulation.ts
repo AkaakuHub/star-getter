@@ -104,6 +104,7 @@ export function createGame(
     lastUsedUnit: null,
     lastUsedSkillIcon: null,
     cardUseCounts: {},
+    skillActivationCounts: {},
     activation: null,
     randomSeed: seed,
     energy: 0,

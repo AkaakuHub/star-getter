@@ -61,6 +61,13 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   const token = state.specialAppealTokens.find((item) => item.card.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
   let next = beginTokenGeneration(spendEnergy(state, specialCost(card)), card.id);
+  next = {
+    ...next,
+    skillActivationCounts: {
+      ...next.skillActivationCounts,
+      [card.id]: (next.skillActivationCounts[card.id] ?? 0) + 1,
+    },
+  };
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   next = finishTokenGeneration(next, card.id);
   if (token) next = startSpecialAppealTokenCooldown(next, token);

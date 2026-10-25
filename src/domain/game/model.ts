@@ -32,8 +32,8 @@ import type {
   SkillCostChange,
   ParameterValueFactor,
   TokenBoost,
-  TokenDeckSplit,
 } from './modelTypes';
+import type { TokenDeckSplit } from './tokenDeckSplitTypes';
 import type { ProxyAbsorption } from './proxySkillTypes';
 import type { IngameMission, IngameMissionGroup } from './ingameMissionTypes';
 import type { HeartLimitAdditionalBuff } from './heartLimitBoostTypes';
@@ -188,6 +188,7 @@ export type GameState = Readonly<{
   lastUsedUnit: UnitId | null;
   lastUsedSkillIcon: number | null;
   cardUseCounts: Readonly<Record<string, number>>;
+  skillActivationCounts: Readonly<Record<string, number>>;
   handCardStats: Readonly<Record<string, HandCardStats>>;
   skillCostChanges: readonly SkillCostChange[];
   parameterValueFactors: readonly ParameterValueFactor[];

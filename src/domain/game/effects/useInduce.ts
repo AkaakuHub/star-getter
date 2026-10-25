@@ -20,3 +20,24 @@ export function activateUseInduce(
     },
   };
 }
+
+export function activateUseCountInduce(
+  state: GameState,
+  effect: Extract<Effect, { kind: 'use-count-induce' }>,
+  card: Card | undefined,
+  apply: EffectApplier,
+): GameState {
+  const skillUseCount = Math.max(0, (card ? (state.skillActivationCounts[card.id] ?? 0) : 0) - 1);
+  if (effect.requireCount !== 0 && skillUseCount % effect.requireCount !== 0) return state;
+  return activateUseInduce(
+    state,
+    {
+      kind: 'use-induce',
+      sourceEffectId: effect.sourceEffectId,
+      limit: effect.limit,
+      effects: effect.effects,
+    },
+    card,
+    apply,
+  );
+}

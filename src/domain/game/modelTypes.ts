@@ -1,5 +1,9 @@
 import type { SkillCooldownEffectInput } from './skillCooldownTypes';
-import type { InduceSkillEffectInput, UseInduceEffect } from './induceSkillEffectTypes';
+import type {
+  InduceSkillEffectInput,
+  UseCountInduceEffect,
+  UseInduceEffect,
+} from './induceSkillEffectTypes';
 import type { DisableMentalDownEffect } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
@@ -180,20 +184,6 @@ export type TokenBoost = Readonly<{
   remainingSections: number | null;
   deactivationKey: string | null;
 }>;
-export type TokenDeckZones = Readonly<{
-  hand: readonly string[];
-  drawPile: readonly string[];
-  discard: readonly string[];
-}>;
-export type TokenDeckSplit = Readonly<{
-  seriesIds: readonly number[] | null;
-  main: TokenDeckZones;
-  sub: TokenDeckZones;
-  active: 'main' | 'sub';
-  remainingSeconds: number | null;
-  remainingSections: number | null;
-  deactivationKey: string | null;
-}>;
 type EffectShape =
   | Readonly<{
       kind: 'branch';
@@ -224,6 +214,7 @@ type EffectShape =
       effects: readonly Effect[];
     }>
   | UseInduceEffect
+  | UseCountInduceEffect
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
   | Readonly<{ kind: 'ingame-mission'; groupId: number }>
   | Readonly<{

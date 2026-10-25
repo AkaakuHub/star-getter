@@ -7,6 +7,14 @@ export type UseInduceEffect = Readonly<{
   effects: readonly import('./modelTypes').Effect[];
 }>;
 
+export type UseCountInduceEffect = Readonly<{
+  kind: 'use-count-induce';
+  sourceEffectId: string;
+  requireCount: number;
+  limit: number;
+  effects: readonly import('./modelTypes').Effect[];
+}>;
+
 export type InduceSkillEffectInput = Readonly<{
   kind: 'induce-skill-effect';
   condition: InduceSkillCondition;
