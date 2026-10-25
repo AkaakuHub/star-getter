@@ -3,6 +3,7 @@ import { changeStarGatherHeartLimit } from '../live/heartLimit';
 import { moodValue } from '../projection';
 import { absorbSkillEffect } from './proxySkill';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { applyHeartLimitBoosts } from './heartLimitBoost';
 import type { Card, Effect, GameState } from '../model';
 
 type HeartLimitChangeEffect = Extract<Effect, { kind: 'heart-limit-change' }>;
@@ -64,8 +65,12 @@ export function activateHeartLimitChange(
           ) * multiplier,
         );
   const powered = Math.fround(calculated * effectPower);
-  const boosted = applyAction52SkillBoostForCard(state, card, powered);
-  const buffValue = powered > 0 ? Math.trunc(boosted.value) : minimumInt32;
+  const additional = applyHeartLimitBoosts(state, card, powered);
+  const action52 =
+    additional.value > 0
+      ? applyAction52SkillBoostForCard(additional.state, card, additional.value)
+      : { state: additional.state, value: additional.value };
+  const buffValue = additional.value > 0 ? Math.trunc(action52.value) : minimumInt32;
   const buff: HeartLimitBuff = {
     id: state.nextHeartLimitBuffId,
     calculation: effect.calculationType === 1 ? 'add' : 'multiply',
@@ -89,12 +94,12 @@ export function activateHeartLimitChange(
   const delta = nextLimit - oldLimitWithoutLimit;
   const absorb = effect.calculationType === 1 || correction >= 1;
   if (absorb && delta > -1) {
-    const absorbed = absorbSkillEffect(boosted.state, 25, BigInt(delta));
+    const absorbed = absorbSkillEffect(action52.state, 25, BigInt(delta));
     if (absorbed.absorbed) return absorbed.state;
   }
   return materializeHeartLimit(
     {
-      ...boosted.state,
+      ...action52.state,
       nextHeartLimitBuffId: state.nextHeartLimitBuffId + 1,
     },
     baseLimit,

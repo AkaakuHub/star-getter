@@ -6,6 +6,7 @@ import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
 import { validateMoodChangeSkillEffect } from './moodChangeSkillTypes';
 import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
+import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -278,6 +279,10 @@ export function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'mood-change-skill') {
     validateMoodChangeSkillEffect(effect);
+    return;
+  }
+  if (effect.kind === 'heart-limit-boost') {
+    validateHeartLimitBoost(effect);
     return;
   }
   if (validateSpecialEffect(effect)) return;

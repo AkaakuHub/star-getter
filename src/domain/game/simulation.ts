@@ -109,6 +109,8 @@ export function createGame(
     heartLimitBase: 100,
     heartLimitBuffs: [],
     nextHeartLimitBuffId: 1,
+    heartLimitAdditionalBuffs: [],
+    nextHeartLimitAdditionalBuffId: 1,
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
     lastUsedMember: null,

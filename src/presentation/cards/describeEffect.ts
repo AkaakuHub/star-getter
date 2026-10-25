@@ -86,6 +86,8 @@ export function describeEffect(effect: Effect): string {
       return '対象メンバーがアクションを使用したとき、合計APに応じた効果を発動する。';
     case 'heart-limit-change':
       return 'きらめき上限を変更する。';
+    case 'heart-limit-boost':
+      return 'きらめき上限変更の効果量を増幅する。';
     case 'additional-heart-induce':
       return '条件に一致したアクションの使用後、追加のきらめきを生成する。';
     case 'induce-skill-effect':

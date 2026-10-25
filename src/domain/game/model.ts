@@ -36,6 +36,7 @@ import type {
 } from './modelTypes';
 import type { ProxyAbsorption } from './proxySkillTypes';
 import type { IngameMission, IngameMissionGroup } from './ingameMissionTypes';
+import type { HeartLimitAdditionalBuff } from './heartLimitBoostTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -169,6 +170,8 @@ export type GameState = Readonly<{
     deactivationKey: string | null;
   }>[];
   nextHeartLimitBuffId: number;
+  heartLimitAdditionalBuffs: readonly HeartLimitAdditionalBuff[];
+  nextHeartLimitAdditionalBuffId: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
     shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];
@@ -319,7 +322,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mood-change-skill'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-mood-change-skill'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-heart-limit-boost'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,
