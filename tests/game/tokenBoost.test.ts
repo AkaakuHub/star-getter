@@ -5,6 +5,7 @@ import {
   requestTokenCard,
   requestTokens,
 } from '../../src/domain/game/cards/tokens';
+import { boostTokenRequests } from '../../src/domain/game/cards/tokenBoost';
 import { applyEffect } from '../../src/domain/game/effects';
 import { act } from '../../src/domain/game/actions';
 import { advanceTo } from '../../src/domain/game/simulation';
@@ -214,6 +215,27 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
   state = finishTokenGeneration(state, source.id);
   expect(state.deck.filter((card) => card.id.startsWith('action28-template-'))).toHaveLength(2);
   expect(state.tokenBoosts).toHaveLength(0);
+});
+
+it('ActionType28は各加算バフ後にfloat32へ戻す', () => {
+  const initial = game('library');
+  const tokenBoosts = [1, 2].map(() => ({
+    calculation: 'add' as const,
+    value: 1,
+    target: { kind: 'all' as const },
+    remainingUses: null,
+    remainingSeconds: null,
+    remainingSections: null,
+    deactivationKey: null,
+  }));
+  const state = { ...initial, tokenBoosts };
+  const result = boostTokenRequests(
+    state,
+    [{ template: { kind: 'token-kind', token: 'story' }, count: 16_777_216 }],
+    null,
+    false,
+  );
+  expect(result.counts).toEqual([16_777_216]);
 });
 
 it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocationTypeを反映する', () => {

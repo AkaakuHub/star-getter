@@ -40,11 +40,10 @@ export function boostTokenRequests(
           )
         : [];
     for (const { index } of matching) used.add(index);
-    let value = request.count;
+    let value = Math.fround(request.count);
     for (const { boost } of matching) {
-      if (boost.calculation === 'add') value += Math.fround(boost.value);
+      if (boost.calculation === 'add') value = Math.fround(value + Math.fround(boost.value));
     }
-    value = Math.fround(value);
     const percent = matching.reduce(
       (sum, { boost }) =>
         boost.calculation === 'multiply-percent'
