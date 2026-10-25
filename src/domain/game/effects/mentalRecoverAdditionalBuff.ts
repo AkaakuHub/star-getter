@@ -1,7 +1,6 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
-import { roundToEvenFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   MentalRecoverAdditionalBuffEffect,
@@ -26,16 +25,16 @@ export function activateMentalRecoverAdditionalBuff(
       )
     : 0;
   const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
-  const value = roundToEvenFloat32(
+  const value = toInt32(
     Math.fround(
       Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
         Math.fround(multiplier),
     ),
   );
-  if (value > 0 && !source) throw new Error('元気回復追加バフの発動元カードがありません。');
-  const boosted =
-    value > 0 && source ? applyAction52SkillBoost(state, source, value) : { state, value };
-  const percent = value > 0 && source ? toInt32(boosted.value) : value;
+  if (value <= 0) return state;
+  if (!source) throw new Error('元気回復追加バフの発動元カードがありません。');
+  const boosted = applyAction52SkillBoost(state, source, value);
+  const percent = toInt32(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['mentalRecoverAdditionalBuffs'][number] = {
     id: boosted.state.nextSkillAdditionalBuffId,

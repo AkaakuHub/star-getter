@@ -105,7 +105,7 @@ it('ActionType32の登録値にActionType52を適用する', () => {
   expect(additional.action52Buffs).toHaveLength(0);
 });
 
-it('ActionType32は正負の小数追加率をC#のMathf.Roundで登録する', () => {
+it('ActionType32は小数の追加率をC#のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
@@ -125,5 +125,5 @@ it('ActionType32は正負の小数追加率をC#のMathf.Roundで登録する', 
     );
     return changed.mentalRecoverAdditionalBuffs[0]?.percent;
   });
-  expect(percentages).toEqual([1, -1, 0, 2]);
+  expect(percentages).toEqual([undefined, undefined, undefined, 1]);
 });
