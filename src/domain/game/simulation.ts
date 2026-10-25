@@ -68,6 +68,7 @@ export function createGame(
     tokenGroups: [],
     tokenBoosts: [],
     handLimit: rules.handSize,
+    proxyAbsorptions: [],
     handLimitEffects: [],
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },

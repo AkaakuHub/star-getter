@@ -163,6 +163,16 @@ export type TokenBoost = Readonly<{
   remainingSeconds: number | null;
   remainingSections: number | null;
 }>;
+export type ProxyAbsorption = Readonly<{
+  sourceId: string;
+  hasAbsorbLimit: boolean;
+  isAbsoluteAdd: boolean;
+  effects: readonly Readonly<{
+    actionType: number;
+    targetAmount: bigint;
+    totalAmount: bigint;
+  }>[];
+}>;
 
 type EffectShape =
   | Readonly<{

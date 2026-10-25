@@ -15,6 +15,8 @@ export function applyHandLimit(
       skillValue(state, baseAmount, { kind: 'hand-limit', amount: baseAmount }, card) * multiplier,
     ),
   );
+  const absorption = amount >= 0 ? absorbHandLimit(state, amount) : null;
+  const appliedAmount = absorption?.absorbed ? 0 : amount;
   const activation = state.activation;
   const handLimitEffects =
     amount === 0
@@ -22,7 +24,8 @@ export function applyHandLimit(
       : [
           ...state.handLimitEffects,
           {
-            amount,
+            amount: appliedAmount,
+            expirationAmount: -amount,
             remainingSeconds:
               duration?.kind === 'milliseconds' ? Math.fround(duration.value / 1000) : null,
             remainingSections: duration?.kind === 'sections' ? duration.value : null,
@@ -30,16 +33,17 @@ export function applyHandLimit(
         ];
   return {
     ...state,
-    handLimit: state.handLimit + amount,
+    handLimit: state.handLimit + appliedAmount,
     handLimitEffects,
-    ...(activation && card && amount !== 0
+    ...(activation && card && appliedAmount !== 0
       ? {
           activation: {
             ...activation,
-            handCountChanges: { ...activation.handCountChanges, [card.id]: amount },
+            handCountChanges: { ...activation.handCountChanges, [card.id]: appliedAmount },
           },
         }
       : {}),
+    ...(absorption ? { proxyAbsorptions: absorption.absorptions } : {}),
   };
 }
 
@@ -71,14 +75,53 @@ function expireHandLimitEffects(
   const handLimitEffects = state.handLimitEffects.flatMap((effect) => {
     const next = advance(effect);
     if (next) return [next];
-    expiredAmount += effect.amount;
+    expiredAmount += effect.expirationAmount;
     return [];
   });
   if (expiredAmount === 0) return { state: { ...state, handLimitEffects }, handAdjustment: 0 };
-  const resetAmount = -expiredAmount;
+  const resetAmount = expiredAmount;
   const minimumCorrection = state.handLimit > 3 ? 0 : state.handLimit - 3;
   return {
     state: { ...state, handLimit: state.handLimit + resetAmount, handLimitEffects },
     handAdjustment: Math.max(0, minimumCorrection + resetAmount),
   };
+}
+
+function absorbHandLimit(
+  state: GameState,
+  amount: number,
+): Readonly<{ absorptions: GameState['proxyAbsorptions']; absorbed: boolean }> | null {
+  for (
+    let absorptionIndex = 0;
+    absorptionIndex < state.proxyAbsorptions.length;
+    absorptionIndex += 1
+  ) {
+    const absorption = state.proxyAbsorptions[absorptionIndex];
+    if (!absorption) continue;
+    for (let effectIndex = 0; effectIndex < absorption.effects.length; effectIndex += 1) {
+      const effect = absorption.effects[effectIndex];
+      if (!effect) continue;
+      if (effect.actionType !== 20) continue;
+      if (absorption.hasAbsorbLimit && isAbsorptionTargetReached(absorption, effect))
+        return { absorptions: state.proxyAbsorptions, absorbed: true };
+      const totalAmount = effect.totalAmount + BigInt(amount);
+      const effects = absorption.effects.map((item, index) =>
+        index === effectIndex ? { ...item, totalAmount } : item,
+      );
+      const absorptions = state.proxyAbsorptions.map((item, index) =>
+        index === absorptionIndex ? { ...item, effects } : item,
+      );
+      return { absorptions, absorbed: true };
+    }
+  }
+  return null;
+}
+
+function isAbsorptionTargetReached(
+  absorption: GameState['proxyAbsorptions'][number],
+  effect: GameState['proxyAbsorptions'][number]['effects'][number],
+): boolean {
+  if (effect.actionType === 48 && !absorption.isAbsoluteAdd && effect.targetAmount < 0n)
+    return effect.totalAmount <= effect.targetAmount;
+  return effect.totalAmount >= effect.targetAmount;
 }

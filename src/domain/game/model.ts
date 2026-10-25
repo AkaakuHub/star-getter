@@ -21,6 +21,7 @@ import type {
   ParameterValueFactor,
   ParameterValueChangeEffect,
   TokenBoost,
+  ProxyAbsorption,
 } from './modelTypes';
 
 export type { MoodBonus, SearchRequest } from './modelTypes';
@@ -186,8 +187,10 @@ export type GameState = Readonly<{
   }>[];
   tokenBoosts: readonly TokenBoost[];
   handLimit: number;
+  proxyAbsorptions: readonly ProxyAbsorption[];
   handLimitEffects: readonly Readonly<{
     amount: number;
+    expirationAmount: number;
     remainingSeconds: number | null;
     remainingSections: number | null;
   }>[];
