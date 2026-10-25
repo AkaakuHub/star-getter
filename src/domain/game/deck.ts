@@ -182,6 +182,25 @@ function validateEffect(effect: Effect): void {
       throw new Error('熱気変換の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'mental-heart-induce') {
+    const validDuration = (duration: typeof effect.duration, allowStage: boolean) =>
+      (duration.kind === 'milliseconds' ||
+        duration.kind === 'sections' ||
+        (allowStage && duration.kind === 'stage')) &&
+      Number.isSafeInteger(duration.value) &&
+      duration.value >= (duration.kind === 'sections' ? 1 : 0);
+    if (
+      !Number.isSafeInteger(effect.num) ||
+      ![0, 1].includes(effect.disabledType) ||
+      !Number.isSafeInteger(effect.disabledValue) ||
+      !validDuration(effect.duration, true) ||
+      !validDuration(effect.heartDuration, true) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('精神力連動ハート生成の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'skill-boost') {
     const duration = effect.duration;
     if (

@@ -4,6 +4,7 @@ import { changeBloomResource } from './bloom';
 import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
 import type { Card } from './model';
 import { convertVoltageIncrease } from './effects/voltageConversion';
+import { induceMentalHearts } from './effects/mentalHeartInduce';
 
 export function changeResource(
   state: GameState,
@@ -40,7 +41,11 @@ export function changeResource(
       : resource === 'excitement'
         ? voltageThreshold(state.maximumVoltageLevel)
         : 100;
-  return { ...state, [resource]: Math.max(0, Math.min(maximum, state[resource] + Number(amount))) };
+  const nextValue = Math.max(0, Math.min(maximum, state[resource] + Number(amount)));
+  const next = { ...state, [resource]: nextValue };
+  return resource === 'stamina' && nextValue !== state.stamina
+    ? induceMentalHearts(next, Math.trunc(nextValue))
+    : next;
 }
 
 export function decreaseMentalNaturally(state: GameState): GameState {
@@ -96,10 +101,11 @@ export function expireGaugeInfinities(
       return [{ ...infinity, remainingSections: remaining }];
     return [infinity];
   });
-  let next = { ...state, gaugeInfinities: active };
+  let next: GameState = { ...state, gaugeInfinities: active };
   for (const gauge of ended) {
     if (active.some((infinity) => infinity.gauge === gauge)) continue;
-    if (gauge === 'mental') next = { ...next, stamina: 100, mentalTimerSeconds: 0 };
+    if (gauge === 'mental')
+      next = induceMentalHearts({ ...next, stamina: 100, mentalTimerSeconds: 0 }, 100);
     if (gauge === 'voltage') {
       next = {
         ...next,

@@ -1,5 +1,6 @@
 import { voltageThreshold } from '../live/voltageLevel';
 import type { Effect, GameState } from '../model';
+import { induceMentalHearts } from './mentalHeartInduce';
 
 export function activateInfinityGauge(
   state: GameState,
@@ -23,6 +24,6 @@ export function activateInfinityGauge(
   const next = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
   if (effect.gauge === 'ap') return { ...next, energy: next.maxEnergy };
   if (effect.gauge === 'mental' && firstActivation && !state.resting)
-    return { ...next, stamina: 100, mentalTimerSeconds: 0 };
+    return induceMentalHearts({ ...next, stamina: 100, mentalTimerSeconds: 0 }, 100);
   return { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
 }

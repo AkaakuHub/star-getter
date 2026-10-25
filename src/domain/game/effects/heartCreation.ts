@@ -1,9 +1,21 @@
 import { beatHeartCount } from '../beat';
-import { addHearts } from '../hearts';
+import { addHearts, addHeartsWithLifeTime } from '../hearts';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { skillValue } from './skillValue';
 import { consumeHeartBoosts } from '../live/heartBoosts';
 import type { Card, GameState } from '../model';
+
+export function createSkillHearts(
+  state: GameState,
+  count: number,
+  lifetimeSeconds: number,
+  card: Card | undefined,
+): GameState {
+  const base = Math.max(0, count);
+  const boosted = consumeHeartBoosts(state, card, base);
+  const created = Math.max(1, Math.trunc(Math.fround(base + (base * boosted.percent) / 100)));
+  return addHeartsWithLifeTime(boosted.state, created, lifetimeSeconds);
+}
 
 export function createHeartsFromEffect(
   state: GameState,

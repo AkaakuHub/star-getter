@@ -4,6 +4,7 @@ import { changeResource, decreaseMentalNaturally } from './resources';
 import { mentalDecreaseInterval } from './live/mentalBarriers';
 import { durationSeconds } from './projection';
 import { apIncreaseIntervalSeconds } from './effects/apSpeed';
+import { induceMentalHearts } from './effects/mentalHeartInduce';
 
 export function advanceAutomaticGauges(state: GameState, dt: number): GameState {
   const stage = state.track.stage;
@@ -56,7 +57,10 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       100,
       Math.fround(next.stamina + Math.fround(Math.fround(60 * Math.fround(dt)) / recoveryTime)),
     );
-    return { ...next, mentalTimerSeconds, stamina, resting: stamina < 60 };
+    const recovered = { ...next, mentalTimerSeconds, stamina, resting: stamina < 60 };
+    return stamina !== next.stamina
+      ? induceMentalHearts(recovered, Math.trunc(stamina))
+      : recovered;
   }
   const mentalInterval = mentalDecreaseInterval(next, stage.mentalDecreaseIntervalSeconds);
   if (mentalInterval <= 0) {

@@ -1,9 +1,9 @@
 import type { Card, Effect, GameState } from '../model';
 import type { VoltageConversion, VoltageConvertEffect } from '../voltageConversionTypes';
-import { addHearts } from '../hearts';
 import { addMentalBarrier } from '../live/mentalBarriers';
 import { applyAdditionalBuff } from './additionalBuff';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { createSkillHearts } from './heartCreation';
 import { changeResource } from '../resources';
 
 export function activateVoltageConversion(
@@ -64,7 +64,14 @@ export function convertVoltageIncrease(
     const buffed = card
       ? applyAdditionalBuff(next, 'attract', base, card)
       : { state: next, value: base };
-    next = addHearts(buffed.state, Math.trunc(buffed.value));
+    next = createSkillHearts(
+      buffed.state,
+      Math.trunc(buffed.value),
+      conversion.outputDuration.kind === 'milliseconds'
+        ? Math.fround(conversion.outputDuration.value / 1000)
+        : 9_999,
+      card,
+    );
   } else if (conversion.destination === 'love') {
     const base = Math.trunc(raw);
     const buffed = card

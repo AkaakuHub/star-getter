@@ -19,6 +19,10 @@ import {
   resolveStarGatherHeartDrawCount,
 } from './live/heartPresentation';
 import { expireGaugeInfinities } from './resources';
+import {
+  advanceMentalHeartInducers,
+  expireMentalHeartInducerSections,
+} from './effects/mentalHeartInduce';
 import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
@@ -97,6 +101,8 @@ export function createGame(
     apTimeEffects: [],
     voltageConversions: [],
     action52Buffs: [],
+    mentalHeartInducers: [],
+    nextMentalHeartInducerId: 1,
     nextVoltageConversionId: 1,
     nextAction52BuffId: 1,
     temporaryScoreBoosts: [],
@@ -194,18 +200,21 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = advanceAction52SkillBoosts(
-    advanceVoltageConversions(
-      advanceApSpeedEffects(
-        removeExhaustedMentalBarriers(
-          expireMentalBarriers(
-            advanceGaugeRegenerations(
-              expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+  const gauges = advanceMentalHeartInducers(
+    advanceAction52SkillBoosts(
+      advanceVoltageConversions(
+        advanceApSpeedEffects(
+          removeExhaustedMentalBarriers(
+            expireMentalBarriers(
+              advanceGaugeRegenerations(
+                expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+                dt,
+              ),
+              'milliseconds',
               dt,
             ),
-            'milliseconds',
-            dt,
           ),
+          dt,
         ),
         dt,
       ),
@@ -246,6 +255,7 @@ function advanceTick(state: GameState): GameState {
     next = expireApSpeedSections(next);
     next = expireVoltageConversionSections(next);
     next = expireAction52SkillBoostSections(next);
+    next = expireMentalHeartInducerSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;

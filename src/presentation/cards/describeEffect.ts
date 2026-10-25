@@ -66,6 +66,8 @@ export function describeEffect(effect: Effect): string {
       return 'エナジーの回復速度を変化させる。';
     case 'voltage-convert':
       return '熱気の増加を別の効果に変換する。';
+    case 'mental-heart-induce':
+      return '元気が変化するたび、きらめきを生成する。';
     case 'mental-shield':
       return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
     case 'cost-reduction':

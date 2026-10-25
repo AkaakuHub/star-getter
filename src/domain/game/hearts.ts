@@ -3,13 +3,14 @@ import { flushDeckActions } from './cards/boardActions';
 import { type GameState, rules } from './model';
 import { collectionScore, limitValue } from './scoring';
 import { collectStarGatherHeartRuntime, advanceStarGatherHeartRuntime } from './live/heartRuntime';
-import { spawnStarGatherBeatHearts } from './live/heartSpawn';
+import { spawnStarGatherHearts } from './live/heartSpawn';
 import { starGatherHeartCount } from './live/heartState';
 import { createRangeRandom } from './random';
 import { advanceHandCollectionAbilities } from './cards/collectionAbilities';
 import { recordScoreHistory } from './scoreHistory';
 import { voltageLevel } from './live/voltageLevel';
 import { expireConvertedScoreBoostsOnHeartCollect } from './effects/voltageConversion';
+import { absorbSkillEffect } from './effects/proxySkill';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -114,9 +115,19 @@ export function collectHearts(state: GameState): GameState {
 }
 
 export function addHearts(state: GameState, count: number): GameState {
+  return addHeartsWithLifeTime(state, count, state.hearts.baseLifeTimeSeconds);
+}
+
+export function addHeartsWithLifeTime(
+  state: GameState,
+  count: number,
+  lifeTimeSeconds: number,
+): GameState {
   if (count === 0) return state;
+  const absorption = absorbSkillEffect(state, 1, BigInt(count));
+  if (absorption.absorbed) return absorption.state;
   const random = createRangeRandom(state.heartRandomSeed);
-  const spawned = spawnStarGatherBeatHearts(state.hearts, count, random.range);
+  const spawned = spawnStarGatherHearts(state.hearts, count, lifeTimeSeconds, random.range);
   return awardHearts(
     { ...state, hearts: spawned.state, heartRandomSeed: random.seed },
     spawned.overflowCount,

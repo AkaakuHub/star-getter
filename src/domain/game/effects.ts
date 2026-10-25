@@ -33,6 +33,7 @@ import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
 import { activateVoltageConversion } from './effects/voltageConversion';
+import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -280,6 +281,8 @@ export function applyEffect(
     }
     case 'voltage-convert':
       return activateVoltageConversion(state, effect, card, multiplier, addValue);
+    case 'mental-heart-induce':
+      return activateMentalHeartInduce(state, effect, card, multiplier, addValue);
     case 'skill-boost':
       return activateAction52SkillBoost(state, effect);
     case 'stamina':

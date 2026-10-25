@@ -47,7 +47,7 @@ export function spawnStarGatherBeatHearts(
   return spawnStarGatherHearts(state, requestedCount, state.baseLifeTimeSeconds, randomRange);
 }
 
-function spawnStarGatherHearts(
+export function spawnStarGatherHearts(
   state: StarGatherHeartRuntimeState,
   requestedCount: number,
   lifeTimeSeconds: number,

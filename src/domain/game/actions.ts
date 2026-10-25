@@ -16,6 +16,7 @@ import { deactivateApSpeedEffects } from './effects/apSpeed';
 import { deactivateVoltageConversions } from './effects/voltageConversion';
 import { deactivateAction52SkillBoosts } from './effects/action52SkillBoost';
 import { restoreHandLimitCount } from './cards/drawing';
+import { deactivateMentalHeartInducers } from './effects/mentalHeartInduce';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -43,6 +44,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateVoltageConversions(state, action.deactivationKey);
     case 'deactivate-skill-boost':
       return deactivateAction52SkillBoosts(state, action.deactivationKey);
+    case 'deactivate-mental-heart-induce':
+      return deactivateMentalHeartInducers(state, action.deactivationKey);
   }
 }
 
