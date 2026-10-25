@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { activateBloom, changeBloomResource, finishBloom } from '../../src/domain/game/bloom';
 import { applyEffect } from '../../src/domain/game/effects';
+import { calculateStarGatherGenesisGaugeDelta } from '../../src/domain/game/live/genesisGauge';
 import { rules } from '../../src/domain/game/model';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { canUseSpecial } from '../../src/domain/game/special';
@@ -15,6 +16,25 @@ function active() {
 }
 
 describe('開花の専用ゲージ', () => {
+  it('AP・元気・熱気の換算量をC#と同じく0方向へ切り捨てる', () => {
+    expect(
+      calculateStarGatherGenesisGaugeDelta({
+        actionType: 14,
+        gaugeType: 3,
+        effectValue: 1,
+        currentGenesisEffectValue: 1,
+      }),
+    ).toBe(7);
+    expect(
+      calculateStarGatherGenesisGaugeDelta({
+        actionType: 14,
+        gaugeType: 3,
+        effectValue: -1,
+        currentGenesisEffectValue: 1,
+      }),
+    ).toBe(-7);
+  });
+
   it('2³¹−1に達し、超えると符号付き32bitのオーバーフローで0へ戻る', () => {
     const state = active();
     if (!state.bloom) throw new Error('開花が発動していません。');
@@ -57,17 +77,17 @@ describe('開花の専用ゲージ', () => {
     expect(changed.stats.cardsUsed).toBe(0);
   });
 
-  it('AP・元気・熱気をそれぞれの倍率で切り上げて変換し、通常値を更新しない', () => {
+  it('AP・元気・熱気をそれぞれの倍率で切り捨てて変換し、通常値を更新しない', () => {
     const state = active();
     expect(state.bloom?.progress).toBe(30n);
     let changed = changeBloomResource(state, 'energy', 9n);
-    expect(changed.bloom?.progress).toBe(52n);
+    expect(changed.bloom?.progress).toBe(51n);
     changed = changeBloomResource(changed, 'stamina', 100n);
-    expect(changed.bloom?.progress).toBe(72n);
+    expect(changed.bloom?.progress).toBe(71n);
     changed = changeBloomResource(changed, 'excitement', 2n);
-    expect(changed.bloom?.progress).toBe(74n);
+    expect(changed.bloom?.progress).toBe(72n);
     changed = changeBloomResource(changed, 'energy', -4n);
-    expect(changed.bloom?.progress).toBe(59n);
+    expect(changed.bloom?.progress).toBe(58n);
     expect([changed.energy, changed.stamina, changed.excitement]).toEqual([0, 80, 40]);
     expect(finishBloom(changed).bloom).toBeNull();
     expect(finishBloom(changed).stamina).toBe(80);
