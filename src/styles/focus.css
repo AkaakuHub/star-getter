@@ -23,3 +23,17 @@
 button.heart-field:focus-visible {
   background-color: #17132440;
 }
+
+@media (forced-colors: active) {
+  :is(button, a, input, select, textarea):focus-visible:not(:disabled) {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  :is(.hand-card, .card-browser-card, .special-portrait):focus-visible:not(:disabled)
+    > :is(.hand-name, .hand-cost, .special-cost) {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
