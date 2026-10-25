@@ -37,6 +37,22 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
   expect(second.useInduceActivationCounts[`${card.id}:induce-2`]).toBe(2);
 });
 
+it('ActionType905の発動上限をC#のint32へ変換する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const effect = {
+    kind: 'use-induce' as const,
+    sourceEffectId: 'induce-3',
+    limit: 4_294_967_296,
+    effects: [{ kind: 'energy' as const, amount: 1 }],
+  };
+  const first = applyEffect({ ...initial, energy: 0 }, effect, card);
+  const second = applyEffect(first, effect, card);
+  expect(second.energy).toBeGreaterThan(first.energy);
+  expect(second.useInduceActivationCounts[`${card.id}:induce-3`]).toBe(2);
+});
+
 it('使用回数誘発はC#の増加前カウントを使い、要求回数ごとに判定する', () => {
   const initial = game();
   const card = initial.deck[0];
