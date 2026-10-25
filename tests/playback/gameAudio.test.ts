@@ -4,12 +4,13 @@ import { session } from './gameSession';
 describe('ゲーム進行と効果音', () => {
   it('自然出現の生成回数を表示数に依存せず音へ渡す', () => {
     const { controller, clock, frames, audio } = session();
+    const initialGenerations = controller.state.hearts.generationCount;
     controller.setHeartShowLimit(10);
     clock.seconds = 2;
     frames.run(2000);
     expect(controller.state.hearts.generationCount).toBeGreaterThan(0);
     expect(audio.sounds.filter((sound) => sound === 'heart-spawn')).toHaveLength(
-      controller.state.hearts.generationCount,
+      controller.state.hearts.generationCount - initialGenerations,
     );
   });
 
