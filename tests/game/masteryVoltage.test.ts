@@ -2,7 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { changeResource } from '../../src/domain/game/resources';
 import { game } from './support/game';
 
-it('ActionType22のマスタリー電圧ボーナスは正の加算を蓄積し、閾値一致時に付与する', () => {
+it('ActionType22のマスタリー電圧ボーナスは正の加算を蓄積し、閾値以上で付与する', () => {
   const initial = game();
   const state = {
     ...initial,
@@ -19,6 +19,22 @@ it('ActionType22のマスタリー電圧ボーナスは正の加算を蓄積し�
   const reached = changeResource(first, 'excitement', 1n);
   expect(reached.excitement).toBe(18);
   expect(reached.masteryVoltageProgress).toBe(0);
+});
+
+it('ActionType22のマスタリー電圧ボーナスは閾値を超えても1回付与する', () => {
+  const initial = game();
+  const state = {
+    ...initial,
+    excitement: 10,
+    masteryVoltageProgress: 2,
+    track: {
+      ...initial.track,
+      masteryVoltageBonus: { demand: 3, gain: 5 },
+    },
+  };
+  const changed = changeResource(state, 'excitement', 2n);
+  expect(changed.excitement).toBe(17);
+  expect(changed.masteryVoltageProgress).toBe(0);
 });
 
 it('ActionType22のマスタリー電圧ボーナスは負の加算で進行しない', () => {

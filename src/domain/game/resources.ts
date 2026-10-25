@@ -42,7 +42,7 @@ export function changeResource(
     const bonus = state.track.masteryVoltageBonus;
     if (bonus.demand > 0) {
       const progress = Math.fround(state.masteryVoltageProgress + Math.fround(Number(amount)));
-      if (progress === bonus.demand) {
+      if (progress >= bonus.demand) {
         state = { ...state, masteryVoltageProgress: 0 };
         const gained = BigInt(bonus.gain);
         if (gained > 0n) {
