@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { act } from '../../src/domain/game/actions';
 import { evaluateDrawSuccessInduce } from '../../src/domain/game/effects/drawSuccessInduce';
 import { game, withHand } from './support/game';
@@ -66,7 +67,7 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
       handCountChanges: {},
     },
   };
-  const result = applyEffect(
+  const active = applyEffect(
     state,
     {
       kind: 'draw-success-induce',
@@ -89,7 +90,8 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
     },
     card,
   );
-  expect(result.voltageUpAdditionalBuffs).toHaveLength(0);
+  expect(active.voltageUpAdditionalBuffs).toHaveLength(1);
+  expect(finishCardActivation(active, applyEffect).voltageUpAdditionalBuffs).toHaveLength(0);
 });
 
 it('disabledType省略時はbranchType3を継続扱いにする', () => {

@@ -209,6 +209,7 @@ export type GameState = Readonly<{
     returnToDraw: readonly string[];
     excluded: readonly string[];
     handCountChanges: Readonly<Record<string, number>>;
+    pendingHandStatsDeactivationKeys?: readonly string[];
   }> | null;
   randomSeed: number;
   energy: number;

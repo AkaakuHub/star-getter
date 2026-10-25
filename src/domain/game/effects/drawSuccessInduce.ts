@@ -65,7 +65,19 @@ export function activateDrawSuccessInduce(
       apply(next, disabledType === 1 ? child : withDeactivationKey(child, deactivationKey), card),
     state,
   );
-  return disabledType === 1 ? applied : deactivateInducedEffects(applied, deactivationKey);
+  if (disabledType === 1) return applied;
+  const activation = applied.activation;
+  if (!activation) return deactivateInducedEffects(applied, deactivationKey);
+  return {
+    ...applied,
+    activation: {
+      ...activation,
+      pendingHandStatsDeactivationKeys: [
+        ...(activation.pendingHandStatsDeactivationKeys ?? []),
+        deactivationKey,
+      ],
+    },
+  };
 }
 
 function int32(value: bigint): number {

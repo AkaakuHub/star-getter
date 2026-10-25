@@ -166,6 +166,7 @@ function useCard(state: GameState, index: number): GameState {
       returnToDraw: [],
       excluded: [],
       handCountChanges: {},
+      pendingHandStatsDeactivationKeys: [],
     },
   };
   return finishCardActivation(activateCard(activated, source, state.hand, false), applyEffect);

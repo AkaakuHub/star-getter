@@ -4,6 +4,7 @@ import { flushDeckActions } from './boardActions';
 import { fillHand, handCapacity, removeRandomHandCards } from './drawing';
 import type { EffectApplier } from '../effects/induceSkillEffect';
 import { induceCardMoves } from '../effects/cardMoveInduce';
+import { deactivateInducedEffects } from '../effects/effectInduce';
 
 export function finishCardActivation(state: GameState, apply: EffectApplier): GameState {
   const activation = state.activation;
@@ -22,8 +23,12 @@ export function finishCardActivation(state: GameState, apply: EffectApplier): Ga
     ...activation.returnToDraw,
     ...activation.usedCards.filter((id) => state.skillUseDestinations[id] === 'deck'),
   ]);
-  let next = excludeCards(
+  const handStatsCompleted = (activation.pendingHandStatsDeactivationKeys ?? []).reduce(
+    (current, key) => deactivateInducedEffects(current, key),
     disposeHandEffects(state, children),
+  );
+  let next = excludeCards(
+    handStatsCompleted,
     [...excludedIds].filter((id) => id !== source.id),
   );
   const activeChildren = children.filter((id) => next.deck.some((card) => card.id === id));
