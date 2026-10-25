@@ -288,7 +288,7 @@ export function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'mood-value-boost') return validateMoodValueBoost(effect);
   if (effect.kind === 'genesis-skill') return validateGenesisSkill(effect);
-  if (validateSpecialEffect(effect)) return;
+  if (validateSpecialEffect(effect, validateEffect)) return;
   if (effect.kind === 'skill-cost-change') {
     if (
       !Number.isFinite(effect.amount) ||

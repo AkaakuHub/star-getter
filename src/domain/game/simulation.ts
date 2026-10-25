@@ -181,6 +181,7 @@ export function createGame(
     nextSkillCooldownEffectId: 1,
     inducedSkillEffects: [],
     nextInducedSkillEffectId: 1,
+    useInduceActivationCounts: {},
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],

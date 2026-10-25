@@ -9,6 +9,7 @@ import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import { validateHandMaxCardEffect } from './handMaxCardTypes';
 import { validateMentalShieldEffect } from './mentalShieldTypes';
 import { validateFixedParameterExtendEffect } from './fixedParameterExtendTypes';
+import { validateUseInduceEffect } from './useInduceTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -23,11 +24,15 @@ type SpecialEffect = Extract<
       | 'special-appeal-token'
       | 'hand-max-card'
       | 'mental-shield'
-      | 'fixed-parameter-extend';
+      | 'fixed-parameter-extend'
+      | 'use-induce';
   }
 >;
 
-export function validateSpecialEffect(effect: Effect): boolean {
+export function validateSpecialEffect(
+  effect: Effect,
+  validateChild: (effect: Effect) => void,
+): boolean {
   if (!isSpecialEffect(effect)) return false;
   switch (effect.kind) {
     case 'deck-skill-cost-change':
@@ -60,6 +65,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'fixed-parameter-extend':
       validateFixedParameterExtendEffect(effect);
       break;
+    case 'use-induce':
+      validateUseInduceEffect(effect, validateChild);
+      break;
   }
   return true;
 }
@@ -75,6 +83,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'special-appeal-token' ||
     effect.kind === 'hand-max-card' ||
     effect.kind === 'mental-shield' ||
-    effect.kind === 'fixed-parameter-extend'
+    effect.kind === 'fixed-parameter-extend' ||
+    effect.kind === 'use-induce'
   );
 }

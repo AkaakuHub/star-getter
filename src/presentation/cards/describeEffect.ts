@@ -68,6 +68,8 @@ export function describeEffect(effect: Effect): string {
       return `このパート中、空模様を${effect.amount < 0 ? '雨' : '晴れ'}方向へ${Math.abs(effect.amount)}%変化させる。`;
     case 'conditional':
       return `${effectConditions[effect.condition]}のとき、${effect.effects.map(describeEffect).join('')}`;
+    case 'use-induce':
+      return `カード使用時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
     case 'voltage-tier':
       return `熱気Lv.${effect.step}ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * effect.step}以上：${tier.map(describeEffect).join('')}`).join('')}`;
     case 'energy-limit':

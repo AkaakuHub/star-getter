@@ -1,5 +1,12 @@
 export type InduceSkillCondition = 'voltage' | 'mental-recover' | 'mental-barrier';
 
+export type UseInduceEffect = Readonly<{
+  kind: 'use-induce';
+  sourceEffectId: string;
+  limit: number;
+  effects: readonly import('./modelTypes').Effect[];
+}>;
+
 export type InduceSkillEffectInput = Readonly<{
   kind: 'induce-skill-effect';
   condition: InduceSkillCondition;
