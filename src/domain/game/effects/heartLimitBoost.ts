@@ -10,7 +10,7 @@ export function activateHeartLimitBoost(
   multiplier: number,
   addValue: number,
 ): GameState {
-  const num = Math.fround(effect.num / 10_000);
+  const num = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
   if (num < 0) return state;
   const mood =
     effect.bonusMoodTarget === 0
@@ -18,10 +18,12 @@ export function activateHeartLimitBoost(
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          Math.fround(effect.bonusMoodValue / 10_000),
+          Math.fround(Math.fround(effect.bonusMoodValue) / Math.fround(10_000)),
         );
   const value = toSignedInt32(
-    Math.fround(Math.fround(Math.fround(mood + num) + addValue) * multiplier),
+    Math.fround(
+      Math.fround(Math.fround(mood + num) + Math.fround(addValue)) * Math.fround(multiplier),
+    ),
   );
   const suppressed = effect.duration.kind === 'none' || effect.duration.kind === 'stage';
   const buff: GameState['heartLimitAdditionalBuffs'][number] = {

@@ -143,6 +143,30 @@ it('Action49の加算・割合バフをAction25の効果へ順に適用する', 
   expect(multiplied.hearts.heartLimit).toBe(103);
 });
 
+it('Action49は詳細値をfloat32へ変換してからNumToValueを計算する', () => {
+  const state = game();
+  const buff = applyEffect(
+    state,
+    {
+      kind: 'heart-limit-boost',
+      calculationType: 2,
+      num: 16_777_217,
+      bonusMoodTarget: 0,
+      bonusMoodValue: 0,
+      duration: { kind: 'stage', value: 0 },
+      disabledType: 0,
+      disabledCount: 0,
+      target: { kind: 'all' },
+    },
+    undefined,
+    8192,
+  );
+  const value = Math.trunc(
+    Math.fround(Math.fround(Math.fround(16_777_217) / Math.fround(10_000)) * Math.fround(8192)),
+  );
+  expect(buff.heartLimitAdditionalBuffs[0]?.value).toBe(value);
+});
+
 it('Action49の対象と使用回数をAction25の発動カードで判定する', () => {
   const state = game();
   const card = state.deck[0];
