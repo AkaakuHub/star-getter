@@ -47,6 +47,17 @@ export function validateEffect(effect: Effect): void {
     for (const child of effect.effects) validateEffect(child);
     return;
   }
+  if (effect.kind === 'draw-success-induce') {
+    if (
+      effect.sourceEffectId.length === 0 ||
+      typeof effect.branchType !== 'bigint' ||
+      typeof effect.branchValue !== 'bigint' ||
+      (effect.disabledType !== undefined && typeof effect.disabledType !== 'bigint')
+    )
+      throw new Error('ドロー成功時の分岐効果が正しくありません。');
+    for (const child of [...effect.whenTrue, ...effect.whenFalse]) validateEffect(child);
+    return;
+  }
   if (effect.kind === 'voltage-tier') {
     if (effect.tiers.length !== 1000 / effect.step + 1)
       throw new Error('熱気の段階数が正しくありません。');

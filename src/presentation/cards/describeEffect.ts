@@ -12,6 +12,16 @@ export const effectConditions = {
   'last-section': '最後のパート',
 } as const;
 
+const drawSuccessBranchNames: Readonly<Record<number, string>> = {
+  1: '条件なし',
+  2: '元気割合',
+  3: '継続条件',
+  4: '空模様',
+  5: '熱気段階',
+  6: 'パート範囲',
+  7: 'パート番号',
+};
+
 export function describeEffect(effect: Effect): string {
   switch (effect.kind) {
     case 'branch':
@@ -68,6 +78,8 @@ export function describeEffect(effect: Effect): string {
       return `このパート中、空模様を${effect.amount < 0 ? '雨' : '晴れ'}方向へ${Math.abs(effect.amount)}%変化させる。`;
     case 'conditional':
       return `${effectConditions[effect.condition]}のとき、${effect.effects.map(describeEffect).join('')}`;
+    case 'draw-success-induce':
+      return `${drawSuccessBranchNames[Number(BigInt.asIntN(32, effect.branchType))] ?? '不明な条件'}の条件に応じて${effect.whenTrue.map(describeEffect).join('')}${effect.whenFalse.length ? `それ以外では${effect.whenFalse.map(describeEffect).join('')}` : ''}`;
     case 'use-induce':
       return `カード使用時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
     case 'use-count-induce':

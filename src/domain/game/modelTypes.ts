@@ -34,6 +34,7 @@ import type { RecoverMentalSkillEffect } from './recoverMentalSkillTypes';
 import type { GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import type { AddVoltageSkillEffect } from './addVoltageTypes';
 import type { ReshuffleSkillEffect } from './reshuffleSkillTypes';
+import type { DrawSuccessInduceEffect } from './drawSuccessInduceTypes';
 export type { GaugeRegeneration, GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
@@ -213,6 +214,7 @@ type EffectShape =
       condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
       effects: readonly Effect[];
     }>
+  | DrawSuccessInduceEffect
   | InduceEffect
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
   | Readonly<{ kind: 'ingame-mission'; groupId: number }>

@@ -201,6 +201,7 @@ export type GameState = Readonly<{
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];
+    handCardStatsAtUse: Readonly<Record<string, HandCardStats>>;
     allHand: boolean;
     skipSourceRefill?: boolean;
     recoverDiscard: boolean;

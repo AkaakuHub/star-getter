@@ -14,6 +14,7 @@ import { activateBeatPointBuff } from './beatPointBuff';
 import { activateRecoverMentalSkill } from './recoverMentalSkill';
 import { activateAddVoltageSkill } from './addVoltageSkill';
 import { activateReshuffleSkill } from './reshuffleSkill';
+import { activateDrawSuccessInduce } from './drawSuccessInduce';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -56,5 +57,7 @@ export function dispatchEarlyEffect(
   if (effect.kind === 'add-voltage-skill')
     return activateAddVoltageSkill(state, effect, card, multiplier, addValue, effectPower, apply);
   if (effect.kind === 'reshuffle-skill') return activateReshuffleSkill(state, effect, card);
+  if (effect.kind === 'draw-success-induce')
+    return activateDrawSuccessInduce(state, effect, card, apply);
   return undefined;
 }

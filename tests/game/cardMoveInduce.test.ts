@@ -12,6 +12,7 @@ function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
       activation: {
         sourceId: cardId,
         usedCards: [cardId],
+        handCardStatsAtUse: {},
         allHand: false,
         recoverDiscard: false,
         returnToDraw: [],
@@ -48,6 +49,7 @@ it('代理カードの捨て札行きで使用回数・上限を判定する', (
         activation: {
           sourceId: source.id,
           usedCards: [source.id],
+          handCardStatsAtUse: {},
           allHand: false,
           recoverDiscard: false,
           returnToDraw: [],
@@ -93,6 +95,7 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
       activation: {
         sourceId: source.id,
         usedCards: [source.id],
+        handCardStatsAtUse: {},
         allHand: false,
         recoverDiscard: false,
         returnToDraw: [],

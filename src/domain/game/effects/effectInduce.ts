@@ -128,13 +128,68 @@ function isEffectInducerActive(
   }
 }
 
-function withDeactivationKey(effect: Effect, deactivationKey: string): Effect {
+export function withDeactivationKey(effect: Effect, deactivationKey: string): Effect {
   if ('deactivationKey' in effect) return { ...effect, deactivationKey };
   switch (effect.kind) {
-    case 'boost':
+    case 'infinity-gauge':
     case 'mental-barrier':
+    case 'token-deck-split':
+    case 'token-boost':
+    case 'hand-limit':
+    case 'heart-limit-change':
+    case 'search':
+    case 'ap-speed-change':
+    case 'voltage-convert':
+    case 'mental-heart-induce':
+    case 'additional-heart-induce':
+    case 'combo-induce':
+    case 'skill-boost':
+    case 'skill-cooldown':
+    case 'induce-skill-effect':
+    case 'disable-mental-down':
+    case 'beat-heart-value-buff':
+    case 'beat-point-buff':
+    case 'heart-boost':
+    case 'heart-limit-boost':
+    case 'mood-value-boost':
+    case 'hand-max-card':
+    case 'love-up-additional-buff':
+    case 'recover-mental-additional-buff':
+    case 'mental-barrier-additional-buff':
+    case 'skill-cost-change':
+    case 'stop-voltage-increase':
+    case 'boost':
+    case 'amplify':
+    case 'mood-change-skill':
       return { ...effect, deactivationKey };
+    case 'branch':
+      return {
+        ...effect,
+        whenTrue: effect.whenTrue.map((child) => withDeactivationKey(child, deactivationKey)),
+        whenFalse: effect.whenFalse.map((child) => withDeactivationKey(child, deactivationKey)),
+      };
+    case 'conditional':
+      return {
+        ...effect,
+        effects: effect.effects.map((child) => withDeactivationKey(child, deactivationKey)),
+      };
+    case 'draw-success-induce':
+      return {
+        ...effect,
+        whenTrue: effect.whenTrue.map((child) => withDeactivationKey(child, deactivationKey)),
+        whenFalse: effect.whenFalse.map((child) => withDeactivationKey(child, deactivationKey)),
+      };
     default:
       return effect;
   }
+}
+
+export function deactivateInducedEffects(state: GameState, deactivationKey: string): GameState {
+  let next = state;
+  for (const createAction of deactivationActions) next = act(next, createAction(deactivationKey));
+  next = {
+    ...next,
+    boosts: next.boosts.filter((boost) => boost.deactivationKey !== deactivationKey),
+  };
+  return deactivateMentalBarriers(next, deactivationKey);
 }

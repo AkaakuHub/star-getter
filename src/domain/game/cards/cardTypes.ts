@@ -52,6 +52,7 @@ export type Card = Readonly<{
   handPermanentEffects?: readonly HandPermanentEffect[];
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
+  ability893Effects?: readonly Effect[];
   drawEffects?: readonly Effect[];
   beforeUseEffects?: readonly Effect[];
   handUse?: Readonly<{

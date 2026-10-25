@@ -145,6 +145,7 @@ function useCard(state: GameState, index: number): GameState {
     activation: {
       sourceId: source.id,
       usedCards: [],
+      handCardStatsAtUse: {},
       allHand: source.effects.some((effect) => effect.kind === 'use-hand'),
       skipSourceRefill: false,
       recoverDiscard: false,
@@ -164,12 +165,19 @@ function activateCard(
 ): GameState {
   if (!state.activation) throw new Error('カードの使用処理がありません。');
   const usedSkillCost = cardCost(state, card, allHand);
+  const handCardStatsAtUse = { ...state.activation.handCardStatsAtUse };
+  const handCardStats = state.handCardStats[card.id];
+  if (handCardStats) handCardStatsAtUse[card.id] = handCardStats;
   let next: GameState = {
     ...state,
     onceSkillCostChanges: Object.fromEntries(
       Object.entries(state.onceSkillCostChanges).filter(([id]) => id !== card.id),
     ),
-    activation: { ...state.activation, usedCards: [...state.activation.usedCards, card.id] },
+    activation: {
+      ...state.activation,
+      usedCards: [...state.activation.usedCards, card.id],
+      handCardStatsAtUse,
+    },
     lastActionTick: state.tick,
     lastPerformer: card.performer,
     lastUsedMember: card.member,
@@ -198,20 +206,22 @@ function activateCard(
   next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
   next = notifyComboSkillPoint(next, card, usedSkillCost);
   for (const effect of card.effects) {
-    if (effect.kind === 'use-hand') {
-      if (allHand) continue;
-      next = { ...next, modes: { ...next.modes, held: true } };
-      const children = [...next.hand];
-      for (const id of children) {
-        const child = next.deck.find((item) => item.id === id);
-        if (child)
-          next = activateCard(next, resolveModeSkill(child, next.modes), initialHand, true);
-      }
-      next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
-    } else {
-      const beforeEffect = next;
-      next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
+    if (effect.kind === 'use-hand') continue;
+    const beforeEffect = next;
+    next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
+  }
+  for (const effect of card.ability893Effects ?? []) {
+    next = applyEffect(next, effect, card);
+  }
+  for (const effect of card.effects) {
+    if (effect.kind !== 'use-hand' || allHand) continue;
+    next = { ...next, modes: { ...next.modes, held: true } };
+    const children = [...next.hand];
+    for (const id of children) {
+      const child = next.deck.find((item) => item.id === id);
+      if (child) next = activateCard(next, resolveModeSkill(child, next.modes), initialHand, true);
     }
+    next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
   }
   next = advanceProxySkillUses(
     applyUseAbility(finishTokenGeneration(next, card.id), card),

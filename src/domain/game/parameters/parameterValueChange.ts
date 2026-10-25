@@ -78,6 +78,7 @@ export function initializeParameterValueFactors(
   for (const card of cards) {
     const effects = [
       ...card.effects,
+      ...(card.ability893Effects ?? []),
       ...(card.drawEffects ?? []),
       ...(card.beforeUseEffects ?? []),
       ...(card.handUse?.effects ?? []),
@@ -126,9 +127,11 @@ function collectNestedEffects(effect: Effect): readonly Effect[] {
       ? [...effect.whenTrue, ...effect.whenFalse]
       : effect.kind === 'conditional' || effect.kind === 'mode-reaction'
         ? effect.effects
-        : effect.kind === 'voltage-tier'
-          ? effect.tiers.flat()
-          : [];
+        : effect.kind === 'draw-success-induce'
+          ? [...effect.whenTrue, ...effect.whenFalse]
+          : effect.kind === 'voltage-tier'
+            ? effect.tiers.flat()
+            : [];
   return [effect, ...nested.flatMap(collectNestedEffects)];
 }
 
