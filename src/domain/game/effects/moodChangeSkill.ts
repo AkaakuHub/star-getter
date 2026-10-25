@@ -1,6 +1,5 @@
-import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
-import { moodValue, moodValueWithoutLimit } from '../projection';
+import { moodValueWithoutLimit } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { applyMoodValueAdditionalBuffs } from './moodValueBoost';
 import { absorbSkillEffect } from './proxySkill';
@@ -20,23 +19,12 @@ export function activateMoodChangeSkill(
   const currentMood = moodValueWithoutLimit(state);
   const intNum = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.num))));
   const num = Math.fround(Math.fround(intNum) / Math.fround(10_000));
-  const bonusMood = effect.bonusMood
-    ? calculateSkillMoodCorrection(
-        effect.bonusMood.target,
-        moodValue(state),
-        Math.fround(effect.bonusMood.value / 10_000),
-      )
-    : 0;
   let value: number;
   let calculation: 'add' | 'fixed';
   let isPositive = true;
   switch (effect.calculationType) {
     case 1:
-      value = multiplyFloat32(
-        Math.fround(Math.fround(bonusMood + num) + Math.fround(addValue)),
-        multiplier,
-        effectPower,
-      );
+      value = multiplyFloat32(Math.fround(num + Math.fround(addValue)), multiplier, effectPower);
       calculation = 'add';
       break;
     case 2:
@@ -57,11 +45,7 @@ export function activateMoodChangeSkill(
       break;
     case 4:
       if (currentMood === 0) return state;
-      value = multiplyFloat32(
-        Math.fround(Math.fround(bonusMood + num) + Math.fround(addValue)),
-        multiplier,
-        effectPower,
-      );
+      value = multiplyFloat32(Math.fround(num + Math.fround(addValue)), multiplier, effectPower);
       if (currentMood < 0) value = Math.fround(-value);
       calculation = 'add';
       break;

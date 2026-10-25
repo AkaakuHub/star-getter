@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
-import { moodValue, moodValueWithoutLimit } from '../../src/domain/game/projection';
+import { moodValueWithoutLimit } from '../../src/domain/game/projection';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
@@ -208,23 +208,4 @@ it('Action48は秒・パート期限、期限抑止、外部解除を反映す�
     deactivationKey: 'mood-change',
   });
   expect(deactivated.moodSkillBuffs).toHaveLength(0);
-});
-
-it('Action48の気分補正は現在値に対してC#の対象条件を適用する', () => {
-  const initial = { ...game('library'), moodOffset: 20 };
-  const source = initial.deck[0];
-  if (!source) throw new Error('発動元カードがありません。');
-  const positive = applyEffect(
-    initial,
-    {
-      kind: 'mood-change-skill',
-      calculationType: 1,
-      num: 0,
-      bonusMood: { target: 1, value: 5_000 },
-      duration: { kind: 'stage', value: 0 },
-    },
-    source,
-  );
-  expect(moodValueWithoutLimit(positive)).toBe(30);
-  expect(moodValue(positive)).toBe(30);
 });
