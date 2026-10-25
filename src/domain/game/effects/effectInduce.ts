@@ -31,6 +31,7 @@ const deactivationActions: readonly ((deactivationKey: string) => import('../mod
   (deactivationKey) => ({ type: 'deactivate-gauge-regeneration', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-search', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-heart-boost', deactivationKey }),
+  (deactivationKey) => ({ type: 'deactivate-voltage-up-additional-buff', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-cost-change', deactivationKey }),
 ];
 
@@ -156,6 +157,7 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
     case 'love-up-additional-buff':
     case 'recover-mental-additional-buff':
     case 'mental-barrier-additional-buff':
+    case 'voltage-up-additional-buff':
     case 'skill-cost-change':
     case 'stop-voltage-increase':
     case 'boost':

@@ -19,6 +19,7 @@ import type { ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
 import type { Effect } from './modelTypes';
 import type { Card } from './cards/cardTypes';
+export type { Action } from './actionTypes';
 export type { Card } from './cards/cardTypes';
 import type { TemporaryScoreBoost, VoltageConversion } from './voltageConversionTypes';
 import type { Action52Buff } from './skillBoostTypes';
@@ -318,39 +319,3 @@ export type GameState = Readonly<{
   lastGain: bigint;
   stats: PlayStats;
 }>;
-
-export type Action =
-  | Readonly<{ type: 'start' | 'pause' | 'resume' | 'collect' }>
-  | Readonly<{ type: 'special'; cardId: string }>
-  | Readonly<{ type: 'card'; index: number }>
-  | Readonly<{ type: 'switch-token-deck' }>
-  | Readonly<{ type: 'deactivate-token-deck'; deactivationKey: string }>
-  | Readonly<{ type: 'skip-ingame-mission' }>
-  | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-hand-max-card'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-love-up-additional-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-recover-additional-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-barrier-additional-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-down'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mood-change-skill'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-heart-limit-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mood-value-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-beat-point-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-gauge-regeneration'; deactivationKey: string }>
-  | Readonly<{
-      type: 'deactivate-search' | 'deactivate-heart-boost' | 'deactivate-skill-cost-change';
-      deactivationKey: string;
-    }>;

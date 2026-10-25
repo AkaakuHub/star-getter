@@ -131,6 +131,13 @@ function actInternal(state: GameState, action: Action): GameState {
       return deactivateSearchRequests(state, action.deactivationKey);
     case 'deactivate-heart-boost':
       return deactivateHeartBoosts(state, action.deactivationKey);
+    case 'deactivate-voltage-up-additional-buff':
+      return {
+        ...state,
+        voltageUpAdditionalBuffs: state.voltageUpAdditionalBuffs.filter(
+          (buff) => buff.deactivationKey !== action.deactivationKey,
+        ),
+      };
     case 'deactivate-skill-cost-change':
       return deactivateSkillCostChanges(state, action.deactivationKey);
   }

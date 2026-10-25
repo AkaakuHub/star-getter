@@ -12,6 +12,7 @@ export type VoltageUpAdditionalBuff = Readonly<{
   target: VoltageUpAdditionalBuffTarget;
   remainingSeconds: number | null;
   remainingSections: number | null;
+  deactivationKey: string | null;
 }>;
 
 export type VoltageUpAdditionalBuffEffect = Readonly<{
@@ -24,6 +25,7 @@ export type VoltageUpAdditionalBuffEffect = Readonly<{
   disabledType: number;
   disabledCount: number;
   invocationType?: number;
+  deactivationKey?: string;
 }>;
 
 export function validateVoltageUpAdditionalBuffEffect(effect: VoltageUpAdditionalBuffEffect): void {
@@ -36,7 +38,8 @@ export function validateVoltageUpAdditionalBuffEffect(effect: VoltageUpAdditiona
     (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
     !Number.isSafeInteger(effect.disabledType) ||
     !Number.isSafeInteger(effect.disabledCount) ||
-    (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType))
+    (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+    (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )
     throw new Error('熱気追加バフの設定が正しくありません。');
 }

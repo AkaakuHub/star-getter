@@ -47,7 +47,7 @@ it('Action901はAbility893の発火時にカード使用時点のHandCardStats�
   );
 });
 
-it('disabledType0はHandCardStats終了時に子スキル効果を解除する', () => {
+it('disabledType0はHandCardStats終了時にAction31追加バフを解除する', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('検証用カードがありません。');
@@ -76,18 +76,20 @@ it('disabledType0はHandCardStats終了時に子スキル効果を解除する',
       disabledType: 0n,
       whenTrue: [
         {
-          kind: 'skill-boost',
+          kind: 'voltage-up-additional-buff',
+          calculation: 1,
           num: 500_000,
           target: { kind: 'all' },
           duration: { kind: 'stage', value: 0 },
-          uses: null,
+          disabledType: 0,
+          disabledCount: 0,
         },
       ],
       whenFalse: [],
     },
     card,
   );
-  expect(result.action52Buffs).toHaveLength(0);
+  expect(result.voltageUpAdditionalBuffs).toHaveLength(0);
 });
 
 it('disabledType省略時はbranchType3を継続扱いにする', () => {
