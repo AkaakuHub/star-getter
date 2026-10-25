@@ -77,6 +77,15 @@ function markdown(label: string, recording: GameRecording): string {
         '|',
     );
   }
+  rows.push(
+    '',
+    '最終状態:' +
+      recording.finalState.seconds.toFixed(3) +
+      '秒 / ' +
+      recording.finalState.score +
+      'スター / ' +
+      recording.finalState.phase,
+  );
   return rows.join('\n') + '\n';
 }
 
@@ -115,6 +124,7 @@ export function writeRecordings(label: string, recordings: readonly GameRecordin
           route: recording.route,
           seed: recording.seed,
           ticksPerSecond: rules.ticksPerSecond,
+          finalState: recording.finalState,
           inputs: recording.inputs,
         },
         null,

@@ -34,7 +34,7 @@ export class GameDriver {
       this.frames,
       new ScenarioAudio(),
     );
-    this.recording = new GameRecording(route, seed);
+    this.recording = new GameRecording(route, seed, this.state);
     this.toggleAutomaticHearts();
   }
 
@@ -203,6 +203,7 @@ export class GameDriver {
   }
 
   private observe(): void {
+    this.recording.observe(this.state);
     this.peakDeckSize = Math.max(this.peakDeckSize, this.state.deck.length);
     this.peakHeartLimit = Math.max(this.peakHeartLimit, this.state.hearts.heartLimit);
     const gauge = this.state.bloom?.progress ?? 0n;

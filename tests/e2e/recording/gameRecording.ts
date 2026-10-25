@@ -35,8 +35,22 @@ export class GameRecording {
   constructor(
     readonly route: RouteId,
     readonly seed: number,
+    private state: GameState,
   ) {
     recordings.push(this);
+  }
+
+  get finalState() {
+    return {
+      ...snapshot(this.state),
+      phase: this.state.phase,
+      tick: this.state.tick,
+      seconds: this.state.tick / rules.ticksPerSecond,
+    };
+  }
+
+  observe(state: GameState): void {
+    this.state = state;
   }
 
   record(input: RecordedInput, before: GameState, after: GameState): void {
