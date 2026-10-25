@@ -11,6 +11,33 @@ import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
 describe('元気バリア', () => {
+  it('耐久割合を最大元気へ掛けて整数化する', () => {
+    const active = applyEffect(
+      { ...game(), maximumMental: 80 },
+      {
+        kind: 'mental-barrier',
+        barrier: 'endurance',
+        enduranceType: 'ratio',
+        endurance: 25,
+        attenuation: 0,
+        duration: { kind: 'stage' },
+      },
+    );
+    expect(active.mentalBarriers[0]?.endurance).toBe(20);
+  });
+
+  it('有限耐久が0になる時はC#同様にバリアを登録しない', () => {
+    const active = applyEffect(game(), {
+      kind: 'mental-barrier',
+      barrier: 'endurance',
+      enduranceType: 'fixed',
+      endurance: 0,
+      attenuation: 0,
+      duration: { kind: 'stage' },
+    });
+    expect(active.mentalBarriers).toHaveLength(0);
+  });
+
   it('ActionType7のProxyへ整数耐久値を渡し、吸収時にバリアを登録しない', () => {
     const initial = game();
     const source = initial.deck[0];
@@ -112,7 +139,7 @@ describe('元気バリア', () => {
         barrier: 'attenuation',
         enduranceType: 'infinite',
         endurance: 0,
-        attenuation: 2,
+        attenuation: 200,
         duration: { kind: 'stage' },
       },
     );

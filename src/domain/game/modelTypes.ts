@@ -32,11 +32,13 @@ import type { FixedParameterExtendEffect } from './fixedParameterExtendTypes';
 import type { BeatPointBuffEffect } from './beatPointBuffTypes';
 import type { RecoverMentalSkillEffect } from './recoverMentalSkillTypes';
 import type { GaugeRegenerationEffect } from './gaugeRegenerationTypes';
+import type { MentalBarrierEffect } from './mentalBarrierTypes';
 import type { AddVoltageSkillEffect } from './addVoltageTypes';
 import type { ReshuffleSkillEffect } from './reshuffleSkillTypes';
 import type { DrawSuccessInduceEffect } from './drawSuccessInduceTypes';
 import type { SkillActionEffect } from './skillActionTypes';
 export type { GaugeRegeneration, GaugeRegenerationEffect } from './gaugeRegenerationTypes';
+export type { MentalBarrier, MentalBarrierEffect } from './mentalBarrierTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -54,27 +56,6 @@ type InfinityGaugeEffect = Readonly<{
   deactivationKey?: string;
 }>;
 type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrierEffect;
-export type MentalBarrier = Readonly<{
-  kind: 'endurance' | 'attenuation';
-  endurance: number;
-  currentEndurance: number;
-  attenuation: number;
-  remainingSeconds: number | null;
-  remainingSections: number | null;
-  deactivationKey?: string | null;
-}>;
-export type MentalBarrierEffect = Readonly<{
-  kind: 'mental-barrier';
-  barrier: 'endurance' | 'attenuation';
-  enduranceType: 'ratio' | 'fixed' | 'infinite';
-  endurance: number;
-  attenuation: number;
-  deactivationKey?: string;
-  invocationType?: number;
-  duration:
-    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
-    | Readonly<{ kind: 'stage' }>;
-}>;
 export type ComboInduceEffect = Readonly<{
   kind: 'combo-induce';
   members: readonly MemberId[];
