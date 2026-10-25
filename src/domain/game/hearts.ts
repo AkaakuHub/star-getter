@@ -7,6 +7,7 @@ import { spawnStarGatherBeatHearts } from './live/heartSpawn';
 import { starGatherHeartCount } from './live/heartState';
 import { createRangeRandom } from './random';
 import { advanceHandCollectionAbilities } from './cards/collectionAbilities';
+import { recordScoreHistory } from './scoreHistory';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -24,6 +25,10 @@ function awardHearts(state: GameState, count: number, missed: boolean): GameStat
   return {
     ...state,
     score,
+    scoreHistory: recordScoreHistory(state.scoreHistory, {
+      timeMilliseconds: Math.trunc((state.tick * 1000) / rules.ticksPerSecond),
+      totalScore: score,
+    }),
     combo,
     lastCollectTick: missed ? state.lastCollectTick : state.tick,
     charge: Math.min(100, state.charge + (missed ? 0 : count * 0.8)),

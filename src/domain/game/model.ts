@@ -1,6 +1,8 @@
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
 import type { StarGatherCardAppealParameters } from './live/clientScoreInput';
 import type { AutomaticHeartState } from './live/automaticHeart';
+import type { ScoreSample } from './scoreHistory';
+import type { MoodSample } from './moodHistory';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type Mood = 'warm' | 'cool' | 'bright';
@@ -133,6 +135,8 @@ export type GameState = Readonly<{
   excitement: number;
   charge: number;
   score: bigint;
+  scoreHistory: readonly ScoreSample[];
+  moodHistory: readonly MoodSample[];
   hearts: StarGatherHeartRuntimeState;
   automaticHeart: AutomaticHeartState;
   heartRandomSeed: number;

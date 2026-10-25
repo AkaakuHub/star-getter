@@ -1,9 +1,7 @@
-import { formatScore } from '../cardDescription';
-
-export function shareScoreUrl(score: bigint, routeName: string, currentUrl: string): string {
-  const url = new URL('https://twitter.com/intent/tweet');
-  url.searchParams.set('text', `スターギャザー「${routeName}」で${formatScore(score)}スター`);
-  url.searchParams.set('hashtags', 'スターギャザー');
-  url.searchParams.set('url', currentUrl);
-  return url.href;
+export function resultShareData(score: bigint, routeName: string, currentUrl: string) {
+  return {
+    title: 'スターギャザー',
+    text: `スターギャザー「${routeName}」で${score.toLocaleString('ja-JP')}スター\n#スターギャザー`,
+    url: currentUrl,
+  };
 }

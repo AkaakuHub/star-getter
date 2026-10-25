@@ -6,10 +6,12 @@ import { validateDeck, validateCard, shuffle } from './deck';
 import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
 import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
-import { durationSeconds, sectionAt } from './projection';
+import { durationSeconds, sectionAt, moodValue } from './projection';
 import { finishBloom } from './bloom';
 import { fillHand } from './cards/drawing';
 import { createStarGatherHeartRuntimeState } from './live/heartSpawn';
+import { recordScoreHistory } from './scoreHistory';
+import { recordMoodHistory } from './moodHistory';
 import {
   starGatherHeartShowLimitSettings,
   resolveStarGatherHeartDrawCount,
@@ -32,6 +34,8 @@ export function createGame(
   );
   const lead = deck[0];
   if (!lead) throw new Error('先頭のカードがありません。');
+  const firstSection = track.sections[0];
+  if (!firstSection) throw new Error('最初のパートがありません。');
   const ordered = [lead.id, ...shuffled.items.filter((id) => id !== lead.id)];
   const initial: GameState = {
     phase: 'ready',
@@ -57,6 +61,8 @@ export function createGame(
     excitement: 0,
     charge: 0,
     score: 0n,
+    scoreHistory: [{ timeMilliseconds: 0, totalScore: 0n }],
+    moodHistory: [{ timeMilliseconds: 0, moodValue: firstSection.moodValue }],
     hearts: {
       ...createStarGatherHeartRuntimeState((track.beats * 60) / track.bpm),
       showLimit: heartShowLimit,
@@ -108,7 +114,18 @@ export function advanceTo(state: GameState, seconds: number): GameState {
   while (next.tick < target) next = advanceTick(next);
   if (next.tick === endTick) {
     const collected = collectHearts({ ...next, relayUsed: [...next.hand] });
-    return { ...finishBloom(collected), phase: 'finished' };
+    return {
+      ...finishBloom(collected),
+      scoreHistory: recordScoreHistory(collected.scoreHistory, {
+        timeMilliseconds: Math.trunc(durationSeconds(collected) * 1000),
+        totalScore: collected.score,
+      }),
+      moodHistory: recordMoodHistory(collected.moodHistory, {
+        timeMilliseconds: Math.trunc(durationSeconds(collected) * 1000),
+        moodValue: moodValue(collected),
+      }),
+      phase: 'finished',
+    };
   }
   return next;
 }
@@ -158,7 +175,17 @@ function advanceTick(state: GameState): GameState {
     next = fillHand({ ...next, handLimit: rules.handSize, moodOffset: 0, apIntervalFactor: 1 });
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
-  return automatic.shouldCollect ? collectHearts(next) : next;
+  const collected = automatic.shouldCollect ? collectHearts(next) : next;
+  const mood = moodValue(collected);
+  return mood === collected.moodHistory.at(-1)?.moodValue
+    ? collected
+    : {
+        ...collected,
+        moodHistory: recordMoodHistory(collected.moodHistory, {
+          timeMilliseconds: Math.trunc((tick * 1000) / rules.ticksPerSecond),
+          moodValue: mood,
+        }),
+      };
 }
 
 function validateTrack(track: Track): void {

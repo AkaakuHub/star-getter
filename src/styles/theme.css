@@ -9,6 +9,7 @@
 @import './stage.css';
 @import './dialogs.css';
 @import './cardBrowser.css';
+@import './results.css';
 
 @theme {
   --color-idol-pink: #ed7297;

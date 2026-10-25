@@ -1,0 +1,33 @@
+.result-panel {
+  position: absolute;
+  inset: 7cqw 4cqw;
+  z-index: 75;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 5cqw;
+  border-radius: 2cqw;
+  background: #fffaf5;
+  text-align: center;
+}
+.result-panel h2 {
+  font-size: max(16px, 4cqw);
+}
+.result-panel .result-score {
+  margin-top: 3cqw;
+  font-size: max(24px, 7cqw);
+  overflow-wrap: normal;
+}
+.result-graph {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  margin-top: 5cqw;
+}
+.result-actions {
+  display: grid;
+  gap: 3cqw;
+  margin-top: 5cqw;
+}
+.result-actions a {
+  text-decoration: none;
+}

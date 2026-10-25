@@ -1,8 +1,8 @@
-import { RotateCcw, Share2 } from 'lucide-preact';
+import { RotateCcw } from 'lucide-preact';
 import { routes, type RouteId } from '../../content/routes';
 import { type GameState } from '../../domain/game/model';
-import { formatScore } from '../cardDescription';
-import { shareScoreUrl } from '../results/shareScore';
+import { ResultGraph } from '../results/ResultGraph';
+import { ResultShareButton } from '../results/ResultShareButton';
 
 export function Result({
   state,
@@ -10,10 +10,20 @@ export function Result({
   onReplay,
   busy,
 }: Readonly<{ state: GameState; route: RouteId; onReplay: () => void; busy: boolean }>) {
+  const scoreGroups = state.score.toLocaleString('ja-JP').split(',');
   return (
     <section className="result-panel" aria-label="ライブ結果">
       <h2>{routes[route].name}</h2>
-      <p className="result-score">{formatScore(state.score)}</p>
+      <p className="result-score">
+        {scoreGroups.map((group, index) => (
+          <span key={index}>
+            {group}
+            {index < scoreGroups.length - 1 ? ',' : ''}
+            <wbr />
+          </span>
+        ))}
+      </p>
+      <ResultGraph state={state} />
       <dl className="result-stats">
         <div>
           <dt>カード使用</dt>
@@ -25,15 +35,7 @@ export function Result({
         </div>
       </dl>
       <div className="result-actions">
-        <a
-          className="button primary"
-          href={shareScoreUrl(state.score, routes[route].name, location.href)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Share2 size={18} aria-hidden="true" />
-          Xでスコアを共有
-        </a>
+        <ResultShareButton state={state} route={route} busy={busy} />
         <button type="button" className="button quiet" onClick={onReplay} disabled={busy}>
           <RotateCcw size={18} aria-hidden="true" />
           もう一度
