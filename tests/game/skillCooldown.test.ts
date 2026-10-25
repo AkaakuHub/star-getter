@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
 import { cardCooldownTicks } from '../../src/domain/game/projection';
+import { skillCooldownSeconds } from '../../src/domain/game/effects/skillCooldown';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
 
@@ -91,4 +92,51 @@ it('InvocationType 0x388では枚数再計算と期限を抑止し、Deactivator
     act(active, { type: 'deactivate-skill-cooldown', deactivationKey: 'cooldown' })
       .skillCooldownEffects,
   ).toHaveLength(0);
+});
+
+it('ActionType40はlongをfloat32・int32へ変換してから時間と枚数補正を計算する', () => {
+  const initial = game();
+  const state = {
+    ...initial,
+    track: { ...initial.track, songTime: 1 },
+  };
+  const source = state.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const floatBoundary = applyEffect(
+    state,
+    {
+      kind: 'skill-cooldown',
+      num: 16_777_217,
+      deckUnderAdd: 0,
+      deckOverAdd: 0,
+      deckUnderLimit: 0,
+      deckOverLimit: 0,
+      deckCardMax: null,
+      duration,
+    },
+    source,
+  );
+  const active = floatBoundary.skillCooldownEffects[0];
+  if (!active) throw new Error('クールタイム効果がありません。');
+  const numValue = Math.fround(Math.fround(16_777_216) / Math.fround(10_000));
+  const expected = Math.fround(Math.fround(numValue * Math.fround(1)) / Math.fround(10_000));
+  expect(skillCooldownSeconds(floatBoundary, active)).toBe(expected);
+
+  const wrappedLimit = applyEffect(
+    { ...state, track: { ...state.track, songTime: 10_000 } },
+    {
+      kind: 'skill-cooldown',
+      num: 10_000,
+      deckUnderAdd: 10_000,
+      deckOverAdd: 0,
+      deckUnderLimit: 4_294_967_296,
+      deckOverLimit: 0,
+      deckCardMax: state.deck.length + 1,
+      duration,
+    },
+    source,
+  );
+  const wrapped = wrappedLimit.skillCooldownEffects[0];
+  if (!wrapped) throw new Error('クールタイム効果がありません。');
+  expect(skillCooldownSeconds(wrappedLimit, wrapped)).toBe(1);
 });
