@@ -11,7 +11,9 @@ import { validateMoodValueBoost } from './moodValueBoostTypes';
 import { validateGenesisSkill } from './genesisSkillTypes';
 import { validateGaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import { validateSkillCostChangeEffect } from './skillCostChangeTypes';
+import { validateAddVoltageSkillEffect } from './addVoltageTypes';
 export function validateEffect(effect: Effect): void {
+  if (effect.kind === 'add-voltage-skill') return validateAddVoltageSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('検索回数が正しくありません。');

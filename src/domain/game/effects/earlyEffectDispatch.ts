@@ -12,6 +12,7 @@ import { activateMoodValueBoost } from './moodValueBoost';
 import { activateVoltageConversion } from './voltageConversion';
 import { activateBeatPointBuff } from './beatPointBuff';
 import { activateRecoverMentalSkill } from './recoverMentalSkill';
+import { activateAddVoltageSkill } from './addVoltageSkill';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -51,5 +52,7 @@ export function dispatchEarlyEffect(
       effectPower,
       apply,
     );
+  if (effect.kind === 'add-voltage-skill')
+    return activateAddVoltageSkill(state, effect, card, multiplier, addValue, effectPower, apply);
   return undefined;
 }
