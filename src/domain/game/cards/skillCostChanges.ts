@@ -25,9 +25,26 @@ export function addSkillCostChange(
     maximum: effect.maximum,
     conditionType: effect.conditionType,
     conditionId: effect.conditionId ?? 0,
-    remainingSections: effect.duration?.sections ?? null,
+    remainingSections:
+      effect.invocationType === 0x388 || effect.invocationType === 0x38b
+        ? null
+        : (effect.duration?.sections ?? null),
+    invocationType: effect.invocationType ?? null,
+    deactivationKey: effect.deactivationKey ?? null,
   };
   return { ...state, skillCostChanges: [...state.skillCostChanges, change] };
+}
+
+export function deactivateSkillCostChanges(state: GameState, deactivationKey: string): GameState {
+  return {
+    ...state,
+    skillCostChanges: state.skillCostChanges.filter(
+      (change) =>
+        change.deactivationKey !== deactivationKey ||
+        change.invocationType === 0x388 ||
+        change.invocationType === 0x38b,
+    ),
+  };
 }
 
 export function skillCostDelta(state: GameState, card: Card): number {

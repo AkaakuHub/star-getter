@@ -48,6 +48,7 @@ import type { MentalShield } from './mentalShieldTypes';
 import type { FixedParameterExtend } from './fixedParameterExtendTypes';
 import type { BeatPointBuff } from './beatPointBuffTypes';
 import type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
+export { rules } from './rules';
 export type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
 
 export type { SearchRequest } from './modelTypes';
@@ -347,13 +348,7 @@ export type Action =
   | Readonly<{ type: 'deactivate-mood-value-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-beat-point-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-gauge-regeneration'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-search' | 'deactivate-heart-boost'; deactivationKey: string }>;
-
-export const rules = {
-  ticksPerSecond: 60,
-  handSize: 5,
-  maxDeckSize: 100,
-  maxBloomGauge: 2_147_483_647n,
-  comboWindowTicks: 120,
-  maxScore: 9999n * 10n ** 68n,
-} as const;
+  | Readonly<{
+      type: 'deactivate-search' | 'deactivate-heart-boost' | 'deactivate-skill-cost-change';
+      deactivationKey: string;
+    }>;

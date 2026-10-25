@@ -44,6 +44,7 @@ import { deactivateBeatPointBuffs } from './effects/beatPointBuff';
 import { deactivateGaugeRegenerations } from './live/gaugeRegeneration';
 import { deactivateSearchRequests } from './cards/search';
 import { deactivateHeartBoosts } from './live/heartBoosts';
+import { deactivateSkillCostChanges } from './cards/skillCostChanges';
 
 export function act(state: GameState, action: Action): GameState {
   return refreshEffectInducers(actInternal(state, action), applyEffect);
@@ -130,6 +131,8 @@ function actInternal(state: GameState, action: Action): GameState {
       return deactivateSearchRequests(state, action.deactivationKey);
     case 'deactivate-heart-boost':
       return deactivateHeartBoosts(state, action.deactivationKey);
+    case 'deactivate-skill-cost-change':
+      return deactivateSkillCostChanges(state, action.deactivationKey);
   }
 }
 

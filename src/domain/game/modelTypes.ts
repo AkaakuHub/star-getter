@@ -141,6 +141,8 @@ export type SkillCostChange = Readonly<{
   conditionType: SkillCostConditionType;
   conditionId: number;
   remainingSections: number | null;
+  invocationType: number | null;
+  deactivationKey: string | null;
 }>;
 export type ParameterDetailValue = Readonly<{
   id: bigint;

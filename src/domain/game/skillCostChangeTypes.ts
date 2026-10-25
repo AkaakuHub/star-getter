@@ -43,6 +43,8 @@ export type SkillCostChangeEffect = Readonly<{
   conditionId?: number;
   addValue?: number;
   duration?: Readonly<{ sections: number }>;
+  invocationType?: number;
+  deactivationKey?: string;
 }>;
 
 export function validateSkillCostChangeEffect(effect: SkillCostChangeEffect): void {
@@ -54,7 +56,9 @@ export function validateSkillCostChangeEffect(effect: SkillCostChangeEffect): vo
     (effect.conditionId !== undefined && !Number.isSafeInteger(effect.conditionId)) ||
     (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
     (effect.duration !== undefined &&
-      (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 0))
+      (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 0)) ||
+    (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+    (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )
     throw new Error('スキルコスト変更の設定が正しくありません。');
 }
