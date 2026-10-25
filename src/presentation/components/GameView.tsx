@@ -1,4 +1,4 @@
-import { Pause, Menu, List, Heart, Volume2, VolumeX } from 'lucide-preact';
+import { Pause, Menu, List, Layers, Heart, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
@@ -18,6 +18,7 @@ export function GameView({
   onWaitMode,
   onMenu,
   onHand,
+  onDeck,
   busy,
   muted,
   onMuted,
@@ -29,6 +30,7 @@ export function GameView({
   onWaitMode: () => void;
   onMenu: () => void;
   onHand: () => void;
+  onDeck: () => void;
   busy: boolean;
   muted: boolean;
   onMuted: () => void;
@@ -47,6 +49,16 @@ export function GameView({
         >
           <List size={13} aria-hidden="true" />
           手札 {state.hand.length}
+        </button>
+        <button
+          type="button"
+          className="live-tool live-list"
+          style={liveLayout.deck}
+          onClick={onDeck}
+          disabled={busy}
+        >
+          <Layers size={13} aria-hidden="true" />
+          山札 {state.drawPile.length}
         </button>
         <button
           type="button"

@@ -1,0 +1,70 @@
+.card-browser .modal-heading {
+  position: sticky;
+  top: -26px;
+  z-index: 1;
+  padding-block: 8px;
+  background: var(--paper);
+}
+.card-browser-list {
+  position: relative;
+  max-height: 65dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.card-browser-list section + section {
+  margin-top: 24px;
+}
+.card-browser-list h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+.card-browser-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.card-browser-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 6px;
+  border: 2px solid var(--accent);
+}
+.card-browser-card .hand-name {
+  font-size: 10px;
+}
+.card-performance {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+}
+.card-performance-art {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+}
+.card-performance-stats {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.card-performance-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.card-performance-stats dd {
+  margin: 0;
+  font-weight: 800;
+}
+.card-performance-effect {
+  grid-column: 1 / -1;
+  font-size: 1rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
