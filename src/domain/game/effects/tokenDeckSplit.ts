@@ -23,8 +23,9 @@ export function activateTokenDeckSplit(
   if (state.tokenDeckSplit) return state;
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('表示パート数が0です。');
+  const seriesIds = effect.seriesIds?.map((id) => id | 0) ?? null;
   const selected = new Set(
-    state.deck.filter((card) => isSeriesCard(card, effect.seriesIds)).map((card) => card.id),
+    state.deck.filter((card) => isSeriesCard(card, seriesIds)).map((card) => card.id),
   );
   const handCount = state.hand.length;
   const main: TokenDeckZones = {
@@ -39,7 +40,7 @@ export function activateTokenDeckSplit(
   };
   const suppressExpiration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const split: TokenDeckSplit = {
-    seriesIds: effect.seriesIds,
+    seriesIds,
     main,
     sub,
     active: 'main',
