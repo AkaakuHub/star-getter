@@ -88,6 +88,9 @@ describe('原実装のパラメータ計算', () => {
       ]),
     ).toBe(9);
   });
+  it('上限の整数加算をC#のint32範囲へ戻す', () => {
+    expect(changeMaximum(2_147_483_647, [{ calculation: 'add', value: 1 }])).toBe(-2_147_483_648);
+  });
   it('エナジーの絶対上限100と元気の基礎値10倍を守る', () => {
     expect(energyMaximum(20, [{ calculation: 'add', value: 200 }])).toBe(100);
     expect(staminaMaximum(100, [{ calculation: 'add', value: 2000 }])).toBe(1000);

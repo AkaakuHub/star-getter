@@ -7,15 +7,19 @@ export function changeMaximum(origin: number, changes: readonly MaximumChange[])
   return changes.reduce((value, change) => {
     switch (change.calculation) {
       case 'fixed':
-        return change.value;
+        return int32(change.value);
       case 'add':
-        return change.value + value;
+        return int32(change.value + value);
       case 'multiply':
         return Math.trunc(
           Math.fround(Math.fround(Math.fround(change.value / 10000) + 1) * Math.fround(value)),
         );
     }
   }, origin);
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function energyMaximum(origin: number, changes: readonly MaximumChange[]): number {
