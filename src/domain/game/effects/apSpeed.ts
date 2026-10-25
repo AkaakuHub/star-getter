@@ -45,20 +45,24 @@ export function applyApSpeedChange(
   let value: number;
   let absorbedAmount: number;
   let currentState = state;
-  if (effect.calculationType === 2) {
-    let rate = Math.fround(
-      Math.fround(multiplier) *
-        Math.fround(
-          Math.fround(Math.fround(addValue * 100) + (10_000 - Math.trunc(effect.num))) -
-            Math.fround(correction * 10_000),
-        ),
-    );
-    if (rate > 0 && card) {
+  let rate = Math.fround(
+    Math.fround(multiplier) *
+      Math.fround(
+        Math.fround(Math.fround(addValue * 100) + (10_000 - Math.trunc(effect.num))) -
+          Math.fround(correction * 10_000),
+      ),
+  );
+  if (rate > 0 && card) {
+    if (effect.calculationType === 2) {
       const legacyBoosted = skillValue(currentState, rate, { kind: 'energy', amount: rate }, card);
       const boosted = applyAction52SkillBoostForCard(currentState, card, legacyBoosted);
       currentState = boosted.state;
       rate = Math.trunc(boosted.value);
+    } else {
+      currentState = applyAction52SkillBoostForCard(currentState, card, rate).state;
     }
+  }
+  if (effect.calculationType === 2) {
     value = Math.fround(1 - Math.fround(rate / 10_000));
     absorbedAmount = Math.trunc((1 - value) * 100);
     calculation = 'multiply';

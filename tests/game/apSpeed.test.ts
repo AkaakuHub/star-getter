@@ -90,6 +90,33 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(30n);
 });
 
+it('ActionType21のcalcType1は正のrateでActionType52を消費するが値には適用しない', () => {
+  const base = game();
+  const source = base.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const initial = {
+    ...base,
+    amplification: 100,
+    storyAmplification: 0,
+    handEffectCardIds: [],
+    targetBoosts: [],
+  };
+  const boosted = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'member', member: source.member },
+      duration: { kind: 'stage', value: 0 },
+      uses: 1,
+    },
+    source,
+  );
+  const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 0.25 }, source);
+  expect(changed.action52Buffs).toHaveLength(0);
+  expect(changed.apTimeEffects.at(-1)?.value).toBe(0.25);
+});
+
 it('Action21のパート期限とミリ秒期限を解除する', () => {
   const initial = game();
   const sectionEffect = applyEffect(initial, {
