@@ -3,7 +3,7 @@ import { type Action, type Card, type GameState } from './model';
 import { applyEffect, changeResource } from './effects';
 import { canUseCard, cardAt } from './projection';
 import { cardCost } from './cards/cost';
-import { fillHand } from './cards/drawing';
+import { finishCardActivation } from './cards/cardZones';
 import { useSpecial } from './special';
 import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
 
@@ -30,13 +30,17 @@ function useCard(state: GameState, index: number): GameState {
   const paid = state.bloom
     ? state
     : changeResource(state, 'energy', -BigInt(cardCost(state, source)));
-  const next = activateCard(paid, source, state.hand, false);
-  return fillHand({
-    ...next,
-    lastUsedMember: source.member,
-    lastUsedUnit: source.unit,
-    drawContext: 'skill',
-  });
+  const activated = {
+    ...paid,
+    activation: {
+      sourceId: source.id,
+      usedCards: [],
+      allHand: source.effects.some((effect) => effect.kind === 'use-hand'),
+      shuffle: false,
+      excluded: [],
+    },
+  };
+  return finishCardActivation(activateCard(activated, source, state.hand, false));
 }
 
 function activateCard(
@@ -45,8 +49,10 @@ function activateCard(
   initialHand: readonly string[],
   allHand: boolean,
 ): GameState {
+  if (!state.activation) throw new Error('カードの使用処理がありません。');
   let next: GameState = {
     ...state,
+    activation: { ...state.activation, usedCards: [...state.activation.usedCards, card.id] },
     lastActionTick: state.tick,
     lastPerformer: card.performer,
     lastUsedMember: card.member,
@@ -89,9 +95,7 @@ function retireCard(state: GameState, card: Card): GameState {
     ...state,
     hand: state.hand.filter((id) => id !== card.id),
     drawPile: state.drawPile.filter((id) => id !== card.id),
-    discard: card.exhausts
-      ? state.discard.filter((id) => id !== card.id)
-      : [...state.discard.filter((id) => id !== card.id), card.id],
+    discard: state.discard.filter((id) => id !== card.id),
     relayUsed: state.relayUsed.filter((id) => id !== card.id),
     handHeartCollectCounts: Object.fromEntries(
       Object.entries(state.handHeartCollectCounts).filter(([id]) => id !== card.id),

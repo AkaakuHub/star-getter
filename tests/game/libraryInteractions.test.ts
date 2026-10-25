@@ -156,7 +156,7 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
   expect(advanceTo(state, 3).resting).toBe(false);
 });
 
-it('一斉使用は効果の位置で子を実行し、除外後79枚なら後続80枚条件を発動しない', () => {
+it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を判定してから除外する', () => {
   let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 1);
   state = addTokens(state, 'bookmark', 80 - state.deck.length);
   const source = token(state, 'ensemble'),
@@ -164,11 +164,11 @@ it('一斉使用は効果の位置で子を実行し、除外後79枚なら後�
   state = withHand(state, [source.id, story.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
-  expect(used.deck).toHaveLength(79);
-  expect(used.deck.some((item) => item.token === 'clock')).toBe(false);
+  expect(used.deck).toHaveLength(88);
+  expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(3);
 });
 
-it('極光のエナジー0化は子のドロー時回復より後で、巻き込んだ一斉使用は再帰しない', () => {
+it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の回復を実行する', () => {
   let state = addTokens(game('library'), 'bookmark', 20);
   const source = card(state, 'aurora-ensemble'),
     bookmark = token(state, 'bookmark');
@@ -179,7 +179,11 @@ it('極光のエナジー0化は子のドロー時回復より後で、巻き込
   ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(3);
-  expect(used.energy).toBe(0);
+  expect(used.energy).toBeGreaterThan(0);
+  expect(used.energy).toBeLessThan(used.maxEnergy);
+  expect(used.hand).not.toContain(source.id);
+  expect(used.discard).toContain(source.id);
+  expect(used.activation).toBeNull();
   expect(used.lastUsedMember).toBe(source.member);
   expect(used.lastUsedUnit).toBe(source.unit);
 });

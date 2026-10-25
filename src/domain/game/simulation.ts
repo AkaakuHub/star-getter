@@ -53,6 +53,7 @@ export function createGame(
     lastUsedMember: null,
     lastUsedUnit: null,
     cardUseCounts: {},
+    activation: null,
     randomSeed: shuffled.seed,
     energy: 10,
     maxEnergy: rules.maxEnergy,

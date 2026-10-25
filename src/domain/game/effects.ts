@@ -74,7 +74,9 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
         ).state,
       };
     case 'shuffle':
-      return fillHand(shuffleHand(state));
+      return state.activation?.allHand
+        ? { ...state, activation: { ...state.activation, shuffle: true } }
+        : fillHand(shuffleHand(state));
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'energy':

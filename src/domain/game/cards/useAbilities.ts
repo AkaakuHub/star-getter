@@ -46,12 +46,10 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
     (card.useAbility === 'class' && count >= 3) ||
     (card.useAbility === 'shadow' && count >= 14)
   ) {
+    if (!next.activation) throw new Error('カードの使用処理がありません。');
     next = {
       ...next,
-      deck: next.deck.filter((item) => item.id !== card.id),
-      hand: next.hand.filter((id) => id !== card.id),
-      drawPile: next.drawPile.filter((id) => id !== card.id),
-      discard: next.discard.filter((id) => id !== card.id),
+      activation: { ...next.activation, excluded: [...next.activation.excluded, card.id] },
     };
   }
   return next;

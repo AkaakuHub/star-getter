@@ -170,6 +170,13 @@ export type GameState = Readonly<{
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;
   cardUseCounts: Readonly<Record<string, number>>;
+  activation: Readonly<{
+    sourceId: string;
+    usedCards: readonly string[];
+    allHand: boolean;
+    shuffle: boolean;
+    excluded: readonly string[];
+  }> | null;
   randomSeed: number;
   energy: number;
   maxEnergy: number;
