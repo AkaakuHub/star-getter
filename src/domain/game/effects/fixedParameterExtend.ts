@@ -14,24 +14,30 @@ export function activateFixedParameterExtend(
 ): GameState {
   if (effect.calculation !== 'fixed' && !card)
     throw new Error('固定パラメーター上限変更の発動元カードがありません。');
+  const value = int32(effect.value);
   const boosted =
     effect.calculation === 'fixed'
-      ? { state, value: effect.value }
-      : applyAction52SkillBoostForCard(state, card, effect.value);
+      ? { state, value }
+      : applyAction52SkillBoostForCard(state, card, value);
+  const durationValue = effect.duration.kind === 'stage' ? 0 : int32(effect.duration.value);
   const fixedParameterExtend: FixedParameterExtend = {
     id: boosted.state.nextFixedParameterExtendId,
     target: effect.target,
     calculation: effect.calculation,
-    value: Math.trunc(boosted.value),
+    value: int32(boosted.value),
     remainingSeconds:
-      effect.duration.kind === 'milliseconds' ? Math.fround(effect.duration.value / 1000) : null,
-    remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
+      effect.duration.kind === 'milliseconds' ? Math.fround(durationValue / 1000) : null,
+    remainingSections: effect.duration.kind === 'sections' ? durationValue : null,
   };
   return recalculateFixedParameters({
     ...boosted.state,
     fixedParameterExtends: [...boosted.state.fixedParameterExtends, fixedParameterExtend],
     nextFixedParameterExtendId: boosted.state.nextFixedParameterExtendId + 1,
   });
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function advanceFixedParameterExtends(state: GameState, elapsedSeconds: number): GameState {

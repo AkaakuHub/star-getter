@@ -50,6 +50,17 @@ it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {
   expect(fixed.energy).toBe(30);
 });
 
+it('ActionType58の値をC#のint32へ変換する', () => {
+  const extended = applyEffect(game(), {
+    kind: 'fixed-parameter-extend',
+    target: 'ap',
+    calculation: 'fixed',
+    value: 2_147_483_648,
+    duration: { kind: 'stage' },
+  });
+  expect(extended.fixedParameterExtends[0]?.value).toBe(-2_147_483_648);
+});
+
 it('期限終了後にAP上限を元へ戻す', () => {
   const initial = game();
   const source = initial.deck[0];
