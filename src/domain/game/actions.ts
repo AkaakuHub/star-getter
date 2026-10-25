@@ -13,6 +13,7 @@ import { useSpecial } from './special';
 import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
 import { advanceProxySkillUses } from './effects/proxySkill';
 import { deactivateHandLimitEffects } from './effects/handLimit';
+import { deactivateHandMaxCardEffects } from './effects/handMaxCard';
 import { deactivateApSpeedEffects } from './effects/apSpeed';
 import { deactivateVoltageConversions } from './effects/voltageConversion';
 import { deactivateAction52SkillBoosts } from './effects/action52SkillBoost';
@@ -65,6 +66,8 @@ export function act(state: GameState, action: Action): GameState {
         ? restoreHandLimitCount(expired.state, expired.handAdjustment)
         : expired.state;
     }
+    case 'deactivate-hand-max-card':
+      return deactivateHandMaxCardEffects(state, action.deactivationKey);
     case 'deactivate-ap-speed':
       return deactivateApSpeedEffects(state, action.deactivationKey);
     case 'deactivate-voltage-convert':

@@ -66,7 +66,6 @@ export function createGame(
   for (const card of tokenCatalog) validateCard(card);
   resolveStarGatherHeartDrawCount(0, heartShowLimit);
   const lead = deck[0];
-  if (!lead) throw new Error('先頭のカードがありません。');
   const initial: GameState = {
     supportLevels: {},
     modes: createModes(
@@ -164,6 +163,7 @@ export function createGame(
     excitement: 0,
     maximumVoltageLevel: 1000,
     specialAppealTokens: [],
+    handMaxCardEffects: [],
     specialUsed: [],
     score: 0n,
     scoreMultiplier: 1n,

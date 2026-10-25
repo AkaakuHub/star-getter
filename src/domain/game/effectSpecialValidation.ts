@@ -6,6 +6,7 @@ import { validateDeckSkillCostChange } from './skillCostChangeTypes';
 import { validateLoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
 import { validateVoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
 import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
+import { validateHandMaxCardEffect } from './handMaxCardTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -17,7 +18,8 @@ type SpecialEffect = Extract<
       | 'recover-mental-additional-buff'
       | 'mental-barrier-additional-buff'
       | 'disable-mental-down'
-      | 'special-appeal-token';
+      | 'special-appeal-token'
+      | 'hand-max-card';
   }
 >;
 
@@ -45,6 +47,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'special-appeal-token':
       validateSpecialAppealTokenEffect(effect);
       break;
+    case 'hand-max-card':
+      validateHandMaxCardEffect(effect);
+      break;
   }
   return true;
 }
@@ -57,6 +62,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'recover-mental-additional-buff' ||
     effect.kind === 'mental-barrier-additional-buff' ||
     effect.kind === 'disable-mental-down' ||
-    effect.kind === 'special-appeal-token'
+    effect.kind === 'special-appeal-token' ||
+    effect.kind === 'hand-max-card'
   );
 }

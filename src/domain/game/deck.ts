@@ -1,6 +1,8 @@
 import { validateEffect } from './effectValidation';
 import { type Card, costumeIds, rules } from './model';
-export function validateDeck(deck: readonly Card[]): void {
+export function validateDeck(
+  deck: readonly Card[],
+): asserts deck is readonly [Card, Card, Card, ...Card[]] {
   if (
     deck.length < 3 ||
     deck.length > rules.maxDeckSize ||

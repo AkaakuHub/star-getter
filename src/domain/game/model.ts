@@ -39,6 +39,7 @@ import type { IngameMission, IngameMissionGroup } from './ingameMissionTypes';
 import type { HeartLimitAdditionalBuff } from './heartLimitBoostTypes';
 import type { MoodValueAdditionalBuff } from './moodValueBoostTypes';
 import type { SpecialAppealToken } from './specialAppealTokenTypes';
+import type { HandMaxCardEffectState } from './handMaxCardTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -272,6 +273,7 @@ export type GameState = Readonly<{
   excitement: number;
   maximumVoltageLevel: number;
   specialAppealTokens: readonly SpecialAppealToken[];
+  handMaxCardEffects: readonly HandMaxCardEffectState[];
   specialUsed: readonly string[];
   score: bigint;
   scoreMultiplier: bigint;
@@ -310,6 +312,7 @@ export type Action =
   | Readonly<{ type: 'deactivate-token-deck'; deactivationKey: string }>
   | Readonly<{ type: 'skip-ingame-mission' }>
   | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-hand-max-card'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>

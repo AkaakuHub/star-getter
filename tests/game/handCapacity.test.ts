@@ -7,6 +7,10 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 import { advanceHandLimitEffects } from '../../src/domain/game/effects/handLimit';
+import {
+  advanceHandMaxCardEffects,
+  expireHandMaxCardSections,
+} from '../../src/domain/game/effects/handMaxCard';
 
 function game() {
   const track = tracks[0];
@@ -133,4 +137,60 @@ it('手札内の減少効果を合算してから、上限を3〜8枚に制限�
   expect(handCapacity(compressed)).toBe(3);
   expect(fillHand(compressed).hand).toHaveLength(3);
   expect(handCapacity({ ...compressed, handLimit: 11 })).toBe(8);
+});
+
+it('手札最大化は手札を8枚まで補充し、期限後も保持した手札を減らさない', () => {
+  const initial = game();
+  const shortHand = {
+    ...initial,
+    handLimit: 4,
+    hand: initial.hand.slice(0, 3),
+    drawPile: initial.deck
+      .map((card) => card.id)
+      .filter((id) => !initial.hand.slice(0, 3).includes(id)),
+  };
+  const expanded = applyEffect(shortHand, {
+    kind: 'hand-max-card',
+    duration: { kind: 'sections', value: 1 },
+  });
+  expect(expanded.hand).toHaveLength(8);
+  expect(handCapacity(expanded)).toBe(8);
+  const expired = expireHandMaxCardSections(expanded);
+  expect(expired.handMaxCardEffects).toHaveLength(0);
+  expect(expired.hand).toHaveLength(8);
+  expect(handCapacity(expired)).toBe(4);
+});
+
+it('重複した手札最大化は他の期限が残る間だけ継続する', () => {
+  const first = applyEffect(game(), {
+    kind: 'hand-max-card',
+    duration: { kind: 'milliseconds', value: 100 },
+  });
+  const second = applyEffect(first, {
+    kind: 'hand-max-card',
+    duration: { kind: 'stage' },
+  });
+  const afterTimer = advanceHandMaxCardEffects(second, 0.2);
+  expect(afterTimer.handMaxCardEffects).toHaveLength(1);
+  expect(handCapacity(afterTimer)).toBe(8);
+});
+
+it('InvocationType 0x388と0x38bは手動解除まで手札最大化を保つ', () => {
+  for (const invocationType of [0x388, 0x38b] as const) {
+    const deactivationKey = `hand-max-${invocationType}`;
+    const activated = applyEffect(game(), {
+      kind: 'hand-max-card',
+      duration: { kind: 'milliseconds', value: 100 },
+      invocationType,
+      deactivationKey,
+    });
+    const timed = advanceHandMaxCardEffects(activated, 1);
+    expect(timed.handMaxCardEffects).toHaveLength(1);
+    const ended = act(timed, {
+      type: 'deactivate-hand-max-card',
+      deactivationKey,
+    });
+    expect(ended.handMaxCardEffects).toHaveLength(0);
+    expect(ended.hand).toEqual(timed.hand);
+  }
 });

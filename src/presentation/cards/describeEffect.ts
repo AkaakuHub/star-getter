@@ -94,6 +94,8 @@ export function describeEffect(effect: Effect): string {
       return 'ジェネシスを発動する。';
     case 'special-appeal-token':
       return '特別アピールトークンを追加する。';
+    case 'hand-max-card':
+      return '手札を最大枚数まで増やす。';
     case 'additional-heart-induce':
       return '条件に一致したアクションの使用後、追加のきらめきを生成する。';
     case 'induce-skill-effect':

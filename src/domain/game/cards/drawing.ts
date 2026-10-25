@@ -7,6 +7,7 @@ import type { Card, GameState, HandShuffle } from '../model';
 import { initializeHandCardStats } from './skillCostChanges';
 
 export function handCapacity(state: GameState): number {
+  if (state.handMaxCardEffects.length > 0) return Math.min(8, state.deck.length);
   const penalty = state.deck.reduce(
     (sum, card) =>
       sum + (state.handEffectCardIds.includes(card.id) ? (card.passive?.handLimitDelta ?? 0) : 0),
