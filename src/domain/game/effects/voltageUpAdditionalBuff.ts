@@ -24,12 +24,16 @@ export function activateVoltageUpAdditionalBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const base = Math.fround(
-    Math.fround(Math.fround(correction + Math.fround(effect.num / 10_000)) + addValue) * multiplier,
+  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
+  const base = toInt32(
+    Math.fround(
+      Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+        Math.fround(multiplier),
+    ),
   );
   if (base <= 0) return state;
   if (!source) throw new Error('熱気追加バフの発動元カードがありません。');
-  const boosted = applyAction52SkillBoost(state, source, Math.trunc(base));
+  const boosted = applyAction52SkillBoost(state, source, base);
   const percent = toInt32(boosted.value);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const buff: GameState['voltageUpAdditionalBuffs'][number] = {

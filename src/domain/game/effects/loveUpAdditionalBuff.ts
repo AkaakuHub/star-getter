@@ -24,8 +24,10 @@ export function activateLoveUpAdditionalBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
+  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
   const base = Math.fround(
-    Math.fround(Math.fround(correction + Math.fround(effect.num / 10_000)) + addValue) * multiplier,
+    Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+      Math.fround(multiplier),
   );
   const value = toInt32(base);
   if (value <= 0) return state;

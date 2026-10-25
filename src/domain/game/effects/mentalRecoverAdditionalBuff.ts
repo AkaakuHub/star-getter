@@ -24,10 +24,11 @@ export function activateMentalRecoverAdditionalBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
+  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
   const value = toInt32(
     Math.fround(
-      Math.fround(Math.fround(correction + Math.fround(effect.num / 10_000)) + addValue) *
-        multiplier,
+      Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+        Math.fround(multiplier),
     ),
   );
   if (value <= 0) return state;
