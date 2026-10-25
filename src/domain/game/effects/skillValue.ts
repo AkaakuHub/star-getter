@@ -25,7 +25,7 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   return applyStarGatherSkillBoost(base, skillBoostPercent(state, card));
 }
 
-export function skillBoostPercent(state: GameState, card?: Card): number {
+function skillBoostPercent(state: GameState, card?: Card): number {
   const handBoost = state.deck.reduce(
     (sum, item) =>
       sum +

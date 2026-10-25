@@ -2,9 +2,7 @@ import type { Card, GameState } from '../model';
 import type { BeatPointBuffEffect } from '../beatPointBuffTypes';
 import { moodValue } from '../projection';
 import { calculateSkillMoodCorrection } from '../live/skillMood';
-import { applyStarGatherSkillBoost } from '../live/skillBoost';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
-import { skillBoostPercent } from './skillValue';
 
 export function activateBeatPointBuff(
   state: GameState,
@@ -20,31 +18,31 @@ export function activateBeatPointBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const numToValue = Math.fround(effect.amount / 10_000);
+  const numToValue = Math.fround(Math.fround(effect.amount) / Math.fround(10_000));
   const combined = Math.fround(
-    Math.fround(Math.fround(correction + numToValue) + addValue) * multiplier,
+    Math.fround(Math.fround(correction + numToValue) + Math.fround(addValue)) *
+      Math.fround(multiplier),
   );
-  const skillBoosted = applyStarGatherSkillBoost(
-    Math.trunc(combined),
-    skillBoostPercent(state, card),
-  );
+  const value = int32(combined);
   const action52 =
-    skillBoosted > 0
-      ? applyAction52SkillBoostForCard(state, card, skillBoosted)
-      : { state, value: skillBoosted };
+    value > 0 ? applyAction52SkillBoostForCard(state, card, value) : { state, value };
   const suppressed = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...action52.state,
     beatPointBuffs: [
       ...action52.state.beatPointBuffs,
       {
-        value: Math.trunc(action52.value),
+        value: int32(action52.value),
         remainingSections:
           effect.duration.kind === 'sections' && !suppressed ? effect.duration.value : null,
         deactivationKey: effect.deactivationKey ?? null,
       },
     ],
   };
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function expireBeatPointBuffSections(state: GameState): GameState {

@@ -32,6 +32,19 @@ it('Action3の加算Buffを基礎BeatPointへ適用する', () => {
   ).toHaveLength(0);
 });
 
+it('Action3には汎用のスキル増幅を適用せずActionType52だけを使う', () => {
+  const initial = { ...game(), amplification: 200 };
+  const source = initial.deck[0];
+  if (!source) throw new Error('テスト用カードがありません。');
+  const activated = applyEffect(
+    initial,
+    { kind: 'beat-point-buff', amount: 100_000, duration: { kind: 'stage' } },
+    source,
+  );
+
+  expect(activated.beatPointBuffs[0]?.value).toBe(10);
+});
+
 it('Action3の手札永続Buffは手札離脱時に解除され、パート期限も進む', () => {
   const initial = game();
   const source = initial.deck[0];
