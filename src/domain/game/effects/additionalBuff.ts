@@ -6,6 +6,7 @@ export function applyAdditionalBuff(
   value: number,
   card?: Card,
 ): Readonly<{ state: GameState; value: number }> {
+  if (!(value > 0)) return { state, value };
   const matches = (boost: ResourceBoost) =>
     boost.target === target &&
     (!boost.members || (card !== undefined && boost.members.includes(card.member)));

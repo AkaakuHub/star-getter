@@ -264,7 +264,7 @@ export function applyEffect(
     case 'stamina':
     case 'excitement': {
       const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);
-      return changeResource(boosted.state, effect.kind, BigInt(Math.ceil(boosted.value)));
+      return changeResource(boosted.state, effect.kind, BigInt(Math.trunc(boosted.value)));
     }
     case 'collect':
       return collectHearts(state);
