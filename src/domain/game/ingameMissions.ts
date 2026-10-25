@@ -60,11 +60,13 @@ export function missionActionEffect(
                       ? 21
                       : effect.kind === 'heart-limit-change'
                         ? 25
-                        : effect.kind === 'token-card'
-                          ? 28
-                          : effect.kind === 'disable-mental-down'
-                            ? 34
-                            : null;
+                        : effect.kind === 'genesis-skill'
+                          ? 51
+                          : effect.kind === 'token-card'
+                            ? 28
+                            : effect.kind === 'disable-mental-down'
+                              ? 34
+                              : null;
   if (actionType === null) return state;
   const amount =
     actionType === 1
@@ -93,7 +95,9 @@ export function missionActionEffect(
                         ? effect.num
                         : effect.kind === 'heart-limit-change'
                           ? effect.num
-                          : 0;
+                          : effect.kind === 'genesis-skill'
+                            ? effect.effectBaseNum
+                            : 0;
   return registerMissionAction(state, actionType, amount);
 }
 

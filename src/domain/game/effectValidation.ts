@@ -8,6 +8,7 @@ import { validateMoodChangeSkillEffect } from './moodChangeSkillTypes';
 import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
 import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 import { validateMoodValueBoost } from './moodValueBoostTypes';
+import { validateGenesisSkill } from './genesisSkillTypes';
 
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -287,6 +288,7 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'mood-value-boost') return validateMoodValueBoost(effect);
+  if (effect.kind === 'genesis-skill') return validateGenesisSkill(effect);
   if (validateSpecialEffect(effect)) return;
   if (effect.kind === 'skill-cost-change') {
     if (
