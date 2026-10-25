@@ -2,7 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
-import { fillHand, handCapacity } from '../../src/domain/game/cards/drawing';
+import { fillHand, fillHandToCount, handCapacity } from '../../src/domain/game/cards/drawing';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
@@ -101,6 +101,33 @@ it('Action904の子Action20は手札中だけ有効で、離脱時に解除す�
   const disposed = disposeHandEffects(active, [card.id]);
   expect(disposed.handLimit).toBe(5);
   expect(disposed.handLimitEffects).toHaveLength(0);
+});
+
+it('Action904は通常ドローで手札へ入った時点で子効果を発動する', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  if (!original) throw new Error('対象カードがありません。');
+  const card = {
+    ...original,
+    handPermanentEffects: [{ kind: 'hand-limit' as const, amount: -1 }],
+  };
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [],
+    handCardStats: {},
+    handEffectCardIds: [],
+    drawPile: [card.id],
+    discard: [],
+    drawContext: 'skill' as const,
+  };
+
+  const drawn = fillHandToCount(state, 1);
+
+  expect(drawn.hand).toEqual([card.id]);
+  expect(drawn.handLimit).toBe(initial.handLimit - 1);
+  expect(drawn.activeHandPermanentCardIds).toContain(card.id);
 });
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
