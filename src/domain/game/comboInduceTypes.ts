@@ -6,7 +6,7 @@ export type ComboInduceMemberAp = Readonly<{ member: MemberId; ap: number | null
 export type ComboInducer = Readonly<{
   sourceCardId: string;
   members: readonly ComboInduceMemberAp[];
-  apPower: number;
+  apPower: bigint;
   repeatAction: 0 | 1 | 2;
   effects: readonly Effect[];
   addValue: number;

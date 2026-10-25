@@ -59,7 +59,7 @@ type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrier
 export type ComboInduceEffect = Readonly<{
   kind: 'combo-induce';
   members: readonly MemberId[];
-  apPower: number;
+  apPower: bigint;
   repeatAction: 0 | 1 | 2;
   duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
   effects: readonly Effect[];

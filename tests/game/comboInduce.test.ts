@@ -22,7 +22,7 @@ function setup(repeatAction: 0 | 1 | 2 = 0) {
   const effect = {
     kind: 'combo-induce',
     members: [source.member, first.member],
-    apPower: 10_000,
+    apPower: 10_000n,
     repeatAction,
     duration: { kind: 'stage', value: 0 },
     effects: [
@@ -51,6 +51,24 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   const reset = advanceComboInducer(queued, 1, applyEffect);
   expect(reset.comboInducer?.phase).toBe('collecting');
   expect(reset.comboInducer?.members.map((member) => member.ap)).toEqual([3, null]);
+});
+
+it('ActionType24はlong積をfloat32へ直接変換する', () => {
+  const { state, source, first } = setup();
+  const inducer = state.comboInducer;
+  if (!inducer) throw new Error('コンボ誘発が有効ではありません。');
+  const apPower = 9_007_199_791_611_905n;
+  const armed = { ...state, comboInducer: { ...inducer, apPower } };
+  const one = notifyComboSkillPoint(armed, source, 1);
+  const complete = notifyComboSkillPoint(one, first, 0);
+  const effectPowers: number[] = [];
+
+  advanceComboInducer(complete, 1, (current, _effect, _card, _multiplier, _addValue, power) => {
+    effectPowers.push(power ?? 1);
+    return current;
+  });
+
+  expect(effectPowers).toEqual([900_720_033_792, 900_720_033_792]);
 });
 
 it('カード使用時に実APをコンボ誘発へ渡す', () => {
@@ -82,7 +100,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     {
       kind: 'combo-induce',
       members: [first.member, second.member],
-      apPower: 10_000,
+      apPower: 10_000n,
       repeatAction: 1,
       duration: { kind: 'stage', value: 0 },
       effects: [],

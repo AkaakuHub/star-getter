@@ -113,3 +113,6 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'reshuffle-skill'
   );
 }
+export function isInt64(value: bigint): boolean {
+  return value >= -(1n << 63n) && value <= (1n << 63n) - 1n;
+}

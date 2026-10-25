@@ -1,6 +1,6 @@
 import { validateSkillCooldownEffect } from './skillCooldownTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
-import { validateSpecialEffect } from './effectSpecialValidation';
+import { isInt64, validateSpecialEffect } from './effectSpecialValidation';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
 import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
@@ -227,7 +227,7 @@ export function validateEffect(effect: Effect): void {
     const duration = effect.duration;
     if (
       effect.members.some((member) => !Number.isSafeInteger(member)) ||
-      !Number.isSafeInteger(effect.apPower) ||
+      !isInt64(effect.apPower) ||
       ![0, 1, 2].includes(effect.repeatAction) ||
       !['milliseconds', 'sections', 'stage'].includes(duration.kind) ||
       !Number.isSafeInteger(duration.value) ||
