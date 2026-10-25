@@ -30,13 +30,14 @@ export function advanceWaitMode(
     skillPoint: number;
     ableUseSkill: boolean;
     mentalDown: boolean;
+    allSkillsCostOver: boolean;
     deltaTimeSeconds: number;
   }>,
 ): WaitModeState {
   if (!Number.isFinite(input.deltaTimeSeconds) || input.deltaTimeSeconds < 0) {
     throw new Error('自動停止の経過時間が正しくありません。');
   }
-  if (!input.enabled) return createWaitMode();
+  if (!input.enabled) return { ...createWaitMode(), previousSkillPoint: input.skillPoint };
   if (state.kind === 'waiting') return state;
   const remainingCoolTimeSeconds = Math.max(
     0,
@@ -48,30 +49,14 @@ export function advanceWaitMode(
     previousSkillPoint: input.skillPoint,
   };
   if (state.kind !== 'reserved' && state.previousSkillPoint === input.skillPoint) return next;
-  if (
-    remainingCoolTimeSeconds <= 0 &&
-    input.ableUseSkill &&
-    !input.mentalDown &&
-    (state.kind === 'force-reserved' || state.previousAvailableCards !== input.availableCards)
-  ) {
-    return {
-      ...next,
-      previousAvailableCards: input.availableCards,
-      kind:
-        input.availableCards !== 0
-          ? 'waiting'
-          : state.kind === 'force-reserved'
-            ? 'force-reserved'
-            : 'reserved',
-    };
+  if (remainingCoolTimeSeconds > 0 || !input.ableUseSkill || input.mentalDown) {
+    return { ...next, kind: state.kind === 'force-reserved' ? 'force-reserved' : 'reserved' };
   }
-  return {
-    ...next,
-    kind:
-      state.kind === 'force-reserved'
-        ? 'force-reserved'
-        : input.mentalDown
-          ? 'initial'
-          : 'reserved',
-  };
+  if (state.kind === 'force-reserved' || state.previousAvailableCards !== input.availableCards) {
+    const checked = { ...next, previousAvailableCards: input.availableCards };
+    if (input.availableCards !== 0) return { ...checked, kind: 'waiting' };
+    if (!input.allSkillsCostOver) return checked;
+    return { ...checked, kind: 'initial' };
+  }
+  return { ...next, kind: 'initial' };
 }

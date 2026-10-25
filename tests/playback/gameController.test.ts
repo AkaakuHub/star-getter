@@ -247,6 +247,9 @@ describe('カード待ちの解除操作', () => {
     frames.run(1000);
     controller.toggleAutomaticHearts();
     await controller.toggleWaitMode();
+    clock.seconds = 2;
+    frames.run(2000);
+    expect(controller.waiting).toBe(true);
     const before = controller.state.stats.heartsCollected;
     controller.command({ type: 'collect' });
     expect(controller.state.stats.heartsCollected).toBeGreaterThan(before);
@@ -254,8 +257,8 @@ describe('カード待ちの解除操作', () => {
     controller.cancelWait();
     await vi.waitFor(() => expect(clock.paused).toBe(false));
     expect(controller.waiting).toBe(false);
-    clock.seconds = 1.5;
-    frames.run(1500);
+    clock.seconds = 2.5;
+    frames.run(2500);
     expect(controller.waiting).toBe(false);
   });
 });

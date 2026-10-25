@@ -11,6 +11,7 @@ const available = {
   skillPoint: 10,
   ableUseSkill: true,
   mentalDown: false,
+  allSkillsCostOver: false,
   deltaTimeSeconds: 0,
 };
 const waiting = () => advanceWaitMode({ ...createWaitMode(), kind: 'force-reserved' }, available);
@@ -26,10 +27,10 @@ describe('本家のカード待ち状態遷移', () => {
       skillPoint: 11,
       deltaTimeSeconds: 0.4,
     });
-    expect(advanced.kind).toBe('reserved');
-    expect(advanceWaitMode(advanced, { ...available, skillPoint: 11 }).kind).toBe('reserved');
+    expect(advanced.kind).toBe('initial');
+    expect(advanceWaitMode(advanced, { ...available, skillPoint: 11 }).kind).toBe('initial');
     expect(
-      advanceWaitMode(advanced, { ...available, skillPoint: 11, availableCards: 7 }).kind,
+      advanceWaitMode(advanced, { ...available, skillPoint: 12, availableCards: 7 }).kind,
     ).toBe('waiting');
   });
   it('カード使用後は同じ位置でも再停止し、使用間隔と解除後0.35秒を守る', () => {
@@ -56,5 +57,13 @@ describe('本家のカード待ち状態遷移', () => {
         { ...available, mentalDown: true },
       ).kind,
     ).toBe('force-reserved');
+  });
+  it('全て消費不足なら強制予約を初期状態へ戻してAP変化を待つ', () => {
+    const next = advanceWaitMode(
+      { ...createWaitMode(), kind: 'force-reserved' },
+      { ...available, availableCards: 0, allSkillsCostOver: true },
+    );
+    expect(next.kind).toBe('initial');
+    expect(next.previousAvailableCards).toBe(0);
   });
 });

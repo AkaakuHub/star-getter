@@ -1,3 +1,4 @@
+import { cardCost } from '../domain/game/cards/cost';
 import { act } from '../domain/game/actions';
 import { type Action, type Card, type GameState, rules } from '../domain/game/model';
 import { canUseCard, cardAt, cardCooldownTicks, sectionAt } from '../domain/game/projection';
@@ -70,6 +71,11 @@ export class GameController {
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
       mentalDown: this.currentState.resting,
+      allSkillsCostOver: this.currentState.hand.every(
+        (_, index) =>
+          this.currentState.bloom === null &&
+          cardCost(this.currentState, cardAt(this.currentState, index)) > this.currentState.energy,
+      ),
       deltaTimeSeconds,
     });
     if (!this.waiting) return;
