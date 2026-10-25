@@ -19,3 +19,7 @@
   text-decoration: underline;
   text-decoration-thickness: 2px;
 }
+
+button.heart-field:focus-visible {
+  background-color: #17132440;
+}
