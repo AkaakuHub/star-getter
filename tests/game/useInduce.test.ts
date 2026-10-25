@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { refreshEffectInducers } from '../../src/domain/game/effects/effectInduce';
 import { game } from './support/game';
 
 it('使用誘発は子効果を実行し、子効果の発動数で上限を判定する', () => {
@@ -65,4 +66,36 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   expect(secondUse.energy).toBe(firstUse.energy);
   expect(thirdUse.energy).toBeGreaterThan(secondUse.energy);
   expect(thirdUse.useInduceActivationCounts[`${card.id}:induce-3`]).toBe(2);
+});
+
+it('Action907は子効果のCheckDeckOutを実行する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const state = {
+    ...initial,
+    deckOutCount: 1,
+    mentalBarriers: [
+      {
+        kind: 'endurance' as const,
+        endurance: 10,
+        currentEndurance: 0,
+        attenuation: 0,
+        remainingSeconds: null,
+        remainingSections: null,
+      },
+    ],
+    effectInducers: [
+      {
+        sourceCardId: source.id,
+        sourceEffectId: `${source.id}:effect-induce`,
+        target: 'mental-barrier' as const,
+        threshold: { kind: 'none' as const, value: 0 },
+        effects: [{ kind: 'energy' as const, amount: 1 }],
+        active: false,
+      },
+    ],
+  };
+  const activated = refreshEffectInducers(state, applyEffect);
+  expect(activated.deckOutCount).toBe(0);
 });

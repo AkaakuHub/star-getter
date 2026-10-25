@@ -100,5 +100,10 @@ function applyEffects(
   card: Card,
   apply: EffectApplier,
 ): GameState {
-  return effects.reduce((next, effect) => apply(next, effect, card), state);
+  return effects.reduce((next, effect) => {
+    const activated = apply(next, effect, card);
+    return activated.deckOutCount > 0
+      ? { ...activated, deckOutCount: activated.deckOutCount - 1 }
+      : activated;
+  }, state);
 }

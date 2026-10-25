@@ -85,8 +85,10 @@ export function refreshEffectInducers(state: GameState, apply: EffectApplier): G
     }
     const card = next.cardPool.find((item) => item.id === inducer.sourceCardId);
     if (!card) throw new Error('効果誘発の発動元カードがありません。');
-    for (const effect of inducer.effects)
+    for (const effect of inducer.effects) {
       next = apply(next, withDeactivationKey(effect, deactivationKey), card);
+      if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
+    }
   }
   return next;
 }
