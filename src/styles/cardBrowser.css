@@ -7,10 +7,13 @@
 }
 .card-browser-list {
   position: relative;
-  max-height: 65dvh;
+  height: 65dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
+}
+.card-browser-list > section:last-child {
+  min-height: 100%;
 }
 .card-browser-list section + section {
   margin-top: 24px;
@@ -34,6 +37,12 @@
 }
 .card-browser-card .hand-name {
   font-size: 11px;
+}
+.card-browser-card .hand-cost {
+  min-width: 24px;
+  height: 24px;
+  padding-inline: 3px;
+  font-size: 14px;
 }
 .card-performance {
   display: grid;
