@@ -80,6 +80,7 @@ function useCard(state: GameState, index: number): GameState {
     }
     for (const effect of card.effects)
       if (effect.kind !== 'use-hand') next = applyEffect(next, effect, card);
+    if (card.exhausts) next = { ...next, deck: next.deck.filter((item) => item.id !== card.id) };
   }
   return fillHand(next);
 }
@@ -88,11 +89,14 @@ function retireCard(state: GameState, card: Card): GameState {
   return {
     ...state,
     hand: state.hand.filter((id) => id !== card.id),
-    deck: card.token ? state.deck.filter((item) => item.id !== card.id) : state.deck,
     drawPile: state.drawPile.filter((id) => id !== card.id),
-    discard: card.token
+    discard: card.exhausts
       ? state.discard.filter((id) => id !== card.id)
       : [...state.discard.filter((id) => id !== card.id), card.id],
+    relayUsed: state.relayUsed.filter((id) => id !== card.id),
+    handHeartCollectCounts: Object.fromEntries(
+      Object.entries(state.handHeartCollectCounts).filter(([id]) => id !== card.id),
+    ),
   };
 }
 

@@ -25,7 +25,7 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
   const value = (amount: number) => skillValue(state, amount, effect, card);
   switch (effect.kind) {
     case 'conditional':
-      return moodValue(state) >= 100
+      return (effect.condition === 'happy100' ? moodValue(state) >= 100 : state.deck.length >= 80)
         ? effect.effects.reduce((next, item) => applyEffect(next, item, card), state)
         : state;
     case 'mood':

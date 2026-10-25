@@ -30,7 +30,7 @@ export type Effect =
   | Readonly<{ kind: 'boost'; multiplier: number; seconds: number; moodBonus?: MoodBonus }>
   | Readonly<{ kind: 'amplify'; percent: number; moodBonus?: MoodBonus }>
   | Readonly<{ kind: 'mood'; amount: number }>
-  | Readonly<{ kind: 'conditional'; condition: 'happy100'; effects: readonly Effect[] }>
+  | Readonly<{ kind: 'conditional'; condition: 'happy100' | 'deck80'; effects: readonly Effect[] }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'shuffle' | 'use-hand' }>
@@ -56,6 +56,7 @@ export type Card = Readonly<{
   effects: readonly Effect[];
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean }>;
   token?: TokenKind;
+  exhausts?: true;
   drawPreference?: TokenKind;
   passive?: Readonly<{ heartsPercent: number; handLimitDelta: number; moodBonus?: MoodBonus }>;
   drawAbility?: 'clock' | 'bookmark' | 'story' | 'library';

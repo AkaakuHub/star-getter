@@ -31,7 +31,7 @@ describe('固定プリセット', () => {
     );
   });
 
-  it('書架は共演カード3枚を生成し、エナジーをまとめて支払い、一斉使用後に除外する', () => {
+  it('書架は共演カード3枚を生成し、エナジーをまとめて支払い、一斉使用後は捨札へ戻る', () => {
     let state = game('library');
     const hand = ['halo', 'orbit', 'ember', 'prism', 'flare'];
     state = {
@@ -51,10 +51,10 @@ describe('固定プリセット', () => {
     const before = state.stats.cardsUsed;
     state = act(state, { type: 'card', index });
     expect(state.stats.cardsUsed - before).toBe(5);
-    expect(state.deck.some((card) => card.id === source.id)).toBe(false);
-    expect(state.discard.includes(source.id)).toBe(false);
-    expect(state.deck.filter((card) => card.token === 'clock')).toHaveLength(3);
-    expect(state.deck.filter((card) => card.token === 'bookmark')).toHaveLength(3);
+    expect(state.deck.some((card) => card.id === source.id)).toBe(true);
+    expect(state.discard.includes(source.id)).toBe(true);
+    expect(state.deck.filter((card) => card.token === 'clock')).toHaveLength(0);
+    expect(state.deck.filter((card) => card.token === 'bookmark')).toHaveLength(0);
     expect(state.cardUses).toHaveLength(5);
     expectOwnedOnce(state);
   });

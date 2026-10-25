@@ -11,7 +11,7 @@ function describeEffect(effect: Effect): string {
         clock: '時を刻む合図',
         bookmark: '次の一幕',
       };
-      return `「${names[effect.token]}」を${effect.count}枚、山札に追加する。追加されたカードは使用後に除外される。`;
+      return `「${names[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'ensemble' ? '追加されたカードは使用後に捨札へ戻る。' : '追加されたカードは使用後に除外される。'}`;
     }
     case 'hand-limit':
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
@@ -20,11 +20,11 @@ function describeEffect(effect: Effect): string {
     case 'shuffle':
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':
-      return '他の手札のアクションを一斉に使用する。必要エナジーは他の手札の合計からデッキ枚数に応じた値を引いて決まり、このカードは使用後に除外される。';
+      return '他の手札のアクションを一斉に使用する。必要エナジーは他の手札の合計からデッキ枚数に応じた値を引いて決まる。';
     case 'mood':
       return `このパート中、空模様を晴れ方向へ${effect.amount}%変化させる。`;
     case 'conditional':
-      return `空模様が晴れ100%のとき、${effect.effects.map(describeEffect).join('')}`;
+      return `${effect.condition === 'happy100' ? '空模様が晴れ100%' : '編成が80枚以上'}のとき、${effect.effects.map(describeEffect).join('')}`;
     case 'beat-hearts':
       return `自然発生${effect.amount}回分のきらめきを獲得する。`;
     case 'hearts':

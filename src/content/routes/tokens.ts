@@ -14,9 +14,16 @@ export const routeTokens: readonly Card[] = [
     token: 'ensemble',
     drawPreference: 'story',
     effects: [
-      { kind: 'tokens', token: 'clock', count: 3 },
-      { kind: 'tokens', token: 'bookmark', count: 3 },
       { kind: 'use-hand' },
+      {
+        kind: 'conditional',
+        condition: 'deck80',
+        effects: [
+          { kind: 'tokens', token: 'story', count: 3 },
+          { kind: 'tokens', token: 'clock', count: 3 },
+          { kind: 'tokens', token: 'bookmark', count: 3 },
+        ],
+      },
     ],
   },
   {
@@ -28,6 +35,7 @@ export const routeTokens: readonly Card[] = [
     beatPoint: 0,
     appeal,
     token: 'story',
+    exhausts: true,
     drawPreference: 'bookmark',
     drawAbility: 'story',
     effects: [
@@ -56,6 +64,7 @@ export const routeTokens: readonly Card[] = [
     beatPoint: 0,
     appeal,
     token: 'clock',
+    exhausts: true,
     drawPreference: 'bookmark',
     drawAbility: 'clock',
     effects: [
@@ -73,6 +82,7 @@ export const routeTokens: readonly Card[] = [
     beatPoint: 0,
     appeal,
     token: 'bookmark',
+    exhausts: true,
     drawPreference: 'clock',
     drawAbility: 'bookmark',
     effects: [{ kind: 'shuffle' }, { kind: 'tokens', token: 'story', count: 1 }],

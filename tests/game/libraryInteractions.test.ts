@@ -8,6 +8,7 @@ import { cardCost } from '../../src/domain/game/cards/cost';
 import type { Card, GameState } from '../../src/domain/game/model';
 import { moodValue } from '../../src/domain/game/projection';
 import { collectionScore } from '../../src/domain/game/scoring';
+import { addTokens } from '../../src/domain/game/cards/tokens';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game() {
@@ -102,4 +103,50 @@ it('しおりの回復は使用時ではなく引いたときに発生し、引�
   const second = applyDrawAbility(first, bookmark);
   expect(first.energy).toBe(1);
   expect(second.energy).toBe(2);
+});
+
+for (const count of [79, 80]) {
+  it(`共演は編成${count}枚で一斉使用し、80枚以上のときだけ追加カード3種類を3枚ずつ生成する`, () => {
+    let state = addTokens(game(), 'ensemble', 1);
+    for (const amount of [30, 30, count - 70]) state = addTokens(state, 'story', amount);
+    expect(state.deck).toHaveLength(count);
+    const ensemble = token(state, 'ensemble');
+    const hand = [ensemble.id, 'orbit', 'ember', 'prism', 'flare'];
+    state = {
+      ...state,
+      hand,
+      drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
+      discard: [],
+      costReductions: Object.fromEntries(state.deck.map((card) => [card.id, 100])),
+    };
+    const stories = state.deck.filter((card) => card.token === 'story').length;
+    const used = act(state, { type: 'card', index: 0 });
+    expect(used.stats.cardsUsed).toBe(5);
+    expect(used.deck.some((card) => card.id === ensemble.id)).toBe(true);
+    expect(used.discard).toContain(ensemble.id);
+    expect(used.deck.filter((card) => card.token === 'story')).toHaveLength(
+      stories + (count === 80 ? 3 : 0),
+    );
+    expect(used.deck.filter((card) => card.token === 'clock')).toHaveLength(count === 80 ? 3 : 0);
+    expect(used.deck.filter((card) => card.token === 'bookmark')).toHaveLength(
+      count === 80 ? 3 : 0,
+    );
+  });
+}
+
+it('花のページ・時計・しおりは使用後に除外し、同じ追加カードを山札へ再循環させない', () => {
+  for (const kind of ['story', 'clock', 'bookmark'] as const) {
+    let state = addTokens(game(), kind, 1);
+    const source = token(state, kind);
+    const hand = [source.id, 'orbit', 'ember', 'prism', 'flare'];
+    state = {
+      ...state,
+      hand,
+      drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
+    };
+    const used = act(state, { type: 'card', index: 0 });
+    expect(used.stats.cardsUsed).toBe(1);
+    expect(used.deck.some((card) => card.id === source.id)).toBe(false);
+    expect([...used.hand, ...used.drawPile, ...used.discard]).not.toContain(source.id);
+  }
 });
