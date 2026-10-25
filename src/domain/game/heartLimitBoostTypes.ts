@@ -13,7 +13,7 @@ export type HeartLimitBoostEffect = Readonly<{
   bonusMoodTarget: 0 | 1 | 2 | 3;
   bonusMoodValue: number;
   duration: Readonly<{ kind: 'none' | 'milliseconds' | 'sections' | 'stage'; value: number }>;
-  disabledType: 0 | 1;
+  disabledType: number;
   disabledCount: number;
   target: HeartLimitBoostTarget;
   deactivationKey?: string;
@@ -37,8 +37,7 @@ export function validateHeartLimitBoost(effect: HeartLimitBoostEffect): void {
     !Number.isFinite(effect.bonusMoodValue) ||
     !['none', 'milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
     !Number.isSafeInteger(effect.duration.value) ||
-    (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
-    ![0, 1].includes(effect.disabledType) ||
+    !Number.isSafeInteger(effect.disabledType) ||
     !Number.isSafeInteger(effect.disabledCount) ||
     (effect.target.kind === 'member' && !Number.isSafeInteger(effect.target.member)) ||
     (effect.target.kind === 'unit' && ![1, 2, 3].includes(effect.target.unit)) ||

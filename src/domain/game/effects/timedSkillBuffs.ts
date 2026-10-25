@@ -26,17 +26,24 @@ import {
   advanceHeartLimitAdditionalBuffs,
   expireHeartLimitAdditionalBuffSections,
 } from './heartLimitBoost';
+import {
+  advanceMoodValueAdditionalBuffs,
+  expireMoodValueAdditionalBuffSections,
+} from './moodValueBoost';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceHeartLimitAdditionalBuffs(
-    advanceMoodChangeSkills(
-      advanceBeatHeartValueBuffs(
-        advanceDisableMentalDownEffects(
-          advanceMentalBarrierAdditionalBuffs(
-            advanceMentalRecoverAdditionalBuffs(
-              advanceVoltageUpAdditionalBuffs(
-                advanceLoveUpAdditionalBuffs(
-                  advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceMoodValueAdditionalBuffs(
+    advanceHeartLimitAdditionalBuffs(
+      advanceMoodChangeSkills(
+        advanceBeatHeartValueBuffs(
+          advanceDisableMentalDownEffects(
+            advanceMentalBarrierAdditionalBuffs(
+              advanceMentalRecoverAdditionalBuffs(
+                advanceVoltageUpAdditionalBuffs(
+                  advanceLoveUpAdditionalBuffs(
+                    advanceAction52SkillBoosts(state, elapsedSeconds),
+                    elapsedSeconds,
+                  ),
                   elapsedSeconds,
                 ),
                 elapsedSeconds,
@@ -56,14 +63,16 @@ export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number)
 }
 
 export function expireTimedSkillBuffSections(state: GameState): GameState {
-  return expireHeartLimitAdditionalBuffSections(
-    expireMoodChangeSkillSections(
-      expireBeatHeartValueBuffSections(
-        expireDisableMentalDownEffectSections(
-          expireMentalBarrierAdditionalBuffSections(
-            expireMentalRecoverAdditionalBuffSections(
-              expireVoltageUpAdditionalBuffSections(
-                expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+  return expireMoodValueAdditionalBuffSections(
+    expireHeartLimitAdditionalBuffSections(
+      expireMoodChangeSkillSections(
+        expireBeatHeartValueBuffSections(
+          expireDisableMentalDownEffectSections(
+            expireMentalBarrierAdditionalBuffSections(
+              expireMentalRecoverAdditionalBuffSections(
+                expireVoltageUpAdditionalBuffSections(
+                  expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+                ),
               ),
             ),
           ),

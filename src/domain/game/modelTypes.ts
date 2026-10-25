@@ -23,6 +23,7 @@ import type { ProxyForcedActivationEffect, ProxySkillEffect } from './proxySkill
 import type { MoodChangeSkillEffect } from './moodChangeSkillTypes';
 import type { BeatHeartValueBuffEffect } from './beatHeartValueBuffTypes';
 import type { HeartLimitBoostEffect } from './heartLimitBoostTypes';
+import type { MoodValueBoostEffect } from './moodValueBoostTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -296,6 +297,7 @@ type EffectShape =
   | BeatHeartValueBuffEffect
   | HeartBoostEffect
   | HeartLimitBoostEffect
+  | MoodValueBoostEffect
   | LoveUpAdditionalBuffEffect
   | VoltageUpAdditionalBuffEffect
   | MentalRecoverAdditionalBuffEffect

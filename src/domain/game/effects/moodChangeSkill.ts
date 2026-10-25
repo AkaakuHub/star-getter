@@ -2,6 +2,7 @@ import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue, moodValueWithoutLimit } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { applyMoodValueAdditionalBuffs } from './moodValueBoost';
 import { absorbSkillEffect } from './proxySkill';
 
 type MoodChangeSkillEffect = Extract<Effect, { kind: 'mood-change-skill' }>;
@@ -53,9 +54,11 @@ export function activateMoodChangeSkill(
       calculation = 'add';
       break;
   }
-  const boosted = applyAction52SkillBoostForCard(state, card, Math.abs(value));
+  const additional = applyMoodValueAdditionalBuffs(state, card, Math.abs(value), null);
+  const adjustedValue = value < 0 ? -additional.value : additional.value;
+  const boosted = applyAction52SkillBoostForCard(additional.state, card, Math.abs(adjustedValue));
   const intMagnitude = toSignedInt32(boosted.value);
-  const intValue = value < 0 ? toSignedInt32(-intMagnitude) : intMagnitude;
+  const intValue = adjustedValue < 0 ? toSignedInt32(-intMagnitude) : intMagnitude;
   const candidate = {
     ...boosted.state,
     moodSkillBuffs: [

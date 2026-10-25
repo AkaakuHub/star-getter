@@ -111,6 +111,8 @@ export function createGame(
     nextHeartLimitBuffId: 1,
     heartLimitAdditionalBuffs: [],
     nextHeartLimitAdditionalBuffId: 1,
+    moodValueAdditionalBuffs: [],
+    nextMoodValueAdditionalBuffId: 1,
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
     lastUsedMember: null,

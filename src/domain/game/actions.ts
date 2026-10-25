@@ -37,6 +37,7 @@ import { missionActionEffect, registerMissionMember, skipIngameMission } from '.
 import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
 import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
+import { deactivateMoodValueAdditionalBuffs } from './effects/moodValueBoost';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -107,6 +108,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateMoodChangeSkills(state, action.deactivationKey);
     case 'deactivate-heart-limit-boost':
       return deactivateHeartLimitAdditionalBuffs(state, action.deactivationKey);
+    case 'deactivate-mood-value-boost':
+      return deactivateMoodValueAdditionalBuffs(state, action.deactivationKey);
   }
 }
 

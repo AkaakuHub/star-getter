@@ -44,6 +44,7 @@ import { startIngameMission } from './ingameMissions';
 import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
 import { activateMoodChangeSkill } from './effects/moodChangeSkill';
 import { activateHeartLimitBoost } from './effects/heartLimitBoost';
+import { activateMoodValueBoost } from './effects/moodValueBoost';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -61,6 +62,8 @@ export function applyEffect(
     return activateMoodChangeSkill(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'heart-limit-boost')
     return activateHeartLimitBoost(state, effect, multiplier, addValue);
+  if (effect.kind === 'mood-value-boost')
+    return activateMoodValueBoost(state, effect, card, multiplier, addValue);
   if (effect.kind === 'voltage-convert')
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
   if (effect.kind === 'mental-heart-induce')
