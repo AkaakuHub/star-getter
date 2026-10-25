@@ -89,6 +89,7 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
       handUse: {
         trigger,
         limit: 1,
+        limitMemory: 'reset' as const,
         effects: [{ kind: 'energy' as const, amount: 1 }],
       },
     };
@@ -184,7 +185,11 @@ it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', (
   };
   const handCard = {
     ...source,
-    handUse: { trigger: { kind: 'any-skill' as const }, effects: [child] },
+    handUse: {
+      trigger: { kind: 'any-skill' as const },
+      limitMemory: 'reset' as const,
+      effects: [child],
+    },
   };
   const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
   const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));

@@ -35,7 +35,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
   let next = state;
   for (const id of ids) {
     const card = state.deck.find((item) => item.id === id);
-    if (!card || card.handUse?.limitMemory === 'retain') continue;
+    if (!card || !card.handUse || card.handUse.limitMemory !== 'reset') continue;
     for (const effect of card.handUse?.effects ?? []) {
       if (effect.kind === 'parameter-value-change')
         next = applyParameterValueChange(next, card, effect, true);
@@ -86,7 +86,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
     handUseActivationCounts: Object.fromEntries(
       Object.entries(state.handUseActivationCounts).filter(([id]) => {
         if (!ids.includes(id)) return true;
-        return state.deck.find((card) => card.id === id)?.handUse?.limitMemory === 'retain';
+        return state.deck.find((card) => card.id === id)?.handUse?.limitMemory !== 'reset';
       }),
     ),
     handUseHeartCollectionCounts: Object.fromEntries(
