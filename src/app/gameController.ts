@@ -100,12 +100,20 @@ export class GameController {
     }
   }
 
-  constructor(state: GameState, clock: PlaybackClock, frames: FrameScheduler, audio: GameAudio) {
+  constructor(
+    state: GameState,
+    clock: PlaybackClock,
+    frames: FrameScheduler,
+    audio: GameAudio,
+    waitModeEnabled: boolean,
+  ) {
     if (state.phase !== 'ready') throw new Error('開始前のライブを指定してください。');
     this.currentState = act(state, { type: 'start' });
     this.clock = clock;
     this.frames = frames;
     this.audio = audio;
+    this.waitEnabled = waitModeEnabled;
+    if (waitModeEnabled) this.waitState = { ...this.waitState, kind: 'force-reserved' };
     this.requestFrame();
   }
 

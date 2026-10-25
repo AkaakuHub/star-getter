@@ -17,6 +17,7 @@ export function GameView({
   route,
   onReplay,
   onWaitMode,
+  onAutomaticHearts,
   onMenu,
   onHand,
   onDeck,
@@ -30,6 +31,7 @@ export function GameView({
   route: RouteId;
   onReplay: () => void;
   onWaitMode: () => void;
+  onAutomaticHearts: () => void;
   onMenu: () => void;
   onHand: () => void;
   onDeck: () => void;
@@ -81,7 +83,7 @@ export function GameView({
           style={liveLayout.automaticHeart}
           aria-label="きらめき100個で自動回収"
           aria-pressed={state.automaticHeart.enabled}
-          onClick={() => controller.toggleAutomaticHearts()}
+          onClick={onAutomaticHearts}
           disabled={busy || state.phase === 'finished'}
         >
           <Star size={20} aria-hidden="true" />

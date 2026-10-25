@@ -5,7 +5,12 @@ import { GameView } from '../presentation/components/GameView';
 import { GameMenu } from '../presentation/components/GameMenu';
 import { CardBrowser } from '../presentation/cards/CardBrowser';
 import { createGameController } from './createGameController';
-import { initialRoute } from './initialRoute';
+import {
+  readGamePreferences,
+  writeGamePreferences,
+} from '../infrastructure/storage/gamePreferences';
+import type { GamePreferences } from './gamePreferences';
+import { initialRoute, routeUrl } from './initialRoute';
 import { useGameControls } from './useGameControls';
 import { hasAvailableSpecial } from '../domain/game/special';
 import { SpecialSelection } from '../presentation/special/SpecialSelection';
@@ -15,9 +20,9 @@ type Panel = 'menu' | 'hand' | 'deck' | 'special';
 export function App() {
   const [route, setRoute] = useState(() => initialRoute(location.href));
   const [heartShowLimit, setHeartShowLimit] = useState(() => readHeartShowLimit(localStorage));
-  const [muted, setMuted] = useState(false);
+  const [preferences, setPreferences] = useState(() => readGamePreferences(localStorage));
   const [controller, setController] = useState(() =>
-    createGameController(route, heartShowLimit, muted),
+    createGameController(route, heartShowLimit, preferences),
   );
   const [panel, setPanel] = useState<Panel | null>(null);
   const [resumeAfterPanel, setResumeAfterPanel] = useState(false);
@@ -32,15 +37,27 @@ export function App() {
     [controller],
   );
 
+  useEffect(() => {
+    history.replaceState(null, '', routeUrl(route, location.href));
+  }, [route]);
+
+  function savePreferences(next: GamePreferences): void {
+    writeGamePreferences(localStorage, next);
+    setPreferences(next);
+  }
+
+  async function changeWaitMode(): Promise<void> {
+    await controller.toggleWaitMode();
+    savePreferences({ ...preferences, waitMode: controller.waitModeEnabled });
+  }
+
   async function restart(nextRoute: RouteId): Promise<void> {
     if (busy) return;
     setBusy(true);
     try {
       await controller.dispose();
-      const next = createGameController(nextRoute, heartShowLimit, muted);
-      const url = new URL(location.href);
-      url.searchParams.set('route', nextRoute);
-      history.replaceState(null, '', url);
+      const next = createGameController(nextRoute, heartShowLimit, preferences);
+      history.replaceState(null, '', routeUrl(nextRoute, location.href));
       setRoute(nextRoute);
       setController(next);
       setPanel(null);
@@ -117,15 +134,22 @@ export function App() {
         state={controller.state}
         route={route}
         onReplay={() => void restart(route)}
-        onWaitMode={() => void controller.toggleWaitMode()}
+        onWaitMode={() => void changeWaitMode()}
         onMenu={() => void openPanel('menu')}
         onHand={() => void openPanel('hand')}
         onDeck={() => void openPanel('deck')}
         onSpecial={openSpecial}
-        muted={muted}
+        muted={preferences.muted}
         onMuted={() => {
-          controller.setMuted(!muted);
-          setMuted(!muted);
+          controller.setMuted(!preferences.muted);
+          savePreferences({ ...preferences, muted: !preferences.muted });
+        }}
+        onAutomaticHearts={() => {
+          controller.toggleAutomaticHearts();
+          savePreferences({
+            ...preferences,
+            automaticHearts: controller.state.automaticHeart.enabled,
+          });
         }}
         busy={busy}
       />

@@ -77,6 +77,7 @@ export function session(energy = 10) {
     clock,
     frames,
     audio,
+    false,
   );
   return { clock, frames, controller, audio };
 }

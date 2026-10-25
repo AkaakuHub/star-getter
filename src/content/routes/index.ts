@@ -7,6 +7,7 @@ export type RouteId = (typeof routeIds)[number];
 type Route = Readonly<{
   id: RouteId;
   name: string;
+  slug: string;
   deck: readonly Card[];
   tokens: readonly Card[];
 }>;
@@ -14,6 +15,7 @@ export const routes: Readonly<Record<RouteId, Route>> = {
   library: {
     id: 'library',
     name: 'うなばら',
+    slug: 'unabara',
     tokens: routeTokens,
     deck: resolveDeck([
       'library-pages',
@@ -24,5 +26,11 @@ export const routes: Readonly<Record<RouteId, Route>> = {
       'class',
     ]),
   },
-  bloom: { id: 'bloom', name: '開花', tokens: routeTokens, deck: resolveDeck(defaultDeckIds) },
+  bloom: {
+    id: 'bloom',
+    name: '開花',
+    slug: 'kaika',
+    tokens: routeTokens,
+    deck: resolveDeck(defaultDeckIds),
+  },
 };

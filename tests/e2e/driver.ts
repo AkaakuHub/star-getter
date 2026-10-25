@@ -40,6 +40,7 @@ export class GameDriver {
       this.clock,
       this.frames,
       new ScenarioAudio(),
+      false,
     );
     this.timingRandom = createRangeRandom((seed ^ 0x5bd1e995) >>> 0);
     this.recording = new GameRecording(route, seed, this.state, timing);
@@ -116,12 +117,17 @@ export class GameDriver {
     if (this.elapsedTicks > 300 * rules.ticksPerSecond)
       throw new Error('操作開始から300秒以内に手順が完了しませんでした。');
     const before = this.state.stats.heartsCollected;
+    const hand = this.state.hand.join(',');
+    const amplification = this.state.storyAmplification;
     if (!this.clock.paused) {
       this.clock.seconds = (this.state.tick + 1) / rules.ticksPerSecond;
       this.frames.run(this.wallSeconds * 1000);
     }
-    if (this.state.automaticHeart.enabled && this.state.stats.heartsCollected > before)
+    if (this.state.automaticHeart.enabled && this.state.stats.heartsCollected > before) {
       this.automaticCollections++;
+      if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
+      this.collectionAmplification += this.state.storyAmplification - amplification;
+    }
     this.observe();
   }
 
@@ -275,6 +281,7 @@ export class GameDriver {
 
   async burst(seconds: number, tapsPerSecond: number): Promise<void> {
     await this.setWaitMode(false);
+    if (this.state.automaticHeart.enabled) await this.toggleAutomaticHearts();
     const target = this.state.tick + Math.round(seconds * rules.ticksPerSecond);
     let next = this.state.tick;
     while (this.state.tick < target && this.state.phase === 'playing') {
@@ -338,6 +345,7 @@ export class GameDriver {
         shadowUses: this.state.cardUseCounts['shadow-1'] ?? 0,
         score: this.state.score.toString(),
         gauge: this.state.bloom?.progress.toString() ?? null,
+        bloomStrength: this.state.bloom?.strength ?? null,
         peakGauge: this.peakGauge.toString(),
         peakDeckSize: this.peakDeckSize,
         peakHeartLimit: this.peakHeartLimit,
