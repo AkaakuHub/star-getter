@@ -130,7 +130,7 @@ export const bloomCards: readonly Card[] = [
       cost: 3,
       extra: true,
       effects: [
-        { kind: 'reset-special', unit: 2 },
+        { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 2 } },
         { kind: 'voltage-limit', amount: 500 },
       ],
     },

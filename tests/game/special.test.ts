@@ -5,6 +5,8 @@ import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 import { game, withHand } from './support/game';
 import { activateBloom } from '../../src/domain/game/bloom';
 import { cardCooldownTicks } from '../../src/domain/game/projection';
+import { applyEffect } from '../../src/domain/game/effects';
+import type { Card } from '../../src/domain/game/model';
 
 it('空模様0でも20APを支払って開花し、支払後のAPを保持する', () => {
   const state = { ...game(), energy: 20, maxEnergy: 20 };
@@ -73,4 +75,73 @@ it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用
     );
   }
   expect([...state.hand, ...state.drawPile, ...state.discard]).not.toContain('class');
+});
+
+it('共鳴の再使用は種別・メンバーを絞り、追加共鳴とトークン共鳴を区別する', () => {
+  const initial = game('library');
+  const normal = initial.deck.find((card) => card.id === 'library-pages');
+  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
+  const otherExtra: Card = {
+    ...extra,
+    id: 'extra-other-member',
+    member: 1041,
+    unit: 2,
+  };
+  const tokenSpecial: Card = { ...normal, id: 'token-special', token: 'story' };
+  const deck = [...initial.deck, otherExtra, tokenSpecial];
+  const state = {
+    ...initial,
+    deck,
+    cardPool: deck,
+    specialUsed: [normal.id, extra.id, otherExtra.id, tokenSpecial.id],
+  };
+  const next = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'extra', target: { kind: 'member', member: 1021 } },
+    initial.deck.find((card) => card.id === 'library-invitation'),
+  );
+  expect(next.specialUsed).toEqual([normal.id, otherExtra.id, tokenSpecial.id]);
+});
+
+it('共鳴を使ったカード自身は再使用対象から除き、他の対象共鳴を戻す', () => {
+  const initial = game('library');
+  const deck = initial.deck;
+  const state = { ...initial, specialUsed: ['library-pages', 'library-ensemble'] };
+  const source = deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('発動元カードがありません。');
+  const next = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'all', target: { kind: 'all' } },
+    source,
+  );
+  expect(next.specialUsed).toEqual(['library-pages']);
+});
+
+it('共鳴の再使用はユニットと発動元以外の対象を適用する', () => {
+  const initial = game('library');
+  const normal = initial.deck.find((card) => card.id === 'library-pages');
+  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
+  const otherExtra: Card = { ...extra, id: 'extra-other-member', member: 1041, unit: 2 };
+  const deck = [...initial.deck, otherExtra];
+  const state = {
+    ...initial,
+    deck,
+    cardPool: deck,
+    specialUsed: [normal.id, extra.id, otherExtra.id],
+  };
+  const unitReset = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 1 } },
+    initial.deck.find((card) => card.id === 'library-invitation'),
+  );
+  expect(unitReset.specialUsed).toEqual([otherExtra.id]);
+
+  const otherReset = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'all', target: { kind: 'others' } },
+    normal,
+  );
+  expect(otherReset.specialUsed).toEqual([normal.id]);
 });

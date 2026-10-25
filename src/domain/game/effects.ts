@@ -15,6 +15,7 @@ import { type Card, type Effect, type GameState, rules } from './model';
 import { applyCostReduction } from './cards/cost';
 import { requestTokens } from './cards/tokens';
 import { skillValue } from './effects/skillValue';
+import { applySpecialReset } from './effects/specialReset';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -161,16 +162,7 @@ export function applyEffect(
         maxEnergy: energyMaximum(state.maxEnergy, [{ calculation: 'add', value: effect.amount }]),
       };
     case 'reset-special':
-      return {
-        ...state,
-        specialUsed: state.specialUsed.filter((id) => {
-          const source = state.deck.find((item) => item.id === id);
-          return (
-            (effect.normalOnly && source?.special?.extra) ||
-            (effect.unit !== undefined && source?.unit !== effect.unit)
-          );
-        }),
-      };
+      return applySpecialReset(state, effect, card);
     case 'mental-shield':
       return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
     case 'cost-reduction':

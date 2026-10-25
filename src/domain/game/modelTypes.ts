@@ -1,6 +1,14 @@
 import type { MemberId, TokenKind, UnitId } from './model';
 
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
+export type ResetSpecial = Readonly<{
+  kind: 'reset-special';
+  scope: 'normal' | 'extra' | 'all';
+  target:
+    | Readonly<{ kind: 'all' | 'source' | 'others' }>
+    | Readonly<{ kind: 'member'; member: MemberId }>
+    | Readonly<{ kind: 'unit'; unit: UnitId }>;
+}>;
 export type SearchTarget =
   | Readonly<{ kind: 'icon'; icon: number }>
   | Readonly<{ kind: 'member'; member: MemberId }>

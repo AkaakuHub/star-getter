@@ -85,7 +85,7 @@ export const libraryCards: readonly Card[] = [
       cost: 3,
       extra: true,
       effects: [
-        { kind: 'reset-special', unit: 1 },
+        { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 1 } },
         { kind: 'energy-limit', amount: 10 },
       ],
     },

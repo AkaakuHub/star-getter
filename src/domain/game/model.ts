@@ -11,6 +11,7 @@ import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
 import type {
   MoodBonus,
+  ResetSpecial,
   SearchRequest,
   SearchTarget,
   TokenBoost,
@@ -19,6 +20,7 @@ import type {
 
 export type {
   MoodBonus,
+  ResetSpecial,
   SearchRequest,
   SearchTarget,
   TokenBoost,
@@ -93,7 +95,7 @@ export type Effect =
   | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
-  | Readonly<{ kind: 'reset-special'; unit?: UnitId; normalOnly?: true }>
+  | ResetSpecial
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
   | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>

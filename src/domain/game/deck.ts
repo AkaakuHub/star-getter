@@ -78,13 +78,17 @@ function validateEffect(effect: Effect): void {
     for (const tier of effect.tiers) for (const child of tier) validateEffect(child);
     return;
   }
-  if (
-    effect.kind === 'collect' ||
-    effect.kind === 'shuffle' ||
-    effect.kind === 'reset-special' ||
-    effect.kind === 'protect-mental'
-  )
+  if (effect.kind === 'collect' || effect.kind === 'shuffle' || effect.kind === 'protect-mental')
     return;
+  if (effect.kind === 'reset-special') {
+    if (
+      !['normal', 'extra', 'all'].includes(effect.scope) ||
+      (effect.target.kind === 'member' && !Number.isSafeInteger(effect.target.member)) ||
+      (effect.target.kind === 'unit' && ![1, 2, 3].includes(effect.target.unit))
+    )
+      throw new Error('共鳴の再使用対象が正しくありません。');
+    return;
+  }
   if (effect.kind === 'use-hand') {
     if (effect.addAp !== undefined && !Number.isSafeInteger(effect.addAp))
       throw new Error('一斉使用の追加消費量が正しくありません。');

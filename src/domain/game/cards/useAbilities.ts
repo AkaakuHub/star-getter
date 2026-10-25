@@ -6,7 +6,11 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
   let next = state;
   const count = state.cardUseCounts[card.id] ?? 0;
   if (card.useAbility === 'class' && count === 3)
-    next = applyEffect(next, { kind: 'reset-special', normalOnly: true }, card);
+    next = applyEffect(
+      next,
+      { kind: 'reset-special', scope: 'normal', target: { kind: 'all' } },
+      card,
+    );
   if (card.useAbility === 'shadow' && count === 14) {
     next = applyEffect(next, { kind: 'protect-mental' }, card);
     next = applyEffect(
