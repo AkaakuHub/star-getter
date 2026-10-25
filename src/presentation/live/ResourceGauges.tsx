@@ -38,6 +38,7 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
           <i style={{ height: state.stamina + '%' }} />
         </div>
         <strong>{Math.floor(state.stamina)}</strong>
+        <span>元気</span>
       </div>
       <div
         className="resource-gauge ap-gauge"

@@ -1,7 +1,7 @@
 .heart-display-panel label,
 .heart-display-panel output {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 .heart-display-panel input {
   display: block;

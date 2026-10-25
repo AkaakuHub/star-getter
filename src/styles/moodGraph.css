@@ -10,7 +10,7 @@
   position: absolute;
   top: 3%;
   left: 3%;
-  font-size: 2.4cqw;
+  font-size: 3cqw;
   line-height: 1;
   color: #353148;
 }
@@ -18,10 +18,10 @@
   position: absolute;
   overflow: hidden;
   contain: size layout paint;
-  top: 17.1875%;
+  top: 20%;
   left: 2.168367%;
   width: 95.663265%;
-  height: 66.40625%;
+  height: 60%;
 }
 .mood-graph canvas {
   position: absolute;
@@ -43,7 +43,7 @@
 .mood-goal {
   position: absolute;
   bottom: 2%;
-  font-size: 1.8cqw;
+  font-size: 2.6cqw;
   font-weight: 800;
   line-height: 1;
 }
