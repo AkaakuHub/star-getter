@@ -3,7 +3,7 @@ export type GaugeRegeneration = Readonly<{
   calculationType: number;
   sourceCardId: string | null;
   amount: number;
-  amountBasis: 'fixed' | 'maximum-gauge';
+  amountBasis: 'fixed' | 'maximum-gauge' | 'skill-fixed';
   intervalType: 1 | 2;
   intervalSeconds: number;
   elapsedSeconds: number;
@@ -19,7 +19,7 @@ export type GaugeRegenerationEffect = Readonly<{
   gauge: GaugeRegeneration['gauge'];
   calculationType: number;
   amount: number;
-  amountBasis: 'fixed' | 'maximum-gauge';
+  amountBasis: 'fixed' | 'maximum-gauge' | 'skill-fixed';
   moodBonus?: Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
   intervalType: 1 | 2;
   intervalMilliseconds: number;
@@ -32,8 +32,11 @@ export function validateGaugeRegenerationEffect(effect: GaugeRegenerationEffect)
   if (
     !Number.isSafeInteger(effect.calculationType) ||
     !Number.isFinite(effect.amount) ||
-    (effect.amountBasis !== 'fixed' && effect.amountBasis !== 'maximum-gauge') ||
+    (effect.amountBasis !== 'fixed' &&
+      effect.amountBasis !== 'maximum-gauge' &&
+      effect.amountBasis !== 'skill-fixed') ||
     (effect.amountBasis === 'maximum-gauge' && effect.gauge !== 'mental') ||
+    (effect.amountBasis === 'skill-fixed' && effect.gauge !== 'voltage') ||
     !Number.isSafeInteger(effect.intervalMilliseconds) ||
     !Number.isSafeInteger(effect.duration.value) ||
     (effect.duration.kind === 'sections' && effect.duration.value === 0) ||

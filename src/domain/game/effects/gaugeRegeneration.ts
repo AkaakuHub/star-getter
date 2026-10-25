@@ -17,7 +17,7 @@ export function applyGaugeRegeneration(
   applyEffect?: EffectApplier,
 ): GameState {
   const raw =
-    effect.amountBasis === 'maximum-gauge'
+    effect.amountBasis !== 'fixed'
       ? Math.fround(
           effect.amount +
             (effect.moodBonus
@@ -30,7 +30,7 @@ export function applyGaugeRegeneration(
         )
       : skillValue(state, effect.amount, effect, card);
   const base =
-    effect.amountBasis === 'maximum-gauge'
+    effect.amountBasis !== 'fixed'
       ? Math.fround(
           Math.fround(Math.fround(raw + Math.fround(addValue)) * Math.fround(multiplier)) *
             Math.fround(effectPower),

@@ -23,6 +23,24 @@ describe('ゲージの継続回復', () => {
     expect(advanceTo(active, 0.21).stamina).toBe(50);
   });
 
+  it('Action11は汎用スキル増幅と切り上げを使わず周期ごとに熱気を加算する', () => {
+    const active = applyEffect(
+      { ...game(), excitement: 500, amplification: 200 },
+      {
+        kind: 'gauge-regeneration',
+        gauge: 'voltage',
+        calculationType: 1,
+        amount: 10.5,
+        amountBasis: 'skill-fixed',
+        intervalType: 1,
+        intervalMilliseconds: 200,
+        duration: { kind: 'milliseconds', value: 600 },
+      },
+    );
+    expect(active.excitement).toBe(510);
+    expect(advanceTo(active, 0.21).excitement).toBe(520);
+  });
+
   it('元気は発動時に回復し、周期回復後に期限切れとなる', () => {
     const initial = { ...game(), stamina: 40 };
     const active = applyEffect(initial, {
