@@ -3,6 +3,7 @@ export type GaugeRegeneration = Readonly<{
   calculationType: number;
   sourceCardId: string | null;
   amount: number;
+  amountBasis: 'fixed' | 'maximum-gauge';
   intervalType: 1 | 2;
   intervalSeconds: number;
   elapsedSeconds: number;
@@ -18,6 +19,8 @@ export type GaugeRegenerationEffect = Readonly<{
   gauge: GaugeRegeneration['gauge'];
   calculationType: number;
   amount: number;
+  amountBasis: 'fixed' | 'maximum-gauge';
+  moodBonus?: Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
   intervalType: 1 | 2;
   intervalMilliseconds: number;
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
@@ -29,6 +32,8 @@ export function validateGaugeRegenerationEffect(effect: GaugeRegenerationEffect)
   if (
     !Number.isSafeInteger(effect.calculationType) ||
     !Number.isFinite(effect.amount) ||
+    (effect.amountBasis !== 'fixed' && effect.amountBasis !== 'maximum-gauge') ||
+    (effect.amountBasis === 'maximum-gauge' && effect.gauge !== 'mental') ||
     !Number.isSafeInteger(effect.intervalMilliseconds) ||
     !Number.isSafeInteger(effect.duration.value) ||
     (effect.duration.kind === 'sections' && effect.duration.value === 0) ||

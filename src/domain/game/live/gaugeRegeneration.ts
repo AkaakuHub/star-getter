@@ -8,6 +8,7 @@ export function startGaugeRegeneration(
   state: GameState,
   gauge: GaugeRegeneration['gauge'],
   amount: number,
+  amountBasis: GaugeRegeneration['amountBasis'],
   intervalType: 1 | 2,
   intervalMilliseconds: number,
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>,
@@ -26,6 +27,7 @@ export function startGaugeRegeneration(
     calculationType,
     sourceCardId,
     amount,
+    amountBasis,
     intervalType,
     intervalSeconds,
     elapsedSeconds: 0,
@@ -39,7 +41,7 @@ export function startGaugeRegeneration(
     deactivationKey: deactivationKey ?? null,
   };
   return {
-    ...pulseGauge(state, gauge, amount, sourceCardId, applyEffect, calculationType),
+    ...pulseGauge(state, gauge, amount, amountBasis, sourceCardId, applyEffect, calculationType),
     gaugeRegenerations: [...state.gaugeRegenerations, regeneration],
   };
 }
@@ -59,6 +61,7 @@ export function advanceGaugeRegenerations(
         next,
         regeneration.gauge,
         regeneration.amount,
+        regeneration.amountBasis,
         regeneration.sourceCardId,
         applyEffect,
         regeneration.calculationType,
@@ -109,12 +112,17 @@ function pulseGauge(
   state: GameState,
   gauge: GaugeRegeneration['gauge'],
   amount: number,
+  amountBasis: GaugeRegeneration['amountBasis'],
   sourceCardId: string | null,
   applyEffect?: EffectApplier,
   calculationType = 1,
 ): GameState {
   if (calculationType !== 1) return state;
-  const value = Math.trunc(amount);
+  const value = Math.trunc(
+    amountBasis === 'maximum-gauge'
+      ? Math.fround(Math.fround(amount) * Math.fround(state.maximumMental))
+      : amount,
+  );
   if (gauge === 'mental') {
     return state.bloom
       ? state

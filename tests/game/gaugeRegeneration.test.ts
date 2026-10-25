@@ -5,6 +5,24 @@ import { act } from '../../src/domain/game/actions';
 import { game } from './support/game';
 
 describe('ゲージの継続回復', () => {
+  it('最大元気に対する割合を各回の元気回復量へ変換する', () => {
+    const active = applyEffect(
+      { ...game(), stamina: 40, maximumMental: 100 },
+      {
+        kind: 'gauge-regeneration',
+        gauge: 'mental',
+        calculationType: 1,
+        amount: 0.05,
+        amountBasis: 'maximum-gauge',
+        intervalType: 1,
+        intervalMilliseconds: 200,
+        duration: { kind: 'milliseconds', value: 600 },
+      },
+    );
+    expect(active.stamina).toBe(45);
+    expect(advanceTo(active, 0.21).stamina).toBe(50);
+  });
+
   it('元気は発動時に回復し、周期回復後に期限切れとなる', () => {
     const initial = { ...game(), stamina: 40 };
     const active = applyEffect(initial, {
@@ -12,6 +30,7 @@ describe('ゲージの継続回復', () => {
       gauge: 'mental',
       calculationType: 1,
       amount: 10,
+      amountBasis: 'fixed',
       intervalType: 1,
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 600 },
@@ -29,6 +48,7 @@ describe('ゲージの継続回復', () => {
       gauge: 'voltage',
       calculationType: 1,
       amount: 10,
+      amountBasis: 'fixed',
       intervalType: 1,
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 600 },
@@ -52,6 +72,7 @@ describe('ゲージの継続回復', () => {
       gauge: 'mental',
       calculationType: 1,
       amount: 10,
+      amountBasis: 'fixed',
       intervalType: 2,
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 500 },
@@ -61,6 +82,7 @@ describe('ゲージの継続回復', () => {
       gauge: 'voltage',
       calculationType: 1,
       amount: 10,
+      amountBasis: 'fixed',
       intervalType: 2,
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 500 },
@@ -78,6 +100,7 @@ describe('ゲージの継続回復', () => {
         gauge: 'mental',
         calculationType: 1,
         amount: 10,
+        amountBasis: 'fixed',
         intervalType: 2,
         intervalMilliseconds: 200,
         duration: { kind: 'sections', value: 2 },
@@ -94,6 +117,7 @@ describe('ゲージの継続回復', () => {
       gauge: 'voltage',
       calculationType: 1,
       amount: 1,
+      amountBasis: 'fixed',
       intervalType: 1,
       intervalMilliseconds: 100,
       duration: { kind: 'sections', value: 1 },
@@ -111,6 +135,7 @@ describe('ゲージの継続回復', () => {
         gauge: 'mental',
         calculationType: 1,
         amount: 10,
+        amountBasis: 'fixed',
         intervalType: 1,
         intervalMilliseconds: 200,
         duration: { kind: 'milliseconds', value: 500 },
@@ -134,6 +159,7 @@ describe('ゲージの継続回復', () => {
         gauge: 'mental',
         calculationType: 2,
         amount: 10,
+        amountBasis: 'fixed',
         intervalType: 1,
         intervalMilliseconds: 200,
         duration: { kind: 'milliseconds', value: 500 },
@@ -151,6 +177,7 @@ describe('ゲージの継続回復', () => {
         gauge: 'voltage',
         calculationType: 1,
         amount: 5,
+        amountBasis: 'fixed',
         intervalType: 1,
         intervalMilliseconds: 100,
         duration: { kind: 'milliseconds', value: 500 },
