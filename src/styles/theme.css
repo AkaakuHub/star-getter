@@ -30,9 +30,9 @@
   --line: #353148;
   --teal: #d94e7d;
   --teal-dark: #b83b66;
-  --nova: #ed7297;
-  --lumen: #72c5cf;
-  --tetra: #ebc061;
+  --nova: #f6b83c;
+  --lumen: #79b8e5;
+  --tetra: #a6a6cf;
   --accent: var(--teal);
   color-scheme: light;
 }

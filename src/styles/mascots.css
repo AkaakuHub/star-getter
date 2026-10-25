@@ -1,8 +1,90 @@
 .mascot {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  overflow: visible;
+}
+.weather-body {
+  position: absolute;
+  inset: 12% 3% 3%;
+  width: 94%;
+  height: 85%;
+  filter: drop-shadow(0 3px 0 #35314822);
+}
+.weather-face {
+  position: absolute;
+  top: 49%;
+  left: 37%;
+  width: 26%;
+  height: 10%;
+}
+.weather-lumen .weather-face {
+  top: 38%;
+}
+.weather-tetra .weather-face {
+  top: 50%;
+}
+.weather-face::before,
+.weather-face::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 12%;
+  height: 55%;
+  border-radius: 50%;
+  background: #353148;
+}
+.weather-face::before {
+  left: 9%;
+}
+.weather-face::after {
+  right: 9%;
+}
+.weather-smile {
+  position: absolute;
+  top: 44%;
+  left: 35%;
+  width: 30%;
+  height: 35%;
+  border: 2px solid #353148;
+  border-top: 0;
+  border-radius: 0 0 50% 50%;
+}
+.weather-scarf {
+  position: absolute;
+  top: 67%;
+  left: 32%;
+  width: 36%;
+  height: 7%;
+  border: 1px solid var(--costume-trim);
+  border-radius: 40%;
+  background: var(--costume-fabric);
+  transform: rotate(-8deg);
+}
+.weather-lumen .weather-scarf {
+  top: 54%;
+}
+.weather-tetra .weather-scarf {
+  top: 66%;
+}
+.weather-accessory {
+  position: absolute;
+  top: 6%;
+  right: 9%;
+  display: grid;
+  place-items: center;
+  width: 29%;
+  aspect-ratio: 1;
+  padding: 4%;
+  border: 2px solid var(--costume-trim);
+  border-radius: 28%;
+  background: var(--costume-fabric);
+  color: var(--costume-trim);
+  transform: rotate(12deg);
+}
+.weather-accessory svg {
+  width: 100%;
+  height: 100%;
 }
 .portrait {
   background: #f7f0e8;

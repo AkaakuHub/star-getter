@@ -11,23 +11,23 @@ type Performer = Readonly<{
 export const performers: Readonly<Record<PerformerId, Performer>> = {
   nova: {
     id: 'nova',
-    name: '朝凪のあ',
+    name: 'たいよう',
     mood: 'warm',
-    color: '#ff8fab',
+    color: '#f6b83c',
     costume: 'star',
   },
   lumen: {
     id: 'lumen',
-    name: '雨宮せり',
+    name: 'あめ',
     mood: 'cool',
-    color: '#7edce4',
+    color: '#79b8e5',
     costume: 'sailor',
   },
   tetra: {
     id: 'tetra',
-    name: '星乃りお',
+    name: 'くも',
     mood: 'bright',
-    color: '#ffd678',
+    color: '#a6a6cf',
     costume: 'sunny',
   },
 };
