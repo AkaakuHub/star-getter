@@ -19,7 +19,7 @@ export const preparationCards: readonly Card[] = [
       { kind: 'mood', amount: -50 },
       { kind: 'mental-shield', amount: 140, moodBonus: { target: 3, perPoint: 0.7 } },
       { kind: 'ap-speed', percent: 14, duration: 'section' },
-      { kind: 'hand-limit', amount: 1 },
+      { kind: 'hand-limit', amount: 1, duration: { kind: 'sections', value: 1 } },
     ],
     drawEffects: [
       {

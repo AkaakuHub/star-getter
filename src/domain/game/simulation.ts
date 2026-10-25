@@ -9,7 +9,8 @@ import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt, moodValue } from './projection';
 import { finishBloom } from './bloom';
-import { fillHand } from './cards/drawing';
+import { fillHand, fillHandToCountRetainingOverflow } from './cards/drawing';
+import { advanceHandLimitEffects, expireHandLimitSections } from './effects/handLimit';
 import { createStarGatherHeartRuntimeState } from './live/heartSpawn';
 import { recordScoreHistory } from './scoreHistory';
 import { recordMoodHistory } from './moodHistory';
@@ -67,6 +68,7 @@ export function createGame(
     tokenGroups: [],
     tokenBoosts: [],
     handLimit: rules.handSize,
+    handLimitEffects: [],
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
     lastUsedMember: null,
@@ -200,6 +202,11 @@ function advanceTick(state: GameState): GameState {
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
+  const elapsedHandLimit = advanceHandLimitEffects(next, dt);
+  next = elapsedHandLimit.state;
+  if (elapsedHandLimit.handAdjustment > 0) {
+    next = restoreHandLimitCount(next, elapsedHandLimit.handAdjustment);
+  }
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   if (beat !== previousBeat && beat % 2 === 0) {
@@ -207,10 +214,15 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
+    const expiredHandLimit = expireHandLimitSections(next);
+    next = expiredHandLimit.state;
+    if (expiredHandLimit.handAdjustment > 0) {
+      next = restoreHandLimitCount(next, expiredHandLimit.handAdjustment);
+    }
     next = expireGaugeInfinities(next, 'sections', 1);
     next = expireGaugeRegenerations(next, 'sections');
     next = expireMentalBarriers(next, 'sections', 1);
-    next = fillHand({
+    next = {
       ...next,
       voltageStops: next.voltageStops.flatMap((stop) => {
         if (stop.remainingSections === null) return [stop];
@@ -222,7 +234,6 @@ function advanceTick(state: GameState): GameState {
         const remainingSections = boost.remainingSections - 1;
         return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
       }),
-      handLimit: rules.handSize,
       moodOffset: 0,
       sectionMentalProtected: false,
       sectionBeatHeartBonus: 0,
@@ -241,7 +252,7 @@ function advanceTick(state: GameState): GameState {
       amplification: next.amplification - next.sectionAmplification,
       sectionAmplification: 0,
       targetBoosts: next.targetBoosts.filter((boost) => boost.duration === 'stage'),
-    });
+    };
   }
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
@@ -256,6 +267,14 @@ function advanceTick(state: GameState): GameState {
           moodValue: mood,
         }),
       };
+}
+
+function restoreHandLimitCount(state: GameState, adjustment: number): GameState {
+  const target = Math.min(
+    state.deck.length,
+    Math.max(3, Math.min(8, state.hand.length + adjustment)),
+  );
+  return fillHandToCountRetainingOverflow(state, target);
 }
 
 function validateTrack(track: Track): void {

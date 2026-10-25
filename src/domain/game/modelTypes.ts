@@ -201,7 +201,12 @@ type EffectShape =
       uses?: number;
       duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
     }>
-  | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
+  | Readonly<{
+      kind: 'hand-limit';
+      amount: number;
+      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    }>
+  | Readonly<{ kind: 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'use-hand'; addAp?: number }>
   | Readonly<{ kind: 'card-move'; destination: 'deck' | 'exclusion' }>
   | Readonly<{ kind: 'shuffle'; recoverDiscard: boolean; destination: 'draw' | 'discard' }>

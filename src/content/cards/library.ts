@@ -22,7 +22,7 @@ export const libraryCards: readonly Card[] = [
           condition: 'first-section',
           effects: [
             { kind: 'ap-speed', percent: 80, duration: 'section' },
-            { kind: 'hand-limit', amount: 3 },
+            { kind: 'hand-limit', amount: 3, duration: { kind: 'sections', value: 1 } },
             { kind: 'tokens', token: 'story', count: 30 },
           ],
         },

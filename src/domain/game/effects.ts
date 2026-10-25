@@ -120,7 +120,7 @@ export function applyEffect(
       };
     }
     case 'hand-limit':
-      return applyHandLimit(state, effect.amount, card, multiplier);
+      return applyHandLimit(state, effect.amount, card, multiplier, effect.duration);
     case 'heart-limit':
       return {
         ...state,

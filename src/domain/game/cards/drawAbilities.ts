@@ -36,7 +36,7 @@ function applyNamedDrawAbility(state: GameState, card: Card): GameState {
     const effects: readonly Effect[] = [
       { kind: 'stamina', amount: -14, moodBonus: { target: 3, perPoint: -0.07 } },
       { kind: 'ap-speed', percent: -14, duration: 'section' },
-      { kind: 'hand-limit', amount: -1 },
+      { kind: 'hand-limit', amount: -1, duration: { kind: 'sections', value: 1 } },
     ];
     return effects.reduce<GameState>(
       (current, effect) => applyEffect(current, effect, card),

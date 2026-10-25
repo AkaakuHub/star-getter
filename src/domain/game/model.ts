@@ -186,6 +186,11 @@ export type GameState = Readonly<{
   }>[];
   tokenBoosts: readonly TokenBoost[];
   handLimit: number;
+  handLimitEffects: readonly Readonly<{
+    amount: number;
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+  }>[];
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
     shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];

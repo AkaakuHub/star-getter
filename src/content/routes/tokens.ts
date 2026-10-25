@@ -79,7 +79,7 @@ export const routeTokens: readonly Card[] = [
     drawAbility: 'clock',
     beforeUseEffects: [{ kind: 'tokens', token: 'bookmark', count: 1 }],
     effects: [
-      { kind: 'hand-limit', amount: 3 },
+      { kind: 'hand-limit', amount: 3, duration: { kind: 'sections', value: 1 } },
       { kind: 'mood', amount: 80 },
     ],
   },

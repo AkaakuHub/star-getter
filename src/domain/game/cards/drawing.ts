@@ -16,11 +16,15 @@ export function handCapacity(state: GameState): number {
 }
 
 export function fillHand(state: GameState): GameState {
-  return drawUntil(state, handCapacity(state));
+  return drawUntil(state, handCapacity(state), true);
 }
 
 export function fillHandToCount(state: GameState, count: number): GameState {
-  return drawUntil(state, count);
+  return drawUntil(state, count, true);
+}
+
+export function fillHandToCountRetainingOverflow(state: GameState, count: number): GameState {
+  return drawUntil(state, count, false);
 }
 
 export function removeRandomHandCards(state: GameState, count: number): GameState {
@@ -47,7 +51,7 @@ export function removeRandomHandCards(state: GameState, count: number): GameStat
   };
 }
 
-function drawUntil(state: GameState, count: number): GameState {
+function drawUntil(state: GameState, count: number, trimOverflow: boolean): GameState {
   let next = state;
   const drawnCards: Card[] = [];
 
@@ -107,7 +111,7 @@ function drawUntil(state: GameState, count: number): GameState {
     };
   }
   const maximum = handCapacity(next);
-  if (next.hand.length > maximum) {
+  if (trimOverflow && next.hand.length > maximum) {
     const ordered = [...next.hand].sort(
       (left, right) =>
         Number(Boolean(next.deck.find((card) => card.id === right)?.passive)) -

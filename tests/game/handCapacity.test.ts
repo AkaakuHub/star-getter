@@ -15,15 +15,31 @@ function game() {
   });
 }
 
-it('手札上限を増やすと8枚まで補充し、パート終了時に5枚へ戻す', () => {
-  const expanded = fillHand(applyEffect(game(), { kind: 'hand-limit', amount: 3 }));
+it('手札目標数の期限後に上限を戻しても保持中の手札は減らさない', () => {
+  const expanded = fillHand(
+    applyEffect(game(), {
+      kind: 'hand-limit',
+      amount: 3,
+      duration: { kind: 'sections', value: 1 },
+    }),
+  );
   expect(handCapacity(expanded)).toBe(8);
   expect(expanded.hand).toHaveLength(8);
   const nextSection = expanded.track.sections[1];
   if (!nextSection) throw new Error('次のパートがありません。');
   const nextPart = advanceTo(expanded, (nextSection.startBeat * 60) / expanded.track.bpm);
   expect(handCapacity(nextPart)).toBe(5);
-  expect(nextPart.hand).toHaveLength(5);
+  expect(nextPart.hand).toHaveLength(8);
+});
+
+it('ミリ秒期限の手札数変更を期限後に解除する', () => {
+  const state = applyEffect(game(), {
+    kind: 'hand-limit',
+    amount: 1,
+    duration: { kind: 'milliseconds', value: 100 },
+  });
+  expect(state.handLimit).toBe(6);
+  expect(advanceTo(state, 0.2).handLimit).toBe(5);
 });
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
