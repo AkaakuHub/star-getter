@@ -25,6 +25,23 @@ it('Action48 calcType1にNumToValue・AddValue・MultiplyFactor・EffectPowerを
   expect(moodValueWithoutLimit(changed)).toBe(52);
 });
 
+it('Action48の詳細値をC#のint32へ変換してからNumToValueを計算する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const changed = applyEffect(
+    initial,
+    {
+      kind: 'mood-change-skill',
+      calculationType: 1,
+      num: 2_147_483_648,
+      duration: { kind: 'stage', value: 0 },
+    },
+    source,
+  );
+  expect(changed.moodSkillBuffs[0]?.value).toBe(-214_748);
+});
+
 it('Action48 calcType2は現在の未制限気分値との差を加算する', () => {
   const initial = { ...game('library'), moodOffset: 10 };
   const source = initial.deck[0];

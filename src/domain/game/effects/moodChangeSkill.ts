@@ -18,7 +18,8 @@ export function activateMoodChangeSkill(
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const currentMood = moodValueWithoutLimit(state);
-  const num = Math.fround(effect.num / 10_000);
+  const intNum = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.num))));
+  const num = Math.fround(Math.fround(intNum) / Math.fround(10_000));
   const bonusMood = effect.bonusMood
     ? calculateSkillMoodCorrection(
         effect.bonusMood.target,
@@ -31,14 +32,21 @@ export function activateMoodChangeSkill(
   let isPositive = true;
   switch (effect.calculationType) {
     case 1:
-      value = multiplyFloat32(Math.fround(bonusMood + num + addValue), multiplier, effectPower);
+      value = multiplyFloat32(
+        Math.fround(Math.fround(bonusMood + num) + Math.fround(addValue)),
+        multiplier,
+        effectPower,
+      );
       calculation = 'add';
       break;
     case 2:
       value = multiplyFloat32(
         effectPower,
         multiplier,
-        Math.fround(addValue + Math.fround(Math.fround(num * currentMood) - currentMood)),
+        Math.fround(
+          Math.fround(addValue) +
+            Math.fround(Math.fround(num * Math.fround(currentMood)) - Math.fround(currentMood)),
+        ),
       );
       isPositive = num >= 1;
       calculation = 'add';
@@ -49,7 +57,11 @@ export function activateMoodChangeSkill(
       break;
     case 4:
       if (currentMood === 0) return state;
-      value = multiplyFloat32(Math.fround(bonusMood + num + addValue), multiplier, effectPower);
+      value = multiplyFloat32(
+        Math.fround(Math.fround(bonusMood + num) + Math.fround(addValue)),
+        multiplier,
+        effectPower,
+      );
       if (currentMood < 0) value = Math.fround(-value);
       calculation = 'add';
       break;
