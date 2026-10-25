@@ -1,10 +1,5 @@
 import type { SkillCooldownEffectInput } from './skillCooldownTypes';
-import type {
-  InduceSkillEffectInput,
-  EffectInduceEffect,
-  UseCountInduceEffect,
-  UseInduceEffect,
-} from './induceSkillEffectTypes';
+import type { InduceSkillEffectInput, InduceEffect } from './induceSkillEffectTypes';
 import type { DisableMentalDownEffect } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
@@ -221,9 +216,7 @@ type EffectShape =
       condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
       effects: readonly Effect[];
     }>
-  | UseInduceEffect
-  | UseCountInduceEffect
-  | EffectInduceEffect
+  | InduceEffect
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
   | Readonly<{ kind: 'ingame-mission'; groupId: number }>
   | Readonly<{

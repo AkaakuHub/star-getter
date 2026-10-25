@@ -32,7 +32,6 @@ import { dispatchEarlyEffect } from './effects/earlyEffectDispatch';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
-import { activateVoltageConversion } from './effects/voltageConversion';
 import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
 import { activateComboInduce } from './effects/comboInduce';
 import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
@@ -41,12 +40,9 @@ import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
 import { startIngameMission } from './ingameMissions';
 import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
-import { activateHeartLimitBoost } from './effects/heartLimitBoost';
-import { activateMoodValueBoost } from './effects/moodValueBoost';
 import { activateHandMaxCard } from './effects/handMaxCard';
 import { activateMentalShield } from './effects/mentalShield';
-import { activateUseCountInduce, activateUseInduce } from './effects/useInduce';
-import { activateEffectInduce, refreshEffectInducers } from './effects/effectInduce';
+import { refreshEffectInducers } from './effects/effectInduce';
 import {
   activateFixedParameterExtend,
   changeFixedParameterBase,
@@ -75,15 +71,17 @@ function applyEffectInternal(
   effectPower: number,
 ): GameState {
   effect = resolveEffectParameterDetails(state, card, effect);
-  const earlyEffect = dispatchEarlyEffect(state, effect, card, multiplier, addValue, effectPower);
+  const earlyEffect = dispatchEarlyEffect(
+    state,
+    effect,
+    card,
+    multiplier,
+    addValue,
+    effectPower,
+    applyEffect,
+  );
   if (earlyEffect) return earlyEffect;
-  if (effect.kind === 'heart-limit-boost')
-    return activateHeartLimitBoost(state, effect, multiplier, addValue);
-  if (effect.kind === 'mood-value-boost')
-    return activateMoodValueBoost(state, effect, card, multiplier, addValue);
   if (effect.kind === 'hand-max-card') return activateHandMaxCard(state, effect);
-  if (effect.kind === 'voltage-convert')
-    return activateVoltageConversion(state, effect, card, multiplier, addValue);
   if (effect.kind === 'mental-heart-induce')
     return activateMentalHeartInduce(state, effect, card, multiplier, addValue);
   if (effect.kind === 'combo-induce')
@@ -94,10 +92,6 @@ function applyEffectInternal(
     return activateAdditionalHeartInduce(state, effect, card, multiplier, addValue);
   if (effect.kind === 'induce-skill-effect')
     return activateInducedSkillEffect(state, effect, card, multiplier, addValue);
-  if (effect.kind === 'use-induce') return activateUseInduce(state, effect, card, applyEffect);
-  if (effect.kind === 'use-count-induce')
-    return activateUseCountInduce(state, effect, card, applyEffect);
-  if (effect.kind === 'effect-induce') return activateEffectInduce(state, effect, card);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);

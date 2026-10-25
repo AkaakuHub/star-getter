@@ -312,7 +312,7 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
       handCountChanges: {},
     },
   };
-  const finished = finishCardActivation(activated);
+  const finished = finishCardActivation(activated, applyEffect);
   expect(finished.proxyCards).toEqual([source.id, child.id]);
   expect(finished.drawPile).not.toContain(child.id);
   expect(finished.discard).not.toContain(source.id);

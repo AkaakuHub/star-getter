@@ -23,6 +23,21 @@ export type EffectInduceEffect = Readonly<{
   effects: readonly import('./modelTypes').Effect[];
 }>;
 
+export type CardMoveInduceEffect = Readonly<{
+  kind: 'card-move-induce';
+  sourceEffectId: string;
+  timing: 'stage-to-graveyard';
+  limit: number;
+  requireCount: number;
+  effects: readonly import('./modelTypes').Effect[];
+}>;
+
+export type InduceEffect =
+  | EffectInduceEffect
+  | CardMoveInduceEffect
+  | UseCountInduceEffect
+  | UseInduceEffect;
+
 export type ActiveEffectInducer = Readonly<{
   sourceCardId: string;
   sourceEffectId: string;
@@ -30,6 +45,17 @@ export type ActiveEffectInducer = Readonly<{
   threshold: EffectInduceEffect['threshold'];
   effects: EffectInduceEffect['effects'];
   active: boolean;
+}>;
+
+export type ActiveCardMoveInducer = Readonly<{
+  sourceCardId: string;
+  sourceEffectId: string;
+  timing: CardMoveInduceEffect['timing'];
+  limit: number;
+  requireCount: number;
+  effects: CardMoveInduceEffect['effects'];
+  useCount: number;
+  activatedCount: number;
 }>;
 
 export type InduceSkillEffectInput = Readonly<{

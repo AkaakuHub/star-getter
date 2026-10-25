@@ -137,7 +137,7 @@ function useCard(state: GameState, index: number): GameState {
       handCountChanges: {},
     },
   };
-  return finishCardActivation(activateCard(activated, source, state.hand, false));
+  return finishCardActivation(activateCard(activated, source, state.hand, false), applyEffect);
 }
 
 function activateCard(

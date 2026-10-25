@@ -1,6 +1,6 @@
 import type { Effect } from './modelTypes';
 import type { UseCountInduceEffect, UseInduceEffect } from './induceSkillEffectTypes';
-import type { EffectInduceEffect } from './induceSkillEffectTypes';
+import type { CardMoveInduceEffect, EffectInduceEffect } from './induceSkillEffectTypes';
 
 export function validateUseInduceEffect(
   effect: UseInduceEffect,
@@ -37,5 +37,19 @@ export function validateEffectInduceEffect(
     !effect.effects.length
   )
     throw new Error('効果誘発の設定が正しくありません。');
+  for (const child of effect.effects) validateChild(child);
+}
+
+export function validateCardMoveInduceEffect(
+  effect: CardMoveInduceEffect,
+  validateChild: (effect: Effect) => void,
+): void {
+  if (
+    !effect.sourceEffectId ||
+    effect.timing !== 'stage-to-graveyard' ||
+    !Number.isSafeInteger(effect.limit) ||
+    !Number.isSafeInteger(effect.requireCount)
+  )
+    throw new Error('カード移動誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);
 }

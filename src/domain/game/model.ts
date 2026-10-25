@@ -1,5 +1,9 @@
 import type { SkillCooldownEffect } from './skillCooldownTypes';
-import type { ActiveEffectInducer, InducedSkillEffect } from './induceSkillEffectTypes';
+import type {
+  ActiveCardMoveInducer,
+  ActiveEffectInducer,
+  InducedSkillEffect,
+} from './induceSkillEffectTypes';
 import type { DisableMentalDown } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
@@ -42,6 +46,8 @@ import type { SpecialAppealToken } from './specialAppealTokenTypes';
 import type { HandMaxCardEffectState } from './handMaxCardTypes';
 import type { MentalShield } from './mentalShieldTypes';
 import type { FixedParameterExtend } from './fixedParameterExtendTypes';
+import type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
+export type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -95,23 +101,6 @@ export type CardUse = Readonly<{
   handIndex: number;
   handCount: number;
   cost: number;
-}>;
-export type Boost = Readonly<{
-  percent: number;
-  untilTick: number;
-  deactivationKey?: string | null;
-}>;
-export type ResourceBoost = Readonly<{
-  target: 'excitement' | 'stamina' | 'attract';
-  members?: readonly MemberId[];
-  percent: number;
-  uses: number | null;
-}>;
-export type TargetBoost = Readonly<{
-  members: readonly MemberId[];
-  percent: number;
-  duration: 'stage' | 'section';
-  deactivationKey?: string;
 }>;
 export type Bloom = Readonly<{
   progress: bigint;
@@ -305,6 +294,7 @@ export type GameState = Readonly<{
   handUseActivationCounts: Readonly<Record<string, number>>;
   useInduceActivationCounts: Readonly<Record<string, number>>;
   effectInducers: readonly ActiveEffectInducer[];
+  cardMoveInducers: readonly ActiveCardMoveInducer[];
   combo: number;
   lastCollectTick: number;
   lastActionTick: number;
