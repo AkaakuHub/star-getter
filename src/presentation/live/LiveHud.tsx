@@ -69,7 +69,7 @@ export function LiveHud({
         type="button"
         className="collect-number"
         style={liveLayout.hearts}
-        disabled={!heartCount(state) || state.phase !== 'playing'}
+        disabled={state.phase !== 'playing'}
         onPointerDown={(event) => {
           if (event.button === 0) {
             event.preventDefault();
