@@ -1,7 +1,7 @@
 import type { GameState } from '../model';
 import { disposeHandEffects } from './handEffects';
 import { flushDeckActions } from './boardActions';
-import { fillHand } from './drawing';
+import { fillHand, handCapacity, removeRandomHandCards } from './drawing';
 
 export function finishCardActivation(state: GameState): GameState {
   const activation = state.activation;
@@ -35,13 +35,24 @@ export function finishCardActivation(state: GameState): GameState {
     ],
   };
   next = flushDeckActions(next);
-  next = fillHand({
+  const handCountChange = activation.handCountChanges[source.id] ?? 0;
+  const handReady: GameState = {
     ...next,
     lastUsedMember: source.member,
     lastUsedUnit: source.unit,
     lastUsedSkillIcon: source.skillIcon ?? null,
     drawContext: 'skill',
-  });
+  };
+  if (handCountChange < 0) {
+    const target = Math.min(handCapacity(handReady), handReady.deck.length);
+    const removedCount = Math.max(0, handReady.hand.length + 1 - target);
+    next = {
+      ...removeRandomHandCards(handReady, removedCount),
+      drawContext: 'idle',
+    };
+  } else {
+    next = fillHand(handReady);
+  }
   next = disposeHandEffects(next, [source.id]);
   next = excludedIds.has(source.id)
     ? excludeCards(next, [source.id])

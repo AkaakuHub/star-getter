@@ -212,6 +212,7 @@ export type GameState = Readonly<{
     recoverDiscard: boolean;
     returnToDraw: readonly string[];
     excluded: readonly string[];
+    handCountChanges: Readonly<Record<string, number>>;
   }> | null;
   randomSeed: number;
   energy: number;

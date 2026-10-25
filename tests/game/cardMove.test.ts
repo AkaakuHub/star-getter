@@ -20,6 +20,7 @@ function activateSourceCard() {
         recoverDiscard: false,
         returnToDraw: [],
         excluded: [],
+        handCountChanges: {},
       },
     },
   };

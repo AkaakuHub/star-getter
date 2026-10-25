@@ -41,6 +41,7 @@ function useCard(state: GameState, index: number): GameState {
       recoverDiscard: false,
       returnToDraw: [],
       excluded: [],
+      handCountChanges: {},
     },
   };
   return finishCardActivation(activateCard(activated, source, state.hand, false));

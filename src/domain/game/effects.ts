@@ -23,6 +23,7 @@ import { resolveEffectParameterDetails } from './parameters/parameterValueChange
 import { applyParameterEffect } from './parameters/applyParameterEffect';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
+import { applyHandLimit } from './effects/handLimit';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -119,7 +120,7 @@ export function applyEffect(
       };
     }
     case 'hand-limit':
-      return { ...state, handLimit: state.handLimit + Math.trunc(value(effect.amount)) };
+      return applyHandLimit(state, effect.amount, card, multiplier);
     case 'heart-limit':
       return {
         ...state,

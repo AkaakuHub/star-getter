@@ -23,6 +23,30 @@ export function fillHandToCount(state: GameState, count: number): GameState {
   return drawUntil(state, count);
 }
 
+export function removeRandomHandCards(state: GameState, count: number): GameState {
+  let next = state;
+  const removed: string[] = [];
+  while (removed.length < count && next.hand.length > 0) {
+    const random = createRangeRandom(next.randomSeed);
+    const index = Math.floor(random.range(0, next.hand.length));
+    const id = next.hand[index];
+    if (id === undefined) throw new Error('手札のカードがありません。');
+    removed.push(id);
+    next = { ...next, randomSeed: random.seed, hand: next.hand.filter((cardId) => cardId !== id) };
+  }
+  next = disposeHandEffects(next, removed);
+  return {
+    ...next,
+    handCardStats: Object.fromEntries(
+      Object.entries(next.handCardStats).filter(([id]) => !removed.includes(id)),
+    ),
+    discard: [...next.discard, ...removed],
+    handHeartCollectCounts: Object.fromEntries(
+      Object.entries(next.handHeartCollectCounts).filter(([id]) => !removed.includes(id)),
+    ),
+  };
+}
+
 function drawUntil(state: GameState, count: number): GameState {
   let next = state;
   const drawnCards: Card[] = [];

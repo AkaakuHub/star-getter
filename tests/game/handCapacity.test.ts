@@ -4,6 +4,7 @@ import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { fillHand, handCapacity } from '../../src/domain/game/cards/drawing';
 import { applyEffect } from '../../src/domain/game/effects';
+import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 
 function game() {
@@ -29,6 +30,30 @@ it('手札枚数変更にスキル増幅を適用して整数化する', () => {
   const state = { ...game(), amplification: 150 };
   const next = applyEffect(state, { kind: 'hand-limit', amount: 3 });
   expect(next.handLimit).toBe(9);
+});
+
+it('手札枚数を減らす効果はランダム除外後に発動元を補充しない', () => {
+  const state = fillHand(game());
+  const source = state.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const activated = {
+    ...state,
+    hand: state.hand.filter((id) => id !== source.id),
+    activation: {
+      sourceId: source.id,
+      usedCards: [source.id],
+      allHand: false,
+      recoverDiscard: false,
+      returnToDraw: [],
+      excluded: [],
+      handCountChanges: {},
+    },
+  };
+  const changed = applyEffect(activated, { kind: 'hand-limit', amount: -1 }, source);
+  const finished = finishCardActivation(changed);
+  expect(finished.hand).toHaveLength(3);
+  expect(finished.discard).toHaveLength(2);
+  expect(finished.discard).toContain(source.id);
 });
 
 it('手札内の減少効果を合算してから、上限を3〜8枚に制限する', () => {
