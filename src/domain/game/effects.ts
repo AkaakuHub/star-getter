@@ -1,3 +1,4 @@
+import { enqueueHandShuffle } from './cards/boardActions';
 import { changeResource } from './resources';
 import { evaluateCondition } from './conditions/evaluate';
 import { conditionContext } from './conditions/gameContext';
@@ -100,30 +101,7 @@ export function applyEffect(
         ).state,
       };
     case 'shuffle':
-      return state.activation?.allHand
-        ? {
-            ...state,
-            activation: {
-              ...state.activation,
-              shuffle: {
-                recoverDiscard: Boolean(
-                  state.activation.shuffle?.recoverDiscard || effect.recoverDiscard,
-                ),
-                destination:
-                  state.activation.shuffle?.destination === 'draw' ? 'draw' : effect.destination,
-              },
-            },
-          }
-        : {
-            ...state,
-            deckActions: {
-              ...state.deckActions,
-              shuffles: [
-                ...state.deckActions.shuffles,
-                { sourceId: card?.id ?? null, options: effect },
-              ],
-            },
-          };
+      return enqueueHandShuffle(state, effect, card?.id ?? null);
     case 'search-unit':
     case 'search-token': {
       const target =

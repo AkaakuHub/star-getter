@@ -1,7 +1,7 @@
 import type { GameState } from '../model';
 import { disposeHandEffects } from './handEffects';
 import { flushDeckActions } from './boardActions';
-import { fillHand, shuffleHand } from './drawing';
+import { fillHand } from './drawing';
 
 export function finishCardActivation(state: GameState): GameState {
   const activation = state.activation;
@@ -14,14 +14,18 @@ export function finishCardActivation(state: GameState): GameState {
     activation.excluded.filter((id) => id !== source.id),
   );
   const activeChildren = children.filter((id) => next.deck.some((card) => card.id === id));
-  next = activation.shuffle
-    ? shuffleHand(
-        activation.shuffle.destination === 'draw'
-          ? { ...next, drawPile: [...next.drawPile, ...activeChildren] }
-          : { ...next, discard: [...next.discard, ...activeChildren] },
-        activation.shuffle,
-      )
-    : { ...next, discard: [...next.discard, ...activeChildren] };
+  next = {
+    ...next,
+    drawPile: [
+      ...next.drawPile,
+      ...(activation.recoverDiscard ? next.discard : []),
+      ...activeChildren.filter((id) => activation.returnToDraw.includes(id)),
+    ],
+    discard: [
+      ...(activation.recoverDiscard ? [] : next.discard),
+      ...activeChildren.filter((id) => !activation.returnToDraw.includes(id)),
+    ],
+  };
   next = flushDeckActions(next);
   next = fillHand({
     ...next,
@@ -33,7 +37,9 @@ export function finishCardActivation(state: GameState): GameState {
   next = disposeHandEffects(next, [source.id]);
   next = activation.excluded.includes(source.id)
     ? excludeCards(next, [source.id])
-    : { ...next, discard: [...next.discard, source.id] };
+    : activation.returnToDraw.includes(source.id)
+      ? { ...next, drawPile: [...next.drawPile, source.id] }
+      : { ...next, discard: [...next.discard, source.id] };
   return { ...next, activation: null };
 }
 

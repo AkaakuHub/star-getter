@@ -36,7 +36,8 @@ function useCard(state: GameState, index: number): GameState {
       sourceId: source.id,
       usedCards: [],
       allHand: source.effects.some((effect) => effect.kind === 'use-hand'),
-      shuffle: null,
+      recoverDiscard: false,
+      returnToDraw: [],
       excluded: [],
     },
   };

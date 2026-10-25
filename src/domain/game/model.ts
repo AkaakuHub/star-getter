@@ -240,7 +240,8 @@ export type GameState = Readonly<{
     sourceId: string;
     usedCards: readonly string[];
     allHand: boolean;
-    shuffle: HandShuffle | null;
+    recoverDiscard: boolean;
+    returnToDraw: readonly string[];
     excluded: readonly string[];
   }> | null;
   randomSeed: number;

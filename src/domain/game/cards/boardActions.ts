@@ -1,4 +1,4 @@
-import type { GameState } from '../model';
+import type { GameState, HandShuffle } from '../model';
 import { fillHandToCount, shuffleHand } from './drawing';
 
 export function flushDeckActions(state: GameState): GameState {
@@ -29,4 +29,36 @@ export function flushDeckActions(state: GameState): GameState {
     );
   }
   return next;
+}
+
+export function enqueueHandShuffle(
+  state: GameState,
+  options: HandShuffle,
+  sourceId: string | null,
+): GameState {
+  const activation = state.activation;
+  if (!activation?.allHand)
+    return {
+      ...state,
+      deckActions: {
+        ...state.deckActions,
+        shuffles: [...state.deckActions.shuffles, { sourceId, options }],
+      },
+    };
+  return {
+    ...state,
+    activation: {
+      ...activation,
+      recoverDiscard: activation.recoverDiscard || options.recoverDiscard,
+      returnToDraw:
+        options.destination === 'draw'
+          ? [
+              ...new Set([
+                ...activation.returnToDraw,
+                ...[...activation.usedCards, ...state.hand].filter((id) => id !== sourceId),
+              ]),
+            ]
+          : activation.returnToDraw,
+    },
+  };
 }
