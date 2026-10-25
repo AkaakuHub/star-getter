@@ -20,7 +20,7 @@ export function collectionScore(state: GameState, count: number, missed: boolean
   const rank = calculateStarGatherHeartRank(count, voltage, null);
   const base = calculateStarGatherClientScore(
     {
-      cards: state.deck
+      cards: state.cardPool
         .filter((card) => !card.token)
         .map((card) => ({
           appealValue: calculateStarGatherCardAppealValue(card.appeal, 0, durationSeconds(state)),

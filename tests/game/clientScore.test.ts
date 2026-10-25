@@ -85,3 +85,9 @@ describe('スターギャザーの回収得点', () => {
     expect(collectionScore(huge, 100, false)).toBe(2147483647n);
   });
 });
+
+it('基本カードを除外しても開始時の基礎アピールを変えない', () => {
+  const initial = game();
+  const excluded = { ...initial, deck: initial.deck.filter((card) => card.id !== 'class') };
+  expect(collectionScore(excluded, 10, false)).toBe(collectionScore(initial, 10, false));
+});
