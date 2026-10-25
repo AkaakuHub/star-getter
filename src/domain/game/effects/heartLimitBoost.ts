@@ -31,7 +31,7 @@ export function activateHeartLimitBoost(
     calculation: effect.calculationType === 1 ? 'multiply2' : 'add',
     value,
     target: effect.target,
-    remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
+    remainingUses: toSignedInt32(effect.disabledType) === 1 ? effect.disabledCount : null,
     remainingSeconds:
       suppressed || effect.duration.kind !== 'milliseconds'
         ? null

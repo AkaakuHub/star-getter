@@ -43,7 +43,8 @@ export function activateMoodValueBoost(
         target: effect.target,
         paramSeriesIds: effect.tokenCardSeriesIds ?? null,
         remainingUses: 1,
-        remainingDeactivations: effect.disabledType === 1 ? effect.disabledCount : null,
+        remainingDeactivations:
+          toSignedInt32(effect.disabledType) === 1 ? toSignedInt32(effect.disabledCount) : null,
         remainingSeconds:
           effect.duration.kind !== 'milliseconds'
             ? null
