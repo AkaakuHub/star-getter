@@ -4,9 +4,7 @@ import {
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
 import { applyEffect } from '../effects';
-import { deactivateBeatPointBuffs } from '../effects/beatPointBuff';
-import { deactivateHandLimitEffects } from '../effects/handLimit';
-import { deactivateAction52SkillBoosts } from '../effects/action52SkillBoost';
+import { withDeactivationKey, deactivateInducedEffects } from '../effects/effectInduce';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -23,7 +21,7 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
               ? { ...effect, invocationType: 0x388, deactivationKey }
               : effect.kind === 'skill-boost'
                 ? { ...effect, invocationType: 0x388, deactivationKey }
-                : { ...effect, deactivationKey },
+                : withDeactivationKey(effect, deactivationKey),
             card,
           );
   }
@@ -64,18 +62,10 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
       effects.filter((effect) => effect.kind === 'parameter-value-change'),
     );
     const deactivationKey = `hand-permanent:${card.id}`;
+    next = deactivateInducedEffects(next, deactivationKey);
     next = {
       ...next,
       targetBoosts: next.targetBoosts.filter((boost) => boost.deactivationKey !== deactivationKey),
-    };
-    next = deactivateBeatPointBuffs(next, deactivationKey);
-    next = deactivateHandLimitEffects(next, deactivationKey).state;
-    next = deactivateAction52SkillBoosts(next, deactivationKey);
-    next = {
-      ...next,
-      skillScoreUps: next.skillScoreUps.filter(
-        (boost) => boost.deactivationKey !== deactivationKey,
-      ),
     };
   }
   return {
