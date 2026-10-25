@@ -58,6 +58,25 @@ it('追加カードの増幅は対象カードと生成効果のシリーズ指�
   expect(matched.deck.filter((card) => card.token === 'story')).toHaveLength(4);
 });
 
+it('ActionType38は負の加算バフを登録して追加枚数を減らす', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('発動元カードがありません。');
+  const boosted = applyEffect(
+    initial,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: -10_000,
+      target: { kind: 'member', member: source.member },
+    },
+    source,
+  );
+  expect(boosted.tokenBoosts[0]?.value).toBe(-1);
+  const generated = requestTokens(boosted, 'story', 2, source.id);
+  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(1);
+});
+
 it('追加カードの増幅は時間またはパート期限で解除する', () => {
   const initial = game('library');
   const source = initial.deck[0];
@@ -230,7 +249,7 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
   ).toHaveLength(0);
 });
 
-it('ActionType38は詳細値をint32へ変換してからNumToValueを適用する', () => {
+it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適用する', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
@@ -244,7 +263,9 @@ it('ActionType38は詳細値をint32へ変換してからNumToValueを適用す�
     },
     source,
   );
-  expect(wrapped.tokenBoosts).toHaveLength(0);
+  expect(wrapped.tokenBoosts[0]?.value).toBe(
+    Math.trunc(Math.fround(Math.fround(2_147_483_648) / Math.fround(10_000))),
+  );
 
   const float32Value = applyEffect(
     initial,
@@ -257,6 +278,6 @@ it('ActionType38は詳細値をint32へ変換してからNumToValueを適用す�
     source,
   );
   expect(float32Value.tokenBoosts[0]?.value).toBe(
-    Math.fround(Math.fround(Math.fround(16_777_216) / Math.fround(10_000))),
+    Math.trunc(Math.fround(Math.fround(16_777_216) / Math.fround(10_000))),
   );
 });
