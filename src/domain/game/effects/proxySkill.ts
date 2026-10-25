@@ -194,7 +194,7 @@ function finishProxyAbsorption(
   const allTargetsReached = absorption.effects.every((effect) =>
     isProxyTargetReached(absorption, effect),
   );
-  if (checkTargets && !allTargetsReached) return removeProxyAbsorption(state, absorption);
+  if (checkTargets && !allTargetsReached) return releaseFailedProxyAbsorption(state, absorption);
   const card = state.cardPool.find((item) => item.id === absorption.sourceId);
   if (!card) return removeProxyAbsorption(state, absorption);
   let next = updateProxyAbsorption(state, absorption, { ...absorption, isAbsorbEnd: true });
@@ -254,7 +254,7 @@ function endProxyAbsorption(
   const allTargetsReached = absorption.effects.every((effect) =>
     isProxyTargetReached(absorption, effect),
   );
-  if (checkTargets && !allTargetsReached) return removeProxyAbsorption(state, absorption);
+  if (checkTargets && !allTargetsReached) return releaseFailedProxyAbsorption(state, absorption);
   return updateProxyAbsorption(state, absorption, { ...absorption, isAbsorbEnd: true });
 }
 
@@ -291,6 +291,21 @@ function removeProxyAbsorption(
     return false;
   });
   return removed ? { ...state, proxyAbsorptions } : state;
+}
+
+function releaseFailedProxyAbsorption(
+  state: GameState,
+  absorption: GameState['proxyAbsorptions'][number],
+): GameState {
+  const next = removeProxyAbsorption(state, absorption);
+  if (!state.proxyCards.includes(absorption.sourceId)) return next;
+  return {
+    ...next,
+    proxyCards: next.proxyCards.filter((id) => id !== absorption.sourceId),
+    discard: next.discard.includes(absorption.sourceId)
+      ? next.discard
+      : [...next.discard, absorption.sourceId],
+  };
 }
 
 function signedInt32(value: number): number {
