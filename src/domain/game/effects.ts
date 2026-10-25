@@ -14,9 +14,10 @@ import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
 import { applyCostReduction } from './cards/cost';
 import { requestTokens } from './cards/tokens';
+import { skillValue } from './effects/skillValue';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
-import { applyStarGatherSkillBoost } from './live/skillBoost';
+export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
   state: GameState,
@@ -89,7 +90,32 @@ export function applyEffect(
       );
     }
     case 'tokens':
-      return requestTokens(state, effect.token, effect.count, card?.id ?? null);
+      return requestTokens(state, effect.token, effect.count, card?.id ?? null, effect.seriesIds);
+    case 'token-boost': {
+      const base = Math.fround(
+        (Math.fround(effect.num / 10_000) + (effect.addValue ?? 0)) * multiplier,
+      );
+      if (base <= 0) return state;
+      const boosted = skillValue(state, base, { kind: 'amplify', percent: base }, card);
+      return {
+        ...state,
+        tokenBoosts: [
+          ...state.tokenBoosts,
+          {
+            calculation: effect.calculation,
+            value: boosted,
+            target: effect.target,
+            ...(effect.seriesIds ? { seriesIds: effect.seriesIds } : {}),
+            remainingUses: effect.uses ?? null,
+            remainingSeconds:
+              effect.duration?.kind === 'milliseconds'
+                ? Math.fround(effect.duration.value / 1000)
+                : null,
+            remainingSections: effect.duration?.kind === 'sections' ? effect.duration.value : null,
+          },
+        ],
+      };
+    }
     case 'hand-limit':
       return { ...state, handLimit: state.handLimit + effect.amount };
     case 'heart-limit':
@@ -295,55 +321,4 @@ export function applyEffect(
         : state;
     }
   }
-}
-
-export function skillValue(state: GameState, value: number, effect: Effect, card?: Card): number {
-  const bonus =
-    'moodBonus' in effect && effect.moodBonus
-      ? calculateSkillMoodCorrection(
-          effect.moodBonus.target,
-          moodValue(state),
-          effect.moodBonus.perPoint,
-        )
-      : 0;
-  const raw = Math.fround(value + bonus);
-  const base =
-    effect.kind === 'boost'
-      ? Math.trunc(raw)
-      : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'energy'
-        ? raw
-        : Math.ceil(raw);
-  const handBoost = state.deck.reduce(
-    (sum, item) =>
-      sum +
-      (state.handEffectCardIds.includes(item.id) &&
-      (item.token === 'bookmark' || item.token === 'story') &&
-      state.deck.length >= 80
-        ? Math.fround(1001 + Math.max(0, moodValue(state)) * 5.005)
-        : 0),
-    0,
-  );
-  const story = card?.token === 'story' ? state.storyAmplification + handBoost : 0;
-  const targeted = card
-    ? state.targetBoosts.reduce(
-        (sum, boost) => sum + (boost.members.includes(card.member) ? boost.percent : 0),
-        0,
-      )
-    : 0;
-  const passive = card
-    ? state.deck.reduce((sum, item) => {
-        const boost = item.passive?.skillBoost;
-        if (!state.handEffectCardIds.includes(item.id) || !boost?.members.includes(card.member))
-          return sum;
-        const mood = boost.moodBonus
-          ? calculateSkillMoodCorrection(
-              boost.moodBonus.target,
-              moodValue(state),
-              boost.moodBonus.perPoint,
-            )
-          : 0;
-        return sum + boost.percent + mood;
-      }, 0)
-    : 0;
-  return applyStarGatherSkillBoost(base, state.amplification - 100 + story + targeted + passive);
 }

@@ -24,6 +24,8 @@ export function describeEffect(effect: Effect): string {
     case 'tokens': {
       return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
     }
+    case 'token-boost':
+      return `追加カードの生成枚数を${effect.calculation === 'add' ? '加算' : '割合増幅'}する。`;
     case 'hand-limit':
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
     case 'heart-limit':

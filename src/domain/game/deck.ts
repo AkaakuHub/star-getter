@@ -91,6 +91,17 @@ function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
+  if (effect.kind === 'token-boost') {
+    if (
+      !Number.isSafeInteger(effect.num) ||
+      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
+      (effect.uses !== undefined && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
+      (effect.duration !== undefined &&
+        (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0))
+    )
+      throw new Error('追加カード増幅の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'stop-voltage-increase') {
     if (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)
       throw new Error('熱気停止の期限が正しくありません。');

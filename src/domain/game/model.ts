@@ -41,6 +41,20 @@ export type SearchRequest = Readonly<{
   scope: 'grade' | 'section' | 'skill';
   target: SearchTarget;
 }>;
+export type TokenBoostTarget =
+  | Readonly<{ kind: 'all' }>
+  | Readonly<{ kind: 'member'; member: MemberId }>
+  | Readonly<{ kind: 'unit'; unit: UnitId }>
+  | Readonly<{ kind: 'card-series'; seriesId: number }>;
+export type TokenBoost = Readonly<{
+  calculation: 'add' | 'multiply-percent';
+  value: number;
+  target: TokenBoostTarget;
+  seriesIds?: readonly number[];
+  remainingUses: number | null;
+  remainingSeconds: number | null;
+  remainingSections: number | null;
+}>;
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
   | Readonly<{
@@ -68,7 +82,17 @@ export type Effect =
       condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
       effects: readonly Effect[];
     }>
-  | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
+  | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
+  | Readonly<{
+      kind: 'token-boost';
+      calculation: TokenBoost['calculation'];
+      num: number;
+      addValue?: number;
+      target: TokenBoostTarget;
+      seriesIds?: readonly number[];
+      uses?: number;
+      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'use-hand' }>
   | (Readonly<{ kind: 'shuffle' }> & HandShuffle)
@@ -241,8 +265,13 @@ export type GameState = Readonly<{
   nextTokenId: number;
   tokenGroups: readonly Readonly<{
     sourceId: string;
-    requests: readonly Readonly<{ token: TokenKind; count: number }>[];
+    requests: readonly Readonly<{
+      token: TokenKind;
+      count: number;
+      seriesIds?: readonly number[];
+    }>[];
   }>[];
+  tokenBoosts: readonly TokenBoost[];
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{

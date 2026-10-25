@@ -48,6 +48,7 @@ export function createGame(
     tokenCatalog,
     nextTokenId: 1,
     tokenGroups: [],
+    tokenBoosts: [],
     handLimit: rules.handSize,
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },
@@ -159,6 +160,11 @@ function advanceTick(state: GameState): GameState {
       const remainingSeconds = Math.fround(stop.remainingSeconds - Math.fround(dt));
       return remainingSeconds > 0 ? [{ ...stop, remainingSeconds }] : [];
     }),
+    tokenBoosts: state.tokenBoosts.flatMap((boost) => {
+      if (boost.remainingSeconds === null) return [boost];
+      const remainingSeconds = Math.fround(boost.remainingSeconds - Math.fround(dt));
+      return remainingSeconds > 0 ? [{ ...boost, remainingSeconds }] : [];
+    }),
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
@@ -175,6 +181,11 @@ function advanceTick(state: GameState): GameState {
         if (stop.remainingSections === null) return [stop];
         const remainingSections = stop.remainingSections - 1;
         return remainingSections > 0 ? [{ ...stop, remainingSections }] : [];
+      }),
+      tokenBoosts: next.tokenBoosts.flatMap((boost) => {
+        if (boost.remainingSections === null) return [boost];
+        const remainingSections = boost.remainingSections - 1;
+        return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
       }),
       handLimit: rules.handSize,
       moodOffset: 0,

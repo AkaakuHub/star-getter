@@ -1,4 +1,5 @@
 import { type GameState, type TokenKind, rules } from '../model';
+import { boostTokenRequests } from './tokenBoost';
 
 export function addTokens(state: GameState, kind: TokenKind, count: number): GameState {
   const template = state.tokenCatalog.find((card) => card.token === kind);
@@ -28,14 +29,21 @@ export function requestTokens(
   token: TokenKind,
   count: number,
   sourceId: string | null,
+  seriesIds?: readonly number[],
 ): GameState {
-  if (count < 1 || state.deck.length >= rules.maxDeckSize) return state;
+  if (count < 1) return state;
   const index = state.tokenGroups.findLastIndex((group) => group.sourceId === sourceId);
-  if (index < 0) return addTokens(state, token, count);
+  if (index < 0) {
+    const boosted = boostTokenRequests(state, [{ token, count, seriesIds }], sourceId, false);
+    return addTokens(boosted.state, token, boosted.counts[0] ?? 0);
+  }
+  if (state.deck.length >= rules.maxDeckSize) return state;
   return {
     ...state,
     tokenGroups: state.tokenGroups.map((group, position) =>
-      position === index ? { ...group, requests: [...group.requests, { token, count }] } : group,
+      position === index
+        ? { ...group, requests: [...group.requests, { token, count, seriesIds }] }
+        : group,
     ),
   };
 }
@@ -44,8 +52,12 @@ export function finishTokenGeneration(state: GameState, sourceId: string): GameS
   const group = state.tokenGroups.at(-1);
   if (!group || group.sourceId !== sourceId)
     throw new Error('追加カードの生成順序が正しくありません。');
-  let next: GameState = { ...state, tokenGroups: state.tokenGroups.slice(0, -1) };
-  const pending = group.requests.map((request) => ({ ...request }));
+  const boosted = boostTokenRequests(state, group.requests, sourceId, true);
+  let next: GameState = { ...boosted.state, tokenGroups: state.tokenGroups.slice(0, -1) };
+  const pending = group.requests.map((request, index) => ({
+    token: request.token,
+    count: boosted.counts[index] ?? 0,
+  }));
   while (next.deck.length < rules.maxDeckSize) {
     let added = false;
     for (const request of pending) {
