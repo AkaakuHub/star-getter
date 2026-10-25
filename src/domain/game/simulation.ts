@@ -47,6 +47,7 @@ export function createGame(
     discard: [],
     tokenCatalog,
     nextTokenId: 1,
+    tokenGroups: [],
     handLimit: rules.handSize,
     drawContext: 'initial',
     deckActions: { shuffles: [], searches: [] },

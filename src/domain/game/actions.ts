@@ -1,3 +1,4 @@
+import { beginTokenGeneration, finishTokenGeneration } from './cards/tokens';
 import { applyBeforeUseAbility } from './cards/beforeUse';
 import { drainModeChanges } from './effects/modeChange';
 import { collectHearts } from './hearts';
@@ -76,7 +77,7 @@ function activateCard(
       },
     ],
   };
-  next = retireCard(applyBeforeUseAbility(next, card), card);
+  next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') {
       if (allHand) continue;
@@ -91,7 +92,7 @@ function activateCard(
       next = applyEffect(next, effect, card);
     }
   }
-  next = applyUseAbility(next, card);
+  next = applyUseAbility(finishTokenGeneration(next, card.id), card);
   return notifyHandSkillUse(next, card);
 }
 

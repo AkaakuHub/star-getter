@@ -31,3 +31,17 @@ it('追い風は使用開始時にエナジーを失い、その後に巻き込�
   expect(used.stats.cardsUsed - state.stats.cardsUsed).toBe(2);
   expect(used.energy).toBeGreaterThan(0);
 });
+
+it('97枚から潮の便りを使うと残り3枠に貝がら・舵・浮き輪を1枚ずつ追加する', () => {
+  let state = game('library');
+  for (let batch = 0; batch < 3; batch++) state = addTokens(state, 'story', 30);
+  state = addTokens(state, 'story', 1);
+  expect(state.deck).toHaveLength(97);
+  state = withHand({ ...state, energy: 100, maxEnergy: 100 }, ['library-pages']);
+  const used = act(state, { type: 'card', index: 0 });
+  expect(used.deck).toHaveLength(100);
+  expect(used.deck.filter((card) => card.token === 'story')).toHaveLength(92);
+  expect(used.deck.filter((card) => card.token === 'clock')).toHaveLength(1);
+  expect(used.deck.filter((card) => card.token === 'bookmark')).toHaveLength(1);
+  expect(used.tokenGroups).toEqual([]);
+});

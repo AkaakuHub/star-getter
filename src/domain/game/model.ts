@@ -224,6 +224,10 @@ export type GameState = Readonly<{
   discard: readonly string[];
   tokenCatalog: readonly Card[];
   nextTokenId: number;
+  tokenGroups: readonly Readonly<{
+    sourceId: string;
+    requests: readonly Readonly<{ token: TokenKind; count: number }>[];
+  }>[];
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{

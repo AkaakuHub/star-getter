@@ -1,3 +1,4 @@
+import { beginTokenGeneration, finishTokenGeneration } from './cards/tokens';
 import type { Card, GameState } from './model';
 import { applyEffect } from './effects';
 import { spendEnergy } from './resources';
@@ -45,8 +46,9 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   if (state.phase !== 'playing' || !canUseSpecial(state, cardId)) return state;
   const card = specialCards(state).find((item) => item.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
-  let next = spendEnergy(state, specialCost(card));
+  let next = beginTokenGeneration(spendEnergy(state, specialCost(card)), card.id);
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
+  next = finishTokenGeneration(next, card.id);
   return fillHand(
     flushDeckActions({
       ...next,

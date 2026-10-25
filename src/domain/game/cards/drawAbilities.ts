@@ -1,3 +1,4 @@
+import { beginTokenGeneration, finishTokenGeneration } from './tokens';
 import type { Card, Effect, GameState } from '../model';
 import { applyEffect, skillValue } from '../effects';
 import { moodValue } from '../projection';
@@ -5,9 +6,9 @@ import { moodValue } from '../projection';
 export function applyDrawAbility(state: GameState, card: Card): GameState {
   const drawn = (card.drawEffects ?? []).reduce(
     (next, effect) => applyEffect(next, effect, card),
-    state,
+    beginTokenGeneration(state, card.id),
   );
-  return applyNamedDrawAbility(drawn, card);
+  return finishTokenGeneration(applyNamedDrawAbility(drawn, card), card.id);
 }
 
 function applyNamedDrawAbility(state: GameState, card: Card): GameState {

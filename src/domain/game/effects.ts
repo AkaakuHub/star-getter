@@ -13,7 +13,7 @@ import { activateBloom } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
 import { applyCostReduction } from './cards/cost';
-import { addTokens } from './cards/tokens';
+import { requestTokens } from './cards/tokens';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 import { applyStarGatherSkillBoost } from './live/skillBoost';
@@ -89,7 +89,7 @@ export function applyEffect(
       );
     }
     case 'tokens':
-      return addTokens(state, effect.token, effect.count);
+      return requestTokens(state, effect.token, effect.count, card?.id ?? null);
     case 'hand-limit':
       return { ...state, handLimit: state.handLimit + effect.amount };
     case 'heart-limit':
