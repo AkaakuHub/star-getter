@@ -46,6 +46,7 @@ import type { SpecialAppealToken } from './specialAppealTokenTypes';
 import type { HandMaxCardEffectState } from './handMaxCardTypes';
 import type { MentalShield } from './mentalShieldTypes';
 import type { FixedParameterExtend } from './fixedParameterExtendTypes';
+import type { BeatPointBuff } from './beatPointBuffTypes';
 import type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
 export type { Boost, ResourceBoost, TargetBoost } from './boostTypes';
 
@@ -260,6 +261,7 @@ export type GameState = Readonly<{
   nextDisableMentalDownId: number;
   sectionMentalProtected: boolean;
   sectionBeatHeartBonus: number;
+  beatPointBuffs: readonly BeatPointBuff[];
   beatHeartValueBuffs: readonly Readonly<{
     calculation: 'add' | 'multiply' | 'fixed';
     value: number;
@@ -337,7 +339,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mood-change-skill'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-heart-limit-boost'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mood-value-boost'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-mood-value-boost'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-beat-point-buff'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

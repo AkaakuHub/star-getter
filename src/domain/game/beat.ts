@@ -19,7 +19,8 @@ export function beatHeartCount(state: GameState): number {
       heartAppearRatio: 1,
     },
     {
-      applyBeatPointBuff: (value) => value,
+      applyBeatPointBuff: (value) =>
+        state.beatPointBuffs.reduce((current, buff) => current + buff.value, value),
       applyBeatHeartBuff: (value) =>
         applyOrderedBuffs(
           value,

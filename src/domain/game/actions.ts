@@ -40,6 +40,7 @@ import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
 import { deactivateMoodValueAdditionalBuffs } from './effects/moodValueBoost';
 import { refreshEffectInducers } from './effects/effectInduce';
+import { deactivateBeatPointBuffs } from './effects/beatPointBuff';
 
 export function act(state: GameState, action: Action): GameState {
   return refreshEffectInducers(actInternal(state, action), applyEffect);
@@ -118,6 +119,8 @@ function actInternal(state: GameState, action: Action): GameState {
       return deactivateHeartLimitAdditionalBuffs(state, action.deactivationKey);
     case 'deactivate-mood-value-boost':
       return deactivateMoodValueAdditionalBuffs(state, action.deactivationKey);
+    case 'deactivate-beat-point-buff':
+      return deactivateBeatPointBuffs(state, action.deactivationKey);
   }
 }
 

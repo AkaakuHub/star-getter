@@ -19,6 +19,7 @@ import { expireGaugeRegenerations } from './live/gaugeRegeneration';
 import { expireMentalBarriers } from './live/mentalBarriers';
 import { expireVoltageIncreaseStopSections } from './effects/stopVoltageIncrease';
 import { expireSectionHeartBoosts } from './live/heartBoosts';
+import { expireBeatPointBuffSections } from './effects/beatPointBuff';
 
 export function advanceSectionChange(state: GameState, applyEffect: EffectApplier): GameState {
   let next = expireTokenDeckSplitSections(state);
@@ -40,6 +41,7 @@ export function advanceSectionChange(state: GameState, applyEffect: EffectApplie
   next = expireGaugeRegenerations(next, 'sections');
   next = expireMentalBarriers(next, 'sections', 1);
   next = expireVoltageIncreaseStopSections(next);
+  next = expireBeatPointBuffSections(next);
   next = {
     ...next,
     tokenBoosts: next.tokenBoosts.flatMap((boost) => {

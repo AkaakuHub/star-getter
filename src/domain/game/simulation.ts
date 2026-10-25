@@ -146,6 +146,7 @@ export function createGame(
     nextDisableMentalDownId: 1,
     sectionMentalProtected: false,
     sectionBeatHeartBonus: 0,
+    beatPointBuffs: [],
     beatHeartValueBuffs: [],
     heartBoosts: [],
     mentalBarriers: [],

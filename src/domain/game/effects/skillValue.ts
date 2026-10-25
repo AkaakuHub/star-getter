@@ -22,6 +22,10 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
       : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'energy'
         ? raw
         : Math.ceil(raw);
+  return applyStarGatherSkillBoost(base, skillBoostPercent(state, card));
+}
+
+export function skillBoostPercent(state: GameState, card?: Card): number {
   const handBoost = state.deck.reduce(
     (sum, item) =>
       sum +
@@ -54,5 +58,5 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
         return sum + boost.percent + mood;
       }, 0)
     : 0;
-  return applyStarGatherSkillBoost(base, state.amplification - 100 + story + targeted + passive);
+  return state.amplification - 100 + story + targeted + passive;
 }

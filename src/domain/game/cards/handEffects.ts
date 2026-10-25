@@ -4,6 +4,7 @@ import {
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
 import { applyEffect } from '../effects';
+import { deactivateBeatPointBuffs } from '../effects/beatPointBuff';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -57,6 +58,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
       ...next,
       targetBoosts: next.targetBoosts.filter((boost) => boost.deactivationKey !== deactivationKey),
     };
+    next = deactivateBeatPointBuffs(next, deactivationKey);
   }
   return {
     ...next,

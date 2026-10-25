@@ -29,6 +29,7 @@ import type { AddSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import type { HandMaxCardEffect } from './handMaxCardTypes';
 import type { MentalShieldEffect } from './mentalShieldTypes';
 import type { FixedParameterExtendEffect } from './fixedParameterExtendTypes';
+import type { BeatPointBuffEffect } from './beatPointBuffTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -294,6 +295,7 @@ type EffectShape =
   | DisableMentalDownEffect
   | Readonly<{ kind: 'beat-count'; amount: number }>
   | BeatHeartValueBuffEffect
+  | BeatPointBuffEffect
   | HeartBoostEffect
   | HeartLimitBoostEffect
   | MoodValueBoostEffect

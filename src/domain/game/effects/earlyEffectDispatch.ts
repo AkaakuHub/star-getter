@@ -10,6 +10,7 @@ import type { EffectApplier } from './induceSkillEffect';
 import { activateHeartLimitBoost } from './heartLimitBoost';
 import { activateMoodValueBoost } from './moodValueBoost';
 import { activateVoltageConversion } from './voltageConversion';
+import { activateBeatPointBuff } from './beatPointBuff';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -37,5 +38,7 @@ export function dispatchEarlyEffect(
     return activateMoodValueBoost(state, effect, card, multiplier, addValue);
   if (effect.kind === 'voltage-convert')
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'beat-point-buff')
+    return activateBeatPointBuff(state, effect, card, multiplier, addValue);
   return undefined;
 }

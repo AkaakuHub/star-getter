@@ -3,9 +3,11 @@ import type { StarGatherCardAppealParameters } from '../live/clientScoreInput';
 import type { PerformerId, MemberId, UnitId, CostumeId, TokenKind } from '../model';
 import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
+import type { BeatPointBuffEffect } from '../beatPointBuffTypes';
 
 export type HandPermanentEffect =
   | ParameterValueChangeEffect
+  | BeatPointBuffEffect
   | (Extract<Effect, { kind: 'amplify' }> & Readonly<{ members: readonly MemberId[] }>);
 
 export type HandUseTrigger =
