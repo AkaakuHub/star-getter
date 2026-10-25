@@ -5,6 +5,7 @@ import {
 } from '../parameters/parameterValueChange';
 import { applyEffect } from '../effects';
 import { deactivateBeatPointBuffs } from '../effects/beatPointBuff';
+import { deactivateHandLimitEffects } from '../effects/handLimit';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -15,7 +16,13 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
     next =
       effect.kind === 'parameter-value-change'
         ? applyParameterValueChange(next, card, effect)
-        : applyEffect(next, { ...effect, deactivationKey }, card);
+        : applyEffect(
+            next,
+            effect.kind === 'hand-limit'
+              ? { ...effect, invocationType: 0x388, deactivationKey }
+              : { ...effect, deactivationKey },
+            card,
+          );
   }
   return {
     ...next,
@@ -59,6 +66,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
       targetBoosts: next.targetBoosts.filter((boost) => boost.deactivationKey !== deactivationKey),
     };
     next = deactivateBeatPointBuffs(next, deactivationKey);
+    next = deactivateHandLimitEffects(next, deactivationKey).state;
   }
   return {
     ...next,

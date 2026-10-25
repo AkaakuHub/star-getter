@@ -3,6 +3,10 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { fillHand, handCapacity } from '../../src/domain/game/cards/drawing';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
 import { applyEffect } from '../../src/domain/game/effects';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
@@ -66,6 +70,37 @@ it('InvocationType 0x388と0x38bは自動期限を止め、Deactivator解除で�
     expect(deactivated.handLimit).toBe(5);
     expect(deactivated.handLimitEffects).toHaveLength(0);
   }
+});
+
+it('Action904の子Action20は手札中だけ有効で、離脱時に解除する', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  if (!original) throw new Error('対象カードがありません。');
+  const card = {
+    ...original,
+    handPermanentEffects: [
+      {
+        kind: 'hand-limit' as const,
+        amount: -1,
+        duration: { kind: 'sections' as const, value: 1 },
+      },
+    ],
+  };
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [card.id],
+    handEffectCardIds: [card.id],
+    drawPile: [],
+    discard: [],
+  };
+  const active = activateHandPermanentEffects(state, card);
+  expect(active.handLimit).toBe(4);
+  expect(advanceHandLimitEffects(active, 100).state.handLimit).toBe(4);
+  const disposed = disposeHandEffects(active, [card.id]);
+  expect(disposed.handLimit).toBe(5);
+  expect(disposed.handLimitEffects).toHaveLength(0);
 });
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {

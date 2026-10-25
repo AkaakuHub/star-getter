@@ -8,6 +8,7 @@ import type { BeatPointBuffEffect } from '../beatPointBuffTypes';
 export type HandPermanentEffect =
   | ParameterValueChangeEffect
   | BeatPointBuffEffect
+  | Extract<Effect, { kind: 'hand-limit' }>
   | (Extract<Effect, { kind: 'amplify' }> & Readonly<{ members: readonly MemberId[] }>);
 
 export type HandUseTrigger =
