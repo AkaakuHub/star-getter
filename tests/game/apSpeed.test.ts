@@ -107,8 +107,8 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
       kind: 'skill-boost',
       num: 500_000,
       target: { kind: 'member', member: source.member },
-      duration: { kind: 'stage', value: 0 },
-      uses: 1,
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
     },
     source,
   );

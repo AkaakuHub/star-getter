@@ -11,9 +11,9 @@ export type Action52BuffEffect = Readonly<{
   num: number;
   target: Action52BuffTarget;
   moodBonus?: Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
-  uses: number | null;
-  skillTokenSeriesIds?: readonly number[];
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
+  uses: bigint | null;
+  skillTokenSeriesIds?: readonly bigint[];
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -23,8 +23,8 @@ export type Action52Buff = Readonly<{
   percent: number;
   target: Action52BuffTarget;
   remainingSeconds: number | null;
-  remainingSections: number | null;
-  remainingUses: number | null;
-  skillTokenSeriesIds: readonly number[] | null;
+  remainingSections: bigint | null;
+  remainingUses: bigint | null;
+  skillTokenSeriesIds: readonly bigint[] | null;
   deactivationKey: string | null;
 }>;

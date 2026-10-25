@@ -10,8 +10,8 @@ it('Action10はActionType10・52適用後に熱気を加算する', () => {
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const boosted = applyEffect(
     action52,
@@ -30,8 +30,8 @@ it('Action10は数値種別1以外では補正を消費して熱気を加算し�
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const unchanged = applyEffect(
     action52,

@@ -65,8 +65,8 @@ it('ActionType31の追加率にActionType52を適用する', () => {
       kind: 'skill-boost',
       num: 500_000,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      uses: 1,
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
     },
     source,
   );

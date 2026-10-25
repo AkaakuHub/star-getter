@@ -24,8 +24,8 @@ it('Action5はActionType5・52補正後の割合を最大元気へ適用する',
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const recovered = applyEffect(
     withAction52,
@@ -45,8 +45,8 @@ it('Action5は非割合の数値種別でもActionType5・52を消費して元�
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const unchanged = applyEffect(
     withAction52,

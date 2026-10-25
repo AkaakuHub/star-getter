@@ -43,8 +43,8 @@ it('Action47の正値にAction52を適用し、負値には適用しない', () 
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const buffed = applyEffect(
     action52,

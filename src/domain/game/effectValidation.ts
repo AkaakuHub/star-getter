@@ -258,10 +258,9 @@ export function validateEffect(effect: Effect): void {
         (!Number.isFinite(effect.moodBonus.perPoint) ||
           ![1, 2, 3].includes(effect.moodBonus.target))) ||
       !['stage', 'milliseconds', 'sections'].includes(duration.kind) ||
-      !Number.isSafeInteger(duration.value) ||
-      duration.value < 0 ||
-      (effect.uses !== null && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
-      effect.skillTokenSeriesIds?.some((seriesId) => !Number.isSafeInteger(seriesId)) ||
+      !isInt64(duration.value) ||
+      (effect.uses !== null && !isInt64(effect.uses)) ||
+      effect.skillTokenSeriesIds?.some((seriesId) => !isInt64(seriesId)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

@@ -59,8 +59,8 @@ it('Action50の正値はActionType52で整数化し、回数を1回消費する'
     kind: 'skill-boost',
     num: 1_000_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const boosted = applyEffect(action52, additiveBoost({ disabledType: 1, disabledCount: 1 }), card);
   const first = applyEffect(boosted, moodChange(20_000), card);

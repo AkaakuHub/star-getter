@@ -150,9 +150,9 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
       kind: 'skill-boost',
       num: 500_000,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      uses: 1,
-      skillTokenSeriesIds: [42],
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
+      skillTokenSeriesIds: [42n],
     },
     source,
   );
@@ -207,8 +207,8 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
       kind: 'skill-boost',
       num: 500_000,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      uses: 1,
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
     },
     source,
   );

@@ -2,12 +2,13 @@ import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import type { Action52BuffEffect, Action52BuffTarget } from '../skillBoostTypes';
 import type { Card, GameState } from '../model';
+import { int64ToFloat32 } from '../numeric';
 
 export function activateAction52SkillBoost(
   state: GameState,
   effect: Action52BuffEffect,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const moodBonus = effect.moodBonus
     ? calculateSkillMoodCorrection(
@@ -26,7 +27,7 @@ export function activateAction52SkillBoost(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     remainingUses: effect.uses,
@@ -52,7 +53,9 @@ export function applyAction52SkillBoost(
       matchesTarget(buff.target, card) &&
       (buff.skillTokenSeriesIds === null ||
         (skillTokenSeriesIds !== undefined &&
-          buff.skillTokenSeriesIds.some((seriesId) => skillTokenSeriesIds.includes(seriesId)))),
+          skillTokenSeriesIds.some((seriesId) =>
+            buff.skillTokenSeriesIds?.includes(BigInt(seriesId)),
+          ))),
   );
   if (matched.length === 0) return { state, value };
   const percent = matched.reduce((sum, buff) => Math.fround(sum + Math.fround(buff.percent)), 0);
@@ -63,13 +66,13 @@ export function applyAction52SkillBoost(
   );
   const removedIds = new Set(
     matched.flatMap((buff) =>
-      buff.remainingUses === 0 || buff.remainingUses === 1 ? [buff.id] : [],
+      buff.remainingUses !== null && buff.remainingUses <= 1n ? [buff.id] : [],
     ),
   );
   const action52Buffs = state.action52Buffs.flatMap((buff) => {
     if (removedIds.has(buff.id)) return [];
     if (usedIds.has(buff.id) && buff.remainingUses !== null)
-      return [{ ...buff, remainingUses: buff.remainingUses - 1 }];
+      return [{ ...buff, remainingUses: buff.remainingUses - 1n }];
     return [buff];
   });
   return { state: { ...state, action52Buffs }, value: adjusted };
@@ -99,8 +102,8 @@ export function expireAction52SkillBoostSections(state: GameState): GameState {
     ...state,
     action52Buffs: state.action52Buffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }

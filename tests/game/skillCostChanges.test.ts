@@ -126,8 +126,8 @@ it('Action17は負数をActionType52で増幅してint32化する', () => {
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const changed = applyEffect(
     withAction52,
@@ -225,8 +225,8 @@ it('ActionType29は山札上の対象カードだけに適用し、負数をActi
     kind: 'skill-boost',
     num: 1_000_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const changed = applyEffect(
     boosted,

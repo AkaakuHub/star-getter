@@ -22,8 +22,8 @@ it('Action51は正のGenesis値へActionType52を適用し、強いGenesisを選
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const first = applyEffect(
     action52,
@@ -48,8 +48,8 @@ it('Action51のミリ秒・パート期限ではC#どおりGenesisを有効化�
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const timed = applyEffect(
     action52,
@@ -78,8 +78,8 @@ it('Action51の非FullEnd期限0は何も発動せずActionType52も消費しな
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const unchanged = applyEffect(
     action52,

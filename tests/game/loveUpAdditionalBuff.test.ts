@@ -105,8 +105,8 @@ it('ActionType30の登録値にActionType52を適用し、回数を消費する'
       kind: 'skill-boost',
       num: 500_000,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
-      uses: 1,
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
     },
     source,
   );

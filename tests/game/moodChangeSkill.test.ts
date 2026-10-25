@@ -111,8 +111,8 @@ it('Action48はActionType52で絶対値を補正してから整数化する', ()
     kind: 'skill-boost',
     num: 500_000,
     target: { kind: 'all' },
-    duration: { kind: 'stage', value: 0 },
-    uses: 1,
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
   });
   const changed = applyEffect(
     action52,

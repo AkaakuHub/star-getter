@@ -125,7 +125,7 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
           kind: 'skill-boost',
           num: 500_000,
           target: { kind: 'all' },
-          duration: { kind: 'stage', value: 0 },
+          duration: { kind: 'stage', value: 0n },
           uses: null,
         },
       ],
