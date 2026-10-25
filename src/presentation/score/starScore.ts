@@ -5,10 +5,12 @@ export function projectStarScore(value: bigint) {
   const raw = value.toString(10);
   if (raw.length > 72) throw new Error('STARが無量大数の表示範囲を超えています。');
   const length = Math.max(20, Math.ceil(raw.length / 4) * 4);
-  const rows = Math.ceil(length / 24);
+  const columns = 12;
+  const rows = Math.ceil(length / columns);
   return {
     rows,
-    columns: Math.ceil(length / rows / 4) * 4,
+    columns,
+    firstColumn: columns * rows - length + 1,
     digits: raw
       .padStart(length, '0')
       .split('')
@@ -17,7 +19,7 @@ export function projectStarScore(value: bigint) {
         return {
           digit,
           place,
-          comma: place > 0 && place % 3 === 0,
+          comma: place > 0 && place % 3 === 0 && place % columns !== 0,
           unit: place > 0 && place % 4 === 0 ? scoreUnits[place / 4] : undefined,
         };
       }),

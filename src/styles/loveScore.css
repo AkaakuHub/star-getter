@@ -1,12 +1,11 @@
 .love-number {
   display: grid;
   grid-template-columns: repeat(var(--love-columns), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--love-rows), minmax(0, 1fr));
-  align-items: center;
-  height: 13cqw;
-  padding-bottom: 0.6em;
+  grid-template-rows: repeat(var(--love-rows), 8.5cqw);
+  align-items: start;
+  padding-top: 1cqw;
   font-family: ui-monospace, monospace;
-  font-size: calc(60cqw / var(--love-columns));
+  font-size: 4.5cqw;
   font-weight: 800;
   line-height: 1;
 }
@@ -22,11 +21,11 @@
 }
 .love-unit {
   position: absolute;
-  top: 105%;
+  top: calc(100% + 0.4cqw);
   right: -0.2em;
-  color: #706778;
+  color: #51445e;
   font-family: var(--font-sans);
-  font-size: 0.4em;
+  font-size: 2.7cqw;
   font-weight: 700;
   white-space: nowrap;
 }

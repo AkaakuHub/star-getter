@@ -20,15 +20,17 @@ export function LiveHud({
   const CollectIcon = state.bloom ? Gem : Star;
   return (
     <>
-      <div className="score-display" style={liveLayout.score}>
-        <span>STAR</span>
-        <StarScore value={state.score} />
-      </div>
-      <div className="live-track">
-        <h1>{state.track.name}</h1>
-        <time>
-          {formatTime(seconds)} / {formatTime(durationSeconds(state))}
-        </time>
+      <div className="live-header">
+        <div className="score-display">
+          <span>STAR</span>
+          <StarScore value={state.score} />
+        </div>
+        <div className="live-track">
+          <h1>{state.track.name}</h1>
+          <time>
+            {formatTime(seconds)} / {formatTime(durationSeconds(state))}
+          </time>
+        </div>
       </div>
       {state.combo > 0 && (
         <div className="collection-combo" key={state.lastCollectTick} role="status">

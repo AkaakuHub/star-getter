@@ -1,10 +1,19 @@
-.score-display {
+.live-header {
   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   z-index: 10;
+  pointer-events: none;
+}
+.score-display {
   display: flex;
   flex-direction: column;
   justify-content: end;
-  padding: 3cqw 1.5cqw 2cqw;
+  width: 52.037cqw;
+  min-height: 20.648cqw;
+  margin: 0 auto;
+  padding: 1.5cqw 1.5cqw 0;
   border: 1px solid #ffffffb3;
   border-top: 0;
   border-radius: 0 0 4cqw 4cqw;
@@ -19,19 +28,12 @@
   letter-spacing: 0.2em;
 }
 .score-value {
-  height: 7cqw;
-  font-size: 5cqw;
-  font-weight: 900;
-  line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
 .live-track {
-  position: absolute;
-  top: 13%;
-  left: 5%;
-  z-index: 10;
   display: flex;
   width: 90%;
+  margin: 2.5cqw auto 0;
   justify-content: space-between;
   color: #353148;
   font-size: 2.5cqw;
