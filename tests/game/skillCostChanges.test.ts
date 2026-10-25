@@ -12,8 +12,22 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
   const poolCard = initial.deck.find((card) => card.id !== source?.id && card.id !== other?.id);
   if (!source || !other || !poolCard) throw new Error('検証用カードがありません。');
   const cards = [
-    { ...source, member: 1021 as const, unit: 1 as const, skillIcon: 600, style: 2 },
-    { ...other, member: 1030 as const, unit: 2 as const, skillIcon: 700, style: 4 },
+    {
+      ...source,
+      member: 1021 as const,
+      unit: 1 as const,
+      skillIcon: 600,
+      mainEffect: 800,
+      style: 2,
+    },
+    {
+      ...other,
+      member: 1030 as const,
+      unit: 2 as const,
+      skillIcon: 700,
+      mainEffect: 900,
+      style: 4,
+    },
   ];
   const sourceCard = cards[0];
   if (!sourceCard) throw new Error('発動元カードがありません。');
@@ -42,15 +56,17 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
       conditionId:
         index === 5 || index === 10
           ? 1030
-          : index === 6 || index === 7
+          : index === 6
             ? 700
-            : index === 9
-              ? 4
-              : index === 12 || index === 13
-                ? 2
-                : index === 11
+            : index === 7
+              ? 900
+              : index === 9
+                ? 4
+                : index === 12 || index === 13
                   ? 2
-                  : 0,
+                  : index === 11
+                    ? 2
+                    : 0,
     } as const;
     const updated = applyEffect(state, effect, sourceCard);
     expect({
