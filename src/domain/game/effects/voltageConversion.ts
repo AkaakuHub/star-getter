@@ -5,6 +5,9 @@ import { applyAdditionalBuff } from './additionalBuff';
 import { applyAction52SkillBoost } from './action52SkillBoost';
 import { createSkillHearts } from './heartCreation';
 import { changeResource } from '../resources';
+import type { EffectApplier } from './induceSkillEffect';
+import { applyMentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuff';
+import { induceSkillEffects } from './induceSkillEffect';
 
 export function activateVoltageConversion(
   state: GameState,
@@ -51,6 +54,7 @@ export function convertVoltageIncrease(
   state: GameState,
   amount: bigint,
   sourceCard: Card | undefined,
+  applyEffect?: EffectApplier,
 ): Readonly<{ state: GameState; converted: boolean }> {
   if (amount < 1n) return { state, converted: false };
   const conversion = state.voltageConversions.at(-1);
@@ -103,7 +107,14 @@ export function convertVoltageIncrease(
     const buffed = card
       ? applyAdditionalBuff(next, 'stamina', base, card)
       : { state: next, value: base };
-    next = changeResource(buffed.state, 'stamina', BigInt(Math.trunc(buffed.value)));
+    next = changeResource(
+      buffed.state,
+      'stamina',
+      BigInt(Math.trunc(buffed.value)),
+      'skill',
+      card,
+      applyEffect,
+    );
   } else {
     const output: Extract<Effect, { kind: 'mental-barrier' }> = {
       kind: 'mental-barrier',
@@ -113,15 +124,24 @@ export function convertVoltageIncrease(
       attenuation: 0,
       duration: conversion.outputDuration,
     };
+    const additional = applyMentalBarrierAdditionalBuff(next, card, output.endurance);
+    const beforeCount = additional.state.mentalBarriers.length;
     next = addMentalBarrier(
-      next,
+      additional.state,
       {
         ...output,
         duration: output.duration.kind === 'stage' ? { kind: 'stage' } : output.duration,
       },
-      output.endurance,
+      Math.trunc(additional.value),
       0,
     );
+    if (applyEffect && next.mentalBarriers.length > beforeCount)
+      next = induceSkillEffects(
+        next,
+        'mental-barrier',
+        additional.value === 0 ? 100 : Math.trunc(additional.value),
+        applyEffect,
+      );
   }
   const conversions = conversion.conversions + 1;
   next = {

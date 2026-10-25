@@ -1,4 +1,5 @@
 import type { SkillCooldownEffect } from './skillCooldownTypes';
+import type { InducedSkillEffect } from './induceSkillEffectTypes';
 import type { DisableMentalDown } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
@@ -31,8 +32,8 @@ import type {
   SkillCostChange,
   ParameterValueFactor,
   TokenBoost,
-  ProxyAbsorption,
 } from './modelTypes';
+import type { ProxyAbsorption } from './proxySkillTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -266,6 +267,8 @@ export type GameState = Readonly<{
   lastActionTick: number;
   skillCooldownEffects: readonly SkillCooldownEffect[];
   nextSkillCooldownEffectId: number;
+  inducedSkillEffects: readonly InducedSkillEffect[];
+  nextInducedSkillEffectId: number;
   lastPerformer: PerformerId | null;
   lastCardName: string;
   cardUses: readonly CardUse[];
@@ -292,7 +295,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-mental-down'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

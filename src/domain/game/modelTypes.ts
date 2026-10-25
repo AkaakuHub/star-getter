@@ -1,4 +1,5 @@
 import type { SkillCooldownEffectInput } from './skillCooldownTypes';
+import type { InduceSkillEffectInput } from './induceSkillEffectTypes';
 import type { DisableMentalDownEffect } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
@@ -18,6 +19,8 @@ import type { StopVoltageIncreaseEffect, VoltageConvertEffect } from './voltageC
 import type { Action52BuffEffect } from './skillBoostTypes';
 import type { MentalHeartInduceEffect } from './mentalHeartInduceTypes';
 import type { AdditionalHeartInduceEffect } from './additionalHeartTypes';
+import type { ProxyForcedActivationEffect, ProxySkillEffect } from './proxySkillTypes';
+export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
   gauge: 'ap' | 'voltage' | 'mental';
@@ -168,41 +171,6 @@ export type TokenBoost = Readonly<{
   remainingSections: number | null;
   deactivationKey: string | null;
 }>;
-export type ProxyAbsorption = Readonly<{
-  id: number;
-  sourceId: string;
-  hasAbsorbLimit: boolean;
-  isAbsoluteAdd: boolean;
-  periodType: 1 | 2 | 3 | 4 | 5;
-  remainingPeriod: number;
-  isAbsorbEnd: boolean;
-  induceTiming: number;
-  induceCondition: number;
-  inducePowerType: number;
-  inducePowerParam: number;
-  inducedEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
-  effects: readonly Readonly<{
-    actionType: number;
-    targetAmount: bigint;
-    totalAmount: bigint;
-  }>[];
-}>;
-export type ProxySkillEffect = Readonly<{
-  kind: 'proxy-skill';
-  absorbLimit: number;
-  periodType: 1 | 2 | 3 | 4 | 5;
-  periodParam: number;
-  induceTiming: number;
-  induceCondition: number;
-  inducePowerType: number;
-  inducePowerParam: number;
-  targets: readonly Readonly<{ actionType: number; targetAmount: number }>[];
-  effects: readonly Readonly<{ actionType: number; effect: Effect }>[];
-}>;
-type ProxyForcedActivationEffect = Readonly<{
-  kind: 'proxy-skill-forced-activation';
-  targetType: 1 | 2 | 3 | 4 | 5;
-}>;
 type EffectShape =
   | Readonly<{
       kind: 'branch';
@@ -272,6 +240,7 @@ type EffectShape =
   | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | SkillCooldownEffectInput
+  | InduceSkillEffectInput
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
   | Readonly<{

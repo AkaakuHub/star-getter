@@ -2,6 +2,7 @@ import { validateSkillCooldownEffect } from './skillCooldownTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
 import { validateSpecialEffect } from './effectSpecialValidation';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
+import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
 
 export function validateEffect(effect: Effect): void {
@@ -280,6 +281,15 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'skill-cooldown') return validateSkillCooldownEffect(effect);
+  if (effect.kind === 'induce-skill-effect') {
+    validateInduceSkillEffect(effect);
+    for (const child of effect.effects) {
+      if (!Number.isSafeInteger(child.actionType) || child.actionType < 0)
+        throw new Error('誘発スキル効果のActionTypeが正しくありません。');
+      validateEffect(child.effect);
+    }
+    return;
+  }
   if (
     effect.kind === 'hearts' &&
     effect.lifetimeSeconds !== undefined &&

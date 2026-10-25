@@ -48,6 +48,10 @@ import {
 } from './effects/voltageConversion';
 import { advanceTimedSkillBuffs, expireTimedSkillBuffSections } from './effects/timedSkillBuffs';
 import { advanceSkillCooldownEffects, expireSkillCooldownSections } from './effects/skillCooldown';
+import {
+  advanceInducedSkillEffects,
+  expireInducedSkillEffectSections,
+} from './effects/induceSkillEffect';
 
 export function createGame(
   track: Track,
@@ -181,6 +185,8 @@ export function createGame(
     ),
     skillCooldownEffects: [],
     nextSkillCooldownEffectId: 1,
+    inducedSkillEffects: [],
+    nextInducedSkillEffectId: 1,
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],
@@ -235,6 +241,7 @@ function advanceTick(state: GameState): GameState {
               advanceGaugeRegenerations(
                 expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
                 dt,
+                applyEffect,
               ),
               'milliseconds',
               dt,
@@ -263,6 +270,7 @@ function advanceTick(state: GameState): GameState {
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
   next = advanceSkillCooldownEffects(next, dt);
+  next = advanceInducedSkillEffects(next, dt);
   const elapsedHandLimit = advanceHandLimitEffects(next, dt);
   next = elapsedHandLimit.state;
   next = advanceHeartLimitBuffs(next, dt);
@@ -279,6 +287,7 @@ function advanceTick(state: GameState): GameState {
   }
   if (sectionAt(next) !== sectionAt(state)) {
     next = expireSkillCooldownSections(next);
+    next = expireInducedSkillEffectSections(next);
     next = expireApSpeedSections(next);
     next = expireVoltageConversionSections(next);
     next = expireTimedSkillBuffSections(next);

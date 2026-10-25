@@ -2,6 +2,7 @@ import { calculateStarGatherGenesisGaugeDelta } from './genesisGauge';
 import { changeResource } from '../resources';
 import type { GaugeRegeneration } from '../modelTypes';
 import type { GameState } from '../model';
+import type { EffectApplier } from '../effects/induceSkillEffect';
 
 export function startGaugeRegeneration(
   state: GameState,
@@ -11,6 +12,7 @@ export function startGaugeRegeneration(
   intervalMilliseconds: number,
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>,
   sourceCardId: string | null,
+  applyEffect?: EffectApplier,
 ): GameState {
   if (duration.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
@@ -28,19 +30,29 @@ export function startGaugeRegeneration(
     remainingHeartEvents: duration.kind === 'sections' ? duration.value : null,
   };
   return {
-    ...pulseGauge(state, gauge, amount, sourceCardId),
+    ...pulseGauge(state, gauge, amount, sourceCardId, applyEffect),
     gaugeRegenerations: [...state.gaugeRegenerations, regeneration],
   };
 }
 
-export function advanceGaugeRegenerations(state: GameState, elapsedSeconds: number): GameState {
+export function advanceGaugeRegenerations(
+  state: GameState,
+  elapsedSeconds: number,
+  applyEffect?: EffectApplier,
+): GameState {
   const elapsed = Math.fround(elapsedSeconds);
   const active: GaugeRegeneration[] = [];
   let next = state;
   for (const regeneration of state.gaugeRegenerations) {
     let accumulated = Math.fround(regeneration.elapsedSeconds + elapsed);
     if (regeneration.intervalType === 1 && regeneration.intervalSeconds <= accumulated) {
-      next = pulseGauge(next, regeneration.gauge, regeneration.amount, regeneration.sourceCardId);
+      next = pulseGauge(
+        next,
+        regeneration.gauge,
+        regeneration.amount,
+        regeneration.sourceCardId,
+        applyEffect,
+      );
       accumulated = Math.fround(accumulated - regeneration.intervalSeconds);
     }
     const durationElapsedSeconds = Math.fround(regeneration.durationElapsedSeconds + elapsed);
@@ -79,10 +91,13 @@ function pulseGauge(
   gauge: GaugeRegeneration['gauge'],
   amount: number,
   sourceCardId: string | null,
+  applyEffect?: EffectApplier,
 ): GameState {
   const value = Math.trunc(amount);
   if (gauge === 'mental') {
-    return state.bloom ? state : changeResource(state, 'stamina', BigInt(value));
+    return state.bloom
+      ? state
+      : changeResource(state, 'stamina', BigInt(value), 'skill', undefined, applyEffect);
   }
   if (!state.bloom)
     return changeResource(
@@ -91,6 +106,8 @@ function pulseGauge(
       BigInt(value),
       'skill',
       state.cardPool.find((card) => card.id === sourceCardId),
+      applyEffect,
+      true,
     );
   const delta = calculateStarGatherGenesisGaugeDelta({
     actionType: 0,

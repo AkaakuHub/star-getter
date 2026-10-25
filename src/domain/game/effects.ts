@@ -39,6 +39,7 @@ import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
 import { activateComboInduce } from './effects/comboInduce';
 import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
 import { activateAdditionalHeartInduce } from './effects/additionalHeart';
+import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -62,6 +63,8 @@ export function applyEffect(
     return activateHeartLimitChange(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'additional-heart-induce')
     return activateAdditionalHeartInduce(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'induce-skill-effect')
+    return activateInducedSkillEffect(state, effect, card, multiplier, addValue);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);
@@ -253,9 +256,25 @@ export function applyEffect(
     case 'infinity-gauge':
       return activateInfinityGauge(state, effect);
     case 'gauge-regeneration':
-      return applyGaugeRegeneration(state, effect, card, multiplier, addValue, effectPower);
+      return applyGaugeRegeneration(
+        state,
+        effect,
+        card,
+        multiplier,
+        addValue,
+        effectPower,
+        applyEffect,
+      );
     case 'mental-barrier':
-      return applyMentalBarrier(state, effect, card, multiplier, addValue, effectPower);
+      return applyMentalBarrier(
+        state,
+        effect,
+        card,
+        multiplier,
+        addValue,
+        effectPower,
+        applyEffect,
+      );
     case 'stamina':
     case 'excitement': {
       const base = Math.fround(Math.trunc(value(effect.amount)) * effectPower);
@@ -271,6 +290,7 @@ export function applyEffect(
         BigInt(Math.trunc(action52.value)),
         'skill',
         card,
+        applyEffect,
       );
     }
     case 'collect':
