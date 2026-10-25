@@ -1,5 +1,6 @@
 import { validateMoodTimeline } from './moodTimeline';
 import type { Track } from '../model';
+import { validateIngameMissionGroups } from '../ingameMissionTypes';
 
 export function validateTrack(track: Track): void {
   if (
@@ -24,4 +25,5 @@ export function validateTrack(track: Track): void {
     previous = section.startBeat;
   }
   validateMoodTimeline(track.moodKeys, (track.beats * 60) / track.bpm);
+  validateIngameMissionGroups(track.ingameMissionGroups);
 }

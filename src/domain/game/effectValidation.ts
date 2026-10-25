@@ -76,6 +76,11 @@ export function validateEffect(effect: Effect): void {
       throw new Error('トークンカードデッキ切替の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'ingame-mission') {
+    if (!Number.isSafeInteger(effect.groupId))
+      throw new Error('ミッションのグループIDが正しくありません。');
+    return;
+  }
   if (effect.kind === 'infinity-gauge') {
     if (
       (effect.duration.kind === 'sections' && effect.duration.value === 0) ||

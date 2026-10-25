@@ -5,6 +5,7 @@ import { mentalDecreaseInterval } from './live/mentalBarriers';
 import { durationSeconds } from './projection';
 import { apIncreaseIntervalSeconds } from './effects/apSpeed';
 import { induceMentalHearts } from './effects/mentalHeartInduce';
+import { registerMentalDownMission } from './ingameMissions';
 
 export function advanceAutomaticGauges(state: GameState, dt: number): GameState {
   const stage = state.track.stage;
@@ -63,9 +64,9 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       Math.fround(next.stamina + Math.fround(Math.fround(60 * Math.fround(dt)) / recoveryTime)),
     );
     const recovered = { ...next, mentalTimerSeconds, stamina, resting: stamina < 60 };
-    return stamina !== next.stamina
-      ? induceMentalHearts(recovered, Math.trunc(stamina))
-      : recovered;
+    const result =
+      stamina !== next.stamina ? induceMentalHearts(recovered, Math.trunc(stamina)) : recovered;
+    return !state.resting ? registerMentalDownMission(result) : result;
   }
   const mentalInterval = mentalDecreaseInterval(next, stage.mentalDecreaseIntervalSeconds);
   if (mentalInterval <= 0) {
@@ -88,7 +89,7 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
     mentalTimerSeconds = Math.fround(mentalTimerSeconds - mentalInterval);
     next = decreaseMentalNaturally(next);
   }
-  return {
+  const result: GameState = {
     ...next,
     mentalTimerSeconds,
     resting:
@@ -98,4 +99,5 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
         next.disableMentalDownEffects.length > 0
       ) && next.stamina <= 0,
   };
+  return !state.resting && result.resting ? registerMentalDownMission(result) : result;
 }

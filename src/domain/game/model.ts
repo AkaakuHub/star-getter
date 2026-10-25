@@ -35,6 +35,7 @@ import type {
   TokenDeckSplit,
 } from './modelTypes';
 import type { ProxyAbsorption } from './proxySkillTypes';
+import type { IngameMission, IngameMissionGroup } from './ingameMissionTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -78,6 +79,7 @@ export type Track = Readonly<{
   scoreLimit: ScoreLimitSettings;
   sections: readonly Section[];
   moodKeys: readonly MoodKey[];
+  ingameMissionGroups: readonly IngameMissionGroup[];
 }>;
 
 export type CardUse = Readonly<{
@@ -137,6 +139,7 @@ export type GameState = Readonly<{
   proxyCards: readonly string[];
   drawPile: readonly string[];
   tokenDeckSplit: TokenDeckSplit | null;
+  ingameMission: IngameMission | null;
   deckOutCount: number;
   discard: readonly string[];
   tokenCatalog: readonly Card[];
@@ -284,6 +287,7 @@ export type Action =
   | Readonly<{ type: 'card'; index: number }>
   | Readonly<{ type: 'switch-token-deck' }>
   | Readonly<{ type: 'deactivate-token-deck'; deactivationKey: string }>
+  | Readonly<{ type: 'skip-ingame-mission' }>
   | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-boost'; deactivationKey: string }>

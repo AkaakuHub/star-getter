@@ -41,6 +41,7 @@ import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
 import { activateAdditionalHeartInduce } from './effects/additionalHeart';
 import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
+import { startIngameMission } from './ingameMissions';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -145,6 +146,8 @@ export function applyEffect(
       return activateTokenBoost(state, effect, card, multiplier, addValue);
     case 'token-deck-split':
       return activateTokenDeckSplit(state, effect);
+    case 'ingame-mission':
+      return startIngameMission(state, effect.groupId);
     case 'hand-limit':
       return applyHandLimit(state, effect, card, multiplier, addValue);
     case 'heart-limit':

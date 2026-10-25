@@ -7,6 +7,7 @@ import { convertVoltageIncrease } from './effects/voltageConversion';
 import { induceMentalHearts } from './effects/mentalHeartInduce';
 import { induceSkillEffects, type EffectApplier } from './effects/induceSkillEffect';
 import { absorbSkillEffect } from './effects/proxySkill';
+import { registerVoltageZeroMission } from './ingameMissions';
 
 export function changeResource(
   state: GameState,
@@ -56,9 +57,13 @@ export function changeResource(
   }
   if (state.bloom) {
     const changed = changeBloomResource(state, resource, amount);
+    const withMissionEvent =
+      resource === 'excitement' && state.excitement > 0 && changed.excitement === 0
+        ? registerVoltageZeroMission(changed)
+        : changed;
     return resource === 'excitement' && (amount > 0n || induceVoltageUp) && applyEffect
-      ? induceSkillEffects(changed, 'voltage', Number(amount), applyEffect)
-      : changed;
+      ? induceSkillEffects(withMissionEvent, 'voltage', Number(amount), applyEffect)
+      : withMissionEvent;
   }
   const maximum =
     resource === 'energy'
@@ -68,6 +73,8 @@ export function changeResource(
         : 100;
   const nextValue = Math.max(0, Math.min(maximum, state[resource] + Number(amount)));
   let next = { ...state, [resource]: nextValue };
+  if (resource === 'excitement' && state.excitement > 0 && nextValue === 0)
+    next = registerVoltageZeroMission(next);
   if (resource === 'stamina' && nextValue !== state.stamina)
     next = induceMentalHearts(next, Math.trunc(nextValue));
   if (!applyEffect) return next;
@@ -84,10 +91,11 @@ export function setVoltageValue(state: GameState, amount: number): GameState {
   if (state.bloom) return changeBloomResource(state, 'excitement', BigInt(delta));
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
     return state;
-  return {
+  const next = {
     ...state,
     excitement: target,
   };
+  return state.excitement > 0 && target === 0 ? registerVoltageZeroMission(next) : next;
 }
 
 export function decreaseMentalNaturally(state: GameState): GameState {

@@ -11,6 +11,7 @@ import { recordScoreHistory } from './scoreHistory';
 import { voltageLevel } from './live/voltageLevel';
 import { expireConvertedScoreBoostsOnHeartCollect } from './effects/voltageConversion';
 import { absorbSkillEffect } from './effects/proxySkill';
+import { registerMissionHeartCollect } from './ingameMissions';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -54,12 +55,13 @@ export function collectHearts(state: GameState): GameState {
   if (heartCount(state) === 0) return state;
   const random = createRangeRandom(state.heartRandomSeed);
   const collected = collectStarGatherHeartRuntime(state.hearts, random.range);
-  const next = awardHearts(
+  let next = awardHearts(
     { ...state, hearts: collected.state, heartRandomSeed: random.seed },
     collected.collectCount,
     false,
     collected.collectCount,
   );
+  next = registerMissionHeartCollect(next, collected.collectCount);
   const abilities = advanceHandCollectionAbilities(next, collected.collectCount);
   let triggered = abilities.state;
   for (const card of abilities.activated) {

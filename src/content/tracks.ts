@@ -14,5 +14,6 @@ export const tracks: readonly Track[] = [
     scoreLimit: { additionalEnabled: false, voltageMultipliers: [] },
     moodKeys: weatherTimeline,
     sections: weatherSections,
+    ingameMissionGroups: [],
   },
 ];

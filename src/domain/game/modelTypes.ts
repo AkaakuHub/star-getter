@@ -214,6 +214,7 @@ type EffectShape =
       effects: readonly Effect[];
     }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
+  | Readonly<{ kind: 'ingame-mission'; groupId: number }>
   | Readonly<{
       kind: 'token-deck-split';
       seriesIds: readonly number[] | null;

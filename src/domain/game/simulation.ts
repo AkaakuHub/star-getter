@@ -53,6 +53,7 @@ import {
   expireInducedSkillEffectSections,
 } from './effects/induceSkillEffect';
 import { advanceTokenDeckSplit, expireTokenDeckSplitSections } from './effects/tokenDeckSplit';
+import { advanceIngameMission } from './ingameMissions';
 
 export function createGame(
   track: Track,
@@ -94,6 +95,7 @@ export function createGame(
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
     tokenDeckSplit: null,
+    ingameMission: null,
     deckOutCount: 0,
     discard: [],
     tokenCatalog,
@@ -257,7 +259,7 @@ function advanceTick(state: GameState): GameState {
     ),
     dt,
   );
-  const tokenDeckState = advanceTokenDeckSplit(gauges, dt);
+  const tokenDeckState = advanceIngameMission(advanceTokenDeckSplit(gauges, dt), dt);
   const proxyPeriodState = advanceProxySkillPeriods(tokenDeckState, dt, applyEffect);
   const comboState = advanceComboInducer(proxyPeriodState, dt, applyEffect);
   let next: GameState = advanceHearts({

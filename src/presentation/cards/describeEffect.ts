@@ -40,6 +40,8 @@ export function describeEffect(effect: Effect): string {
       return `追加カードの生成枚数を${effect.calculation === 'add' ? '加算' : '割合増幅'}する。`;
     case 'token-deck-split':
       return '指定したトークンカードを別の山札に分ける。';
+    case 'ingame-mission':
+      return '指定グループのインゲームミッションを開始する。';
     case 'hand-limit':
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
     case 'proxy-skill':

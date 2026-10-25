@@ -33,6 +33,7 @@ import { deactivateGaugeInfinities } from './resources';
 import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
 import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
+import { missionActionEffect, registerMissionMember, skipIngameMission } from './ingameMissions';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -52,6 +53,8 @@ export function act(state: GameState, action: Action): GameState {
       return switchTokenDeck(state);
     case 'deactivate-token-deck':
       return deactivateTokenDeck(state, action.deactivationKey);
+    case 'skip-ingame-mission':
+      return skipIngameMission(state);
     case 'deactivate-hand-limit': {
       const expired = deactivateHandLimitEffects(state, action.deactivationKey);
       return expired.handAdjustment > 0
@@ -166,7 +169,8 @@ function activateCard(
       }
       next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
     } else {
-      next = applyEffect(next, effect, card);
+      const beforeEffect = next;
+      next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
     }
   }
   next = advanceProxySkillUses(
@@ -176,7 +180,7 @@ function activateCard(
     applyEffect,
   );
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
-  return notifyHandSkillUse(next, card);
+  return registerMissionMember(notifyHandSkillUse(next, card), card.member);
 }
 
 function retireCard(state: GameState, card: Card): GameState {
