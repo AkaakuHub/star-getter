@@ -3,6 +3,7 @@ import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import {
   applyParameterValueChange,
   initializeParameterValueFactors,
+  resolveEffectParameterDetails,
 } from '../../src/domain/game/parameters/parameterValueChange';
 import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
 import { fillHand, removeRandomHandCards } from '../../src/domain/game/cards/drawing';
@@ -114,6 +115,28 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
     card,
   );
   expect(result.energy).toBe(7);
+});
+
+it('詳細値へ係数を掛けた結果をC#と同じく0方向へ切り捨てる', () => {
+  const initial = game();
+  const card = initial.deck.find((item) => item.id === 'class');
+  if (!card) throw new Error('検証用カードがありません。');
+  const changed = applyParameterValueChange(initial, card, {
+    kind: 'parameter-value-change',
+    sourceEffectId: 'change-param',
+    targetDetailId: 202141300101n,
+    calculation: 'add',
+    base: 10_000,
+    increment: 2_500,
+  });
+  const effect = {
+    kind: 'energy',
+    amount: 0,
+    parameterDetails: {
+      amount: { id: 202141300101n, value: 1n, unitsPerValue: 1 },
+    },
+  } as const;
+  expect(resolveEffectParameterDetails(changed, card, effect)).toMatchObject({ amount: 1 });
 });
 
 it('amount以外の詳細値も効果実行前に補正する', () => {
