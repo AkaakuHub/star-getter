@@ -9,6 +9,21 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
+import type {
+  MoodBonus,
+  SearchRequest,
+  SearchTarget,
+  TokenBoost,
+  TokenBoostTarget,
+} from './modelTypes';
+
+export type {
+  MoodBonus,
+  SearchRequest,
+  SearchTarget,
+  TokenBoost,
+  TokenBoostTarget,
+} from './modelTypes';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
@@ -31,31 +46,6 @@ export type CostumeId = (typeof costumeIds)[number];
 export type HandShuffle = Readonly<{ recoverDiscard: boolean; destination: 'draw' | 'discard' }>;
 
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark' | 'shadow';
-export type SearchTarget =
-  | Readonly<{ kind: 'icon'; icon: number }>
-  | Readonly<{ kind: 'member'; member: MemberId }>
-  | Readonly<{ kind: 'unit'; unit: UnitId }>
-  | Readonly<{ kind: 'token-series'; seriesId: number }>
-  | Readonly<{ kind: 'token'; token: TokenKind }>;
-export type SearchRequest = Readonly<{
-  scope: 'grade' | 'section' | 'skill';
-  target: SearchTarget;
-}>;
-export type TokenBoostTarget =
-  | Readonly<{ kind: 'all' }>
-  | Readonly<{ kind: 'member'; member: MemberId }>
-  | Readonly<{ kind: 'unit'; unit: UnitId }>
-  | Readonly<{ kind: 'card-series'; seriesId: number }>;
-export type TokenBoost = Readonly<{
-  calculation: 'add' | 'multiply-percent';
-  value: number;
-  target: TokenBoostTarget;
-  seriesIds?: readonly number[];
-  remainingUses: number | null;
-  remainingSeconds: number | null;
-  remainingSections: number | null;
-}>;
-export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
   | Readonly<{
       kind: 'branch';
@@ -108,6 +98,14 @@ export type Effect =
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
   | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
   | Readonly<{ kind: 'beat-count'; amount: number }>
+  | Readonly<{
+      kind: 'beat-point-buff';
+      amount: number;
+      addValue?: number;
+      multiplier?: number;
+      moodBonus?: MoodBonus;
+      duration?: Readonly<{ sections: number }>;
+    }>
   | Readonly<{ kind: 'heart-boost'; percent: number; uses: number; moodBonus?: MoodBonus }>
   | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
   | Readonly<{
@@ -310,6 +308,7 @@ export type GameState = Readonly<{
   mentalProtected: boolean;
   sectionMentalProtected: boolean;
   sectionBeatHeartBonus: number;
+  beatPointBuffs: readonly Readonly<{ value: number; remainingSections: number | null }>[];
   heartBoosts: readonly HeartBoost[];
   mentalShield: number;
   excitement: number;

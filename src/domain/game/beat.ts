@@ -1,6 +1,7 @@
 import type { GameState } from './model';
 import { moodValue } from './projection';
 import { calculateStarGatherBeatHeart } from './live/beatHeart';
+import { applyGroupedBuffs } from './parameters/buffs';
 
 const goodMood = { nova: 1, lumen: 3, tetra: 2 } as const;
 
@@ -18,7 +19,15 @@ export function beatHeartCount(state: GameState): number {
       heartAppearRatio: 1,
     },
     {
-      applyBeatPointBuff: (value) => value,
+      applyBeatPointBuff: (value) =>
+        applyGroupedBuffs(
+          value,
+          state.beatPointBuffs.map((buff) => ({
+            kind: 'add' as const,
+            value: buff.value,
+            group: 'skill' as const,
+          })),
+        ),
       applyBeatHeartBuff: (value) => value + state.sectionBeatHeartBonus,
     },
   ).createCount;

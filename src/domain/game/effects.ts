@@ -181,6 +181,31 @@ export function applyEffect(
         : { ...state, mentalProtected: true, resting: false };
     case 'beat-count':
       return { ...state, sectionBeatHeartBonus: state.sectionBeatHeartBonus + effect.amount };
+    case 'beat-point-buff': {
+      const mood = effect.moodBonus
+        ? calculateSkillMoodCorrection(
+            effect.moodBonus.target,
+            moodValue(state),
+            effect.moodBonus.perPoint,
+          )
+        : 0;
+      const amount = Math.trunc(
+        Math.fround(
+          (Math.fround(effect.amount + mood) + (effect.addValue ?? 0)) *
+            (effect.multiplier ?? multiplier),
+        ),
+      );
+      const value = Math.trunc(
+        skillValue(state, amount, { kind: 'amplify', percent: amount }, card),
+      );
+      return {
+        ...state,
+        beatPointBuffs: [
+          ...state.beatPointBuffs,
+          { value, remainingSections: effect.duration?.sections ?? null },
+        ],
+      };
+    }
     case 'heart-boost':
       return {
         ...state,

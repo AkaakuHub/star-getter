@@ -122,6 +122,18 @@ function validateEffect(effect: Effect): void {
       throw new Error('増幅回数が正しくありません。');
     return;
   }
+  if (effect.kind === 'beat-point-buff') {
+    if (
+      !Number.isFinite(effect.amount) ||
+      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
+      (effect.multiplier !== undefined && !Number.isFinite(effect.multiplier)) ||
+      (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
+      (effect.duration !== undefined &&
+        (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 1))
+    )
+      throw new Error('自然発生ビートポイントの設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'skill-cooldown') {
     if (!Number.isFinite(effect.ratio) || effect.ratio < 0)
       throw new Error('アクション間隔が正しくありません。');
