@@ -108,7 +108,7 @@ export function GameView({
       </nav>
       <Hand controller={controller} state={state} />
       <CardUseLayer controller={controller} />
-      <CardPreview card={controller.selectedCard} onClose={() => controller.clearSelection()} />
+      <CardPreview card={controller.selectedCard} />
       {(state.phase === 'paused' || controller.waiting) && (
         <div className="pause-band" role="status">
           {controller.waiting ? 'カード使用待ち' : '一時停止'}

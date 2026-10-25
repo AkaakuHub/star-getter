@@ -124,11 +124,6 @@ export class GameController {
     if (index >= 0) this.tapCard(index);
   }
 
-  clearSelection(): void {
-    this.selection = null;
-    this.notify();
-  }
-
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
     return () => {
