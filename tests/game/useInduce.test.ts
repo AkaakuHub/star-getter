@@ -107,6 +107,28 @@ it('ActionType906のRequireCountをC#のint32へ変換する', () => {
   expect(activated.energy).toBeGreaterThan(0);
 });
 
+it('ActionType906は使用回数int32の折返し後もC#と同じ余り判定をする', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const effect = {
+    kind: 'use-count-induce' as const,
+    sourceEffectId: 'induce-wrap',
+    requireCount: 3,
+    limit: 0,
+    effects: [{ kind: 'energy' as const, amount: 1 }],
+  };
+  const state = {
+    ...initial,
+    energy: 0,
+    skillActivationCounts: { [card.id]: -2_147_483_648 },
+  };
+
+  const result = applyEffect(state, effect, card);
+
+  expect(result.energy).toBe(0);
+});
+
 it('Action907は子効果のCheckDeckOutを実行する', () => {
   const initial = game();
   const source = initial.deck[0];

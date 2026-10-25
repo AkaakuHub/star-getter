@@ -65,7 +65,7 @@ export function useSpecial(state: GameState, cardId: string): GameState {
     ...next,
     skillActivationCounts: {
       ...next.skillActivationCounts,
-      [card.id]: (next.skillActivationCounts[card.id] ?? 0) + 1,
+      [card.id]: Number(BigInt.asIntN(32, BigInt((next.skillActivationCounts[card.id] ?? 0) + 1))),
     },
   };
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);

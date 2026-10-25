@@ -193,7 +193,7 @@ function activateCard(
     drawContext: 'skill',
     skillActivationCounts: {
       ...state.skillActivationCounts,
-      [card.id]: (state.skillActivationCounts[card.id] ?? 0) + 1,
+      [card.id]: Number(BigInt.asIntN(32, BigInt((state.skillActivationCounts[card.id] ?? 0) + 1))),
     },
     cardUseCounts: { ...state.cardUseCounts, [card.id]: (state.cardUseCounts[card.id] ?? 0) + 1 },
     lastCardName: card.name,

@@ -32,10 +32,7 @@ export function activateUseCountInduce(
   card: Card | undefined,
   apply: EffectApplier,
 ): GameState {
-  const skillUseCount = Math.max(
-    0,
-    int32(card ? (state.skillActivationCounts[card.id] ?? 0) : 0) - 1,
-  );
+  const skillUseCount = int32((card ? (state.skillActivationCounts[card.id] ?? 1) : 1) - 1);
   const requireCount = int32(effect.requireCount);
   if (requireCount !== 0 && skillUseCount % requireCount !== 0) return state;
   return activateUseInduce(
