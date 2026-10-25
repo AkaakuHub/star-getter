@@ -37,8 +37,8 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
     cardPool: [...cards, poolCard],
     hand: cards.map((card) => card.id),
     handCardStats: {
-      [source.id]: { enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
-      [other.id]: { enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
+      [source.id]: { isActive: true, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
+      [other.id]: { isActive: true, enteredSectionIndex: 0, cardUseCountsAtEntry: {} },
     },
     cardUseCounts: { [source.id]: 2, [other.id]: 2 },
     stamina: 50,

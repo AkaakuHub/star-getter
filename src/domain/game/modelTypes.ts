@@ -130,6 +130,7 @@ export type HeartBoostState = Readonly<{
   deactivationKey: string | null;
 }>;
 export type HandCardStats = Readonly<{
+  isActive: boolean;
   enteredSectionIndex: number;
   cardUseCountsAtEntry: Readonly<Record<string, number>>;
 }>;

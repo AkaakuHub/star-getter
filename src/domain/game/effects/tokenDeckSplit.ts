@@ -62,10 +62,15 @@ export function activateTokenDeckSplit(
   let subState = withZones(next, { hand: [], drawPile: sub.drawPile, discard: sub.discard });
   subState = { ...subState, handEffectCardIds: [], drawContext: 'initial' };
   subState = fillHandToCount(subState, Math.min(handCount, selected.size));
+  const inactiveSubStats = { ...subState.handCardStats };
+  for (const id of subState.hand) {
+    const stats = inactiveSubStats[id];
+    if (stats) inactiveSubStats[id] = { ...stats, isActive: false };
+  }
   return {
     ...next,
     randomSeed: subState.randomSeed,
-    handCardStats: subState.handCardStats,
+    handCardStats: { ...next.handCardStats, ...inactiveSubStats },
     drawContext: 'idle',
     tokenDeckSplit: { ...split, main: activeMain, sub: zones(subState) },
   };
@@ -88,6 +93,16 @@ export function switchTokenDeck(state: GameState): GameState {
     tokenDeckSplit: updated,
     handEffectCardIds: [],
   };
+  const handCardStats = { ...next.handCardStats };
+  for (const id of state.hand) {
+    const stats = handCardStats[id];
+    if (stats) handCardStats[id] = { ...stats, isActive: false };
+  }
+  for (const id of incoming.hand) {
+    const stats = handCardStats[id];
+    if (stats) handCardStats[id] = { ...stats, isActive: true };
+  }
+  next = { ...next, handCardStats };
   next = { ...next, handEffectCardIds: [...incoming.hand] };
   for (const id of incoming.hand) {
     const card = next.deck.find((item) => item.id === id);

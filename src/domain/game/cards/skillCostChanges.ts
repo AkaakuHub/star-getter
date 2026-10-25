@@ -65,6 +65,7 @@ export function initializeHandCardStats(state: GameState, ids: readonly string[]
   const handCardStats = { ...state.handCardStats };
   for (const id of ids) {
     handCardStats[id] = {
+      isActive: true,
       enteredSectionIndex: sectionIndex,
       cardUseCountsAtEntry: state.cardUseCounts,
     };
