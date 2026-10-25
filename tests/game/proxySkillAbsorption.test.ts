@@ -83,7 +83,16 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
     },
     source,
   );
-  const absorbed = applyEffect(active, { kind: 'mood', amount: -3 }, source);
-  expect(absorbed.moodOffset).toBe(active.moodOffset);
+  const absorbed = applyEffect(
+    active,
+    {
+      kind: 'mood-change-skill',
+      calculationType: 1,
+      num: -30_000,
+      duration: { kind: 'stage', value: 0 },
+    },
+    source,
+  );
+  expect(absorbed.moodSkillBuffs).toHaveLength(0);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(3n);
 });

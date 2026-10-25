@@ -235,6 +235,13 @@ export type GameState = Readonly<{
   gaugeInfinities: readonly GaugeInfinity[];
   gaugeRegenerations: readonly GaugeRegeneration[];
   moodOffset: number;
+  moodSkillBuffs: readonly Readonly<{
+    calculation: 'add' | 'fixed';
+    value: number;
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+    deactivationKey: string | null;
+  }>[];
   costReductions: Readonly<Record<string, number>>;
   onceSkillCostChanges: Readonly<Record<string, number>>;
   storyAmplification: number;
@@ -311,7 +318,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-skill-cooldown'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-induced-skill-effect'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-beat-heart-value-buff'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-mood-change-skill'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

@@ -21,15 +21,19 @@ import {
   expireVoltageUpAdditionalBuffSections,
 } from './voltageUpAdditionalBuff';
 import { advanceBeatHeartValueBuffs, expireBeatHeartValueBuffSections } from './beatHeartValueBuff';
+import { advanceMoodChangeSkills, expireMoodChangeSkillSections } from './moodChangeSkill';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceBeatHeartValueBuffs(
-    advanceDisableMentalDownEffects(
-      advanceMentalBarrierAdditionalBuffs(
-        advanceMentalRecoverAdditionalBuffs(
-          advanceVoltageUpAdditionalBuffs(
-            advanceLoveUpAdditionalBuffs(
-              advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceMoodChangeSkills(
+    advanceBeatHeartValueBuffs(
+      advanceDisableMentalDownEffects(
+        advanceMentalBarrierAdditionalBuffs(
+          advanceMentalRecoverAdditionalBuffs(
+            advanceVoltageUpAdditionalBuffs(
+              advanceLoveUpAdditionalBuffs(
+                advanceAction52SkillBoosts(state, elapsedSeconds),
+                elapsedSeconds,
+              ),
               elapsedSeconds,
             ),
             elapsedSeconds,
@@ -45,12 +49,14 @@ export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number)
 }
 
 export function expireTimedSkillBuffSections(state: GameState): GameState {
-  return expireBeatHeartValueBuffSections(
-    expireDisableMentalDownEffectSections(
-      expireMentalBarrierAdditionalBuffSections(
-        expireMentalRecoverAdditionalBuffSections(
-          expireVoltageUpAdditionalBuffSections(
-            expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+  return expireMoodChangeSkillSections(
+    expireBeatHeartValueBuffSections(
+      expireDisableMentalDownEffectSections(
+        expireMentalBarrierAdditionalBuffSections(
+          expireMentalRecoverAdditionalBuffSections(
+            expireVoltageUpAdditionalBuffSections(
+              expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+            ),
           ),
         ),
       ),

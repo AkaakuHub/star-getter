@@ -29,11 +29,7 @@ import { resolveEffectParameterDetails } from './parameters/parameterValueChange
 import { applyParameterEffect, isParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
 import { activateHeartLimitChange, applyHeartLimitEffect } from './effects/heartLimit';
-import {
-  absorbSkillEffect,
-  forceProxySkillActivation,
-  registerProxySkill,
-} from './effects/proxySkill';
+import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
@@ -46,6 +42,7 @@ import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
 import { startIngameMission } from './ingameMissions';
 import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
+import { activateMoodChangeSkill } from './effects/moodChangeSkill';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -59,6 +56,8 @@ export function applyEffect(
   if (effect.kind === 'proxy-skill-forced-activation')
     return forceProxySkillActivation(state, effect.targetType);
   if (effect.kind === 'proxy-skill') return registerProxySkill(state, effect, card);
+  if (effect.kind === 'mood-change-skill')
+    return activateMoodChangeSkill(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'voltage-convert')
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
   if (effect.kind === 'mental-heart-induce')
@@ -127,8 +126,6 @@ export function applyEffect(
       const base = Math.fround(value(effect.amount) * effectPower);
       const boosted = applyAction52SkillBoostForCard(state, card, base);
       const amount = Math.ceil(boosted.value);
-      const absorption = absorbSkillEffect(boosted.state, 48, BigInt.asIntN(32, BigInt(amount)));
-      if (absorption.absorbed) return absorption.state;
       return {
         ...boosted.state,
         moodOffset: boosted.state.moodOffset + amount,

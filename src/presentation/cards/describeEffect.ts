@@ -113,6 +113,8 @@ export function describeEffect(effect: Effect): string {
         : effect.calculation === 'fixed'
           ? `自然発生するハート数を${effect.amount / 10_000}個にする。`
           : `自然発生するハート数を${effect.amount / 10_000}個増加する。`;
+    case 'mood-change-skill':
+      return '空模様の値を変化させる。';
     case 'heart-boost':
       return `次の${effect.uses}回のきらめき獲得効果を${effect.percent}%増幅する。`;
     case 'voltage-set':

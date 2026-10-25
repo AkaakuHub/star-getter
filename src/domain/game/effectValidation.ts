@@ -4,6 +4,8 @@ import { validateSpecialEffect } from './effectSpecialValidation';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
 import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
+import { validateMoodChangeSkillEffect } from './moodChangeSkillTypes';
+import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
 
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -271,20 +273,11 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'beat-heart-value-buff') {
-    if (
-      !['add', 'multiply', 'fixed'].includes(effect.calculation) ||
-      !Number.isFinite(effect.amount) ||
-      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
-      (effect.multiplier !== undefined && !Number.isFinite(effect.multiplier)) ||
-      (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
-      (effect.duration !== undefined &&
-        (!['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
-          !Number.isSafeInteger(effect.duration.value) ||
-          effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0))) ||
-      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
-      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
-    )
-      throw new Error('ビートハート値変更の設定が正しくありません。');
+    validateBeatHeartValueBuff(effect);
+    return;
+  }
+  if (effect.kind === 'mood-change-skill') {
+    validateMoodChangeSkillEffect(effect);
     return;
   }
   if (validateSpecialEffect(effect)) return;

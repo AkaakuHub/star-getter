@@ -143,6 +143,7 @@ export function createGame(
     gaugeInfinities: [],
     gaugeRegenerations: [],
     moodOffset: 0,
+    moodSkillBuffs: [],
     costReductions: {},
     onceSkillCostChanges: {},
     storyAmplification: 0,

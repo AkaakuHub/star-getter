@@ -20,6 +20,8 @@ import type { Action52BuffEffect } from './skillBoostTypes';
 import type { MentalHeartInduceEffect } from './mentalHeartInduceTypes';
 import type { AdditionalHeartInduceEffect } from './additionalHeartTypes';
 import type { ProxyForcedActivationEffect, ProxySkillEffect } from './proxySkillTypes';
+import type { MoodChangeSkillEffect } from './moodChangeSkillTypes';
+import type { BeatHeartValueBuffEffect } from './beatHeartValueBuffTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -208,6 +210,7 @@ type EffectShape =
       deactivationKey?: string;
     }>
   | Readonly<{ kind: 'mood'; amount: number }>
+  | MoodChangeSkillEffect
   | Readonly<{
       kind: 'conditional';
       condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
@@ -289,17 +292,7 @@ type EffectShape =
   | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
   | DisableMentalDownEffect
   | Readonly<{ kind: 'beat-count'; amount: number }>
-  | Readonly<{
-      kind: 'beat-heart-value-buff';
-      calculation: 'add' | 'multiply' | 'fixed';
-      amount: number;
-      addValue?: number;
-      multiplier?: number;
-      moodBonus?: MoodBonus;
-      duration?: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
-      invocationType?: number;
-      deactivationKey?: string;
-    }>
+  | BeatHeartValueBuffEffect
   | HeartBoostEffect
   | LoveUpAdditionalBuffEffect
   | VoltageUpAdditionalBuffEffect

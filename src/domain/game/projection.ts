@@ -4,6 +4,7 @@ import { moodAtTime } from './live/moodTimeline';
 import { type Card, type GameState, type Section, rules } from './model';
 import { resolveModeSkill } from './live/modes';
 import { skillCooldownSeconds } from './effects/skillCooldown';
+import { applyOrderedBuffs } from './parameters/buffs';
 
 export function sectionAt(state: GameState): Section {
   const beat = ((state.tick / rules.ticksPerSecond) * state.track.bpm) / 60;
@@ -31,11 +32,20 @@ export function cardAt(state: GameState, index: number): Card {
 }
 
 export function moodValue(state: GameState): number {
-  return Math.max(
-    -100,
-    Math.min(
-      100,
-      moodAtTime(state.track.moodKeys, state.tick / rules.ticksPerSecond) + state.moodOffset,
+  return Math.max(-100, Math.min(100, moodValueWithoutLimit(state)));
+}
+
+export function moodValueWithoutLimit(state: GameState): number {
+  const base =
+    moodAtTime(state.track.moodKeys, state.tick / rules.ticksPerSecond) + state.moodOffset;
+  return Math.trunc(
+    applyOrderedBuffs(
+      base,
+      state.moodSkillBuffs.map((buff) => ({
+        kind: buff.calculation,
+        value: buff.value,
+        group: 'skill' as const,
+      })),
     ),
   );
 }

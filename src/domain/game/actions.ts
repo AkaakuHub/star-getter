@@ -35,6 +35,7 @@ import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
 import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
 import { missionActionEffect, registerMissionMember, skipIngameMission } from './ingameMissions';
 import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
+import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -101,6 +102,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateInducedSkillEffects(state, action.deactivationKey);
     case 'deactivate-beat-heart-value-buff':
       return deactivateBeatHeartValueBuffs(state, action.deactivationKey);
+    case 'deactivate-mood-change-skill':
+      return deactivateMoodChangeSkills(state, action.deactivationKey);
   }
 }
 
