@@ -10,7 +10,7 @@ import {
   runCollections,
 } from './library/strategy';
 
-test('うなばら:3種類を生成し95枚を準備して連打、巻き込み後に修復する', () => {
+test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到達する', () => {
   const driver = new GameDriver('library');
   driver.report('開始');
   prepare(driver);
@@ -112,7 +112,7 @@ test('うなばら:autoONはカードも手動回収も使わず間隔付きで�
   expect(driver.state.score).toBeGreaterThan(score);
 });
 
-test('うなばら:autoOFFは5/10/15回毎秒で回収し停止時だけカードで再始動する', () => {
+test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚補充で継続する', () => {
   const scores: bigint[] = [];
   let repairs = 0;
   for (const speed of [5, 10, 15] as const) {
