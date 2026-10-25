@@ -32,3 +32,25 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
   expect(next.handUseHeartCollectionCounts[source.id]).toBe(4);
   expect(next.deckOutCount).toBe(0);
 });
+
+it('Action903は子効果がないとき回収数の監視を登録しない', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'heart-quantity-count' as const, count: 1 },
+      effects: [],
+    },
+  };
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
+    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
+    handEffectCardIds: [source.id],
+  };
+  const unchanged = notifyHandHeartCollect(state, 1, applyEffect);
+  expect(unchanged.handUseActivationCounts[source.id]).toBeUndefined();
+  expect(unchanged.handUseHeartCollectionCounts[source.id]).toBeUndefined();
+});

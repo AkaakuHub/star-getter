@@ -37,7 +37,7 @@ export function notifyHandHeartCollect(
     if (!card) throw new Error('手札効果のカードがありません。');
     const handUse = card.handUse;
     const trigger = handUse?.trigger;
-    if (!handUse || !trigger || trigger.kind !== 'heart-quantity-count') continue;
+    if (!handUse?.effects.length || trigger?.kind !== 'heart-quantity-count') continue;
     const count = (collectionCounts[id] ?? 0) + collectedCount;
     collectionCounts[id] = count;
     const activationCount = activationCounts[id] ?? 0;
