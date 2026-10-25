@@ -1,4 +1,5 @@
 import type { GameState } from '../../domain/game/model';
+import { formatScore } from '../cardDescription';
 import { projectScoreGraph } from './scoreGraph';
 
 export function paintResultGraph(
@@ -22,11 +23,7 @@ export function paintResultGraph(
   context.font = `700 ${fontSize}px sans-serif`;
   context.textAlign = 'left';
   context.textBaseline = 'bottom';
-  const maximumLabel =
-    display.maximumScore.toString().length > 12
-      ? '≈' + Number(display.maximumScore).toExponential(2)
-      : display.maximumScore.toLocaleString('ja-JP');
-  context.fillText(maximumLabel + 'STAR', left, top - fontSize * 0.3);
+  context.fillText(formatScore(display.maximumScore) + 'STAR', left, top - fontSize * 0.3);
   context.textAlign = 'right';
   context.textBaseline = 'middle';
   context.fillText('0', left - fontSize * 0.4, bottom);
@@ -52,20 +49,21 @@ export function paintResultGraph(
   context.lineTo(left, bottom);
   context.lineTo(right, bottom);
   context.stroke();
-  context.strokeStyle = '#d94e7d';
-  context.lineWidth = (width / 750) * 4;
+  context.strokeStyle = '#c3932366';
+  context.lineWidth = (width / 750) * 2;
   context.lineJoin = 'round';
   context.beginPath();
-  for (const [index, point] of display.points.entries()) {
+  for (const [index, point] of display.moodPoints.entries()) {
     const x = left + point.x * graphWidth;
     const y = bottom - point.y * graphHeight;
     if (index === 0) context.moveTo(x, y);
     else context.lineTo(x, y);
   }
   context.stroke();
-  context.strokeStyle = '#c39323';
+  context.strokeStyle = '#d94e7d';
+  context.lineWidth = (width / 750) * 4;
   context.beginPath();
-  for (const [index, point] of display.moodPoints.entries()) {
+  for (const [index, point] of display.points.entries()) {
     const x = left + point.x * graphWidth;
     const y = bottom - point.y * graphHeight;
     if (index === 0) context.moveTo(x, y);

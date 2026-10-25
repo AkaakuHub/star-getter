@@ -1,6 +1,7 @@
 import { RotateCcw } from 'lucide-preact';
 import { routes, type RouteId } from '../../content/routes';
 import { type GameState } from '../../domain/game/model';
+import { formatScore } from '../cardDescription';
 import { ResultGraph } from '../results/ResultGraph';
 import { ResultShareButton } from '../results/ResultShareButton';
 
@@ -10,19 +11,10 @@ export function Result({
   onReplay,
   busy,
 }: Readonly<{ state: GameState; route: RouteId; onReplay: () => void; busy: boolean }>) {
-  const scoreGroups = state.score.toLocaleString('ja-JP').split(',');
   return (
     <section className="result-panel" aria-label="ライブ結果">
       <h2>{routes[route].name}</h2>
-      <p className="result-score">
-        {scoreGroups.map((group, index) => (
-          <span key={index}>
-            {group}
-            {index < scoreGroups.length - 1 ? ',' : ''}
-            <wbr />
-          </span>
-        ))}
-      </p>
+      <p className="result-score">{formatScore(state.score)}</p>
       <ResultGraph state={state} />
       <dl className="result-stats">
         <div>
