@@ -32,7 +32,7 @@ export type GaugeRegenerationEffect = Readonly<{
   intervalMilliseconds: number;
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
 }>;
-export type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrierEffect;
+type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrierEffect;
 export type MentalBarrier = Readonly<{
   kind: 'endurance' | 'attenuation';
   endurance: number;
@@ -51,7 +51,7 @@ export type MentalBarrierEffect = Readonly<{
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
     | Readonly<{ kind: 'stage' }>;
 }>;
-export type ResetSpecial = Readonly<{
+type ResetSpecial = Readonly<{
   kind: 'reset-special';
   scope: 'normal' | 'extra' | 'all';
   target:
@@ -79,7 +79,7 @@ export type HeartBoostTarget =
   | Readonly<{ kind: 'member'; member: MemberId }>
   | Readonly<{ kind: 'unit'; unit: UnitId }>
   | Readonly<{ kind: 'card-series'; seriesId: number }>;
-export type HeartBoostEffect = Readonly<{
+type HeartBoostEffect = Readonly<{
   kind: 'heart-boost';
   percent: number;
   uses: number;
@@ -133,6 +133,27 @@ export type SkillCostChange = Readonly<{
   conditionId: number;
   remainingSections: number | null;
 }>;
+export type ParameterDetailValue = Readonly<{
+  id: bigint;
+  value: bigint;
+  unitsPerValue: number;
+}>;
+export type ParameterValueChangeEffect = Readonly<{
+  kind: 'parameter-value-change';
+  sourceEffectId: string;
+  targetDetailId: bigint;
+  calculation: 'add' | 'multiply' | 'fan-level';
+  base: number;
+  increment: number;
+  values?: readonly number[];
+  members?: readonly MemberId[];
+}>;
+export type ParameterValueFactor = Readonly<{
+  cardId: string;
+  sourceEffectId: string;
+  targetDetailId: bigint;
+  factor: number;
+}>;
 export type TokenBoost = Readonly<{
   calculation: 'add' | 'multiply-percent';
   value: number;
@@ -143,7 +164,7 @@ export type TokenBoost = Readonly<{
   remainingSections: number | null;
 }>;
 
-export type Effect =
+type EffectShape =
   | Readonly<{
       kind: 'branch';
       condition: GameCondition;
@@ -213,6 +234,7 @@ export type Effect =
         | Readonly<{ kind: 'token'; token: TokenKind }>;
     }>
   | SkillCostChangeEffect
+  | ParameterValueChangeEffect
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | GaugeEffect
   | Readonly<{
@@ -237,3 +259,7 @@ export type Effect =
       buffNum: number;
     }>
   | Readonly<{ kind: 'collect' }>;
+export type Effect = EffectShape &
+  Readonly<{
+    parameterDetails?: Readonly<Record<string, ParameterDetailValue>>;
+  }>;

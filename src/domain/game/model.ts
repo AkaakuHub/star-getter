@@ -18,6 +18,7 @@ import type {
   MoodBonus,
   SearchRequest,
   SkillCostChange,
+  ParameterValueFactor,
   TokenBoost,
 } from './modelTypes';
 
@@ -190,6 +191,8 @@ export type GameState = Readonly<{
   cardUseCounts: Readonly<Record<string, number>>;
   handCardStats: Readonly<Record<string, HandCardStats>>;
   skillCostChanges: readonly SkillCostChange[];
+  parameterValueFactors: readonly ParameterValueFactor[];
+  parameterValueChangeCounts: Readonly<Record<string, Readonly<Record<string, number>>>>;
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];

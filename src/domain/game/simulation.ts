@@ -22,6 +22,7 @@ import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaug
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
 import { initializeHandCardStats } from './cards/skillCostChanges';
+import { initializeParameterValueFactors } from './parameters/parameterValueChange';
 
 export function createGame(
   track: Track,
@@ -48,6 +49,8 @@ export function createGame(
     hand: [lead.id],
     handCardStats: {},
     skillCostChanges: [],
+    parameterValueFactors: [],
+    parameterValueChangeCounts: {},
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
     deckOutCount: 0,
@@ -131,7 +134,7 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  return fillHand(initializeHandCardStats(initial, [lead.id]));
+  return fillHand(initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]));
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {

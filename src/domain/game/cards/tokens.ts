@@ -1,5 +1,6 @@
 import { type GameState, type TokenKind, rules } from '../model';
 import { boostTokenRequests } from './tokenBoost';
+import { initializeParameterValueFactors } from '../parameters/parameterValueChange';
 
 export function addTokens(state: GameState, kind: TokenKind, count: number): GameState {
   const template = state.tokenCatalog.find((card) => card.token === kind);
@@ -11,13 +12,16 @@ export function addTokens(state: GameState, kind: TokenKind, count: number): Gam
       id: `${template.id}-${state.nextTokenId + index}`,
     }),
   );
-  return {
-    ...state,
-    deck: [...state.deck, ...generated],
-    cardPool: [...state.cardPool, ...generated],
-    drawPile: [...state.drawPile, ...generated.map((card) => card.id)],
-    nextTokenId: state.nextTokenId + generated.length,
-  };
+  return initializeParameterValueFactors(
+    {
+      ...state,
+      deck: [...state.deck, ...generated],
+      cardPool: [...state.cardPool, ...generated],
+      drawPile: [...state.drawPile, ...generated.map((card) => card.id)],
+      nextTokenId: state.nextTokenId + generated.length,
+    },
+    generated,
+  );
 }
 
 export function beginTokenGeneration(state: GameState, sourceId: string): GameState {

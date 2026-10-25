@@ -168,6 +168,21 @@ function validateEffect(effect: Effect): void {
       throw new Error('スキルコスト変更の設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'parameter-value-change') {
+    if (
+      !effect.sourceEffectId ||
+      effect.targetDetailId < 0n ||
+      !Number.isSafeInteger(effect.base) ||
+      !Number.isSafeInteger(effect.increment) ||
+      (effect.values !== undefined &&
+        effect.values.some((value) => !Number.isSafeInteger(value))) ||
+      (effect.calculation === 'multiply' && !effect.values?.length) ||
+      (effect.calculation === 'fan-level' &&
+        (!effect.members?.length || effect.members.some((member) => member <= 0)))
+    )
+      throw new Error('詳細値変更の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'skill-cooldown') {
     if (!Number.isFinite(effect.ratio) || effect.ratio < 0)
       throw new Error('アクション間隔が正しくありません。');

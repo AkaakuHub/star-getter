@@ -12,7 +12,6 @@ import { beatHeartCount } from './beat';
 import { activateBloom } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
-import { applyCostReduction } from './cards/cost';
 import { requestTokens } from './cards/tokens';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
@@ -20,7 +19,8 @@ import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
 import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
-import { addSkillCostChange } from './cards/skillCostChanges';
+import { resolveParameterDetailValue } from './parameters/parameterValueChange';
+import { applyParameterEffect } from './parameters/applyParameterEffect';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -31,8 +31,10 @@ export function applyEffect(
   card?: Card,
   multiplier = 1,
 ): GameState {
+  const parameterValue = (key: string, fallback: number) =>
+    resolveParameterDetailValue(state, card, effect, key, fallback);
   const value = (amount: number) =>
-    Math.fround(skillValue(state, amount, effect, card) * multiplier);
+    Math.fround(skillValue(state, parameterValue('amount', amount), effect, card) * multiplier);
   switch (effect.kind) {
     case 'branch': {
       const context = conditionContext(state);
@@ -166,9 +168,9 @@ export function applyEffect(
     case 'mental-shield':
       return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
     case 'cost-reduction':
-      return applyCostReduction(state, effect);
     case 'skill-cost-change':
-      return addSkillCostChange(state, effect, card, multiplier);
+    case 'parameter-value-change':
+      return applyParameterEffect(state, effect, card, multiplier);
     case 'protect-mental':
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }
@@ -219,7 +221,7 @@ export function applyEffect(
           {
             remainingSeconds:
               effect.duration.kind === 'milliseconds'
-                ? Math.fround(Math.fround(effect.duration.value) / 1000)
+                ? Math.fround(effect.duration.value / 1000)
                 : null,
             remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
           },
