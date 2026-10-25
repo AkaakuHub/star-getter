@@ -1,10 +1,12 @@
+import { isInt64 } from './numeric';
+
 export type FixedParameterExtendEffect = Readonly<{
   kind: 'fixed-parameter-extend';
   target: 'ap' | 'voltage' | 'mental';
   calculation: 'add' | 'multiply' | 'fixed';
-  value: number;
+  value: bigint;
   duration:
-    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+    | Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>
     | Readonly<{ kind: 'stage' }>;
 }>;
 
@@ -19,11 +21,10 @@ export type FixedParameterExtend = Readonly<{
 
 export function validateFixedParameterExtendEffect(effect: FixedParameterExtendEffect): void {
   if (
-    !Number.isSafeInteger(effect.value) ||
+    !isInt64(effect.value) ||
     !['ap', 'voltage', 'mental'].includes(effect.target) ||
     !['add', 'multiply', 'fixed'].includes(effect.calculation) ||
-    (effect.duration.kind !== 'stage' &&
-      (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0))
+    (effect.duration.kind !== 'stage' && !isInt64(effect.duration.value))
   )
     throw new Error('固定パラメーター上限変更の設定が正しくありません。');
 }

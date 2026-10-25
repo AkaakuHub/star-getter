@@ -6,6 +6,7 @@ import type { Card, GameState } from '../model';
 import { energyMaximum, changeMaximum } from '../parameters/maximum';
 import { voltageThreshold } from '../live/voltageLevel';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 
 export function activateFixedParameterExtend(
   state: GameState,
@@ -26,7 +27,9 @@ export function activateFixedParameterExtend(
     calculation: effect.calculation,
     value: int32(boosted.value),
     remainingSeconds:
-      effect.duration.kind === 'milliseconds' ? Math.fround(durationValue / 1000) : null,
+      effect.duration.kind === 'milliseconds'
+        ? Math.fround(int64ToFloat32(effect.duration.value) / 1000)
+        : null,
     remainingSections: effect.duration.kind === 'sections' ? durationValue : null,
   };
   return recalculateFixedParameters({
@@ -36,8 +39,8 @@ export function activateFixedParameterExtend(
   });
 }
 
-function int32(value: number): number {
-  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
+function int32(value: number | bigint): number {
+  return Number(BigInt.asIntN(32, typeof value === 'bigint' ? value : BigInt(Math.trunc(value))));
 }
 
 export function advanceFixedParameterExtends(state: GameState, elapsedSeconds: number): GameState {
