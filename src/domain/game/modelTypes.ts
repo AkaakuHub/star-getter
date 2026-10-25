@@ -30,6 +30,7 @@ import type { HandMaxCardEffect } from './handMaxCardTypes';
 import type { MentalShieldEffect } from './mentalShieldTypes';
 import type { FixedParameterExtendEffect } from './fixedParameterExtendTypes';
 import type { BeatPointBuffEffect } from './beatPointBuffTypes';
+import type { RecoverMentalSkillEffect } from './recoverMentalSkillTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -191,6 +192,7 @@ type EffectShape =
       whenFalse: readonly Effect[];
     }>
   | Readonly<{ kind: 'hearts'; amount: number; moodBonus?: MoodBonus; lifetimeSeconds?: number }>
+  | RecoverMentalSkillEffect
   | Readonly<{
       kind: 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
       amount: number;

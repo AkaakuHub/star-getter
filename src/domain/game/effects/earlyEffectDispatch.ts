@@ -11,6 +11,7 @@ import { activateHeartLimitBoost } from './heartLimitBoost';
 import { activateMoodValueBoost } from './moodValueBoost';
 import { activateVoltageConversion } from './voltageConversion';
 import { activateBeatPointBuff } from './beatPointBuff';
+import { activateRecoverMentalSkill } from './recoverMentalSkill';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -40,5 +41,15 @@ export function dispatchEarlyEffect(
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
   if (effect.kind === 'beat-point-buff')
     return activateBeatPointBuff(state, effect, card, multiplier, addValue);
+  if (effect.kind === 'recover-mental-skill')
+    return activateRecoverMentalSkill(
+      state,
+      effect,
+      card,
+      multiplier,
+      addValue,
+      effectPower,
+      apply,
+    );
   return undefined;
 }

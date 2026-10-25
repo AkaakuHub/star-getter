@@ -9,7 +9,9 @@ import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
 import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 import { validateMoodValueBoost } from './moodValueBoostTypes';
 import { validateGenesisSkill } from './genesisSkillTypes';
+import { validateRecoverMentalSkillEffect } from './recoverMentalSkillTypes';
 export function validateEffect(effect: Effect): void {
+  if (effect.kind === 'recover-mental-skill') return validateRecoverMentalSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('検索回数が正しくありません。');
@@ -80,11 +82,9 @@ export function validateEffect(effect: Effect): void {
       throw new Error('トークンカードデッキ切替の設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'ingame-mission') {
-    if (!Number.isSafeInteger(effect.groupId))
-      throw new Error('ミッションのグループIDが正しくありません。');
-    return;
-  }
+  if (effect.kind === 'ingame-mission' && !Number.isSafeInteger(effect.groupId))
+    throw new Error('ミッションのグループIDが正しくありません。');
+  if (effect.kind === 'ingame-mission') return;
   if (effect.kind === 'proxy-skill') {
     if (
       !Number.isSafeInteger(effect.absorbLimit) ||

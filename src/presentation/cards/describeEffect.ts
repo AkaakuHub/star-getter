@@ -90,6 +90,8 @@ export function describeEffect(effect: Effect): string {
       return '熱気の増加を別の効果に変換する。';
     case 'mental-heart-induce':
       return '元気が変化するたび、きらめきを生成する。';
+    case 'recover-mental-skill':
+      return '指定した割合だけ元気を回復する。';
     case 'combo-induce':
       return '対象メンバーがアクションを使用したとき、合計APに応じた効果を発動する。';
     case 'heart-limit-change':
