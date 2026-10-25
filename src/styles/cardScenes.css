@@ -26,9 +26,11 @@
 .card-illustration > .mascot {
   position: absolute;
   z-index: 1;
-  width: 92%;
   height: auto;
   aspect-ratio: 1;
+}
+:where(.card-illustration) > .mascot {
+  width: 92%;
   left: 4%;
   top: 25%;
 }
