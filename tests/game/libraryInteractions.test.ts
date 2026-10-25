@@ -25,7 +25,10 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
   let initial = addTokens(addTokens(game('library'), 'clock', 1), 'story', 1);
   const clock = token(initial, 'clock'),
     story = token(initial, 'story');
-  initial = withHand({ ...initial, energy: 20, maxEnergy: 20 }, [clock.id, story.id]);
+  initial = withHand({ ...initial, moodOffset: 50, energy: 20, maxEnergy: 20 }, [
+    clock.id,
+    story.id,
+  ]);
   const play = (first: Card, second: Card) => {
     const state = advanceTo(
       act(initial, { type: 'card', index: initial.hand.indexOf(first.id) }),
@@ -49,7 +52,7 @@ it('80枚で風車を引いた増幅は折り紙だけに適用する', () => {
   state = addTokens(state, 'story', 80 - state.deck.length);
   const clock = token(state, 'clock'),
     story = token(state, 'story');
-  state = withHand(state, [clock.id]);
+  state = withHand({ ...state, moodOffset: 50 }, [clock.id]);
   const drawn = applyDrawAbility(state, clock);
   expect(drawn.apIntervalFactor).toBe(0.5);
   expect(drawn.storyAmplification).toBe(1251.25);

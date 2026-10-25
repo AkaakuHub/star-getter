@@ -31,14 +31,12 @@ export function paintMoodGraph(context: CanvasRenderingContext2D, track: Track):
     context.lineTo(width, y);
     context.stroke();
   }
-  const points = projectMoodStepPoints(
-    track.sections.map((section) => ({
-      songTimeSeconds: (section.startBeat * 60) / track.bpm,
-      keyValue: section.moodValue,
-    })),
-    (track.beats * 60) / track.bpm,
-    { x: 0, y: 0, width, height },
-  );
+  const points = projectMoodStepPoints(track.moodKeys, (track.beats * 60) / track.bpm, {
+    x: 0,
+    y: 0,
+    width,
+    height,
+  });
   context.strokeStyle = '#f2f2f2';
   context.lineWidth = 3;
   context.beginPath();

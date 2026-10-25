@@ -29,11 +29,11 @@ it('空模様は同じミリ秒でも変更前後を追加して階段を残す'
 
 it('空模様を初期値から記録し、効果実行ではなく進行フレームで変化を記録する', () => {
   const initial = game();
-  expect(initial.moodHistory).toEqual([{ timeMilliseconds: 0, moodValue: 50 }]);
+  expect(initial.moodHistory).toEqual([{ timeMilliseconds: 0, moodValue: 0 }]);
   const changed = applyEffect(initial, { kind: 'mood', amount: 20 });
   expect(changed.moodHistory).toBe(initial.moodHistory);
   const observed = advanceTo(changed, 1 / 60);
-  expect(observed.moodHistory.at(-1)).toEqual({ timeMilliseconds: 16, moodValue: 70 });
+  expect(observed.moodHistory.at(-1)).toEqual({ timeMilliseconds: 16, moodValue: 20 });
   expect(advanceTo(observed, 0.5).moodHistory).toEqual(observed.moodHistory);
 });
 

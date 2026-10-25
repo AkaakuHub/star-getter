@@ -46,7 +46,13 @@ it('ゼロ点でも開始と曲末の記録が残る', () => {
   if (!original) throw new Error('楽曲がありません。');
   const section = original.sections[0];
   if (!section) throw new Error('パートがありません。');
-  const track = { ...original, bpm: 120, beats: 1, sections: [section] };
+  const track = {
+    ...original,
+    bpm: 120,
+    beats: 1,
+    sections: [section],
+    moodKeys: [{ songTimeSeconds: 0, keyValue: 0 }],
+  };
   const state = act(createGame(track, routes.library.deck, 7, 100, routes.library.tokens), {
     type: 'start',
   });

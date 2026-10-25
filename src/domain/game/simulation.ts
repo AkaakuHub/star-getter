@@ -1,4 +1,5 @@
 import { advanceAutomaticGauges } from './automaticGauges';
+import { moodAtTime, validateMoodTimeline } from './live/moodTimeline';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { applyDrawAbility } from './cards/drawAbilities';
 import { beatHeartCount } from './beat';
@@ -34,8 +35,6 @@ export function createGame(
   );
   const lead = deck[0];
   if (!lead) throw new Error('先頭のカードがありません。');
-  const firstSection = track.sections[0];
-  if (!firstSection) throw new Error('最初のパートがありません。');
   const ordered = [lead.id, ...shuffled.items.filter((id) => id !== lead.id)];
   const initial: GameState = {
     phase: 'ready',
@@ -76,7 +75,7 @@ export function createGame(
     score: 0n,
     scoreMultiplier: 1n,
     scoreHistory: [{ timeMilliseconds: 0, totalScore: 0n }],
-    moodHistory: [{ timeMilliseconds: 0, moodValue: firstSection.moodValue }],
+    moodHistory: [{ timeMilliseconds: 0, moodValue: moodAtTime(track.moodKeys, 0) }],
     hearts: {
       ...createStarGatherHeartRuntimeState((track.beats * 60) / track.bpm),
       showLimit: heartShowLimit,
@@ -201,10 +200,7 @@ function validateTrack(track: Track): void {
   let previous = -1;
   for (const section of track.sections) {
     if (
-      !Number.isSafeInteger(section.moodValue) ||
-      section.moodValue < -100 ||
-      section.moodValue > 100 ||
-      !Number.isInteger(section.startBeat) ||
+      !Number.isFinite(section.startBeat) ||
       section.startBeat <= previous ||
       section.startBeat >= track.beats
     ) {
@@ -212,4 +208,5 @@ function validateTrack(track: Track): void {
     }
     previous = section.startBeat;
   }
+  validateMoodTimeline(track.moodKeys, (track.beats * 60) / track.bpm);
 }

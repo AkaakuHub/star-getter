@@ -12,12 +12,10 @@ import { moodValue, sectionAt } from '../../src/domain/game/projection';
 import { tracks } from '../../src/content/tracks';
 import { game, withHand } from './support/game';
 
-it('自然な空模様に雨100%はなく、準備カード3回の使用で最初のパート中に段階的に下げる', () => {
-  expect(
-    tracks.flatMap((track) => track.sections).every((section) => section.moodValue > -100),
-  ).toBe(true);
+it('自然な空模様に雨100%はなく、準備カードの使用で最初のパート中に段階的に下げる', () => {
+  expect(tracks.flatMap((track) => track.moodKeys).every((key) => key.keyValue > -100)).toBe(true);
   let state = { ...game(), apIntervalFactor: 1 };
-  for (const [index, expected] of [0, -50, -100].entries()) {
+  for (const [index, expected] of [-50, -100].entries()) {
     state = withHand({ ...state, energy: 20, maxEnergy: 20, tick: (index + 1) * 20 }, [
       'rain-preparation',
     ]);
@@ -25,7 +23,7 @@ it('自然な空模様に雨100%はなく、準備カード3回の使用で最�
     expect(moodValue(state)).toBe(expected);
     expect(sectionAt(state)).toBe(state.track.sections[0]);
   }
-  expect(state.cardUseCounts['rain-preparation']).toBe(3);
+  expect(state.cardUseCounts['rain-preparation']).toBe(2);
   expect(state.mentalShield).toBeGreaterThan(0);
 });
 

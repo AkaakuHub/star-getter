@@ -28,9 +28,9 @@ it('楽曲の空模様値が範囲外なら開始を拒否する', () => {
   if (!track) throw new Error('テスト楽曲がありません。');
   const invalid = {
     ...track,
-    sections: track.sections.map((section) => ({ ...section, moodValue: 101 })),
+    moodKeys: [{ songTimeSeconds: 0, keyValue: 101 }],
   };
   expect(() => createGame(invalid, resolveDeck(defaultDeckIds), 7)).toThrow(
-    '区間の設定が正しくありません。',
+    '空模様の設定が正しくありません。',
   );
 });

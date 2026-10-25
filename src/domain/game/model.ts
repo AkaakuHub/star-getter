@@ -4,11 +4,11 @@ import type { StageGauges } from './live/gaugeTiming';
 import type { AutomaticHeartState } from './live/automaticHeart';
 import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
+import type { MoodKey } from './live/moodTimeline';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
 export type UnitId = 1 | 2 | 3;
-export type Mood = 'warm' | 'cool' | 'bright';
 export const costumeIds = [
   'star',
   'moon',
@@ -118,8 +118,6 @@ export type Card = Readonly<{
 export type Section = Readonly<{
   name: string;
   startBeat: number;
-  mood: Mood;
-  moodValue: number;
   climax: boolean;
 }>;
 
@@ -130,6 +128,7 @@ export type Track = Readonly<{
   beats: number;
   stage: StageGauges;
   sections: readonly Section[];
+  moodKeys: readonly MoodKey[];
 }>;
 
 export type CardUse = Readonly<{

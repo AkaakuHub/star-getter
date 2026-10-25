@@ -110,7 +110,7 @@ for (const mood of [-100, 0, 100]) {
       ...initial,
       track: {
         ...initial.track,
-        sections: initial.track.sections.map((section) => ({ ...section, moodValue: mood })),
+        moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
       },
       hand: ['horizon'],
       hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 1_000_000 },

@@ -71,7 +71,7 @@ function prepare(driver: GameDriver): readonly number[] {
 test('開花:20APで発動し通常ゲージの条件を保って準備と連打を計測する', () => {
   const driver = new GameDriver('bloom');
   driver.report('開始');
-  expect(driver.state.track.sections.every((section) => section.moodValue > -100)).toBe(true);
+  expect(driver.state.track.moodKeys.every((key) => key.keyValue > -100)).toBe(true);
   const moodChanges = prepare(driver);
   expect(moodChanges.length).toBeGreaterThanOrEqual(2);
   expect(moodChanges.at(-1)).toBe(-100);

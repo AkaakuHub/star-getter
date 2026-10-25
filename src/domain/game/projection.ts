@@ -1,5 +1,6 @@
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { cardCost } from './cards/cost';
+import { moodAtTime } from './live/moodTimeline';
 import { type Card, type GameState, type Section, rules } from './model';
 
 export function sectionAt(state: GameState): Section {
@@ -25,7 +26,13 @@ export function canActivateBloom(state: GameState): boolean {
 }
 
 export function moodValue(state: GameState): number {
-  return Math.max(-100, Math.min(100, sectionAt(state).moodValue + state.moodOffset));
+  return Math.max(
+    -100,
+    Math.min(
+      100,
+      moodAtTime(state.track.moodKeys, state.tick / rules.ticksPerSecond) + state.moodOffset,
+    ),
+  );
 }
 
 export function canUseCard(state: GameState, index: number): boolean {

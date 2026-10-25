@@ -36,7 +36,7 @@ describe('開花の専用ゲージ', () => {
         maxEnergy: 20,
         track: {
           ...initial.track,
-          sections: initial.track.sections.map((section) => ({ ...section, moodValue: mood })),
+          moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
         },
       };
       expect(canUseSpecial(state, 'horizon')).toBe(false);
