@@ -21,7 +21,7 @@ export function applySpecialReset(
         (effect.target.kind === 'others' && card.id !== sourceCard?.id) ||
         (effect.target.kind === 'member' && card.member === effect.target.member) ||
         (effect.target.kind === 'unit' && card.unit === effect.target.unit);
-      return !matchesTarget || card.id === sourceCard?.id;
+      return !matchesTarget || (state.currentSkillType === 1 && card.id === sourceCard?.id);
     }),
   };
 }

@@ -60,7 +60,11 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   const card = specialCards(state).find((item) => item.id === cardId);
   const token = state.specialAppealTokens.find((item) => item.card.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
-  let next = beginTokenGeneration(spendEnergy(state, specialCost(card)), card.id);
+  const previousSkillType = state.currentSkillType;
+  let next = beginTokenGeneration(
+    { ...spendEnergy(state, specialCost(card)), currentSkillType: 1 },
+    card.id,
+  );
   next = {
     ...next,
     skillActivationCounts: {
@@ -71,13 +75,13 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   next = finishTokenGeneration(next, card.id);
   if (token) next = startSpecialAppealTokenCooldown(next, token);
-  return fillHand(
-    flushDeckActions({
-      ...next,
-      specialUsed: token
-        ? next.specialUsed
-        : [...next.specialUsed.filter((id) => id !== cardId), cardId],
-      stats: { ...next.stats, specialsUsed: next.stats.specialsUsed + 1 },
-    }),
-  );
+  const completed = flushDeckActions({
+    ...next,
+    currentSkillType: previousSkillType,
+    specialUsed: token
+      ? next.specialUsed
+      : [...next.specialUsed.filter((id) => id !== cardId), cardId],
+    stats: { ...next.stats, specialsUsed: next.stats.specialsUsed + 1 },
+  });
+  return fillHand(completed);
 }

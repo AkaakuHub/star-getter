@@ -128,7 +128,11 @@ it('全ての共鳴を戻すときも先頭以外の通常共鳴を対象に含�
 it('共鳴を使ったカード自身は再使用対象から除き、他の対象共鳴を戻す', () => {
   const initial = game('library');
   const deck = initial.deck;
-  const state = { ...initial, specialUsed: ['library-pages', 'library-ensemble'] };
+  const state = {
+    ...initial,
+    currentSkillType: 1,
+    specialUsed: ['library-pages', 'library-ensemble'],
+  };
   const source = deck.find((card) => card.id === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const next = applyEffect(
@@ -137,6 +141,25 @@ it('共鳴を使ったカード自身は再使用対象から除き、他の対�
     source,
   );
   expect(next.specialUsed).toEqual(['library-pages']);
+});
+
+it('通常スキルからの共鳴再使用では発動元カード自身も対象にする', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('発動元カードがありません。');
+  const state = {
+    ...initial,
+    currentSkillType: 2,
+    specialUsed: ['library-pages'],
+  };
+
+  const next = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'all', target: { kind: 'source' } },
+    source,
+  );
+
+  expect(next.specialUsed).toEqual([]);
 });
 
 it('共鳴の再使用はユニットと発動元以外の対象を適用する', () => {

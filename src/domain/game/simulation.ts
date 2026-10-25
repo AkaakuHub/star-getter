@@ -65,6 +65,7 @@ export function createGame(
     ),
     modeReactions: [],
     phase: 'ready',
+    currentSkillType: null,
     tick: 0,
     track,
     deck: [...deck],

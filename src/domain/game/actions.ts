@@ -179,12 +179,14 @@ function activateCard(
   allHand: boolean,
 ): GameState {
   if (!state.activation) throw new Error('カードの使用処理がありません。');
+  const previousSkillType = state.currentSkillType;
   const usedSkillCost = cardCost(state, card, allHand);
   const handCardStatsAtUse = { ...state.activation.handCardStatsAtUse };
   const handCardStats = state.handCardStats[card.id];
   if (handCardStats) handCardStatsAtUse[card.id] = handCardStats;
   let next: GameState = {
     ...state,
+    currentSkillType: 2,
     onceSkillCostChanges: Object.fromEntries(
       Object.entries(state.onceSkillCostChanges).filter(([id]) => id !== card.id),
     ),
@@ -246,7 +248,8 @@ function activateCard(
     applyEffect,
   );
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
-  return registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
+  const completed = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
+  return { ...completed, currentSkillType: previousSkillType };
 }
 
 function retireCard(state: GameState, card: Card): GameState {

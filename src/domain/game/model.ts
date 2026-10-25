@@ -131,6 +131,7 @@ export type GameState = Readonly<{
     count: number;
   }>[];
   phase: 'ready' | 'playing' | 'paused' | 'finished';
+  currentSkillType: number | null;
   tick: number;
   track: Track;
   deck: readonly Card[];
