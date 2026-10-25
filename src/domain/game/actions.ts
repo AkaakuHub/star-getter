@@ -41,6 +41,7 @@ import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
 import { deactivateMoodValueAdditionalBuffs } from './effects/moodValueBoost';
 import { refreshEffectInducers } from './effects/effectInduce';
 import { deactivateBeatPointBuffs } from './effects/beatPointBuff';
+import { deactivateGaugeRegenerations } from './live/gaugeRegeneration';
 
 export function act(state: GameState, action: Action): GameState {
   return refreshEffectInducers(actInternal(state, action), applyEffect);
@@ -121,6 +122,8 @@ function actInternal(state: GameState, action: Action): GameState {
       return deactivateMoodValueAdditionalBuffs(state, action.deactivationKey);
     case 'deactivate-beat-point-buff':
       return deactivateBeatPointBuffs(state, action.deactivationKey);
+    case 'deactivate-gauge-regeneration':
+      return deactivateGaugeRegenerations(state, action.deactivationKey);
   }
 }
 

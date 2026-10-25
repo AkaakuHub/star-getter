@@ -44,3 +44,17 @@ export type SkillCostChangeEffect = Readonly<{
   addValue?: number;
   duration?: Readonly<{ sections: number }>;
 }>;
+
+export function validateSkillCostChangeEffect(effect: SkillCostChangeEffect): void {
+  if (
+    !Number.isFinite(effect.amount) ||
+    !Number.isFinite(effect.minimum) ||
+    !Number.isFinite(effect.maximum) ||
+    ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(effect.conditionType) ||
+    (effect.conditionId !== undefined && !Number.isSafeInteger(effect.conditionId)) ||
+    (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
+    (effect.duration !== undefined &&
+      (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 0))
+  )
+    throw new Error('スキルコスト変更の設定が正しくありません。');
+}

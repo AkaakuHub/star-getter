@@ -29,5 +29,8 @@ export function applyGaugeRegeneration(
     effect.duration,
     card?.id ?? null,
     applyEffect,
+    effect.calculationType,
+    effect.invocationType,
+    effect.deactivationKey,
   );
 }

@@ -13,24 +13,33 @@ export function startGaugeRegeneration(
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>,
   sourceCardId: string | null,
   applyEffect?: EffectApplier,
+  calculationType = 1,
+  invocationType?: number,
+  deactivationKey?: string,
 ): GameState {
   if (duration.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const intervalSeconds = Math.fround(intervalMilliseconds / 1000);
+  const suppressExpiry = invocationType === 0x388 || invocationType === 0x38b;
   const regeneration: GaugeRegeneration = {
     gauge,
+    calculationType,
     sourceCardId,
     amount,
     intervalType,
     intervalSeconds,
     elapsedSeconds: 0,
-    durationSeconds: duration.kind === 'milliseconds' ? Math.fround(duration.value / 1000) : null,
+    durationSeconds:
+      duration.kind === 'milliseconds' && !suppressExpiry
+        ? Math.fround(duration.value / 1000)
+        : null,
     durationElapsedSeconds: 0,
-    remainingSections: duration.kind === 'sections' ? duration.value : null,
+    remainingSections: duration.kind === 'sections' && !suppressExpiry ? duration.value : null,
     remainingHeartEvents: duration.kind === 'sections' ? duration.value : null,
+    deactivationKey: deactivationKey ?? null,
   };
   return {
-    ...pulseGauge(state, gauge, amount, sourceCardId, applyEffect),
+    ...pulseGauge(state, gauge, amount, sourceCardId, applyEffect, calculationType),
     gaugeRegenerations: [...state.gaugeRegenerations, regeneration],
   };
 }
@@ -52,6 +61,7 @@ export function advanceGaugeRegenerations(
         regeneration.amount,
         regeneration.sourceCardId,
         applyEffect,
+        regeneration.calculationType,
       );
       accumulated = Math.fround(accumulated - regeneration.intervalSeconds);
     }
@@ -86,13 +96,24 @@ export function expireGaugeRegenerations(
   };
 }
 
+export function deactivateGaugeRegenerations(state: GameState, deactivationKey: string): GameState {
+  return {
+    ...state,
+    gaugeRegenerations: state.gaugeRegenerations.filter(
+      (regeneration) => regeneration.deactivationKey !== deactivationKey,
+    ),
+  };
+}
+
 function pulseGauge(
   state: GameState,
   gauge: GaugeRegeneration['gauge'],
   amount: number,
   sourceCardId: string | null,
   applyEffect?: EffectApplier,
+  calculationType = 1,
 ): GameState {
+  if (calculationType !== 1) return state;
   const value = Math.trunc(amount);
   if (gauge === 'mental') {
     return state.bloom

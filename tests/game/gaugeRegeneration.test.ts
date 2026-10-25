@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '../../src/domain/game/actions';
 import { game } from './support/game';
 
 describe('ゲージの継続回復', () => {
@@ -9,6 +10,7 @@ describe('ゲージの継続回復', () => {
     const active = applyEffect(initial, {
       kind: 'gauge-regeneration',
       gauge: 'mental',
+      calculationType: 1,
       amount: 10,
       intervalType: 1,
       intervalMilliseconds: 200,
@@ -25,6 +27,7 @@ describe('ゲージの継続回復', () => {
     const active = applyEffect(initial, {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
+      calculationType: 1,
       amount: 10,
       intervalType: 1,
       intervalMilliseconds: 200,
@@ -47,6 +50,7 @@ describe('ゲージの継続回復', () => {
     const mental = applyEffect(initial, {
       kind: 'gauge-regeneration',
       gauge: 'mental',
+      calculationType: 1,
       amount: 10,
       intervalType: 2,
       intervalMilliseconds: 200,
@@ -55,6 +59,7 @@ describe('ゲージの継続回復', () => {
     const voltage = applyEffect(mental, {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
+      calculationType: 1,
       amount: 10,
       intervalType: 2,
       intervalMilliseconds: 200,
@@ -71,6 +76,7 @@ describe('ゲージの継続回復', () => {
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
+        calculationType: 1,
         amount: 10,
         intervalType: 2,
         intervalMilliseconds: 200,
@@ -86,6 +92,7 @@ describe('ゲージの継続回復', () => {
     const active = applyEffect(game(), {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
+      calculationType: 1,
       amount: 1,
       intervalType: 1,
       intervalMilliseconds: 100,
@@ -94,5 +101,45 @@ describe('ゲージの継続回復', () => {
     const firstHeartBeat = (2 * 60) / active.track.bpm;
     const ended = advanceTo(active, firstHeartBeat + 1 / 60);
     expect(ended.gaugeRegenerations).toHaveLength(0);
+  });
+
+  it('外部解除とInvocationTypeによる自動期限抑止を処理する', () => {
+    const active = applyEffect(
+      { ...game(), stamina: 40 },
+      {
+        kind: 'gauge-regeneration',
+        gauge: 'mental',
+        calculationType: 1,
+        amount: 10,
+        intervalType: 1,
+        intervalMilliseconds: 200,
+        duration: { kind: 'milliseconds', value: 500 },
+        invocationType: 0x388,
+        deactivationKey: 'regen',
+      },
+    );
+    expect(advanceTo(active, 0.61).gaugeRegenerations).toHaveLength(1);
+    const ended = act(advanceTo(active, 0.61), {
+      type: 'deactivate-gauge-regeneration',
+      deactivationKey: 'regen',
+    });
+    expect(ended.gaugeRegenerations).toHaveLength(0);
+  });
+
+  it('計算種別1以外は追加バフ適用後も元気を回復しない', () => {
+    const inactive = applyEffect(
+      { ...game(), stamina: 40 },
+      {
+        kind: 'gauge-regeneration',
+        gauge: 'mental',
+        calculationType: 2,
+        amount: 10,
+        intervalType: 1,
+        intervalMilliseconds: 200,
+        duration: { kind: 'milliseconds', value: 500 },
+      },
+    );
+    expect(inactive.stamina).toBe(40);
+    expect(inactive.gaugeRegenerations).toHaveLength(1);
   });
 });

@@ -9,9 +9,9 @@ import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
 import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 import { validateMoodValueBoost } from './moodValueBoostTypes';
 import { validateGenesisSkill } from './genesisSkillTypes';
-import { validateRecoverMentalSkillEffect } from './recoverMentalSkillTypes';
+import { validateGaugeRegenerationEffect } from './gaugeRegenerationTypes';
+import { validateSkillCostChangeEffect } from './skillCostChangeTypes';
 export function validateEffect(effect: Effect): void {
-  if (effect.kind === 'recover-mental-skill') return validateRecoverMentalSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('検索回数が正しくありません。');
@@ -278,6 +278,7 @@ export function validateEffect(effect: Effect): void {
     validateBeatHeartValueBuff(effect);
     return;
   }
+  if (effect.kind === 'gauge-regeneration') return validateGaugeRegenerationEffect(effect);
   if (effect.kind === 'mood-change-skill') {
     validateMoodChangeSkillEffect(effect);
     return;
@@ -289,20 +290,7 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'mood-value-boost') return validateMoodValueBoost(effect);
   if (effect.kind === 'genesis-skill') return validateGenesisSkill(effect);
   if (validateSpecialEffect(effect, validateEffect)) return;
-  if (effect.kind === 'skill-cost-change') {
-    if (
-      !Number.isFinite(effect.amount) ||
-      !Number.isFinite(effect.minimum) ||
-      !Number.isFinite(effect.maximum) ||
-      ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(effect.conditionType) ||
-      (effect.conditionId !== undefined && !Number.isSafeInteger(effect.conditionId)) ||
-      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
-      (effect.duration !== undefined &&
-        (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 0))
-    )
-      throw new Error('スキルコスト変更の設定が正しくありません。');
-    return;
-  }
+  if (effect.kind === 'skill-cost-change') return validateSkillCostChangeEffect(effect);
   if (effect.kind === 'parameter-value-change') {
     if (
       !effect.sourceEffectId ||
@@ -345,6 +333,10 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'energy' && Number.isFinite(effect.amount)) return;
-  if (!('amount' in effect) || !Number.isSafeInteger(effect.amount))
+  if (
+    !('amount' in effect) ||
+    !Number.isSafeInteger(effect.amount) ||
+    (effect.kind === 'recover-mental-skill' && !Number.isSafeInteger(effect.numberType))
+  )
     throw new Error('カードの効果量が正しくありません。');
 }

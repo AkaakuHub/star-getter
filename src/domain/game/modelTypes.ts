@@ -31,6 +31,8 @@ import type { MentalShieldEffect } from './mentalShieldTypes';
 import type { FixedParameterExtendEffect } from './fixedParameterExtendTypes';
 import type { BeatPointBuffEffect } from './beatPointBuffTypes';
 import type { RecoverMentalSkillEffect } from './recoverMentalSkillTypes';
+import type { GaugeRegenerationEffect } from './gaugeRegenerationTypes';
+export type { GaugeRegeneration, GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -46,26 +48,6 @@ type InfinityGaugeEffect = Readonly<{
   duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
   invocationType?: number;
   deactivationKey?: string;
-}>;
-export type GaugeRegeneration = Readonly<{
-  gauge: 'mental' | 'voltage';
-  sourceCardId: string | null;
-  amount: number;
-  intervalType: 1 | 2;
-  intervalSeconds: number;
-  elapsedSeconds: number;
-  durationSeconds: number | null;
-  durationElapsedSeconds: number;
-  remainingSections: number | null;
-  remainingHeartEvents: number | null;
-}>;
-export type GaugeRegenerationEffect = Readonly<{
-  kind: 'gauge-regeneration';
-  gauge: GaugeRegeneration['gauge'];
-  amount: number;
-  intervalType: 1 | 2;
-  intervalMilliseconds: number;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
 }>;
 type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrierEffect;
 export type MentalBarrier = Readonly<{
