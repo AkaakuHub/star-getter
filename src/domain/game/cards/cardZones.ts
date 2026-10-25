@@ -50,6 +50,8 @@ export function finishCardActivation(state: GameState): GameState {
       ...removeRandomHandCards(handReady, removedCount),
       drawContext: 'idle',
     };
+  } else if (handCapacity(handReady) < handReady.hand.length + 1) {
+    next = { ...handReady, drawContext: 'idle' };
   } else {
     next = fillHand(handReady);
   }

@@ -56,6 +56,29 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
   expect(finished.discard).toContain(source.id);
 });
 
+it('手札目標数より多い状態では使用元カードを補充しない', () => {
+  const state = fillHand({ ...game(), handLimit: 7 });
+  const source = state.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const activated = {
+    ...state,
+    handLimit: 5,
+    hand: state.hand.filter((id) => id !== source.id),
+    activation: {
+      sourceId: source.id,
+      usedCards: [source.id],
+      allHand: false,
+      recoverDiscard: false,
+      returnToDraw: [],
+      excluded: [],
+      handCountChanges: {},
+    },
+  };
+  const finished = finishCardActivation(activated);
+  expect(finished.hand).toHaveLength(6);
+  expect(finished.discard).toContain(source.id);
+});
+
 it('手札内の減少効果を合算してから、上限を3〜8枚に制限する', () => {
   const state = game();
   const card = state.deck[0];
