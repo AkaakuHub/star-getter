@@ -30,7 +30,12 @@ export function validateCard(card: Card): void {
   ) {
     throw new Error('カードの設定が正しくありません。');
   }
-  for (const effect of card.effects) validateEffect(effect);
+  for (const effect of [
+    ...card.effects,
+    ...(card.drawEffects ?? []),
+    ...(card.handUse?.effects ?? []),
+  ])
+    validateEffect(effect);
   if (card.special) {
     if (!Number.isSafeInteger(card.special.cost) || card.special.cost < 0)
       throw new Error('共鳴の消費量が正しくありません。');
@@ -39,12 +44,18 @@ export function validateCard(card: Card): void {
 }
 
 function validateEffect(effect: Effect): void {
+  if (effect.kind === 'search-unit') {
+    if (!Number.isSafeInteger(effect.count) || effect.count < 1)
+      throw new Error('検索回数が正しくありません。');
+    return;
+  }
   if (effect.kind === 'conditional') {
     for (const child of effect.effects) validateEffect(child);
     return;
   }
   if (effect.kind === 'voltage-tier') {
-    if (effect.tiers.length !== 6) throw new Error('熱気の段階数が正しくありません。');
+    if (effect.tiers.length !== 1000 / effect.step + 1)
+      throw new Error('熱気の段階数が正しくありません。');
     for (const tier of effect.tiers) for (const child of tier) validateEffect(child);
     return;
   }

@@ -1,4 +1,5 @@
 import type { GameState } from '../model';
+import { flushDeckActions } from './boardActions';
 import { fillHand, shuffleHand } from './drawing';
 
 export function finishCardActivation(state: GameState): GameState {
@@ -15,6 +16,7 @@ export function finishCardActivation(state: GameState): GameState {
   next = activation.shuffle
     ? shuffleHand({ ...next, drawPile: [...next.drawPile, ...activeChildren] })
     : { ...next, discard: [...next.discard, ...activeChildren] };
+  next = flushDeckActions(next);
   next = fillHand({
     ...next,
     lastUsedMember: source.member,

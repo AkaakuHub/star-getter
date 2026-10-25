@@ -5,8 +5,9 @@ import { beatHeartCount } from './beat';
 import { activateBloom, changeBloomResource } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
+import { applyCostReduction } from './cards/cost';
 import { addTokens } from './cards/tokens';
-import { fillHand, shuffleHand } from './cards/drawing';
+
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 import { applyStarGatherSkillBoost } from './live/skillBoost';
 
@@ -15,6 +16,11 @@ export function changeResource(
   resource: 'energy' | 'stamina' | 'excitement',
   amount: bigint,
 ): GameState {
+  if (resource === 'stamina' && amount < 0n) {
+    const blocked = Math.min(state.mentalShield, -Number(amount));
+    state = { ...state, mentalShield: state.mentalShield - blocked };
+    amount += BigInt(Math.trunc(blocked));
+  }
   if (state.bloom) return changeBloomResource(state, resource, amount);
   const maximum =
     resource === 'energy'
@@ -76,7 +82,21 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     case 'shuffle':
       return state.activation?.allHand
         ? { ...state, activation: { ...state.activation, shuffle: true } }
-        : fillHand(shuffleHand(state));
+        : {
+            ...state,
+            deckActions: { ...state.deckActions, shuffles: state.deckActions.shuffles + 1 },
+          };
+    case 'search-unit':
+      return {
+        ...state,
+        deckActions: {
+          ...state.deckActions,
+          searches: [
+            ...state.deckActions.searches,
+            ...Array.from({ length: effect.count }, () => effect.unit),
+          ],
+        },
+      };
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'energy':
@@ -98,6 +118,10 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
       return state.bloom
         ? changeBloomResource(state, 'energy', BigInt(effect.amount - state.energy))
         : { ...state, energy: Math.min(state.maxEnergy, effect.amount) };
+    case 'mental-shield':
+      return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
+    case 'cost-reduction':
+      return applyCostReduction(state, effect);
     case 'protect-mental':
       return { ...state, mentalProtected: true, resting: false };
     case 'voltage-limit':
@@ -111,7 +135,10 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     case 'voltage-tier': {
       const tier =
         effect.tiers[
-          Math.min(5, Math.floor(voltageLevel(state.excitement, state.maximumVoltageLevel) / 200))
+          Math.min(
+            effect.tiers.length - 1,
+            Math.floor(voltageLevel(state.excitement, state.maximumVoltageLevel) / effect.step),
+          )
         ];
       if (!tier) throw new Error('熱気の段階に対応する効果がありません。');
       return tier.reduce((next, child) => applyEffect(next, child, card), state);

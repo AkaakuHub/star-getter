@@ -1,5 +1,5 @@
 import { applyEffect } from './effects';
-import { fillHand, shuffleHand } from './cards/drawing';
+import { flushDeckActions } from './cards/boardActions';
 import { type GameState, rules } from './model';
 import { collectionScore, limitValue } from './scoring';
 import { collectStarGatherHeartRuntime, advanceStarGatherHeartRuntime } from './live/heartRuntime';
@@ -66,20 +66,17 @@ export function collectHearts(state: GameState): GameState {
         },
         card,
       );
-    } else if (card.collectionAbility === 'icy-sayaka') {
-      if (voltageLevel(state.excitement, state.maximumVoltageLevel) >= 950 && state.stamina === 0) {
-        triggered = fillHand(shuffleHand(triggered));
-        triggered = applyEffect(
-          triggered,
-          {
-            kind: 'excitement',
-            amount:
-              voltageLevel(state.excitement, state.maximumVoltageLevel) >= 1000
-                ? -15_400_000
-                : -1_400_000,
-          },
-          card,
-        );
+    } else if (card.collectionAbility) {
+      if (
+        voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 950 &&
+        triggered.stamina / 100 < Math.fround(1 / 1_000_000)
+      ) {
+        triggered = applyEffect(triggered, { kind: 'shuffle' }, card);
+        if (card.collectionAbility === 'icy-kosuzu')
+          triggered = applyEffect(triggered, { kind: 'search-unit', unit: 2, count: 4 }, card);
+        triggered = applyEffect(triggered, { kind: 'excitement', amount: -1_400_000 }, card);
+        if (voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 1000)
+          triggered = applyEffect(triggered, { kind: 'excitement', amount: -14_000_000 }, card);
       }
     } else if (state.deck.length >= 95) {
       triggered =
@@ -89,10 +86,10 @@ export function collectHearts(state: GameState): GameState {
               { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
               card,
             )
-          : fillHand(shuffleHand(triggered));
+          : applyEffect(triggered, { kind: 'shuffle' }, card);
     }
   }
-  return triggered;
+  return flushDeckActions(triggered);
 }
 
 export function addHearts(state: GameState, count: number): GameState {

@@ -6,7 +6,7 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
-export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1053;
+export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
 export type UnitId = 1 | 2 | 3;
 export type Mood = 'warm' | 'cool' | 'bright';
 export const costumeIds = [
@@ -49,14 +49,23 @@ export type Effect =
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'shuffle' | 'use-hand' }>
+  | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
   | Readonly<{ kind: 'reset-special'; unit?: UnitId; normalOnly?: true }>
   | Readonly<{ kind: 'set-energy'; amount: number }>
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
-  | Readonly<{ kind: 'voltage-tier'; tiers: readonly (readonly Effect[])[] }>
+  | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
   | Readonly<{ kind: 'protect-mental' }>
+  | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
+  | Readonly<{
+      kind: 'cost-reduction';
+      amount: number;
+      target:
+        | Readonly<{ kind: 'unit'; unit: UnitId }>
+        | Readonly<{ kind: 'token'; token: TokenKind }>;
+    }>
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | Readonly<{
       kind: 'resource-boost';
@@ -79,6 +88,8 @@ export type Card = Readonly<{
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   effects: readonly Effect[];
+  drawEffects?: readonly Effect[];
+  handUse?: Readonly<{ unit: UnitId; effects: readonly Effect[] }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
@@ -101,7 +112,7 @@ export type Card = Readonly<{
     | 'perennial'
     | 'shadow';
   useAbility?: 'story-boost' | 'aurora' | 'class' | 'icy-sayaka' | 'shadow';
-  collectionAbility?: 'icy-sayaka';
+  collectionAbility?: 'icy-sayaka' | 'icy-kosuzu';
 }>;
 
 export type Section = Readonly<{
@@ -167,6 +178,7 @@ export type GameState = Readonly<{
   nextTokenId: number;
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
+  deckActions: Readonly<{ shuffles: number; searches: readonly UnitId[] }>;
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;
   cardUseCounts: Readonly<Record<string, number>>;
@@ -191,6 +203,7 @@ export type GameState = Readonly<{
   stamina: number;
   resting: boolean;
   mentalProtected: boolean;
+  mentalShield: number;
   excitement: number;
   maximumVoltageLevel: number;
   specialUsed: readonly string[];

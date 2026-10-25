@@ -22,11 +22,11 @@ function expectOwnedOnce(state: GameState) {
 }
 
 describe('固定プリセット', () => {
-  it('1曲と用途に応じた6枚・8枚のプリセット2つを使用する', () => {
+  it('1曲と用途に応じた6枚・9枚のプリセット2つを使用する', () => {
     expect(tracks).toHaveLength(1);
     expect(routeIds).toEqual(['library', 'bloom']);
     expect(routes.library.deck).toHaveLength(6);
-    expect(routes.bloom.deck).toHaveLength(8);
+    expect(routes.bloom.deck).toHaveLength(9);
     for (const route of Object.values(routes)) expect(() => validateDeck(route.deck)).not.toThrow();
     expect(routes.library.deck.map((card) => card.id)).not.toEqual(
       routes.bloom.deck.map((card) => card.id),

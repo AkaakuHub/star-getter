@@ -19,6 +19,8 @@ export function describeEffect(effect: Effect): string {
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
     case 'heart-limit':
       return `このステージ中、きらめき上限を${effect.amount}個増加する。`;
+    case 'search-unit':
+      return `次の${effect.count}回、対象の編成のカードを優先して引く。`;
     case 'shuffle':
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':
@@ -28,7 +30,7 @@ export function describeEffect(effect: Effect): string {
     case 'conditional':
       return `${effectConditions[effect.condition]}のとき、${effect.effects.map(describeEffect).join('')}`;
     case 'voltage-tier':
-      return `熱気Lv.200ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * 200}以上：${tier.map(describeEffect).join('')}`).join('')}`;
+      return `熱気Lv.${effect.step}ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * effect.step}以上：${tier.map(describeEffect).join('')}`).join('')}`;
     case 'energy-limit':
       return `このステージ中、エナジー上限を${effect.amount}増加する。`;
     case 'reset-special':
@@ -37,6 +39,10 @@ export function describeEffect(effect: Effect): string {
       return `${effect.duration === 'stage' ? 'このステージ' : 'このパート'}中、エナジー回復速度を${effect.percent > 0 ? '+' : ''}${effect.percent}%変化させる。`;
     case 'set-energy':
       return `エナジーを${effect.amount}にする。`;
+    case 'mental-shield':
+      return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
+    case 'cost-reduction':
+      return `対象カードの消費エナジーを${effect.amount}減少させる。`;
     case 'protect-mental':
       return 'このステージ中、元気が0でも休憩に入らない。';
     case 'voltage-set':

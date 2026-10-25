@@ -6,6 +6,7 @@ export const defaultDeckIds = [
   'library-ensemble',
   'frost-echo',
   'frost-pulse',
+  'rain-preparation',
   'aurora-ensemble',
   'perennial',
   'camera',

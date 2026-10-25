@@ -44,9 +44,11 @@ export const bloomCards: readonly Card[] = [
     beatPoint: 100,
     useAbility: 'icy-sayaka',
     collectionAbility: 'icy-sayaka',
+    handUse: { unit: 2, effects: [{ kind: 'shuffle' }, { kind: 'energy', amount: 9 }] },
     effects: [
       {
         kind: 'voltage-tier',
+        step: 200,
         tiers: voltageHearts.map((amount, index) => {
           const points = voltagePoints[index],
             score = scorePercents[index],
@@ -95,6 +97,7 @@ export const bloomCards: readonly Card[] = [
     effects: [
       {
         kind: 'voltage-tier',
+        step: 200,
         tiers: voltageGains.map((amount, index) => {
           const percent = targetPercents[index];
           if (percent === undefined) throw new Error('段階の効果がありません。');

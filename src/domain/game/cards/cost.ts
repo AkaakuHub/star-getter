@@ -1,5 +1,5 @@
 import { finalizeStarGatherSkillCost } from '../live/skillCost';
-import type { Card, GameState } from '../model';
+import type { Card, Effect, GameState } from '../model';
 
 export function cardCost(state: GameState, card: Card): number {
   if (!card.allHandCost)
@@ -22,4 +22,22 @@ export function cardCost(state: GameState, card: Card): number {
     0,
   );
   return Math.max(0, total - reduction - (state.costReductions[card.id] ?? 0));
+}
+
+export function applyCostReduction(
+  state: GameState,
+  effect: Extract<Effect, { kind: 'cost-reduction' }>,
+): GameState {
+  return {
+    ...state,
+    costReductions: Object.fromEntries(
+      state.deck.map((card) => {
+        const matches =
+          effect.target.kind === 'unit'
+            ? card.unit === effect.target.unit
+            : card.token === effect.target.token;
+        return [card.id, (state.costReductions[card.id] ?? 0) + (matches ? effect.amount : 0)];
+      }),
+    ),
+  };
 }

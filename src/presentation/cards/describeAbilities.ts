@@ -1,7 +1,13 @@
+import { describeEffect } from './describeEffect';
 import type { Card } from '../../domain/game/model';
 
 export function describeAbilities(card: Card): string {
-  let text = '';
+  let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
+  if (card.handUse)
+    text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
+  if (card.collectionAbility === 'icy-kosuzu')
+    text +=
+      '手札にある間に累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直し、雨音の反響・凍空の鼓動・雨の準備を次の4回優先して引く。熱気を140万減らし、1000段階以上ならさらに1400万減らす。';
   switch (card.drawAbility) {
     case 'library':
       text +=
@@ -47,7 +53,7 @@ export function describeAbilities(card: Card): string {
       break;
     case 'icy-sayaka':
       text +=
-        '初回使用後、パズルを1枚追加する。手札にある間、雨音の反響・凍空の鼓動使用後に手札を引き直し、エナジーを9回復する。累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直して熱気を140万減らす。1000段階以上ならさらに1400万減らす。';
+        '初回使用後、パズルを1枚追加する。累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直して熱気を140万減らす。1000段階以上ならさらに1400万減らす。';
       break;
     case 'shadow':
       text +=

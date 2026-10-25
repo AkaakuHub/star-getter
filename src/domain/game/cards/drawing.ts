@@ -35,6 +35,17 @@ export function fillHand(state: GameState): GameState {
       next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
       candidates = next.drawPile.filter(eligible);
     }
+    const search = next.deckActions.searches.at(-1);
+    if (search !== undefined) {
+      const matches = candidates.filter((id) =>
+        next.deck.some((card) => card.id === id && card.unit === search),
+      );
+      if (matches.length) candidates = matches;
+      next = {
+        ...next,
+        deckActions: { ...next.deckActions, searches: next.deckActions.searches.slice(0, -1) },
+      };
+    }
     const random = createRangeRandom(next.randomSeed);
     const randomIndex = (maximumExclusive: number) => Math.floor(random.range(0, maximumExclusive));
     const drawn =

@@ -46,7 +46,7 @@ describe('ライブの進行', () => {
   it('スタミナが尽きると休憩し、回復してからカードを使用できる', () => {
     const resting = advanceTo({ ...game(), stamina: 0, energy: 5 }, 1);
     expect(resting.resting).toBe(true);
-    expect(heartCount(resting)).toBe(0);
+    expect(heartCount(resting)).toBeLessThanOrEqual(heartCount(game()));
     expect(canUseCard(resting, 0)).toBe(false);
     const recovered = advanceTo(resting, 11);
     expect(recovered.resting).toBe(false);

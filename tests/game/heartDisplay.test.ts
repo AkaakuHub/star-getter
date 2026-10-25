@@ -37,7 +37,11 @@ describe('きらめきの表示上限', () => {
   it('既定は100個で、表示上限を減らしても論理上の個数は減らさない', () => {
     expect(game().hearts.showLimit).toBe(100);
     for (let limit = 10; limit <= 100; limit += 10) {
-      const state = addHearts(game(limit), 100);
+      const initial = game(limit);
+      const state = addHearts(
+        { ...initial, hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [] } },
+        100,
+      );
       expect(heartCount(state)).toBe(100);
       expect(state.hearts.stageHearts).toHaveLength(limit);
       expect(state.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0)).toBe(

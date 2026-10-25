@@ -9,7 +9,14 @@ function game(count: number) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
   const state = act(createGame(track, resolveDeck(defaultDeckIds), 7), { type: 'start' });
-  return addHearts({ ...state, relayUsed: [...state.hand] }, count);
+  return addHearts(
+    {
+      ...state,
+      hearts: { ...state.hearts, stageHearts: [], hiddenHeartBatches: [] },
+      relayUsed: [...state.hand],
+    },
+    count,
+  );
 }
 
 it('100個が0.3秒続いた時点で自動回収し、99個では回収しない', () => {

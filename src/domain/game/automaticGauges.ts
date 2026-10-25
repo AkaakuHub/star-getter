@@ -1,5 +1,6 @@
 import type { GameState } from './model';
 import { advanceStarGatherApGauge } from './live/apGauge';
+import { changeBloomResource } from './bloom';
 import { changeResource } from './effects';
 import { durationSeconds } from './projection';
 
@@ -53,7 +54,9 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
   }
   while (stage.mentalDecreaseIntervalSeconds < mentalTimerSeconds) {
     mentalTimerSeconds = Math.fround(mentalTimerSeconds - stage.mentalDecreaseIntervalSeconds);
-    next = changeResource(next, 'stamina', -1n);
+    next = next.bloom
+      ? changeBloomResource(next, 'stamina', -1n)
+      : { ...next, stamina: Math.max(0, next.stamina - 1) };
   }
   return { ...next, mentalTimerSeconds, resting: !next.mentalProtected && next.stamina <= 0 };
 }

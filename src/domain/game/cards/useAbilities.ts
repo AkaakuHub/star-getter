@@ -56,16 +56,14 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
 }
 
 export function notifyHandSkillUse(state: GameState, used: Card): GameState {
-  if (used.unit !== 2) return state;
   const listeners = state.deck.filter(
-    (card) => state.hand.includes(card.id) && card.collectionAbility === 'icy-sayaka',
+    (card) => state.hand.includes(card.id) && card.handUse?.unit === used.unit,
   );
   return listeners.reduce(
     (next, card) =>
-      applyEffect(
-        applyEffect(next, { kind: 'shuffle' }, card),
-        { kind: 'energy', amount: 9 },
-        card,
+      (card.handUse?.effects ?? []).reduce(
+        (current, effect) => applyEffect(current, effect, card),
+        next,
       ),
     state,
   );
