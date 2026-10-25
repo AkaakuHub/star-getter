@@ -133,7 +133,7 @@ export function applyEffect(
       };
     }
     case 'hand-limit':
-      return applyHandLimit(state, effect.amount, card, multiplier, effect.duration, addValue);
+      return applyHandLimit(state, effect, card, multiplier, addValue);
     case 'heart-limit':
       return applyHeartLimit(state, value(effect.amount));
     case 'shuffle':

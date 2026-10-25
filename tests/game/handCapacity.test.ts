@@ -6,6 +6,7 @@ import { fillHand, handCapacity } from '../../src/domain/game/cards/drawing';
 import { applyEffect } from '../../src/domain/game/effects';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { advanceHandLimitEffects } from '../../src/domain/game/effects/handLimit';
 
 function game() {
   const track = tracks[0];
@@ -40,6 +41,27 @@ it('ミリ秒期限の手札数変更を期限後に解除する', () => {
   });
   expect(state.handLimit).toBe(6);
   expect(advanceTo(state, 0.2).handLimit).toBe(5);
+});
+
+it('InvocationType 0x388と0x38bは自動期限を止め、Deactivator解除で元へ戻す', () => {
+  for (const invocationType of [0x388, 0x38b] as const) {
+    const state = applyEffect(game(), {
+      kind: 'hand-limit',
+      amount: 1,
+      duration: { kind: 'milliseconds', value: 100 },
+      invocationType,
+      deactivationKey: `ability-${invocationType}`,
+    });
+    const afterTimer = advanceHandLimitEffects(state, 1).state;
+    expect(afterTimer.handLimit).toBe(6);
+    expect(afterTimer.handLimitEffects).toHaveLength(1);
+    const deactivated = act(afterTimer, {
+      type: 'deactivate-hand-limit',
+      deactivationKey: `ability-${invocationType}`,
+    });
+    expect(deactivated.handLimit).toBe(5);
+    expect(deactivated.handLimitEffects).toHaveLength(0);
+  }
 });
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {

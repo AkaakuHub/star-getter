@@ -11,6 +11,8 @@ import { finishCardActivation } from './cards/cardZones';
 import { useSpecial } from './special';
 import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
 import { advanceProxySkillUses } from './effects/proxySkill';
+import { deactivateHandLimitEffects } from './effects/handLimit';
+import { restoreHandLimitCount } from './cards/drawing';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -26,6 +28,12 @@ export function act(state: GameState, action: Action): GameState {
       return useSpecial(state, action.cardId);
     case 'card':
       return useCard(state, action.index);
+    case 'deactivate-hand-limit': {
+      const expired = deactivateHandLimitEffects(state, action.deactivationKey);
+      return expired.handAdjustment > 0
+        ? restoreHandLimitCount(expired.state, expired.handAdjustment)
+        : expired.state;
+    }
   }
 }
 

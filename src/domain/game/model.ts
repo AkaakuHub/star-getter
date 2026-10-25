@@ -193,6 +193,7 @@ export type GameState = Readonly<{
   handLimitEffects: readonly Readonly<{
     amount: number;
     expirationAmount: number;
+    deactivationKey: string | null;
     remainingSeconds: number | null;
     remainingSections: number | null;
   }>[];
@@ -282,7 +283,8 @@ export type GameState = Readonly<{
 export type Action =
   | Readonly<{ type: 'start' | 'pause' | 'resume' | 'collect' }>
   | Readonly<{ type: 'special'; cardId: string }>
-  | Readonly<{ type: 'card'; index: number }>;
+  | Readonly<{ type: 'card'; index: number }>
+  | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

@@ -9,7 +9,7 @@ import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt, moodValue } from './projection';
 import { finishBloom } from './bloom';
-import { fillHand, fillHandToCountRetainingOverflow } from './cards/drawing';
+import { fillHand, restoreHandLimitCount } from './cards/drawing';
 import { advanceHandLimitEffects, expireHandLimitSections } from './effects/handLimit';
 import { createStarGatherHeartRuntimeState } from './live/heartSpawn';
 import { recordScoreHistory } from './scoreHistory';
@@ -274,14 +274,6 @@ function advanceTick(state: GameState): GameState {
           moodValue: mood,
         }),
       };
-}
-
-function restoreHandLimitCount(state: GameState, adjustment: number): GameState {
-  const target = Math.min(
-    state.deck.length,
-    Math.max(3, Math.min(8, state.hand.length + adjustment)),
-  );
-  return fillHandToCountRetainingOverflow(state, target);
 }
 
 function validateTrack(track: Track): void {

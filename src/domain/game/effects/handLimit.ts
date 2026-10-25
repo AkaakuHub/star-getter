@@ -1,15 +1,18 @@
-import type { Card, GameState } from '../model';
+import type { Card, Effect, GameState } from '../model';
 import { skillValue } from './skillValue';
 import { isProxyTargetReached } from './proxySkill';
 
+type HandLimitEffect = Extract<Effect, { kind: 'hand-limit' }>;
+
 export function applyHandLimit(
   state: GameState,
-  baseAmount: number,
+  effect: HandLimitEffect,
   card: Card | undefined,
   multiplier: number,
-  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }> | undefined,
   addValue = 0,
 ): GameState {
+  const baseAmount = effect.amount;
+  const duration = effect.duration;
   if (duration?.kind === 'sections' && duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const scaledAmount = Math.trunc(Math.fround((baseAmount + addValue) * multiplier));
@@ -27,9 +30,15 @@ export function applyHandLimit(
           {
             amount: appliedAmount,
             expirationAmount: -amount,
+            deactivationKey: effect.deactivationKey ?? null,
             remainingSeconds:
-              duration?.kind === 'milliseconds' ? Math.fround(duration.value / 1000) : null,
-            remainingSections: duration?.kind === 'sections' ? duration.value : null,
+              effect.invocationType !== undefined || duration?.kind !== 'milliseconds'
+                ? null
+                : Math.fround(duration.value / 1000),
+            remainingSections:
+              effect.invocationType !== undefined || duration?.kind !== 'sections'
+                ? null
+                : duration.value,
           },
         ];
   return {
@@ -64,6 +73,20 @@ export function expireHandLimitSections(state: GameState): HandLimitExpiry {
   });
 }
 
+export function deactivateHandLimitEffects(
+  state: GameState,
+  deactivationKey: string,
+): HandLimitExpiry {
+  const retainedEffects = state.handLimitEffects.filter(
+    (effect) => effect.deactivationKey !== deactivationKey,
+  );
+  if (retainedEffects.length === state.handLimitEffects.length) return { state, handAdjustment: 0 };
+  const expiredAmount = state.handLimitEffects
+    .filter((effect) => effect.deactivationKey === deactivationKey)
+    .reduce((sum, effect) => sum + effect.expirationAmount, 0);
+  return restoreHandLimitEffects(state, retainedEffects, expiredAmount);
+}
+
 type HandLimitExpiry = Readonly<{ state: GameState; handAdjustment: number }>;
 
 function expireHandLimitEffects(
@@ -79,6 +102,14 @@ function expireHandLimitEffects(
     expiredAmount += effect.expirationAmount;
     return [];
   });
+  return restoreHandLimitEffects(state, handLimitEffects, expiredAmount);
+}
+
+function restoreHandLimitEffects(
+  state: GameState,
+  handLimitEffects: GameState['handLimitEffects'],
+  expiredAmount: number,
+): HandLimitExpiry {
   if (expiredAmount === 0) return { state: { ...state, handLimitEffects }, handAdjustment: 0 };
   const resetAmount = expiredAmount;
   const minimumCorrection = state.handLimit > 3 ? 0 : state.handLimit - 3;

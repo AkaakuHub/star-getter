@@ -23,7 +23,15 @@ export function fillHandToCount(state: GameState, count: number): GameState {
   return drawUntil(state, count, true);
 }
 
-export function fillHandToCountRetainingOverflow(state: GameState, count: number): GameState {
+export function restoreHandLimitCount(state: GameState, adjustment: number): GameState {
+  const target = Math.min(
+    state.deck.length,
+    Math.max(3, Math.min(8, state.hand.length + adjustment)),
+  );
+  return fillHandToCountRetainingOverflow(state, target);
+}
+
+function fillHandToCountRetainingOverflow(state: GameState, count: number): GameState {
   return drawUntil(state, count, false);
 }
 

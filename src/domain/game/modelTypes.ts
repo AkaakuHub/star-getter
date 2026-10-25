@@ -240,6 +240,8 @@ type EffectShape =
       kind: 'hand-limit';
       amount: number;
       duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+      invocationType?: 0x388 | 0x38b;
+      deactivationKey?: string;
     }>
   | Readonly<{ kind: 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'use-hand'; addAp?: number }>
