@@ -81,9 +81,9 @@ export function describeEffect(effect: Effect): string {
     case 'draw-success-induce':
       return `${drawSuccessBranchNames[Number(BigInt.asIntN(32, effect.branchType))] ?? '不明な条件'}の条件に応じて${effect.whenTrue.map(describeEffect).join('')}${effect.whenFalse.length ? `それ以外では${effect.whenFalse.map(describeEffect).join('')}` : ''}`;
     case 'use-induce':
-      return `カード使用時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
+      return `カード使用時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0n ? '' : `最大${effect.limit}回発動する。`}`;
     case 'use-count-induce':
-      return `カード使用回数の条件成立時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
+      return `カード使用回数の条件成立時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0n ? '' : `最大${effect.limit}回発動する。`}`;
     case 'effect-induce':
       return `条件に応じて${effect.effects.map(describeEffect).join('')}を有効化する。`;
     case 'card-move-induce':

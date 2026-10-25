@@ -11,7 +11,7 @@ it('使用誘発は子効果を実行し、子効果の発動数で上限を判�
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-1',
-    limit: 1,
+    limit: 1n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const first = applyEffect(state, effect, card);
@@ -28,7 +28,7 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-2',
-    limit: 0,
+    limit: 0n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const first = applyEffect({ ...initial, energy: 0 }, effect, card);
@@ -44,7 +44,7 @@ it('ActionType905の発動上限をC#のint32へ変換する', () => {
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-3',
-    limit: 4_294_967_296,
+    limit: 18_014_398_509_481_984n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const first = applyEffect({ ...initial, energy: 0 }, effect, card);
@@ -60,8 +60,8 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-3',
-    requireCount: 2,
-    limit: 0,
+    requireCount: 2n,
+    limit: 0n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const firstUse = applyEffect(
@@ -91,8 +91,8 @@ it('ActionType906のRequireCountをC#のint32へ変換する', () => {
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-4',
-    requireCount: 4_294_967_298,
-    limit: 0,
+    requireCount: 4_294_967_298n,
+    limit: 0n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const activated = applyEffect(
@@ -114,8 +114,8 @@ it('ActionType906は使用回数int32の折返し後もC#と同じ余り判定�
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-wrap',
-    requireCount: 3,
-    limit: 0,
+    requireCount: 3n,
+    limit: 0n,
     effects: [{ kind: 'energy' as const, amount: 1 }],
   };
   const state = {

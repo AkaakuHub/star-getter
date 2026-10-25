@@ -2,11 +2,13 @@ import type { Effect } from './modelTypes';
 import type { UseCountInduceEffect, UseInduceEffect } from './induceSkillEffectTypes';
 import type { CardMoveInduceEffect, EffectInduceEffect } from './induceSkillEffectTypes';
 
+import { isInt64 } from './numeric';
+
 export function validateUseInduceEffect(
   effect: UseInduceEffect,
   validateChild: (effect: Effect) => void,
 ): void {
-  if (!effect.sourceEffectId || !Number.isSafeInteger(effect.limit) || !effect.effects.length)
+  if (!effect.sourceEffectId || !isInt64(effect.limit) || !effect.effects.length)
     throw new Error('使用誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);
 }
@@ -17,8 +19,8 @@ export function validateUseCountInduceEffect(
 ): void {
   if (
     !effect.sourceEffectId ||
-    !Number.isSafeInteger(effect.requireCount) ||
-    !Number.isSafeInteger(effect.limit) ||
+    !isInt64(effect.requireCount) ||
+    !isInt64(effect.limit) ||
     !effect.effects.length
   )
     throw new Error('使用回数誘発の設定が正しくありません。');
