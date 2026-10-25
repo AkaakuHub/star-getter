@@ -26,6 +26,7 @@ import { initializeHandCardStats } from './cards/skillCostChanges';
 import { initializeParameterValueFactors } from './parameters/parameterValueChange';
 import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/proxySkill';
 import { applyEffect } from './effects';
+import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
 
 export function createGame(
   track: Track,
@@ -85,8 +86,7 @@ export function createGame(
     randomSeed: seed,
     energy: 0,
     maxEnergy: track.stage.maxEnergy,
-    apIntervalFactor: 1,
-    apStageIntervalFactor: 1,
+    apTimeEffects: [],
     apTimerSeconds: 0,
     mentalTimerSeconds: 0,
     voltageTimerSeconds: 0,
@@ -181,15 +181,18 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = removeExhaustedMentalBarriers(
-    expireMentalBarriers(
-      advanceGaugeRegenerations(
-        expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+  const gauges = advanceApSpeedEffects(
+    removeExhaustedMentalBarriers(
+      expireMentalBarriers(
+        advanceGaugeRegenerations(
+          expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+          dt,
+        ),
+        'milliseconds',
         dt,
       ),
-      'milliseconds',
-      dt,
     ),
+    dt,
   );
   const proxyPeriodState = advanceProxySkillPeriods(gauges, dt, applyEffect);
   let next: GameState = advanceHearts({
@@ -221,6 +224,7 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeRegenerations(next, 'heart-event');
   }
   if (sectionAt(next) !== sectionAt(state)) {
+    next = expireApSpeedSections(next);
     next = advanceProxySkillSections(next, applyEffect);
     const expiredHandLimit = expireHandLimitSections(next);
     next = expiredHandLimit.state;
@@ -256,7 +260,6 @@ function advanceTick(state: GameState): GameState {
         const remainingSections = change.remainingSections - 1;
         return remainingSections > 0 ? [{ ...change, remainingSections }] : [];
       }),
-      apIntervalFactor: 1,
       amplification: next.amplification - next.sectionAmplification,
       sectionAmplification: 0,
       targetBoosts: next.targetBoosts.filter((boost) => boost.duration === 'stage'),

@@ -2,6 +2,7 @@ import { beginTokenGeneration, finishTokenGeneration } from './tokens';
 import type { Card, Effect, GameState } from '../model';
 import { applyEffect, skillValue } from '../effects';
 import { moodValue } from '../projection';
+import { applyApSpeedPercent } from '../effects/apSpeed';
 
 export function applyDrawAbility(state: GameState, card: Card): GameState {
   const drawn = (card.drawEffects ?? []).reduce(
@@ -120,8 +121,7 @@ function applyNamedDrawAbility(state: GameState, card: Card): GameState {
   );
   const factor = Math.fround(Math.fround(10000 - reduction) / 10000);
   return {
-    ...next,
-    apIntervalFactor: Math.max(Math.fround(state.apIntervalFactor + Math.fround(factor - 1)), 0),
+    ...applyApSpeedPercent(next, Math.fround((1 - factor) * 100), 'stage'),
     storyAmplification:
       count >= 80
         ? Math.fround(state.storyAmplification + 1001 + Math.max(0, moodValue(state)) * 5.005)

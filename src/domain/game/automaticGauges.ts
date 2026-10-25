@@ -3,6 +3,7 @@ import { advanceStarGatherApGauge } from './live/apGauge';
 import { changeResource, decreaseMentalNaturally } from './resources';
 import { mentalDecreaseInterval } from './live/mentalBarriers';
 import { durationSeconds } from './projection';
+import { apIncreaseIntervalSeconds } from './effects/apSpeed';
 
 export function advanceAutomaticGauges(state: GameState, dt: number): GameState {
   const stage = state.track.stage;
@@ -15,10 +16,7 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
     {
       deltaTimeSeconds: dt,
       mentalDown: state.resting,
-      increaseIntervalSeconds: Math.fround(
-        Math.max(0, state.apIntervalFactor + state.apStageIntervalFactor - 1) *
-          stage.apIncreaseIntervalSeconds,
-      ),
+      increaseIntervalSeconds: apIncreaseIntervalSeconds(state),
     },
   ).state;
   let next = changeResource(state, 'energy', BigInt(ap.currentAp - Math.floor(state.energy)));

@@ -15,7 +15,7 @@ import { game, withHand } from './support/game';
 
 it('自然な空模様に雨100%はなく、準備カードの使用で最初のパート中に段階的に下げる', () => {
   expect(tracks.flatMap((track) => track.moodKeys).every((key) => key.keyValue > -100)).toBe(true);
-  let state = { ...game(), apIntervalFactor: 1 };
+  let state = game();
   for (const expected of [-50, -100]) {
     state = withHand(
       { ...state, energy: 20, maxEnergy: 20, tick: state.tick + cardCooldownTicks(state) },

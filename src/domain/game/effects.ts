@@ -26,6 +26,7 @@ import { applyHeartLimit } from './effects/heartLimit';
 import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
+import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -257,11 +258,10 @@ export function applyEffect(
       return applyVoltageTier(state, effect, card, multiplier, addValue, applyEffect);
     }
     case 'ap-speed': {
-      const field = effect.duration === 'stage' ? 'apStageIntervalFactor' : 'apIntervalFactor';
-      return {
-        ...state,
-        [field]: Math.fround(state[field] - Math.fround(value(effect.percent) / 100)),
-      };
+      return applyApSpeedPercent(state, effect.percent, effect.duration);
+    }
+    case 'ap-speed-change': {
+      return applyApSpeedChange(state, effect, card, multiplier, addValue);
     }
     case 'stamina':
     case 'excitement': {

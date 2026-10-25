@@ -12,6 +12,7 @@ import { useSpecial } from './special';
 import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
 import { advanceProxySkillUses } from './effects/proxySkill';
 import { deactivateHandLimitEffects } from './effects/handLimit';
+import { deactivateApSpeedEffects } from './effects/apSpeed';
 import { restoreHandLimitCount } from './cards/drawing';
 
 export function act(state: GameState, action: Action): GameState {
@@ -34,6 +35,8 @@ export function act(state: GameState, action: Action): GameState {
         ? restoreHandLimitCount(expired.state, expired.handAdjustment)
         : expired.state;
     }
+    case 'deactivate-ap-speed':
+      return deactivateApSpeedEffects(state, action.deactivationKey);
   }
 }
 

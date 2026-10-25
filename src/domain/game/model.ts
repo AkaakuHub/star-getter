@@ -234,8 +234,13 @@ export type GameState = Readonly<{
   randomSeed: number;
   energy: number;
   maxEnergy: number;
-  apIntervalFactor: number;
-  apStageIntervalFactor: number;
+  apTimeEffects: readonly Readonly<{
+    calculation: 'add' | 'multiply';
+    value: number;
+    remainingSeconds: number | null;
+    remainingSections: number | null;
+    deactivationKey: string | null;
+  }>[];
   apTimerSeconds: number;
   mentalTimerSeconds: number;
   voltageTimerSeconds: number;
@@ -290,7 +295,8 @@ export type Action =
   | Readonly<{ type: 'start' | 'pause' | 'resume' | 'collect' }>
   | Readonly<{ type: 'special'; cardId: string }>
   | Readonly<{ type: 'card'; index: number }>
-  | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-hand-limit'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-ap-speed'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

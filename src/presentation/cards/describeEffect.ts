@@ -60,6 +60,8 @@ export function describeEffect(effect: Effect): string {
       return '対応する共鳴を再使用できるようにする。';
     case 'ap-speed':
       return `${effect.duration === 'stage' ? 'このステージ' : 'このパート'}中、エナジー回復速度を${effect.percent > 0 ? '+' : ''}${effect.percent}%変化させる。`;
+    case 'ap-speed-change':
+      return 'エナジーの回復速度を変化させる。';
     case 'mental-shield':
       return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
     case 'cost-reduction':

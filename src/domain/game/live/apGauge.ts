@@ -34,8 +34,8 @@ export function advanceStarGatherApGauge(
   if (increaseIntervalSeconds <= 0) {
     currentAp = state.maxAp;
   } else {
-    while (increaseIntervalSeconds < timerSeconds) {
-      timerSeconds = Math.fround(timerSeconds - increaseIntervalSeconds);
+    while (increaseIntervalSeconds <= timerSeconds + 0.000001) {
+      timerSeconds = Math.max(0, Math.fround(timerSeconds - increaseIntervalSeconds));
       currentAp = Math.min(currentAp + 1, state.maxAp);
     }
   }

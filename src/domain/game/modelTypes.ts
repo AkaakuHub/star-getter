@@ -255,6 +255,18 @@ type EffectShape =
   | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
+  | Readonly<{
+      kind: 'ap-speed-change';
+      calculationType: 1 | 2;
+      num: number;
+      bonusMoodTarget: 0 | 1 | 2 | 3;
+      bonusMoodValue: number;
+      duration:
+        | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+        | Readonly<{ kind: 'stage' }>;
+      invocationType?: number;
+      deactivationKey?: string;
+    }>
   | ResetSpecial
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>

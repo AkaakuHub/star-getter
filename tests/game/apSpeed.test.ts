@@ -1,0 +1,132 @@
+import { expect, it } from 'vite-plus/test';
+import { act } from '../../src/domain/game/actions';
+import { applyEffect } from '../../src/domain/game/effects';
+import { apIncreaseIntervalSeconds } from '../../src/domain/game/effects/apSpeed';
+import { advanceTo } from '../../src/domain/game/simulation';
+import { game } from './support/game';
+
+const speedEffect = {
+  kind: 'ap-speed-change',
+  calculationType: 2,
+  num: 7000,
+  bonusMoodTarget: 0,
+  bonusMoodValue: 0,
+  duration: { kind: 'stage' },
+} as const;
+
+it('Action21の乗算はC#のnum換算でAP回復時間へ適用し、deactivatorで元に戻す', () => {
+  const initial = {
+    ...game(),
+    handEffectCardIds: [],
+    targetBoosts: [],
+    amplification: 100,
+    storyAmplification: 0,
+    apTimerSeconds: 0.3,
+  };
+  const before = apIncreaseIntervalSeconds(initial);
+  const applied = applyEffect(initial, speedEffect, initial.deck[0]);
+  expect(apIncreaseIntervalSeconds(applied)).toBeCloseTo(0.9, 5);
+  expect(applied.apTimerSeconds).toBeCloseTo(initial.apTimerSeconds * 0.75, 5);
+
+  const ended = act(applied, { type: 'deactivate-ap-speed', deactivationKey: 'unused' });
+  expect(ended.apTimeEffects).toHaveLength(1);
+  const keyed = applyEffect(
+    initial,
+    { ...speedEffect, deactivationKey: 'action21' },
+    initial.deck[0],
+  );
+  const deactivated = act(keyed, { type: 'deactivate-ap-speed', deactivationKey: 'action21' });
+  expect(apIncreaseIntervalSeconds(deactivated)).toBeCloseTo(before, 5);
+  expect(deactivated.apTimerSeconds).toBeCloseTo(initial.apTimerSeconds, 5);
+});
+
+it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用する', () => {
+  const initial = {
+    ...game(),
+    handEffectCardIds: [],
+    targetBoosts: [],
+    amplification: 100,
+    storyAmplification: 0,
+  };
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const additive = applyEffect(
+    initial,
+    {
+      ...speedEffect,
+      calculationType: 1,
+      num: -0.25,
+      duration: { kind: 'stage' },
+    },
+    source,
+  );
+  expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(1, 5);
+
+  const boosted = applyEffect(
+    { ...initial, targetBoosts: [{ members: [source.member], percent: 100, duration: 'stage' }] },
+    speedEffect,
+    source,
+  );
+  expect(apIncreaseIntervalSeconds(boosted)).toBeCloseTo(0.5, 5);
+
+  const absorption = {
+    id: 1,
+    sourceId: source.id,
+    hasAbsorbLimit: false,
+    isAbsoluteAdd: false,
+    periodType: 3 as const,
+    remainingPeriod: 0,
+    isAbsorbEnd: false,
+    induceTiming: 1,
+    induceCondition: 1,
+    inducePowerType: 1,
+    inducePowerParam: 0,
+    inducedEffects: [],
+    effects: [{ actionType: 21, targetAmount: 50n, totalAmount: 0n }],
+  };
+  const protectedState = { ...initial, proxyAbsorptions: [absorption] };
+  const absorbed = applyEffect(protectedState, speedEffect, source);
+  expect(absorbed.apTimeEffects).toHaveLength(0);
+  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(30n);
+});
+
+it('Action21のパート期限とミリ秒期限を解除する', () => {
+  const initial = game();
+  const sectionEffect = applyEffect(initial, {
+    ...speedEffect,
+    num: 11000,
+    duration: { kind: 'sections', value: 1 },
+  });
+  const nextSection = initial.track.sections[1];
+  if (!nextSection) throw new Error('次のパートがありません。');
+  const sectionTime = (nextSection.startBeat * 60) / initial.track.bpm;
+  const expiredSection = advanceTo(sectionEffect, sectionTime);
+  expect(expiredSection.apTimeEffects).toHaveLength(0);
+  expect(apIncreaseIntervalSeconds(expiredSection)).toBeCloseTo(
+    apIncreaseIntervalSeconds(initial),
+    5,
+  );
+
+  const persistent = applyEffect(initial, {
+    ...speedEffect,
+    num: 11000,
+    duration: { kind: 'sections', value: 1 },
+    invocationType: 0x388,
+    deactivationKey: 'persistent',
+  });
+  const afterSection = advanceTo(persistent, sectionTime);
+  expect(afterSection.apTimeEffects).toHaveLength(1);
+  const deactivated = act(afterSection, {
+    type: 'deactivate-ap-speed',
+    deactivationKey: 'persistent',
+  });
+  expect(deactivated.apTimeEffects).toHaveLength(0);
+
+  const timed = applyEffect(initial, {
+    ...speedEffect,
+    num: 11000,
+    duration: { kind: 'milliseconds', value: 250 },
+  });
+  expect(timed.apTimeEffects).toHaveLength(1);
+  expect(advanceTo(timed, 0.3).apTimeEffects).toHaveLength(0);
+});

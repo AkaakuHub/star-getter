@@ -52,7 +52,7 @@ it('80枚で舵を引いた増幅は貝がらだけに適用する', () => {
     story = token(state, 'story');
   state = withHand({ ...state, moodOffset: 50 }, [clock.id]);
   const drawn = applyDrawAbility(state, clock);
-  expect(drawn.apIntervalFactor).toBe(0.5);
+  expect(drawn.apTimeEffects[0]?.value).toBe(0.5);
   expect(drawn.storyAmplification).toBe(1251.25);
   expect(drawn.amplification).toBe(state.amplification);
   const effect = { kind: 'hearts', amount: 10 } as const;

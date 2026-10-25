@@ -143,6 +143,24 @@ function validateEffect(effect: Effect): void {
       throw new Error('増幅回数が正しくありません。');
     return;
   }
+  if (effect.kind === 'ap-speed-change') {
+    if (
+      ![1, 2].includes(effect.calculationType) ||
+      ![0, 1, 2, 3].includes(effect.bonusMoodTarget) ||
+      !Number.isFinite(effect.num) ||
+      !Number.isFinite(effect.bonusMoodValue) ||
+      (effect.duration.kind !== 'stage' &&
+        effect.duration.kind !== 'milliseconds' &&
+        effect.duration.kind !== 'sections') ||
+      (effect.duration.kind !== 'stage' &&
+        (!Number.isSafeInteger(effect.duration.value) ||
+          effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0))) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('AP回復速度変更の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'heart-boost') {
     const target = effect.target;
     if (
