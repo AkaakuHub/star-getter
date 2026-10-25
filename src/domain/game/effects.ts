@@ -167,8 +167,8 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
         resourceBoosts: state.resourceBoosts.flatMap((boost) =>
           boost.target !== effect.kind
             ? [boost]
-            : boost.uses > 1
-              ? [{ ...boost, uses: boost.uses - 1 }]
+            : boost.uses === null || boost.uses > 1
+              ? [{ ...boost, uses: boost.uses === null ? null : boost.uses - 1 }]
               : [],
         ),
       };
@@ -245,7 +245,7 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   const base =
     effect.kind === 'boost'
       ? Math.trunc(raw)
-      : effect.kind === 'bloom' || effect.kind === 'amplify'
+      : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'resource-boost'
         ? raw
         : Math.ceil(raw);
   const handBoost = state.deck.reduce(

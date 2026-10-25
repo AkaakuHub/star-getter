@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { drawCandidate } from '../../src/domain/game/cards/drawLottery';
+import { drawCandidate, drawWeight } from '../../src/domain/game/cards/drawLottery';
 import { fillHand } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { game, withHand } from './support/game';
@@ -40,4 +40,29 @@ it('生成した30枚の末尾順で固定せず、各ドローで乱数を進�
       .slice(0, stories.length)
       .map((card) => card.id),
   );
+});
+
+it('条件一致時だけ対象を優先し、極光は開始時の優先を持たない', () => {
+  const state = game();
+  const source = (id: string) => {
+    const card = state.deck.find((item) => item.id === id);
+    if (!card) throw new Error('カードがありません。');
+    return card;
+  };
+  const initial = { ...state, drawContext: 'initial' as const };
+  const doll = {
+    ...state,
+    drawContext: 'skill' as const,
+    lastUsedMember: 1032 as const,
+    lastUsedUnit: 2 as const,
+  };
+  const cerise = { ...doll, lastUsedMember: 1031 as const, lastUsedUnit: 1 as const };
+  expect(drawWeight(source('aurora-ensemble'), initial)).toBe(1);
+  expect(drawWeight(source('aurora-ensemble'), doll)).toBe(-1);
+  expect(drawWeight(source('library-ensemble'), initial)).toBe(0);
+  expect(drawWeight(source('library-ensemble'), doll)).toBe(0);
+  expect(drawWeight(source('library-ensemble'), cerise)).toBe(-1);
+  expect(drawWeight(source('frost-pulse'), doll)).toBe(-1);
+  expect(drawWeight(source('frost-pulse'), cerise)).toBe(0);
+  expect(drawWeight(source('camera'), cerise)).toBe(-1);
 });

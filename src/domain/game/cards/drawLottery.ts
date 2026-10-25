@@ -1,3 +1,5 @@
+import type { Card, GameState } from '../model';
+
 type DrawCandidate = Readonly<{ id: string; weight: number }>;
 
 export function drawCandidate(
@@ -15,4 +17,25 @@ export function drawCandidate(
     if (roll < cumulative) return candidate.id;
   }
   throw new Error('カードの抽選が成立しません。');
+}
+
+export function drawWeight(
+  card: Card,
+  state: Pick<GameState, 'drawContext' | 'lastUsedMember' | 'lastUsedUnit'>,
+): number {
+  const rule = card.drawRule;
+  if (
+    rule?.member !== undefined &&
+    (state.drawContext !== 'skill' || state.lastUsedMember !== rule.member)
+  )
+    return 0;
+  if (
+    rule?.unit !== undefined &&
+    (state.drawContext !== 'skill' || state.lastUsedUnit !== rule.unit)
+  )
+    return 0;
+  return rule?.priority === 'always' ||
+    (rule?.priority === 'after-start' && state.drawContext !== 'initial')
+    ? -1
+    : 1;
 }

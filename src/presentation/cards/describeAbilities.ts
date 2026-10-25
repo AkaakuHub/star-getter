@@ -3,6 +3,8 @@ import type { Card } from '../../domain/game/model';
 
 export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
+  if (card.collectionEffects)
+    text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.collectionEffects.effects.map(describeEffect).join('')}この特性は引き直すと再び使用できる。`;
   if (card.handUse)
     text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
   if (card.collectionAbility === 'icy-kosuzu')

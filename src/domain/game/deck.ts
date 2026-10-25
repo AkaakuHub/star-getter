@@ -34,6 +34,7 @@ export function validateCard(card: Card): void {
     ...card.effects,
     ...(card.drawEffects ?? []),
     ...(card.handUse?.effects ?? []),
+    ...(card.collectionEffects?.effects ?? []),
   ])
     validateEffect(effect);
   if (card.special) {
@@ -74,7 +75,11 @@ function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'amplify' || effect.kind === 'resource-boost' || effect.kind === 'ap-speed') {
     if (!Number.isFinite(effect.percent)) throw new Error('増幅率が正しくありません。');
-    if (effect.kind === 'resource-boost' && (!Number.isSafeInteger(effect.uses) || effect.uses < 1))
+    if (
+      effect.kind === 'resource-boost' &&
+      effect.uses !== null &&
+      (!Number.isSafeInteger(effect.uses) || effect.uses < 1)
+    )
       throw new Error('増幅回数が正しくありません。');
     return;
   }
@@ -88,6 +93,7 @@ function validateEffect(effect: Effect): void {
       throw new Error('得点倍率と効果時間が正しくありません。');
     return;
   }
+  if (effect.kind === 'energy' && Number.isFinite(effect.amount)) return;
   if (!('amount' in effect) || !Number.isSafeInteger(effect.amount))
     throw new Error('カードの効果量が正しくありません。');
 }

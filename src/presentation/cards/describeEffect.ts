@@ -66,7 +66,7 @@ export function describeEffect(effect: Effect): string {
     case 'bloom':
       return '空模様が−100%のときに使用できる。このステージ中、開花を発動し、きらめきを結晶に変化させる。エナジー・熱気・元気の増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のSTARが増加する。発動時のゲージを保持し、開花中はエナジー残量に関係なくアクションを使用できる。';
     case 'resource-boost':
-      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses}回の間、${effect.target === 'excitement' ? '熱気ゲイン' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
+      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'excitement' ? '熱気ゲイン' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
     case 'collect':
       return '出現中のきらめきを全て回収する。';
   }

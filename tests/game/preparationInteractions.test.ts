@@ -152,7 +152,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     .map((card) => ({
       ...card,
       drawEffects: [{ kind: 'amplify' as const, percent: 1 }],
-      ...(card.token === 'shadow' ? { drawRule: { priority: true as const } } : {}),
+      ...(card.token === 'shadow' ? { drawRule: { priority: 'always' as const } } : {}),
     }));
   state = {
     ...state,

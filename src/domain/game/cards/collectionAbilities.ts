@@ -12,6 +12,7 @@ export function advanceHandCollectionAbilities(
     if (!card) throw new Error('手札のカードがありません。');
     const threshold =
       card.relay?.threshold ??
+      card.collectionEffects?.threshold ??
       (card.token === 'story' || card.token === 'bookmark' || card.collectionAbility
         ? 500_000
         : null);

@@ -66,6 +66,9 @@ export function collectHearts(state: GameState): GameState {
         },
         card,
       );
+    } else if (card.collectionEffects) {
+      for (const effect of card.collectionEffects.effects)
+        triggered = applyEffect(triggered, effect, card);
     } else if (card.collectionAbility) {
       if (
         voltageLevel(triggered.excitement, triggered.maximumVoltageLevel) >= 950 &&

@@ -71,7 +71,7 @@ export type Effect =
       kind: 'resource-boost';
       target: 'excitement' | 'stamina';
       percent: number;
-      uses: number;
+      uses: number | null;
       condition: 'voltage20' | 'mental100' | 'always';
       moodBonus?: MoodBonus;
     }>
@@ -95,7 +95,7 @@ export type Card = Readonly<{
   exhausts?: true;
   special?: Readonly<{ cost: number; extra: boolean; effects: readonly Effect[] }>;
   allHandCost?: 'sum' | 'library';
-  drawRule?: Readonly<{ member?: MemberId; unit?: UnitId; priority?: true }>;
+  drawRule?: Readonly<{ member?: MemberId; unit?: UnitId; priority?: 'always' | 'after-start' }>;
   passive?: Readonly<{
     heartsPercent?: number;
     handLimitDelta?: number;
@@ -112,6 +112,7 @@ export type Card = Readonly<{
     | 'perennial'
     | 'shadow';
   useAbility?: 'story-boost' | 'aurora' | 'class' | 'icy-sayaka' | 'shadow';
+  collectionEffects?: Readonly<{ threshold: number; effects: readonly Effect[] }>;
   collectionAbility?: 'icy-sayaka' | 'icy-kosuzu';
 }>;
 
@@ -143,7 +144,7 @@ export type Boost = Readonly<{ percent: number; untilTick: number }>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina';
   percent: number;
-  uses: number;
+  uses: number | null;
 }>;
 export type TargetBoost = Readonly<{
   members: readonly MemberId[];

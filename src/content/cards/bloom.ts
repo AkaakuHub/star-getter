@@ -1,3 +1,4 @@
+import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card, Effect } from '../../domain/game/model';
 
 const mellow = (effects: readonly Effect[]): Effect => ({
@@ -85,7 +86,20 @@ export const bloomCards: readonly Card[] = [
     cost: 14,
     appeal: { smile: 4900, pure: 4600, cool: 7000 },
     beatPoint: 100,
-    drawRule: { unit: 2 },
+    drawRule: { unit: 2, priority: 'always' },
+    collectionEffects: {
+      threshold: 300_000,
+      effects: [
+        {
+          kind: 'resource-boost',
+          target: 'excitement',
+          percent: baselineMemberFanLevels[1022],
+          moodBonus: { target: 3, perPoint: baselineMemberFanLevels[1022] * 0.005 },
+          uses: null,
+          condition: 'always',
+        },
+      ],
+    },
     special: {
       cost: 3,
       extra: true,

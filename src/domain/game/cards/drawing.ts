@@ -1,5 +1,5 @@
 import { createRangeRandom } from '../random';
-import { drawCandidate } from './drawLottery';
+import { drawCandidate, drawWeight } from './drawLottery';
 import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
 import type { Card, GameState } from '../model';
@@ -30,19 +30,16 @@ function drawUntil(state: GameState, count: number): GameState {
       const shuffled = shuffle(next.discard, next.randomSeed);
       next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
     }
-    const eligible = (id: string) => {
-      const rule = next.deck.find((card) => card.id === id)?.drawRule;
-      if (rule?.member && (next.drawContext !== 'skill' || next.lastUsedMember !== rule.member))
-        return false;
-      if (rule?.unit && (next.drawContext !== 'skill' || next.lastUsedUnit !== rule.unit))
-        return false;
-      return true;
+    const probability = (id: string) => {
+      const card = next.deck.find((item) => item.id === id);
+      if (!card) throw new Error('山札のカードがありません。');
+      return drawWeight(card, next);
     };
-    let candidates = next.drawPile.filter(eligible);
+    let candidates = next.drawPile.filter((id) => probability(id) !== 0);
     if (!candidates.length && next.discard.length) {
       const shuffled = shuffle([...next.drawPile, ...next.discard], next.randomSeed);
       next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
-      candidates = next.drawPile.filter(eligible);
+      candidates = next.drawPile.filter((id) => probability(id) !== 0);
     }
     const search = next.deckActions.searches.at(-1);
     if (search !== undefined) {
@@ -61,7 +58,7 @@ function drawUntil(state: GameState, count: number): GameState {
       drawCandidate(
         candidates.map((id) => ({
           id,
-          weight: next.deck.find((card) => card.id === id)?.drawRule?.priority ? -1 : 1,
+          weight: probability(id),
         })),
         randomIndex,
       ) ?? next.drawPile[randomIndex(next.drawPile.length)];

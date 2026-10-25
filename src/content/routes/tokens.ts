@@ -106,7 +106,7 @@ export const routeTokens: readonly Card[] = [
     appeal,
     beatPoint: 0,
     token: 'shadow',
-    drawRule: { unit: 2 },
+    drawRule: { unit: 2, priority: 'always' },
     drawAbility: 'shadow',
     useAbility: 'shadow',
     effects: [{ kind: 'shuffle' }, { kind: 'set-energy', amount: 0 }],

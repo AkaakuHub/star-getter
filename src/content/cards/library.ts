@@ -1,3 +1,4 @@
+import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card } from '../../domain/game/model';
 import { ensembleEffects } from '../routes/tokens';
 
@@ -58,7 +59,11 @@ export const libraryCards: readonly Card[] = [
     appeal: { smile: 6950, pure: 5700, cool: 3550 },
     beatPoint: 100,
     allHandCost: 'library',
-    drawRule: { unit: 1 },
+    drawRule: { unit: 1, priority: 'always' },
+    collectionEffects: {
+      threshold: 300_000,
+      effects: [{ kind: 'energy', amount: baselineMemberFanLevels[1021] * 0.1 }],
+    },
     effects: ensembleEffects,
     special: {
       cost: 3,
