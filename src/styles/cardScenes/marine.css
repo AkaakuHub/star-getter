@@ -1,0 +1,172 @@
+.card-illustration:is(
+    .card-library-pages,
+    .card-library-invitation,
+    .card-library-ensemble,
+    .card-aurora-ensemble,
+    .card-camera,
+    .card-class
+  )
+  .card-scenery
+  > span {
+  inset: auto;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  transform: none;
+}
+
+.card-illustration.card-library-pages {
+  background: linear-gradient(#b9e8ed 0 52%, #65b7c4 52% 75%, #f6d69e 75%);
+}
+.card-library-pages .card-scenery > span:nth-child(1) {
+  inset: 53% -12% 19%;
+  border-radius: 50%;
+  background: #fff4d5;
+  transform: rotate(-16deg);
+}
+.card-library-pages .card-scenery > span:nth-child(2) {
+  inset: 54% -12% 27%;
+  border-radius: 50%;
+  background: #77cbd0;
+  transform: rotate(-16deg);
+}
+.card-illustration.card-library-pages > .mascot {
+  width: 76%;
+  top: 2%;
+  left: 34%;
+  transform: rotate(12deg);
+}
+
+.card-illustration.card-library-invitation {
+  background: linear-gradient(#a6b7da 0 64%, #3d7d98 64%);
+}
+.card-library-invitation .card-scenery > span:nth-child(1) {
+  inset: 28% 53% 11% 8%;
+  background: linear-gradient(
+    #e9f1e9 0 25%,
+    #c75b50 25% 43%,
+    #fff1d7 43% 67%,
+    #c75b50 67% 85%,
+    #fff1d7 85%
+  );
+  clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+}
+.card-library-invitation .card-scenery > span:nth-child(2) {
+  inset: 15% 49% 65% 4%;
+  background: linear-gradient(#354861 0 32%, #fbe8a3 32% 75%, #354861 75%);
+  clip-path: polygon(50% 0, 100% 32%, 89% 32%, 89% 100%, 11% 100%, 11% 32%, 0 32%);
+}
+.card-library-invitation .card-scenery > span:nth-child(3) {
+  inset: 10% -10% 49% 38%;
+  background: #fff3bb99;
+  clip-path: polygon(0 43%, 100% 0, 100% 100%);
+}
+.card-illustration.card-library-invitation > .mascot {
+  width: 81%;
+  top: 35%;
+  left: 23%;
+  transform: rotate(-10deg);
+}
+
+.card-illustration.card-library-ensemble {
+  background: linear-gradient(#585881 0 51%, #ba8092 51% 59%, #375a74 59%);
+}
+.card-library-ensemble .card-scenery > span:nth-child(1) {
+  inset: 55% -12% -10%;
+  background: repeating-linear-gradient(0deg, #bd926a 0 18%, #735d56 18% 22%);
+  clip-path: polygon(0 57%, 100% 0, 100% 43%, 0 100%);
+}
+.card-library-ensemble .card-scenery > span:nth-child(2) {
+  inset: 46% 8% 12% 81%;
+  background: linear-gradient(90deg, #e0b484 0 65%, #84634f 65%);
+}
+.card-library-ensemble .card-scenery > span:nth-child(3) {
+  inset: 69% 74% 0 15%;
+  background: linear-gradient(90deg, #e0b484 0 65%, #84634f 65%);
+}
+.card-illustration.card-library-ensemble > .mascot {
+  width: 98%;
+  top: 0;
+  left: -19%;
+  transform: rotate(10deg);
+}
+
+.card-illustration.card-aurora-ensemble {
+  background: linear-gradient(#a3d5ee 0 54%, #467f9d 54% 77%, #cc745f 77%);
+}
+.card-aurora-ensemble .card-scenery > span:nth-child(1) {
+  inset: 8% 38% 30% 3%;
+  background: #fff6de;
+  clip-path: polygon(86% 0, 86% 100%, 0 100%);
+}
+.card-aurora-ensemble .card-scenery > span:nth-child(2) {
+  inset: 7% 46% 19% 50%;
+  background: #6b585a;
+}
+.card-aurora-ensemble .card-scenery > span:nth-child(3) {
+  inset: 69% -5% 8%;
+  border-top: 4px solid #fcebcf;
+  background: #c26a55;
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 17% 100%);
+}
+.card-illustration.card-aurora-ensemble > .mascot {
+  width: 76%;
+  top: 4%;
+  left: 35%;
+  transform: rotate(15deg);
+}
+
+.card-illustration.card-camera {
+  background: linear-gradient(#9cd2d7 0 45%, #286e86 45%);
+}
+.card-camera .card-scenery > span:nth-child(1) {
+  inset: 39% 51% 0 -5%;
+  background: #506f6c;
+  clip-path: polygon(0 0, 65% 7%, 72% 39%, 100% 100%, 0 100%);
+}
+.card-camera .card-scenery > span:nth-child(2) {
+  inset: 62% -20% 11% 15%;
+  border-radius: 50%;
+  background: #d8f0df;
+  transform: rotate(-30deg);
+}
+.card-camera .card-scenery > span:nth-child(3) {
+  inset: 65% -20% 6% 11%;
+  border-radius: 50%;
+  background: #4ca7b4;
+  transform: rotate(-30deg);
+}
+.card-illustration.card-camera > .mascot {
+  width: 72%;
+  top: 13%;
+  left: -3%;
+  transform: rotate(-13deg);
+}
+
+.card-illustration.card-class {
+  background: linear-gradient(#f2b197 0 45%, #69a3ad 45%);
+}
+.card-class .card-scenery > span:nth-child(1) {
+  inset: 43% -15% 0;
+  background: repeating-linear-gradient(0deg, #e2b87e 0 19%, #a7775f 19% 23%);
+  clip-path: polygon(47% 0, 53% 0, 100% 100%, 0 100%);
+}
+.card-class .card-scenery > span:nth-child(2) {
+  inset: 39% 47% 2% 3%;
+  background: #8a5c53;
+  clip-path: polygon(94% 0, 100% 0, 10% 100%, 0 100%);
+}
+.card-class .card-scenery > span:nth-child(3) {
+  inset: 39% 3% 2% 47%;
+  background: #8a5c53;
+  clip-path: polygon(0 0, 6% 0, 100% 100%, 90% 100%);
+}
+.card-illustration.card-class > .mascot {
+  width: 113%;
+  top: 27%;
+  left: -22%;
+  transform: rotate(-14deg);
+}

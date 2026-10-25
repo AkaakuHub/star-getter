@@ -1,10 +1,10 @@
-import { Fan, KeyRound, Origami, Puzzle, Sailboat } from 'lucide-preact';
+import { LifeBuoy, Puzzle, Sailboat, Shell, ShipWheel } from 'lucide-preact';
 
 const tokenSymbols = {
   ensemble: Sailboat,
-  story: Origami,
-  clock: Fan,
-  bookmark: KeyRound,
+  story: Shell,
+  clock: ShipWheel,
+  bookmark: LifeBuoy,
   shadow: Puzzle,
 } as const;
 

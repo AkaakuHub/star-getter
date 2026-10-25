@@ -18,7 +18,8 @@
   top: 2%;
 }
 .token-artwork.token-story {
-  background: linear-gradient(150deg, #eeb978 0 45%, #96b779 45%);
+  color: #995c52;
+  background: linear-gradient(150deg, #f7dab0 0 58%, #72bfbd 58%);
 }
 .token-story .token-artwork-symbol {
   width: 103%;
@@ -28,8 +29,8 @@
   transform: rotate(-12deg);
 }
 .token-artwork.token-clock {
-  color: #326c73;
-  background: repeating-linear-gradient(90deg, #a8d8d1 0 19%, #8cbdb9 19% 22%);
+  color: #f6e0a9;
+  background: linear-gradient(145deg, #315b73 0 55%, #497f91 55%);
 }
 .token-clock .token-artwork-symbol {
   width: 98%;
@@ -37,17 +38,18 @@
   left: 12%;
   top: -10%;
   transform: rotate(18deg);
+  fill: #527d88;
 }
 .token-artwork.token-bookmark {
-  color: #993e59;
-  background: linear-gradient(110deg, #f5d6d5 0 48%, #c990a0 48% 52%, #fff0d4 52%);
+  color: #ca5b48;
+  background: linear-gradient(130deg, #b8e5df 0 50%, #65a9b2 50%);
 }
 .token-bookmark .token-artwork-symbol {
   width: 85%;
   height: 85%;
   left: 8%;
   top: -2%;
-  fill: #d96b86;
+  fill: #fff3dc;
   transform: rotate(12deg);
 }
 .token-artwork.token-shadow {
