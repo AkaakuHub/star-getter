@@ -30,7 +30,8 @@ export function activateMentalShield(
         Math.fround(rawAddValue / 100),
     );
     value = Math.fround(
-      Math.fround(Math.fround(ratio * Math.fround(multiplier)) * 100) * Math.fround(effectPower),
+      Math.fround(Math.fround(ratio * Math.fround(multiplier)) * state.maximumMental) *
+        Math.fround(effectPower),
     );
   } else if (effect.durabilityType === 2) {
     value = Math.fround(

@@ -8,6 +8,7 @@ import { validateVoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuff
 import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import { validateHandMaxCardEffect } from './handMaxCardTypes';
 import { validateMentalShieldEffect } from './mentalShieldTypes';
+import { validateFixedParameterExtendEffect } from './fixedParameterExtendTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -21,7 +22,8 @@ type SpecialEffect = Extract<
       | 'disable-mental-down'
       | 'special-appeal-token'
       | 'hand-max-card'
-      | 'mental-shield';
+      | 'mental-shield'
+      | 'fixed-parameter-extend';
   }
 >;
 
@@ -55,6 +57,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'mental-shield':
       validateMentalShieldEffect(effect);
       break;
+    case 'fixed-parameter-extend':
+      validateFixedParameterExtendEffect(effect);
+      break;
   }
   return true;
 }
@@ -69,6 +74,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'disable-mental-down' ||
     effect.kind === 'special-appeal-token' ||
     effect.kind === 'hand-max-card' ||
-    effect.kind === 'mental-shield'
+    effect.kind === 'mental-shield' ||
+    effect.kind === 'fixed-parameter-extend'
   );
 }

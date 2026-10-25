@@ -54,6 +54,7 @@ import {
 } from './effects/induceSkillEffect';
 import { advanceTokenDeckSplit, expireTokenDeckSplitSections } from './effects/tokenDeckSplit';
 import { advanceIngameMission } from './ingameMissions';
+import { createInitialEffectState } from './effects/initialState';
 export function createGame(
   track: Track,
   deck: readonly Card[],
@@ -121,6 +122,7 @@ export function createGame(
     randomSeed: seed,
     energy: 0,
     maxEnergy: track.stage.maxEnergy,
+    ...createInitialEffectState(track),
     apTimeEffects: [],
     voltageConversions: [],
     action52Buffs: [],
@@ -158,12 +160,9 @@ export function createGame(
     sectionBeatHeartBonus: 0,
     beatHeartValueBuffs: [],
     heartBoosts: [],
-    mentalShields: [],
     mentalBarriers: [],
     excitement: 0,
     maximumVoltageLevel: 1000,
-    specialAppealTokens: [],
-    handMaxCardEffects: [],
     specialUsed: [],
     score: 0n,
     scoreMultiplier: 1n,

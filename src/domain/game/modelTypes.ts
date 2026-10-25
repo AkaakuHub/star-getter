@@ -28,6 +28,7 @@ import type { GenesisSkillEffect } from './genesisSkillTypes';
 import type { AddSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import type { HandMaxCardEffect } from './handMaxCardTypes';
 import type { MentalShieldEffect } from './mentalShieldTypes';
+import type { FixedParameterExtendEffect } from './fixedParameterExtendTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -310,6 +311,7 @@ type EffectShape =
   | MentalRecoverAdditionalBuffEffect
   | MentalBarrierAdditionalBuffEffect
   | MentalShieldEffect
+  | FixedParameterExtendEffect
   | Readonly<{
       kind: 'cost-reduction';
       amount: number;

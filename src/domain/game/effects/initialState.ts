@@ -1,0 +1,24 @@
+import type { GameState, Track } from '../model';
+
+export function createInitialEffectState(
+  track: Track,
+): Pick<
+  GameState,
+  | 'fixedParameterBase'
+  | 'maximumMental'
+  | 'fixedParameterExtends'
+  | 'nextFixedParameterExtendId'
+  | 'specialAppealTokens'
+  | 'handMaxCardEffects'
+  | 'mentalShields'
+> {
+  return {
+    fixedParameterBase: { ap: track.stage.maxEnergy, voltage: 1000, mental: 100 },
+    maximumMental: 100,
+    fixedParameterExtends: [],
+    nextFixedParameterExtendId: 1,
+    specialAppealTokens: [],
+    handMaxCardEffects: [],
+    mentalShields: [],
+  };
+}

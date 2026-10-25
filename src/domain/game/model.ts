@@ -41,6 +41,7 @@ import type { MoodValueAdditionalBuff } from './moodValueBoostTypes';
 import type { SpecialAppealToken } from './specialAppealTokenTypes';
 import type { HandMaxCardEffectState } from './handMaxCardTypes';
 import type { MentalShield } from './mentalShieldTypes';
+import type { FixedParameterExtend } from './fixedParameterExtendTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -209,6 +210,10 @@ export type GameState = Readonly<{
   randomSeed: number;
   energy: number;
   maxEnergy: number;
+  fixedParameterBase: Readonly<{ ap: number; voltage: number; mental: number }>;
+  maximumMental: number;
+  fixedParameterExtends: readonly FixedParameterExtend[];
+  nextFixedParameterExtendId: number;
   apTimeEffects: readonly Readonly<{
     calculation: 'add' | 'multiply';
     value: number;

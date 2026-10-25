@@ -2,7 +2,6 @@ import { enqueueHandShuffle } from './cards/boardActions';
 import { changeResource, setVoltageValue } from './resources';
 import { evaluateCondition } from './conditions/evaluate';
 import { conditionContext } from './conditions/gameContext';
-import { energyMaximum } from './parameters/maximum';
 import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
 import { applyScoreBoost } from './effects/scoreBoost';
@@ -49,6 +48,10 @@ import { activateGenesisSkill } from './effects/genesisSkill';
 import { activateSpecialAppealToken } from './effects/specialAppealToken';
 import { activateHandMaxCard } from './effects/handMaxCard';
 import { activateMentalShield } from './effects/mentalShield';
+import {
+  activateFixedParameterExtend,
+  changeFixedParameterBase,
+} from './effects/fixedParameterExtend';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -214,10 +217,7 @@ export function applyEffect(
       return changeResource(boosted.state, 'energy', BigInt(Math.trunc(boosted.value)));
     }
     case 'energy-limit':
-      return {
-        ...state,
-        maxEnergy: energyMaximum(state.maxEnergy, [{ calculation: 'add', value: effect.amount }]),
-      };
+      return changeFixedParameterBase(state, 'ap', effect.amount);
     case 'reset-special':
       return applySpecialReset(state, effect, card);
     case 'mental-shield':
@@ -244,7 +244,9 @@ export function applyEffect(
     case 'heart-boost':
       return addHeartBoost(state, effect, card, multiplier);
     case 'voltage-limit':
-      return { ...state, maximumVoltageLevel: state.maximumVoltageLevel + effect.amount };
+      return changeFixedParameterBase(state, 'voltage', effect.amount);
+    case 'fixed-parameter-extend':
+      return activateFixedParameterExtend(state, effect, card);
     case 'voltage-set':
       return setVoltageValue(state, effect.amount);
     case 'stop-voltage-increase':
@@ -311,7 +313,7 @@ export function applyEffect(
       const eligible =
         effect.condition === 'always' ||
         (effect.condition === 'mental100'
-          ? state.stamina >= 100
+          ? state.stamina >= state.maximumMental
           : voltageLevel(state.excitement, state.maximumVoltageLevel) >= 20);
       return eligible
         ? {

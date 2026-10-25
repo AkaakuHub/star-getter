@@ -60,7 +60,7 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       Math.trunc(Math.fround(Math.fround((durationSeconds(next) * 1000) / 120000) * 6000)) / 1000,
     );
     const stamina = Math.min(
-      100,
+      next.maximumMental,
       Math.fround(next.stamina + Math.fround(Math.fround(60 * Math.fround(dt)) / recoveryTime)),
     );
     const recovered = { ...next, mentalTimerSeconds, stamina, resting: stamina < 60 };

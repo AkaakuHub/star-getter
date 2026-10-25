@@ -102,6 +102,8 @@ export function describeEffect(effect: Effect): string {
       return '熱気・元気回復・元気バリアに応じて効果を発動する。';
     case 'mental-shield':
       return '元気シールドを付与する。';
+    case 'fixed-parameter-extend':
+      return '固定パラメーターの上限を変更する。';
     case 'cost-reduction':
       return `対象カードの消費エナジーを${effect.amount}減少させる。`;
     case 'skill-cost-change':

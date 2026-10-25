@@ -33,21 +33,28 @@ import {
 import { advanceSpecialAppealTokenCooldowns } from './specialAppealToken';
 import { advanceHandMaxCardEffects, expireHandMaxCardSections } from './handMaxCard';
 import { advanceMentalShields, expireMentalShieldSections } from './mentalShield';
+import {
+  advanceFixedParameterExtends,
+  expireFixedParameterExtendSections,
+} from './fixedParameterExtend';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceMentalShields(
-    advanceHandMaxCardEffects(
-      advanceSpecialAppealTokenCooldowns(
-        advanceMoodValueAdditionalBuffs(
-          advanceHeartLimitAdditionalBuffs(
-            advanceMoodChangeSkills(
-              advanceBeatHeartValueBuffs(
-                advanceDisableMentalDownEffects(
-                  advanceMentalBarrierAdditionalBuffs(
-                    advanceMentalRecoverAdditionalBuffs(
-                      advanceVoltageUpAdditionalBuffs(
-                        advanceLoveUpAdditionalBuffs(
-                          advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceFixedParameterExtends(
+    advanceMentalShields(
+      advanceHandMaxCardEffects(
+        advanceSpecialAppealTokenCooldowns(
+          advanceMoodValueAdditionalBuffs(
+            advanceHeartLimitAdditionalBuffs(
+              advanceMoodChangeSkills(
+                advanceBeatHeartValueBuffs(
+                  advanceDisableMentalDownEffects(
+                    advanceMentalBarrierAdditionalBuffs(
+                      advanceMentalRecoverAdditionalBuffs(
+                        advanceVoltageUpAdditionalBuffs(
+                          advanceLoveUpAdditionalBuffs(
+                            advanceAction52SkillBoosts(state, elapsedSeconds),
+                            elapsedSeconds,
+                          ),
                           elapsedSeconds,
                         ),
                         elapsedSeconds,
@@ -75,17 +82,19 @@ export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number)
 }
 
 export function expireTimedSkillBuffSections(state: GameState): GameState {
-  return expireMentalShieldSections(
-    expireHandMaxCardSections(
-      expireMoodValueAdditionalBuffSections(
-        expireHeartLimitAdditionalBuffSections(
-          expireMoodChangeSkillSections(
-            expireBeatHeartValueBuffSections(
-              expireDisableMentalDownEffectSections(
-                expireMentalBarrierAdditionalBuffSections(
-                  expireMentalRecoverAdditionalBuffSections(
-                    expireVoltageUpAdditionalBuffSections(
-                      expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+  return expireFixedParameterExtendSections(
+    expireMentalShieldSections(
+      expireHandMaxCardSections(
+        expireMoodValueAdditionalBuffSections(
+          expireHeartLimitAdditionalBuffSections(
+            expireMoodChangeSkillSections(
+              expireBeatHeartValueBuffSections(
+                expireDisableMentalDownEffectSections(
+                  expireMentalBarrierAdditionalBuffSections(
+                    expireMentalRecoverAdditionalBuffSections(
+                      expireVoltageUpAdditionalBuffSections(
+                        expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+                      ),
                     ),
                   ),
                 ),
