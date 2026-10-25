@@ -1,6 +1,7 @@
 import { createModes } from './live/modes';
 import { advanceAutomaticGauges } from './automaticGauges';
-import { moodAtTime, validateMoodTimeline } from './live/moodTimeline';
+import { moodAtTime } from './live/moodTimeline';
+import { validateTrack } from './live/validateTrack';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { beatHeartCount } from './beat';
 import { validateDeck, validateCard } from './deck';
@@ -121,6 +122,7 @@ export function createGame(
     loveUpAdditionalBuffs: [],
     voltageUpAdditionalBuffs: [],
     mentalRecoverAdditionalBuffs: [],
+    mentalBarrierAdditionalBuffs: [],
     nextSkillAdditionalBuffId: 1,
     temporaryScoreBoosts: [],
     apTimerSeconds: 0,
@@ -326,29 +328,4 @@ function advanceTick(state: GameState): GameState {
           moodValue: mood,
         }),
       };
-}
-
-function validateTrack(track: Track): void {
-  if (
-    !Number.isFinite(track.bpm) ||
-    track.bpm < 30 ||
-    track.bpm > 300 ||
-    !Number.isInteger(track.beats) ||
-    track.beats < 1 ||
-    track.beats > 2000 ||
-    track.sections[0]?.startBeat !== 0
-  )
-    throw new Error('ステージの設定が正しくありません。');
-  let previous = -1;
-  for (const section of track.sections) {
-    if (
-      !Number.isFinite(section.startBeat) ||
-      section.startBeat <= previous ||
-      section.startBeat >= track.beats
-    ) {
-      throw new Error('区間の設定が正しくありません。');
-    }
-    previous = section.startBeat;
-  }
-  validateMoodTimeline(track.moodKeys, (track.beats * 60) / track.bpm);
 }

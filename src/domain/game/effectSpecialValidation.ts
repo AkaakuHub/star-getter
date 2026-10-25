@@ -1,3 +1,4 @@
+import { validateMentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import { validateMentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
 import type { Effect } from './model';
 import { validateDeckSkillCostChange } from './skillCostChangeTypes';
@@ -11,7 +12,8 @@ type SpecialEffect = Extract<
       | 'deck-skill-cost-change'
       | 'love-up-additional-buff'
       | 'voltage-up-additional-buff'
-      | 'recover-mental-additional-buff';
+      | 'recover-mental-additional-buff'
+      | 'mental-barrier-additional-buff';
   }
 >;
 
@@ -30,6 +32,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'recover-mental-additional-buff':
       validateMentalRecoverAdditionalBuffEffect(effect);
       break;
+    case 'mental-barrier-additional-buff':
+      validateMentalBarrierAdditionalBuffEffect(effect);
+      break;
   }
   return true;
 }
@@ -39,6 +44,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'deck-skill-cost-change' ||
     effect.kind === 'love-up-additional-buff' ||
     effect.kind === 'voltage-up-additional-buff' ||
-    effect.kind === 'recover-mental-additional-buff'
+    effect.kind === 'recover-mental-additional-buff' ||
+    effect.kind === 'mental-barrier-additional-buff'
   );
 }

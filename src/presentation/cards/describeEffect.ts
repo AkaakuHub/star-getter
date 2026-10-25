@@ -28,6 +28,8 @@ export function describeEffect(effect: Effect): string {
       return '対象カードの熱気増加を増幅する。';
     case 'recover-mental-additional-buff':
       return '対象カードの元気回復量を増幅する。';
+    case 'mental-barrier-additional-buff':
+      return '対象カードの元気バリア耐久値を増幅する。';
 
     case 'tokens': {
       return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;

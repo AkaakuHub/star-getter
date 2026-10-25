@@ -1,3 +1,4 @@
+import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
 import type { VoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
 import type { LoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
@@ -299,6 +300,7 @@ type EffectShape =
   | LoveUpAdditionalBuffEffect
   | VoltageUpAdditionalBuffEffect
   | MentalRecoverAdditionalBuffEffect
+  | MentalBarrierAdditionalBuffEffect
   | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
   | Readonly<{
       kind: 'cost-reduction';
