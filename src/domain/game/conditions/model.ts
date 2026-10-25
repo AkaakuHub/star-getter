@@ -2,6 +2,8 @@ export type GameCondition =
   | Readonly<{ kind: 'always' }>
   | Readonly<{ kind: 'mental-at-most'; fraction: number }>
   | Readonly<{ kind: 'mood-at-most'; value: number }>
+  | Readonly<{ kind: 'mood-at-least'; value: number }>
+  | Readonly<{ kind: 'mood-equal'; value: number }>
   | Readonly<{ kind: 'voltage-level-at-most'; level: number }>
   | Readonly<{ kind: 'part-at-most' | 'relative-part'; number: number }>
   | Readonly<{ kind: 'heat'; minimum: number }>

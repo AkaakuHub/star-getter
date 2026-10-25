@@ -8,6 +8,10 @@ export function evaluateCondition(condition: GameCondition, context: ConditionCo
       return context.mentalFraction <= condition.fraction;
     case 'mood-at-most':
       return context.moodValue <= condition.value;
+    case 'mood-at-least':
+      return context.moodValue >= condition.value;
+    case 'mood-equal':
+      return Math.trunc(context.moodValue) === Math.trunc(condition.value);
     case 'voltage-level-at-most':
       return context.heatLevel <= condition.level;
     case 'part-at-most':

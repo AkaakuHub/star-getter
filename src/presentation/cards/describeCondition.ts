@@ -9,6 +9,10 @@ export function describeCondition(condition: GameCondition): string {
       return `元気が${formatNumber(condition.fraction * 100)}%以下`;
     case 'mood-at-most':
       return `気分値が${formatNumber(condition.value)}以下`;
+    case 'mood-at-least':
+      return `気分値が${formatNumber(condition.value)}以上`;
+    case 'mood-equal':
+      return `気分値が${formatNumber(Math.trunc(condition.value))}と一致`;
     case 'voltage-level-at-most':
       return `熱気が${formatNumber(condition.level)}段階以下`;
     case 'part-at-most':

@@ -31,6 +31,14 @@ describe('カード共通の条件判定', () => {
       less: { kind: 'mood-at-most', value: -101 },
     },
     {
+      condition: { kind: 'mood-at-least', value: -100 },
+      less: { kind: 'mood-at-least', value: -99 },
+    },
+    {
+      condition: { kind: 'mood-equal', value: -100.8 },
+      less: { kind: 'mood-equal', value: -99 },
+    },
+    {
       condition: { kind: 'voltage-level-at-most', level: 950 },
       less: { kind: 'voltage-level-at-most', level: 949 },
     },
