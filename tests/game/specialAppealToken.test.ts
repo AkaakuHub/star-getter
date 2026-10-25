@@ -15,6 +15,7 @@ it('対象メンバーのトークンだけを順序付きで追加し、同じ�
     coolTime: 12,
     targetType: 1,
     levelType: 2,
+    musicGenerationsId: 1021,
     sourceSkillLevel: 3,
     sourceSpecialAppealSkillLevel: 1,
     memberOrder: [1022, 1021],
@@ -43,6 +44,49 @@ it('対象メンバーのトークンだけを順序付きで追加し、同じ�
   expect(withToken.specialAppealTokens.map((token) => token.recordId)).toEqual([2, 1]);
   expect(activateSpecialAppealToken(withToken, effect).specialAppealTokens).toHaveLength(2);
   expect(withToken.specialAppealTokens[0]?.card.id).toBe('202');
+});
+
+it('初期クールタイムを音楽GenerationsIdと一致する既存トークンから引き継ぐ', () => {
+  const state = game();
+  const base = state.deck.find((card) => card.special);
+  if (!base?.special) throw new Error('共鳴カードがありません。');
+  const existingToken = {
+    recordId: 9,
+    tokenSetId: 7,
+    targetMember: 1021 as const,
+    card: { ...base, member: 0 as const },
+    coolTime: 0,
+    remainingCoolTime: 6,
+  };
+  const effect: AddSpecialAppealTokenEffect = {
+    kind: 'special-appeal-token',
+    tokenSetId: 8,
+    coolTime: 12,
+    targetType: 1,
+    levelType: 2,
+    musicGenerationsId: 1021,
+    sourceSkillLevel: 3,
+    sourceSpecialAppealSkillLevel: 1,
+    memberOrder: [1022],
+    tokenCardSets: [
+      {
+        id: 1,
+        tokenSetId: 8,
+        resourceId: 201,
+        targetParameter: 1022,
+        orderId: 1,
+        skillSeriesId: 10,
+        cardsBySkillLevel: [{ skillLevel: 3, card: base }],
+      },
+    ],
+  };
+
+  const next = activateSpecialAppealToken(
+    { ...state, specialAppealTokens: [existingToken] },
+    effect,
+  );
+
+  expect(next.specialAppealTokens[1]?.remainingCoolTime).toBe(6);
 });
 
 it('トークン共鳴を使うと同じセットのクールタイムを開始する', () => {

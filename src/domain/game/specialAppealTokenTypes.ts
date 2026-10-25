@@ -16,6 +16,7 @@ export type AddSpecialAppealTokenEffect = Readonly<{
   coolTime: number;
   targetType: number;
   levelType: number;
+  musicGenerationsId: number;
   sourceSkillLevel: number;
   sourceSpecialAppealSkillLevel: number;
   memberOrder: readonly MemberId[];
@@ -37,6 +38,7 @@ export function validateSpecialAppealTokenEffect(effect: AddSpecialAppealTokenEf
     !Number.isSafeInteger(effect.coolTime) ||
     !Number.isSafeInteger(effect.targetType) ||
     !Number.isSafeInteger(effect.levelType) ||
+    !Number.isSafeInteger(effect.musicGenerationsId) ||
     !Number.isSafeInteger(effect.sourceSkillLevel) ||
     !Number.isSafeInteger(effect.sourceSpecialAppealSkillLevel) ||
     effect.memberOrder.some((member) => !Number.isSafeInteger(member))

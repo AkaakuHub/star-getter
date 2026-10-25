@@ -40,7 +40,7 @@ export function activateSpecialAppealToken(
     let remainingCoolTime = 0;
     for (const token of state.specialAppealTokens) {
       if (
-        token.targetMember === tokenCardSet.targetParameter &&
+        token.targetMember === effect.musicGenerationsId &&
         remainingCoolTime <= token.remainingCoolTime
       )
         remainingCoolTime = token.remainingCoolTime;
