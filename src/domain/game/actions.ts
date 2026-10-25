@@ -195,7 +195,7 @@ function activateCard(
     applyEffect,
   );
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
-  return registerMissionMember(notifyHandSkillUse(next, card), card.member);
+  return registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
 }
 
 function retireCard(state: GameState, card: Card): GameState {

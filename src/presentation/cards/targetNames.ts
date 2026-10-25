@@ -27,5 +27,9 @@ export function handUseTriggerDescription(trigger: HandUseTrigger): string {
       return 'このカードのスキルを使用したとき';
     case 'any-skill':
       return 'スキルを使用したとき';
+    case 'voltage-increase':
+      return '熱気段階が上がったとき';
+    case 'section-change':
+      return 'パートが変わったとき';
   }
 }

@@ -12,6 +12,7 @@ export type HandUseTrigger =
   | Readonly<{ kind: 'member'; member: MemberId }>
   | Readonly<{ kind: 'skill-icon'; icon: number }>
   | Readonly<{ kind: 'unit'; unit: UnitId }>
+  | Readonly<{ kind: 'voltage-increase' | 'section-change' }>
   | Readonly<{ kind: 'same-card' | 'any-skill' }>;
 
 export type ModeSkillVariant = Readonly<{

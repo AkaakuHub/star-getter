@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
+import { advanceTo } from '../../src/domain/game/simulation';
 import { activateBloom } from '../../src/domain/game/bloom';
 import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
 import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
@@ -58,7 +59,7 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
   const shadow = state.deck.find((card) => card.token === 'shadow');
   if (!used || !shadow) throw new Error('カードがありません。');
   state = withHand({ ...state, costReductions: {} }, ['rain-preparation']);
-  const reacted = notifyHandSkillUse(state, used);
+  const reacted = notifyHandSkillUse(state, used, applyEffect);
   expect(reacted.costReductions['rain-preparation']).toBe(9);
   expect(reacted.costReductions['frost-pulse']).toBe(9);
   expect(reacted.costReductions[shadow.id]).toBe(9);
@@ -92,8 +93,8 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
     const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
     const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
     const currentUsed = trigger.kind === 'same-card' ? handCard : used;
-    const first = notifyHandSkillUse(state, currentUsed);
-    const second = notifyHandSkillUse(first, currentUsed);
+    const first = notifyHandSkillUse(state, currentUsed, applyEffect);
+    const second = notifyHandSkillUse(first, currentUsed, applyEffect);
     expect(first.energy).toBe(1);
     expect(second.energy).toBe(1);
     expect(second.handUseActivationCounts[source.id]).toBe(1);
@@ -101,6 +102,95 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
       disposeHandEffects(second, [source.id]).handUseActivationCounts[source.id],
     ).toBeUndefined();
   }
+});
+
+it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適用する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'rain-preparation');
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'voltage-increase' as const },
+      effects: [{ kind: 'energy' as const, amount: 1 }],
+    },
+  };
+  const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
+  const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
+  const state = withHand(
+    {
+      ...initial,
+      deck,
+      cardPool,
+      energy: 0,
+      maximumVoltageLevel: 1500,
+      excitement: 655_000_001,
+    },
+    [source.id],
+  );
+  const changed = applyEffect(state, { kind: 'excitement', amount: 16_000_000 });
+  expect(changed.energy).toBe(2);
+  expect(changed.handUseActivationCounts[source.id]).toBe(2);
+  const natural = advanceAutomaticGauges(
+    { ...state, excitement: 655_000_000 },
+    state.track.stage.voltageIncreaseIntervalSeconds + 0.1,
+    applyEffect,
+  );
+  expect(natural.handUseActivationCounts[source.id]).toBe(1);
+});
+
+it('パート切替時に手札誘発を一度実行する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'rain-preparation');
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'section-change' as const },
+      limit: 1,
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+    },
+  };
+  const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
+  const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
+  const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
+  const changed = advanceTo(state, 25);
+  expect(sectionAt(changed)).not.toBe(sectionAt(state));
+  expect(changed.moodOffset).toBe(1);
+  expect(changed.handUseActivationCounts[source.id]).toBe(1);
+});
+
+it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'rain-preparation');
+  const used = initial.deck.find((card) => card.id === 'frost-echo');
+  if (!source || !used) throw new Error('カードがありません。');
+  const child = {
+    kind: 'parameter-value-change' as const,
+    sourceEffectId: 'hand-child',
+    targetDetailId: 1n,
+    calculation: 'add' as const,
+    base: 10_000,
+    increment: 10_000,
+  };
+  const handCard = {
+    ...source,
+    handUse: { trigger: { kind: 'any-skill' as const }, effects: [child] },
+  };
+  const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
+  const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
+  const hand = withHand({ ...initial, deck, cardPool }, [source.id]);
+  const first = notifyHandSkillUse(hand, used, applyEffect);
+  const second = notifyHandSkillUse(first, used, applyEffect);
+  expect(second.parameterValueChangeCounts[source.id]?.['hand-child']).toBe(2);
+  expect(second.parameterValueFactors.find((factor) => factor.cardId === source.id)?.factor).toBe(
+    3,
+  );
+  const disposed = disposeHandEffects(second, [source.id]);
+  expect(disposed.parameterValueChangeCounts[source.id]?.['hand-child']).toBe(0);
+  expect(disposed.parameterValueFactors.find((factor) => factor.cardId === source.id)?.factor).toBe(
+    1,
+  );
 });
 
 it('シールドは自然減少とスキル由来の元気減少を防ぐ', () => {

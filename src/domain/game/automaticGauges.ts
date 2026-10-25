@@ -6,8 +6,13 @@ import { durationSeconds } from './projection';
 import { apIncreaseIntervalSeconds } from './effects/apSpeed';
 import { induceMentalHearts } from './effects/mentalHeartInduce';
 import { registerMentalDownMission } from './ingameMissions';
+import type { EffectApplier } from './effects/induceSkillEffect';
 
-export function advanceAutomaticGauges(state: GameState, dt: number): GameState {
+export function advanceAutomaticGauges(
+  state: GameState,
+  dt: number,
+  applyEffect?: EffectApplier,
+): GameState {
   const stage = state.track.stage;
   const ap = advanceStarGatherApGauge(
     {
@@ -44,6 +49,8 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       'excitement',
       1n,
       'natural',
+      undefined,
+      applyEffect,
     );
   }
   if (next.bloom && (next.mentalProtected || next.sectionMentalProtected)) return next;

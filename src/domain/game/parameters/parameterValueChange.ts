@@ -9,7 +9,9 @@ export function applyParameterValueChange(
 ): GameState {
   if (!card) throw new Error('詳細値変更の発動元カードがありません。');
   if (!effect.sourceEffectId) throw new Error('詳細値変更の識別子がありません。');
-  const useCount = state.parameterValueChangeCounts[card.id]?.[effect.sourceEffectId] ?? 0;
+  const useCount = reset
+    ? 0
+    : (state.parameterValueChangeCounts[card.id]?.[effect.sourceEffectId] ?? 0);
   let factor: number;
   switch (effect.calculation) {
     case 'add':

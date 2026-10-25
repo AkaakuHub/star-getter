@@ -1,5 +1,5 @@
 import type { GameState } from './model';
-import { voltageThreshold } from './live/voltageLevel';
+import { voltageLevel, voltageThreshold } from './live/voltageLevel';
 import { changeBloomResource } from './bloom';
 import { breakMentalShields } from './effects/mentalShield';
 import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
@@ -7,6 +7,7 @@ import type { Card } from './model';
 import { convertVoltageIncrease } from './effects/voltageConversion';
 import { induceMentalHearts } from './effects/mentalHeartInduce';
 import { induceSkillEffects, type EffectApplier } from './effects/induceSkillEffect';
+import { notifyHandVoltageIncrease } from './cards/handInduce';
 import { absorbSkillEffect } from './effects/proxySkill';
 import { registerVoltageZeroMission } from './ingameMissions';
 
@@ -70,10 +71,12 @@ export function changeResource(
   }
   if (state.bloom) {
     const changed = changeBloomResource(state, resource, amount);
+    const withHandInduce =
+      resource === 'excitement' ? notifyVoltageLevelChange(state, changed, applyEffect) : changed;
     const withMissionEvent =
-      resource === 'excitement' && state.excitement > 0 && changed.excitement === 0
-        ? registerVoltageZeroMission(changed)
-        : changed;
+      resource === 'excitement' && state.excitement > 0 && withHandInduce.excitement === 0
+        ? registerVoltageZeroMission(withHandInduce)
+        : withHandInduce;
     return resource === 'excitement' && (amount > 0n || induceVoltageUp) && applyEffect
       ? induceSkillEffects(withMissionEvent, 'voltage', Number(amount), applyEffect)
       : withMissionEvent;
@@ -85,7 +88,8 @@ export function changeResource(
         ? voltageThreshold(state.maximumVoltageLevel)
         : state.maximumMental;
   const nextValue = Math.max(0, Math.min(maximum, state[resource] + Number(amount)));
-  let next = { ...state, [resource]: nextValue };
+  let next: GameState = { ...state, [resource]: nextValue };
+  if (resource === 'excitement') next = notifyVoltageLevelChange(state, next, applyEffect);
   if (resource === 'excitement' && state.excitement > 0 && nextValue === 0)
     next = registerVoltageZeroMission(next);
   if (resource === 'stamina' && nextValue !== state.stamina)
@@ -98,17 +102,45 @@ export function changeResource(
   return next;
 }
 
-export function setVoltageValue(state: GameState, amount: number): GameState {
+export function setVoltageValue(
+  state: GameState,
+  amount: number,
+  applyEffect?: EffectApplier,
+): GameState {
   const target = Math.max(0, Math.trunc(Math.fround(amount)));
   const delta = Math.trunc(Math.fround(target - state.excitement));
-  if (state.bloom) return changeBloomResource(state, 'excitement', BigInt(delta));
+  if (state.bloom) {
+    return notifyVoltageLevelChange(
+      state,
+      changeBloomResource(state, 'excitement', BigInt(delta)),
+      applyEffect,
+    );
+  }
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
     return state;
-  const next = {
-    ...state,
-    excitement: target,
-  };
+  const next = notifyVoltageLevelChange(
+    state,
+    {
+      ...state,
+      excitement: target,
+    },
+    applyEffect,
+  );
   return state.excitement > 0 && target === 0 ? registerVoltageZeroMission(next) : next;
+}
+
+function notifyVoltageLevelChange(
+  previous: GameState,
+  current: GameState,
+  applyEffect?: EffectApplier,
+): GameState {
+  if (!applyEffect || previous.excitement === current.excitement) return current;
+  return notifyHandVoltageIncrease(
+    current,
+    voltageLevel(previous.excitement, previous.maximumVoltageLevel),
+    voltageLevel(current.excitement, current.maximumVoltageLevel),
+    applyEffect,
+  );
 }
 
 export function decreaseMentalNaturally(state: GameState): GameState {

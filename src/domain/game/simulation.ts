@@ -1,5 +1,6 @@
 import { createModes } from './live/modes';
 import { advanceAutomaticGauges } from './automaticGauges';
+import { advanceSectionChange } from './sectionChange';
 import { moodAtTime } from './live/moodTimeline';
 import { validateTrack } from './live/validateTrack';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
@@ -11,7 +12,7 @@ import { type Card, type GameState, type Track, rules } from './model';
 import { durationSeconds, sectionAt, moodValue } from './projection';
 import { finishBloom } from './bloom';
 import { fillHand, restoreHandLimitCount } from './cards/drawing';
-import { advanceHandLimitEffects, expireHandLimitSections } from './effects/handLimit';
+import { advanceHandLimitEffects } from './effects/handLimit';
 import { createStarGatherHeartRuntimeState } from './live/heartSpawn';
 import { recordScoreHistory } from './scoreHistory';
 import { recordMoodHistory } from './moodHistory';
@@ -20,39 +21,24 @@ import {
   resolveStarGatherHeartDrawCount,
 } from './live/heartPresentation';
 import { expireGaugeInfinities } from './resources';
-import {
-  advanceMentalHeartInducers,
-  expireMentalHeartInducerSections,
-} from './effects/mentalHeartInduce';
+import { advanceMentalHeartInducers } from './effects/mentalHeartInduce';
 import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
-import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
+import { advanceHeartBoosts } from './live/heartBoosts';
 import { initializeHandCardStats } from './cards/skillCostChanges';
 import { initializeParameterValueFactors } from './parameters/parameterValueChange';
-import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/proxySkill';
+import { advanceProxySkillPeriods } from './effects/proxySkill';
 import { applyEffect } from './effects';
-import { advanceComboInducer, expireComboInducerSections } from './effects/comboInduce';
-import { advanceHeartLimitBuffs, expireHeartLimitBuffSections } from './effects/heartLimit';
-import {
-  advanceVoltageIncreaseStops,
-  expireVoltageIncreaseStopSections,
-} from './effects/stopVoltageIncrease';
-import {
-  advanceAdditionalHeartInducers,
-  expireAdditionalHeartInducerSections,
-} from './effects/additionalHeart';
-import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
-import {
-  advanceVoltageConversions,
-  expireVoltageConversionSections,
-} from './effects/voltageConversion';
-import { advanceTimedSkillBuffs, expireTimedSkillBuffSections } from './effects/timedSkillBuffs';
-import { advanceSkillCooldownEffects, expireSkillCooldownSections } from './effects/skillCooldown';
-import {
-  advanceInducedSkillEffects,
-  expireInducedSkillEffectSections,
-} from './effects/induceSkillEffect';
-import { advanceTokenDeckSplit, expireTokenDeckSplitSections } from './effects/tokenDeckSplit';
+import { advanceComboInducer } from './effects/comboInduce';
+import { advanceHeartLimitBuffs } from './effects/heartLimit';
+import { advanceVoltageIncreaseStops } from './effects/stopVoltageIncrease';
+import { advanceAdditionalHeartInducers } from './effects/additionalHeart';
+import { advanceApSpeedEffects } from './effects/apSpeed';
+import { advanceVoltageConversions } from './effects/voltageConversion';
+import { advanceTimedSkillBuffs } from './effects/timedSkillBuffs';
+import { advanceSkillCooldownEffects } from './effects/skillCooldown';
+import { advanceInducedSkillEffects } from './effects/induceSkillEffect';
+import { advanceTokenDeckSplit } from './effects/tokenDeckSplit';
 import { advanceIngameMission } from './ingameMissions';
 import { createInitialEffectState } from './effects/initialState';
 export function createGame(
@@ -244,7 +230,11 @@ function advanceTick(state: GameState): GameState {
           removeExhaustedMentalBarriers(
             expireMentalBarriers(
               advanceGaugeRegenerations(
-                expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+                expireGaugeInfinities(
+                  advanceAutomaticGauges(state, dt, applyEffect),
+                  'milliseconds',
+                  dt,
+                ),
                 dt,
                 applyEffect,
               ),
@@ -291,48 +281,7 @@ function advanceTick(state: GameState): GameState {
     if (!next.resting) next = addHearts(next, beatHeartCount(next));
     next = expireGaugeRegenerations(next, 'heart-event');
   }
-  if (sectionAt(next) !== sectionAt(state)) {
-    next = expireTokenDeckSplitSections(next);
-    next = expireSkillCooldownSections(next);
-    next = expireInducedSkillEffectSections(next);
-    next = expireApSpeedSections(next);
-    next = expireVoltageConversionSections(next);
-    next = expireTimedSkillBuffSections(next);
-    next = expireMentalHeartInducerSections(next);
-    next = expireComboInducerSections(next);
-    next = expireHeartLimitBuffSections(next);
-    next = expireAdditionalHeartInducerSections(next);
-    next = advanceProxySkillSections(next, applyEffect);
-    const expiredHandLimit = expireHandLimitSections(next);
-    next = expiredHandLimit.state;
-    if (expiredHandLimit.handAdjustment > 0) {
-      next = restoreHandLimitCount(next, expiredHandLimit.handAdjustment);
-    }
-    next = expireGaugeInfinities(next, 'sections', 1);
-    next = expireGaugeRegenerations(next, 'sections');
-    next = expireMentalBarriers(next, 'sections', 1);
-    next = expireVoltageIncreaseStopSections(next);
-    next = {
-      ...next,
-      tokenBoosts: next.tokenBoosts.flatMap((boost) => {
-        if (boost.remainingSections === null) return [boost];
-        const remainingSections = boost.remainingSections - 1;
-        return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
-      }),
-      moodOffset: 0,
-      sectionMentalProtected: false,
-      sectionBeatHeartBonus: 0,
-      heartBoosts: expireSectionHeartBoosts(next.heartBoosts),
-      skillCostChanges: next.skillCostChanges.flatMap((change) => {
-        if (change.remainingSections === null) return [change];
-        const remainingSections = change.remainingSections - 1;
-        return remainingSections > 0 ? [{ ...change, remainingSections }] : [];
-      }),
-      amplification: next.amplification - next.sectionAmplification,
-      sectionAmplification: 0,
-      targetBoosts: next.targetBoosts.filter((boost) => boost.duration === 'stage'),
-    };
-  }
+  if (sectionAt(next) !== sectionAt(state)) next = advanceSectionChange(next, applyEffect);
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
   const collected = automatic.shouldCollect ? collectHearts(next) : next;

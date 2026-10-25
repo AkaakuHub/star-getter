@@ -251,7 +251,7 @@ export function applyEffect(
     case 'fixed-parameter-extend':
       return activateFixedParameterExtend(state, effect, card);
     case 'voltage-set':
-      return setVoltageValue(state, effect.amount);
+      return setVoltageValue(state, effect.amount, applyEffect);
     case 'stop-voltage-increase':
       return activateVoltageIncreaseStop(state, effect);
     case 'infinity-gauge':

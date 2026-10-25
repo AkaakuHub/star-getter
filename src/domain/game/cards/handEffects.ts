@@ -22,16 +22,16 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
   };
 }
 
-export function handEffectCards(state: GameState): readonly Card[] {
-  return state.handEffectCardIds.map((id) => {
-    const card = state.cardPool.find((item) => item.id === id);
-    if (!card) throw new Error('手札効果のカードがありません。');
-    return card;
-  });
-}
-
 export function disposeHandEffects(state: GameState, ids: readonly string[]): GameState {
   let next = state;
+  for (const id of ids) {
+    const card = state.deck.find((item) => item.id === id);
+    if (!card || card.handUse?.limitMemory === 'retain') continue;
+    for (const effect of card.handUse?.effects ?? []) {
+      if (effect.kind === 'parameter-value-change')
+        next = applyParameterValueChange(next, card, effect, true);
+    }
+  }
   for (const active of state.activeModeParameterChanges) {
     if (!ids.includes(active.cardId)) continue;
     const card = state.cardPool.find((item) => item.id === active.cardId);
