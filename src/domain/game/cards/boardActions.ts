@@ -35,20 +35,30 @@ export function enqueueHandShuffle(
   state: GameState,
   options: HandShuffle,
   sourceId: string | null,
+  skipSourceRefill = false,
 ): GameState {
   const activation = state.activation;
   if (!activation?.allHand)
     return {
       ...state,
+      ...(activation
+        ? {
+            activation: {
+              ...activation,
+              skipSourceRefill: activation.skipSourceRefill || skipSourceRefill,
+            },
+          }
+        : {}),
       deckActions: {
         ...state.deckActions,
-        shuffles: [...state.deckActions.shuffles, { sourceId, options }],
+        shuffles: [...state.deckActions.shuffles, { sourceId, options, skipSourceRefill }],
       },
     };
   return {
     ...state,
     activation: {
       ...activation,
+      skipSourceRefill: activation.skipSourceRefill || skipSourceRefill,
       recoverDiscard: activation.recoverDiscard || options.recoverDiscard,
       returnToDraw:
         options.destination === 'draw'

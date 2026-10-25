@@ -175,7 +175,11 @@ export type GameState = Readonly<{
   nextMoodValueAdditionalBuffId: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
-    shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];
+    shuffles: readonly Readonly<{
+      sourceId: string | null;
+      options: HandShuffle;
+      skipSourceRefill: boolean;
+    }>[];
     searches: readonly SearchRequest[];
   }>;
   lastUsedMember: MemberId | null;
@@ -197,6 +201,7 @@ export type GameState = Readonly<{
     sourceId: string;
     usedCards: readonly string[];
     allHand: boolean;
+    skipSourceRefill?: boolean;
     recoverDiscard: boolean;
     returnToDraw: readonly string[];
     excluded: readonly string[];

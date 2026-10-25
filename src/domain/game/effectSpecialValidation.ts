@@ -15,6 +15,7 @@ import {
   validateUseCountInduceEffect,
   validateUseInduceEffect,
 } from './useInduceTypes';
+import { validateReshuffleSkillEffect } from './reshuffleSkillTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -33,7 +34,8 @@ type SpecialEffect = Extract<
       | 'use-induce'
       | 'use-count-induce'
       | 'effect-induce'
-      | 'card-move-induce';
+      | 'card-move-induce'
+      | 'reshuffle-skill';
   }
 >;
 
@@ -85,6 +87,9 @@ export function validateSpecialEffect(
     case 'card-move-induce':
       validateCardMoveInduceEffect(effect, validateChild);
       break;
+    case 'reshuffle-skill':
+      validateReshuffleSkillEffect(effect);
+      break;
   }
   return true;
 }
@@ -104,6 +109,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'use-induce' ||
     effect.kind === 'use-count-induce' ||
     effect.kind === 'effect-induce' ||
-    effect.kind === 'card-move-induce'
+    effect.kind === 'card-move-induce' ||
+    effect.kind === 'reshuffle-skill'
   );
 }

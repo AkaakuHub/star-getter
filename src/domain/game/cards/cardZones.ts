@@ -57,7 +57,10 @@ export function finishCardActivation(state: GameState, apply: EffectApplier): Ga
     lastUsedSkillIcon: source.skillIcon ?? null,
     drawContext: 'skill',
   };
-  if (handCountChange < 0) {
+  const skipSourceRefill = next.activation?.skipSourceRefill ?? false;
+  if (skipSourceRefill) {
+    next = { ...handReady, drawContext: 'idle' };
+  } else if (handCountChange < 0) {
     const target = Math.min(handCapacity(handReady), handReady.deck.length);
     const removedCount = Math.max(0, handReady.hand.length + 1 - target);
     next = {

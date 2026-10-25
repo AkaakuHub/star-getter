@@ -94,6 +94,8 @@ export function describeEffect(effect: Effect): string {
       return '指定した割合だけ元気を回復する。';
     case 'add-voltage-skill':
       return '指定量の熱気を加算する。';
+    case 'reshuffle-skill':
+      return '手札と山札を引き直す。';
     case 'combo-induce':
       return '対象メンバーがアクションを使用したとき、合計APに応じた効果を発動する。';
     case 'heart-limit-change':

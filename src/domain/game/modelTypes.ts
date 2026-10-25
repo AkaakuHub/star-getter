@@ -33,6 +33,7 @@ import type { BeatPointBuffEffect } from './beatPointBuffTypes';
 import type { RecoverMentalSkillEffect } from './recoverMentalSkillTypes';
 import type { GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import type { AddVoltageSkillEffect } from './addVoltageTypes';
+import type { ReshuffleSkillEffect } from './reshuffleSkillTypes';
 export type { GaugeRegeneration, GaugeRegenerationEffect } from './gaugeRegenerationTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
@@ -178,6 +179,7 @@ type EffectShape =
   | Readonly<{ kind: 'hearts'; amount: number; moodBonus?: MoodBonus; lifetimeSeconds?: number }>
   | RecoverMentalSkillEffect
   | AddVoltageSkillEffect
+  | ReshuffleSkillEffect
   | Readonly<{
       kind: 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
       amount: number;
