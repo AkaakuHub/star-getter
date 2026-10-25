@@ -2,11 +2,13 @@ import { finalizeStarGatherSkillCost } from '../live/skillCost';
 import type { Card, Effect, GameState } from '../model';
 import { skillCostDelta } from './skillCostChanges';
 import { resolveModeSkill } from '../live/modes';
+import { resolveEffectParameterDetails } from '../parameters/parameterValueChange';
 
-export function cardCost(state: GameState, card: Card): number {
+export function cardCost(state: GameState, card: Card, activeAllHandSkill = false): number {
   card = resolveModeSkill(card, state.modes);
-  const useHand = card.effects.find((effect) => effect.kind === 'use-hand');
-  if (!useHand)
+  const useHandEffect = card.effects.find((effect) => effect.kind === 'use-hand');
+  const useHand = useHandEffect ? resolveEffectParameterDetails(state, card, useHandEffect) : null;
+  if (!useHand || useHand.kind !== 'use-hand' || activeAllHandSkill)
     return finalizeStarGatherSkillCost(
       card.cost,
       -(state.costReductions[card.id] ?? 0) +

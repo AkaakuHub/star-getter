@@ -272,6 +272,27 @@ it('一斉使用の追加APを全手札コストへ加え、最終コストを1�
   expect(cardCost(withoutReduction, updated)).toBe(cardCost(withoutReduction, source) + 7);
 });
 
+it('一斉使用中の子カードはActionType42の合算コストではなく通常の個別コストを記録する', () => {
+  const initial = game('library');
+  const source = card(initial, 'library-ensemble');
+  const child = {
+    ...card(initial, 'library-pages'),
+    effects: [{ kind: 'use-hand' as const, addAp: 7 }],
+  };
+  const state = withHand(
+    {
+      ...initial,
+      deck: initial.deck.map((item) => (item.id === child.id ? child : item)),
+      cardPool: initial.deck.map((item) => (item.id === child.id ? child : item)),
+    },
+    [source.id, child.id],
+  );
+  expect(cardCost(state, child)).toBeGreaterThan(child.cost);
+  expect(cardCost(state, child, true)).toBe(child.cost);
+  const used = act({ ...state, energy: 100 }, { type: 'card', index: 0 });
+  expect(used.cardUses.find((item) => item.card.id === child.id)?.cost).toBe(child.cost);
+});
+
 it('招待状自身を使用すると、生成した帆船を優先検索して補充する', () => {
   const initial = game('library');
   const state = withHand({ ...initial, energy: 10 }, ['library-invitation']);

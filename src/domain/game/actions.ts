@@ -119,7 +119,7 @@ function activateCard(
   allHand: boolean,
 ): GameState {
   if (!state.activation) throw new Error('カードの使用処理がありません。');
-  const usedSkillCost = cardCost(state, card);
+  const usedSkillCost = cardCost(state, card, allHand);
   let next: GameState = {
     ...state,
     onceSkillCostChanges: Object.fromEntries(
@@ -143,12 +143,12 @@ function activateCard(
         tick: state.tick,
         handIndex: initialHand.indexOf(card.id),
         handCount: initialHand.length,
-        cost: cardCost(state, card),
+        cost: usedSkillCost,
       },
     ],
   };
   next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
-  next = notifyComboSkillPoint(next, card, cardCost(state, card));
+  next = notifyComboSkillPoint(next, card, usedSkillCost);
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') {
       if (allHand) continue;
@@ -167,7 +167,7 @@ function activateCard(
   next = advanceProxySkillUses(
     applyUseAbility(finishTokenGeneration(next, card.id), card),
     card.id,
-    cardCost(state, card),
+    usedSkillCost,
     applyEffect,
   );
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
