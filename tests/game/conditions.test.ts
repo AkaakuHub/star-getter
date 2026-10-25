@@ -89,17 +89,17 @@ describe('カード共通の条件判定', () => {
       false,
     );
   });
-  it('通常時は成立した側だけ、開花中の熱気・元気分岐は成立側と不成立側を順に実行する', () => {
+  it('Voltage/Mental分岐はtrue側だけを実行し、他の条件は成立側だけを実行する', () => {
     const initial = game();
     const effect = {
       kind: 'branch' as const,
-      condition: { kind: 'heat' as const, minimum: 1000 },
+      condition: { kind: 'heat' as const, minimum: 100_000 },
       whenTrue: [{ kind: 'energy-limit' as const, amount: 1 }],
       whenFalse: [{ kind: 'energy-limit' as const, amount: 2 }],
     };
-    expect(applyEffect(initial, effect).maxEnergy).toBe(initial.maxEnergy + 2);
+    expect(applyEffect(initial, effect).maxEnergy).toBe(initial.maxEnergy + 1);
     const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
-    expect(applyEffect(bloom, effect).maxEnergy).toBe(initial.maxEnergy + 3);
+    expect(applyEffect(bloom, effect).maxEnergy).toBe(initial.maxEnergy + 1);
   });
   it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
     const initial = game();
