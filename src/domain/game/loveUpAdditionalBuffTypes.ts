@@ -12,7 +12,7 @@ export type LoveUpAdditionalBuff = Readonly<{
   target: LoveUpAdditionalBuffTarget;
   remainingSeconds: number | null;
   remainingSections: number | null;
-  removeOnHeartCollect: boolean;
+  remainingUses: number | null;
   deactivationKey: string | null;
 }>;
 

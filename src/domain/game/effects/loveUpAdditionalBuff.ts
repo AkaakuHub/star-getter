@@ -43,7 +43,7 @@ export function activateLoveUpAdditionalBuff(
         : Math.fround(effect.duration.value / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
-    removeOnHeartCollect: effect.disabledType > 0 && effect.disabledType <= 2,
+    remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
     deactivationKey: effect.deactivationKey ?? null,
   };
   return {
@@ -65,19 +65,19 @@ export function applyLoveUpAdditionalBuffs(
     -100,
     matching.reduce((sum, buff) => Math.fround(sum + Math.fround(buff.percent)), 0),
   );
+  const consumedIds = new Set(
+    matching.filter((buff) => buff.remainingUses !== null).map((buff) => buff.id),
+  );
   return {
     value: Math.fround((percent * value) / 100 + value),
     state: {
       ...state,
-      loveUpAdditionalBuffs: state.loveUpAdditionalBuffs,
+      loveUpAdditionalBuffs: state.loveUpAdditionalBuffs.flatMap((buff) => {
+        if (!consumedIds.has(buff.id) || buff.remainingUses === null) return [buff];
+        const remainingUses = buff.remainingUses - 1;
+        return remainingUses < 1 ? [] : [{ ...buff, remainingUses }];
+      }),
     },
-  };
-}
-
-export function removeLoveUpAdditionalBuffsOnHeartCollect(state: GameState): GameState {
-  return {
-    ...state,
-    loveUpAdditionalBuffs: state.loveUpAdditionalBuffs.filter((buff) => !buff.removeOnHeartCollect),
   };
 }
 

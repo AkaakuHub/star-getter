@@ -28,17 +28,18 @@ it('ActionType30は対象カードのSTAR増加を指定率で増幅し、回収
       target: { kind: 'member', member: target.member },
       duration: { kind: 'milliseconds', value: 10_000 },
       disabledType: 1,
-      disabledCount: 1,
+      disabledCount: 2,
     },
     source,
   );
   const used = applyScoreBoost(buffed, 100, target);
   expect(used.boosts[0]?.percent).toBe(150);
-  expect(used.loveUpAdditionalBuffs).toHaveLength(1);
+  expect(used.loveUpAdditionalBuffs[0]?.remainingUses).toBe(1);
   const unmatched = applyScoreBoost(buffed, 100, source);
   expect(unmatched.boosts[0]?.percent).toBe(100);
   expect(unmatched.loveUpAdditionalBuffs).toHaveLength(1);
-  expect(collectHearts(addHearts(used, 1)).loveUpAdditionalBuffs).toHaveLength(0);
+  expect(collectHearts(addHearts(used, 1)).loveUpAdditionalBuffs[0]?.remainingUses).toBe(1);
+  expect(applyScoreBoost(used, 100, target).loveUpAdditionalBuffs).toHaveLength(0);
 });
 
 it('ActionType30は期限・InvocationType抑止・Deactivator解除を処理する', () => {
