@@ -39,7 +39,7 @@ export function effectDetailValue(parameters: EffectParameters, name: string): b
   if (factor === undefined) return detail.value;
   const value = Number(detail.value) * factor;
   if (value === Infinity) return -2147483648n;
-  const rounded = Number.isNaN(value) ? 0 : Math.ceil(value);
+  const rounded = Number.isNaN(value) ? 0 : Math.trunc(value);
   return BigInt(Math.max(-2147483648, Math.min(2147483647, rounded)));
 }
 
