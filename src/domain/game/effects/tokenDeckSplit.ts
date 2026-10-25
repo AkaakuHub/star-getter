@@ -34,10 +34,8 @@ export function activateTokenDeckSplit(
   };
   const sub: TokenDeckZones = {
     hand: [],
-    drawPile: state.deck
-      .filter((card) => selected.has(card.id) && !state.discard.includes(card.id))
-      .map((card) => card.id),
-    discard: state.discard.filter((id) => selected.has(id)),
+    drawPile: state.deck.filter((card) => selected.has(card.id)).map((card) => card.id),
+    discard: [],
   };
   const suppressExpiration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const split: TokenDeckSplit = {
