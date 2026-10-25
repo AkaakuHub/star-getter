@@ -50,6 +50,7 @@ export const sunriseCard: Card = {
   ],
   collectionEffects: {
     threshold: 3000,
+    limit: 1,
     effects: [
       rainy([
         { kind: 'protect-mental', duration: 'section' },

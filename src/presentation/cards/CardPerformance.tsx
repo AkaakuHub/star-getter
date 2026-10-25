@@ -53,9 +53,13 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
         )}
         {collectionEffects && (
           <section>
-            <h3>手札内で累計{collectionEffects.threshold.toLocaleString('ja-JP')}個回収したとき</h3>
+            <h3>
+              手札内で累計{collectionEffects.threshold.toLocaleString('ja-JP')}個回収したとき
+              {collectionEffects.limit === undefined || collectionEffects.limit === 0
+                ? '（回数制限なし）'
+                : `（最大${collectionEffects.limit}回）`}
+            </h3>
             <EffectDetails effects={collectionEffects.effects} />
-            <p>手札にある間に1回発動し、引き直すと再発動できる。</p>
           </section>
         )}
         {traits.length > 0 && (

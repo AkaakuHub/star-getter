@@ -67,6 +67,7 @@ export const libraryCards: readonly Card[] = [
     ],
     collectionEffects: {
       threshold: 300_000,
+      limit: 1,
       effects: [{ kind: 'energy', amount: baselineMemberFanLevels[1021] * 0.1 }],
     },
     effects: [

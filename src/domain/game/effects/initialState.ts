@@ -11,6 +11,7 @@ export function createInitialEffectState(
   | 'specialAppealTokens'
   | 'handMaxCardEffects'
   | 'mentalShields'
+  | 'handCollectionActivationCounts'
 > {
   return {
     fixedParameterBase: { ap: track.stage.maxEnergy, voltage: 1000, mental: 100 },
@@ -20,5 +21,6 @@ export function createInitialEffectState(
     specialAppealTokens: [],
     handMaxCardEffects: [],
     mentalShields: [],
+    handCollectionActivationCounts: {},
   };
 }

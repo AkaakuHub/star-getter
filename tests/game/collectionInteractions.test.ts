@@ -3,7 +3,9 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { beatHeartCount } from '../../src/domain/game/beat';
+import { advanceHandCollectionAbilities } from '../../src/domain/game/cards/collectionAbilities';
 import { fillHand, shuffleHand } from '../../src/domain/game/cards/drawing';
+import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import type { GameState } from '../../src/domain/game/model';
@@ -57,6 +59,58 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
   expect(redrawn.hand).toContain('horizon');
   expect(redrawn.relayUsed).not.toContain('horizon');
   expect(heartCount(act(addHearts(redrawn, 3_000), { type: 'collect' }))).toBeGreaterThan(0);
+});
+
+it('手札誘発は回収条件を超えるたびに発動し、指定回数で止まる', () => {
+  const initial = game('bloom');
+  const original = initial.deck.find((item) => !item.relay);
+  if (!original) throw new Error('カードがありません。');
+  const card = {
+    ...original,
+    collectionEffects: {
+      threshold: 10,
+      limit: 2,
+      effects: [{ kind: 'energy' as const, amount: 1 }],
+    },
+  };
+  const state: GameState = {
+    ...initial,
+    deck: [card, ...initial.deck.slice(1)],
+    hand: [card.id],
+    handHeartCollectCounts: { [card.id]: 0 },
+  };
+  const first = advanceHandCollectionAbilities(state, 10);
+  expect(first.activated.map((item) => item.id)).toEqual([card.id]);
+  const second = advanceHandCollectionAbilities(first.state, 10);
+  expect(second.activated.map((item) => item.id)).toEqual([card.id]);
+  const third = advanceHandCollectionAbilities(second.state, 10);
+  expect(third.activated).toHaveLength(0);
+  expect(second.state.handCollectionActivationCounts[card.id]).toBe(2);
+});
+
+it('手札誘発の回数は離脱時に初期化し、記憶指定時は保持する', () => {
+  const initial = game('bloom');
+  const original = initial.deck[0];
+  if (!original) throw new Error('カードがありません。');
+  const resetCard = {
+    ...original,
+    collectionEffects: { threshold: 10, effects: [{ kind: 'energy' as const, amount: 1 }] },
+  };
+  const retainCard = {
+    ...original,
+    collectionEffects: {
+      threshold: 10,
+      limitMemory: 'retain' as const,
+      effects: [{ kind: 'energy' as const, amount: 1 }],
+    },
+  };
+  const state = {
+    ...initial,
+    deck: [resetCard, { ...retainCard, id: `${retainCard.id}-retain` }, ...initial.deck.slice(1)],
+    handCollectionActivationCounts: { [resetCard.id]: 1, [`${retainCard.id}-retain`]: 2 },
+  };
+  const next = disposeHandEffects(state, [resetCard.id, `${retainCard.id}-retain`]);
+  expect(next.handCollectionActivationCounts).toEqual({ [`${retainCard.id}-retain`]: 2 });
 });
 
 function preparedLibrary(): GameState {

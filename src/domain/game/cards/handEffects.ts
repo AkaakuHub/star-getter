@@ -65,5 +65,13 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
       (item) => !ids.includes(item.cardId),
     ),
     activeHandPermanentCardIds,
+    handCollectionActivationCounts: Object.fromEntries(
+      Object.entries(state.handCollectionActivationCounts).filter(([id]) => {
+        if (!ids.includes(id)) return true;
+        return (
+          state.deck.find((card) => card.id === id)?.collectionEffects?.limitMemory === 'retain'
+        );
+      }),
+    ),
   };
 }

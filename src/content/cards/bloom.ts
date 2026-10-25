@@ -121,6 +121,7 @@ export const bloomCards: readonly Card[] = [
     ],
     collectionEffects: {
       threshold: 300_000,
+      limit: 1,
       effects: [
         {
           kind: 'resource-boost',

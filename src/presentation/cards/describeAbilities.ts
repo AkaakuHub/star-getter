@@ -4,7 +4,7 @@ import type { Card } from '../../domain/game/model';
 export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
   if (card.collectionEffects)
-    text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.collectionEffects.effects.map(describeEffect).join('')}この特性は引き直すと再び使用できる。`;
+    text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収するたび、${card.collectionEffects.effects.map(describeEffect).join('')}${card.collectionEffects.limit === undefined || card.collectionEffects.limit === 0 ? '回数制限なし' : `最大${card.collectionEffects.limit}回`}発動する。`;
   if (card.beforeUseEffects)
     text += `使用時、${card.beforeUseEffects.map(describeEffect).join('')}`;
   if (card.handUse)

@@ -70,6 +70,11 @@ export type Card = Readonly<{
     | 'shadow';
   beforeUseAbility?: 'story-boost' | 'icy-sayaka';
   useAbility?: 'class' | 'shadow';
-  collectionEffects?: Readonly<{ threshold: number; effects: readonly Effect[] }>;
+  collectionEffects?: Readonly<{
+    threshold: number;
+    effects: readonly Effect[];
+    limit?: number;
+    limitMemory?: 'reset' | 'retain';
+  }>;
   collectionAbility?: 'icy-sayaka' | 'icy-kosuzu';
 }>;
