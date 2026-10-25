@@ -93,3 +93,13 @@ it('Action51の非FullEnd期限0は何も発動せずActionType52も消費しな
   expect(unchanged.bloom).toBeNull();
   expect(unchanged.action52Buffs).toHaveLength(1);
 });
+
+it('Action51の期限値をC#のint32へ変換してから有効性を判定する', () => {
+  const initial = game('library');
+  const unchanged = applyEffect(initial, {
+    kind: 'genesis-skill',
+    effectBaseNum: 20_000,
+    duration: { kind: 'sections', value: 2_147_483_648 },
+  });
+  expect(unchanged).toBe(initial);
+});
