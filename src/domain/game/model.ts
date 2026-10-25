@@ -297,6 +297,7 @@ export type GameState = Readonly<{
   relayUsed: readonly string[];
   handHeartCollectCounts: Readonly<Record<string, number>>;
   handCollectionActivationCounts: Readonly<Record<string, number>>;
+  handUseActivationCounts: Readonly<Record<string, number>>;
   combo: number;
   lastCollectTick: number;
   lastActionTick: number;

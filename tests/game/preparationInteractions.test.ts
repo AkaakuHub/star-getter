@@ -3,6 +3,7 @@ import { act } from '../../src/domain/game/actions';
 import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
 import { activateBloom } from '../../src/domain/game/bloom';
 import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
+import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
 import { notifyHandSkillUse } from '../../src/domain/game/cards/useAbilities';
 import { flushDeckActions } from '../../src/domain/game/cards/boardActions';
 import { fillHand } from '../../src/domain/game/cards/drawing';
@@ -10,6 +11,7 @@ import { addTokens } from '../../src/domain/game/cards/tokens';
 import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import { addHearts, heartCount } from '../../src/domain/game/hearts';
 import { cardCooldownTicks, moodValue, sectionAt } from '../../src/domain/game/projection';
+import type { HandUseTrigger } from '../../src/domain/game/cards/cardTypes';
 import { tracks } from '../../src/content/tracks';
 import { game, withHand } from './support/game';
 
@@ -62,6 +64,43 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
   expect(reacted.costReductions[shadow.id]).toBe(9);
   expect(reacted.costReductions.horizon).toBe(0);
   expect(reacted.deckActions.shuffles).toHaveLength(1);
+});
+
+it('手札誘発はメンバー・スキル記号・ユニット・同一カード・任意のスキルを判定し、上限を守る', () => {
+  const initial = addTokens(game(), 'shadow', 1);
+  const source = initial.deck.find((card) => card.id === 'rain-preparation');
+  const baseUsed = initial.deck.find((card) => card.id === 'frost-echo');
+  if (!source || !baseUsed) throw new Error('カードがありません。');
+  const used = { ...baseUsed, skillIcon: 77 };
+  const triggers: readonly HandUseTrigger[] = [
+    { kind: 'member', member: used.member },
+    { kind: 'skill-icon', icon: 77 },
+    { kind: 'unit', unit: 2 },
+    { kind: 'same-card' },
+    { kind: 'any-skill' },
+  ];
+  for (const trigger of triggers) {
+    const handCard = {
+      ...source,
+      handUse: {
+        trigger,
+        limit: 1,
+        effects: [{ kind: 'energy' as const, amount: 1 }],
+      },
+    };
+    const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
+    const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
+    const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
+    const currentUsed = trigger.kind === 'same-card' ? handCard : used;
+    const first = notifyHandSkillUse(state, currentUsed);
+    const second = notifyHandSkillUse(first, currentUsed);
+    expect(first.energy).toBe(1);
+    expect(second.energy).toBe(1);
+    expect(second.handUseActivationCounts[source.id]).toBe(1);
+    expect(
+      disposeHandEffects(second, [source.id]).handUseActivationCounts[source.id],
+    ).toBeUndefined();
+  }
 });
 
 it('シールドは自然減少とスキル由来の元気減少を防ぐ', () => {

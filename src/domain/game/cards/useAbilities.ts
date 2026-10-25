@@ -35,13 +35,36 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
 }
 
 export function notifyHandSkillUse(state: GameState, used: Card): GameState {
-  const listeners = handEffectCards(state).filter((card) => card.handUse?.trigger === used.unit);
-  return listeners.reduce(
-    (next, card) =>
-      (card.handUse?.effects ?? []).reduce(
-        (current, effect) => applyEffect(current, effect, card),
-        next,
-      ),
-    state,
-  );
+  let next = state;
+  const activationCounts = { ...state.handUseActivationCounts };
+  for (const card of handEffectCards(state)) {
+    const handUse = card.handUse;
+    if (!handUse || !handUse.effects.length || !matchesHandUseTrigger(handUse.trigger, card, used))
+      continue;
+    const activationCount = activationCounts[card.id] ?? 0;
+    if (handUse.limit !== undefined && handUse.limit !== 0 && handUse.limit <= activationCount)
+      continue;
+    next = handUse.effects.reduce((current, effect) => applyEffect(current, effect, card), next);
+    activationCounts[card.id] = activationCount + 1;
+  }
+  return { ...next, handUseActivationCounts: activationCounts };
+}
+
+function matchesHandUseTrigger(
+  trigger: NonNullable<Card['handUse']>['trigger'],
+  source: Card,
+  used: Card,
+) {
+  switch (trigger.kind) {
+    case 'member':
+      return trigger.member === used.member;
+    case 'skill-icon':
+      return trigger.icon === used.skillIcon;
+    case 'unit':
+      return trigger.unit === used.unit;
+    case 'same-card':
+      return source.id === used.id;
+    case 'any-skill':
+      return true;
+  }
 }

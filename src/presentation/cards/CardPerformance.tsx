@@ -2,7 +2,7 @@ import type { Card } from '../../domain/game/model';
 import { describeCardTraits } from '../cardDescription';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { EffectDetails } from './EffectDetails';
-import { unitCardNames } from './targetNames';
+import { handUseTriggerDescription } from './targetNames';
 
 export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
   const { drawEffects, handUse, collectionEffects, ...traitsCard } = card;
@@ -45,8 +45,10 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <section>
             <h3>手札にある間</h3>
             <p>
-              {unitCardNames(handUse.trigger)}
-              を使用したとき
+              {handUseTriggerDescription(handUse.trigger)}
+              {handUse.limit === undefined || handUse.limit === 0
+                ? ''
+                : `（最大${handUse.limit}回）`}
             </p>
             <EffectDetails effects={handUse.effects} />
           </section>

@@ -8,6 +8,12 @@ export type HandPermanentEffect =
   | ParameterValueChangeEffect
   | (Extract<Effect, { kind: 'amplify' }> & Readonly<{ members: readonly MemberId[] }>);
 
+export type HandUseTrigger =
+  | Readonly<{ kind: 'member'; member: MemberId }>
+  | Readonly<{ kind: 'skill-icon'; icon: number }>
+  | Readonly<{ kind: 'unit'; unit: UnitId }>
+  | Readonly<{ kind: 'same-card' | 'any-skill' }>;
+
 export type ModeSkillVariant = Readonly<{
   cost: number;
   effects: readonly Effect[];
@@ -43,7 +49,12 @@ export type Card = Readonly<{
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
   beforeUseEffects?: readonly Effect[];
-  handUse?: Readonly<{ trigger: UnitId; effects: readonly Effect[] }>;
+  handUse?: Readonly<{
+    trigger: HandUseTrigger;
+    effects: readonly Effect[];
+    limit?: number;
+    limitMemory?: 'reset' | 'retain';
+  }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;

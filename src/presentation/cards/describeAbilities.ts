@@ -1,5 +1,6 @@
 import { describeEffect } from './describeEffect';
 import type { Card } from '../../domain/game/model';
+import { handUseTriggerDescription } from './targetNames';
 
 export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
@@ -8,7 +9,7 @@ export function describeAbilities(card: Card): string {
   if (card.beforeUseEffects)
     text += `使用時、${card.beforeUseEffects.map(describeEffect).join('')}`;
   if (card.handUse)
-    text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
+    text += `手札にある間、${handUseTriggerDescription(card.handUse.trigger)}、${card.handUse.effects.map(describeEffect).join('')}${card.handUse.limit === undefined || card.handUse.limit === 0 ? '' : `最大${card.handUse.limit}回発動する。`}`;
   if (card.collectionAbility === 'icy-kosuzu')
     text +=
       '手札にある間に累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直し、雨音の反響・凍空の鼓動・雨の準備を次の4回優先して引く。熱気を140万減らし、1000段階以上ならさらに1400万減らす。';

@@ -62,7 +62,7 @@ export const bloomCards: readonly Card[] = [
     beforeUseAbility: 'icy-sayaka',
     collectionAbility: 'icy-sayaka',
     handUse: {
-      trigger: 2,
+      trigger: { kind: 'unit', unit: 2 },
       effects: [
         { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
         { kind: 'energy', amount: 9 },

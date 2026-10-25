@@ -73,5 +73,11 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
         );
       }),
     ),
+    handUseActivationCounts: Object.fromEntries(
+      Object.entries(state.handUseActivationCounts).filter(([id]) => {
+        if (!ids.includes(id)) return true;
+        return state.deck.find((card) => card.id === id)?.handUse?.limitMemory === 'retain';
+      }),
+    ),
   };
 }
