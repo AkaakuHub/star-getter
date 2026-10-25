@@ -1,3 +1,4 @@
+import { voltageLevel } from './live/voltageLevel';
 import { scoreMultipliers } from '../../content/scoring';
 import { type GameState, rules } from './model';
 import { durationSeconds } from './projection';
@@ -15,7 +16,7 @@ export function limitValue(value: bigint): bigint {
 }
 
 export function collectionScore(state: GameState, count: number, missed: boolean): bigint {
-  const voltage = Math.floor(state.excitement / 2);
+  const voltage = voltageLevel(state.excitement);
   const rank = calculateLoveGatherHeartRank(count, voltage, null);
   const base = calculateLoveGatherClientScore(
     {
@@ -30,7 +31,7 @@ export function collectionScore(state: GameState, count: number, missed: boolean
       masteryLoveBonusEffect: calculateLoveGatherMasteryLoveBonusEffect(0),
       skillLoveBonusEffect: 1,
       currentGenesisGauge: Number(state.bloom?.progress ?? 0n),
-      bonusScoreValue: Number(state.boosts.reduce((sum, boost) => sum + boost.percent * 100n, 0n)),
+      bonusScoreValue: Number(state.boosts.reduce((sum, boost) => sum + boost.percent * 100, 0)),
       challengeBonusFactor: 1,
     },
     {

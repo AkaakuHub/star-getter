@@ -4,7 +4,7 @@ export function handGeometry(
 ): Readonly<{ x: number; y: number; width: number; height: number; rotation: number }> {
   if (
     !Number.isInteger(count) ||
-    count < 3 ||
+    count < 1 ||
     count > 8 ||
     !Number.isInteger(index) ||
     index < 0 ||

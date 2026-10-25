@@ -1,10 +1,14 @@
 import type { Card, GameState } from '../model';
 
 export function cardCost(state: GameState, card: Card): number {
-  if (card.token !== 'ensemble') return card.cost;
+  if (card.token !== 'ensemble')
+    return Math.max(0, card.cost - (state.costReductions[card.id] ?? 0));
   const total = state.hand.reduce((sum, id) => {
     const other = state.deck.find((item) => item.id === id);
-    return sum + (other && other.id !== card.id && other.token !== 'ensemble' ? other.cost : 0);
+    return (
+      sum +
+      (other && other.id !== card.id && other.token !== 'ensemble' ? cardCost(state, other) : 0)
+    );
   }, 0);
   const reductions = [
     [0, 5],
@@ -18,5 +22,5 @@ export function cardCost(state: GameState, card: Card): number {
     (sum, [minimum, amount]) => sum + (state.deck.length >= minimum ? amount : 0),
     0,
   );
-  return Math.max(0, total - reduction);
+  return Math.max(0, total - reduction - (state.costReductions[card.id] ?? 0));
 }

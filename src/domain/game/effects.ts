@@ -1,9 +1,12 @@
+import { calculateSkillMoodCorrection } from './live/skillMood';
+import { moodValue } from './projection';
+import { voltageLevel } from './live/voltageLevel';
+import { beatHeartCount } from './beat';
 import { activateBloom, changeBloomResource } from './bloom';
 import { addHearts, collectHearts } from './hearts';
-import { type Effect, type GameState, rules } from './model';
-import { limitValue } from './scoring';
+import { type Card, type Effect, type GameState, rules } from './model';
 import { addTokens } from './cards/tokens';
-import { shuffleHand } from './cards/drawing';
+import { fillHand, shuffleHand } from './cards/drawing';
 import { changeLoveGatherHeartLimit } from './live/heartLimit';
 import { applyLoveGatherSkillBoost } from './live/skillBoost';
 
@@ -13,19 +16,36 @@ export function changeResource(
   amount: bigint,
 ): GameState {
   if (state.bloom) return changeBloomResource(state, resource, amount);
-  const maximum = resource === 'energy' ? rules.maxEnergy : 100;
+  const maximum =
+    resource === 'energy' ? rules.maxEnergy : resource === 'excitement' ? 655_000_001 : 100;
   return { ...state, [resource]: Math.max(0, Math.min(maximum, state[resource] + Number(amount))) };
 }
 
-export function applyEffect(state: GameState, effect: Effect): GameState {
+export function applyEffect(state: GameState, effect: Effect, card?: Card): GameState {
+  const value = (amount: number) => skillValue(state, amount, effect, card);
   switch (effect.kind) {
-    case 'hearts': {
+    case 'conditional':
+      return moodValue(state) >= 100
+        ? effect.effects.reduce((next, item) => applyEffect(next, item, card), state)
+        : state;
+    case 'mood':
+      return { ...state, moodOffset: state.moodOffset + Math.ceil(value(effect.amount)) };
+    case 'hearts':
+    case 'beat-hearts': {
       const percent = state.deck.reduce(
         (sum, card) =>
-          sum + (state.hand.includes(card.id) ? (card.passive?.heartsPercent ?? 0) : 0),
+          sum +
+          (state.hand.includes(card.id) && card.passive
+            ? skillValue(state, card.passive.heartsPercent, {
+                kind: 'amplify',
+                percent: card.passive.heartsPercent,
+                ...(card.passive.moodBonus ? { moodBonus: card.passive.moodBonus } : {}),
+              })
+            : 0),
         100,
       );
-      return addHearts(state, Math.ceil((boosted(state, effect.amount) * percent) / 100));
+      const beats = effect.kind === 'beat-hearts' ? beatHeartCount(state) : 1;
+      return addHearts(state, Math.ceil((value(effect.amount) * percent * beats) / 100));
     }
     case 'tokens':
       return addTokens(state, effect.token, effect.count);
@@ -34,23 +54,25 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
     case 'heart-limit':
       return {
         ...state,
-        hearts: changeLoveGatherHeartLimit(state.hearts, state.hearts.heartLimit + effect.amount)
-          .state,
+        hearts: changeLoveGatherHeartLimit(
+          state.hearts,
+          Math.min(10_000_000, state.hearts.heartLimit + Math.ceil(value(effect.amount))),
+        ).state,
       };
     case 'shuffle':
-      return shuffleHand(state);
+      return fillHand(shuffleHand(state));
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'energy':
-      return changeResource(state, 'energy', BigInt(Math.ceil(boosted(state, effect.amount))));
+      return changeResource(state, 'energy', BigInt(Math.ceil(value(effect.amount))));
     case 'stamina':
     case 'excitement': {
       const matching = state.resourceBoosts.filter((boost) => boost.target === effect.kind);
-      const percent = matching.reduce((sum, boost) => sum + boost.percent, 100n);
+      const percent = matching.reduce((sum, boost) => Math.fround(sum + boost.percent), 100);
       const next = changeResource(
         state,
         effect.kind,
-        (scaled(state, effect.amount) * percent) / 100n,
+        BigInt(Math.ceil(Math.fround((value(effect.amount) * percent) / 100))),
       );
       return {
         ...next,
@@ -71,7 +93,7 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
         boosts: [
           ...state.boosts,
           {
-            percent: scaled(state, Math.round((effect.multiplier - 1) * 100)),
+            percent: Math.trunc(value(Math.round((effect.multiplier - 1) * 100))),
             untilTick: state.tick + Math.round(effect.seconds * rules.ticksPerSecond),
           },
         ],
@@ -79,19 +101,31 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
     case 'amplify':
       return {
         ...state,
-        amplification: limitValue(state.amplification + BigInt(effect.percent)),
+        amplification: Math.fround(
+          state.amplification +
+            effect.percent +
+            (effect.moodBonus
+              ? calculateSkillMoodCorrection(
+                  effect.moodBonus.target,
+                  moodValue(state),
+                  effect.moodBonus.perPoint,
+                )
+              : 0),
+        ),
       };
     case 'bloom':
-      return activateBloom(state, scaled(state, effect.strength));
+      return activateBloom(state, value(effect.strength));
     case 'resource-boost': {
       const eligible =
-        effect.condition === 'mental100' ? state.stamina >= 100 : state.excitement >= 40;
+        effect.condition === 'mental100'
+          ? state.stamina >= 100
+          : voltageLevel(state.excitement) >= 20;
       return eligible
         ? {
             ...state,
             resourceBoosts: [
               ...state.resourceBoosts,
-              { target: effect.target, percent: scaled(state, effect.percent), uses: effect.uses },
+              { target: effect.target, percent: value(effect.percent), uses: effect.uses },
             ],
           }
         : state;
@@ -99,10 +133,32 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
   }
 }
 
-function scaled(state: GameState, value: number): bigint {
-  return limitValue(BigInt(Math.trunc(boosted(state, value))));
-}
-
-function boosted(state: GameState, value: number): number {
-  return applyLoveGatherSkillBoost(value, Number(state.amplification - 100n));
+export function skillValue(state: GameState, value: number, effect: Effect, card?: Card): number {
+  const bonus =
+    'moodBonus' in effect && effect.moodBonus
+      ? calculateSkillMoodCorrection(
+          effect.moodBonus.target,
+          moodValue(state),
+          effect.moodBonus.perPoint,
+        )
+      : 0;
+  const raw = Math.fround(value + bonus);
+  const base =
+    effect.kind === 'boost'
+      ? Math.trunc(raw)
+      : effect.kind === 'bloom' || effect.kind === 'amplify'
+        ? raw
+        : Math.ceil(raw);
+  const handBoost = state.deck.reduce(
+    (sum, item) =>
+      sum +
+      (state.hand.includes(item.id) &&
+      (item.token === 'bookmark' || item.token === 'story') &&
+      state.deck.length >= 80
+        ? Math.fround(1001 + Math.max(0, moodValue(state)) * 5.005)
+        : 0),
+    0,
+  );
+  const story = card?.token === 'story' ? state.storyAmplification + handBoost : 0;
+  return applyLoveGatherSkillBoost(base, state.amplification - 100 + story);
 }

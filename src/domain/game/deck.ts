@@ -1,4 +1,4 @@
-import { type Card, costumeIds, rules } from './model';
+import { type Card, type Effect, costumeIds, rules } from './model';
 
 export function validateDeck(deck: readonly Card[]): void {
   if (deck.length !== rules.deckSize || new Set(deck.map((card) => card.id)).size !== deck.length) {
@@ -30,53 +30,59 @@ export function validateCard(card: Card): void {
   ) {
     throw new Error('カードの設定が正しくありません。');
   }
-  for (const effect of card.effects) {
-    if (effect.kind === 'collect' || effect.kind === 'shuffle' || effect.kind === 'use-hand')
-      continue;
-    if (effect.kind === 'tokens') {
-      if (!Number.isSafeInteger(effect.count) || effect.count < 1 || effect.count > 30)
-        throw new Error('追加カードの枚数が正しくありません。');
-      continue;
-    }
-    if (effect.kind === 'hand-limit' || effect.kind === 'heart-limit') {
-      if (!Number.isSafeInteger(effect.amount) || effect.amount < 1 || effect.amount > 1000)
-        throw new Error('上限の増加量が正しくありません。');
-      continue;
-    }
-    if (effect.kind === 'amplify' || effect.kind === 'resource-boost') {
-      if (!Number.isSafeInteger(effect.percent) || effect.percent <= 0 || effect.percent > 300)
-        throw new Error('増幅率が正しくありません。');
-      if (
-        effect.kind === 'resource-boost' &&
-        (!Number.isSafeInteger(effect.uses) || effect.uses < 1 || effect.uses > 10)
-      )
-        throw new Error('増幅回数が正しくありません。');
-      continue;
-    }
-    if (effect.kind === 'bloom') {
-      if (!Number.isSafeInteger(effect.strength) || effect.strength < 1 || effect.strength > 300)
-        throw new Error('開花の効果量が正しくありません。');
-      continue;
-    }
-    if (effect.kind === 'boost') {
-      if (
-        !Number.isFinite(effect.multiplier) ||
-        effect.multiplier < 1 ||
-        effect.multiplier > 5 ||
-        !Number.isFinite(effect.seconds) ||
-        effect.seconds <= 0 ||
-        effect.seconds > 120
-      ) {
-        throw new Error('得点倍率と効果時間が正しくありません。');
-      }
-    } else if (
-      !('amount' in effect) ||
-      !Number.isSafeInteger(effect.amount) ||
-      effect.amount <= 0 ||
-      effect.amount > 100
+  for (const effect of card.effects) validateEffect(effect);
+}
+
+function validateEffect(effect: Effect): void {
+  if (effect.kind === 'conditional') {
+    for (const child of effect.effects) validateEffect(child);
+    return;
+  }
+  if (effect.kind === 'collect' || effect.kind === 'shuffle' || effect.kind === 'use-hand') return;
+  if (effect.kind === 'tokens') {
+    if (!Number.isSafeInteger(effect.count) || effect.count < 1 || effect.count > 30)
+      throw new Error('追加カードの枚数が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'hand-limit' || effect.kind === 'heart-limit') {
+    if (!Number.isSafeInteger(effect.amount) || effect.amount < 1 || effect.amount > 1000)
+      throw new Error('上限の増加量が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'amplify' || effect.kind === 'resource-boost') {
+    if (!Number.isSafeInteger(effect.percent) || effect.percent <= 0 || effect.percent > 3000)
+      throw new Error('増幅率が正しくありません。');
+    if (
+      effect.kind === 'resource-boost' &&
+      (!Number.isSafeInteger(effect.uses) || effect.uses < 1 || effect.uses > 10)
+    )
+      throw new Error('増幅回数が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'bloom') {
+    if (!Number.isFinite(effect.strength) || effect.strength < 1 || effect.strength > 300)
+      throw new Error('開花の効果量が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'boost') {
+    if (
+      !Number.isFinite(effect.multiplier) ||
+      effect.multiplier < 1 ||
+      effect.multiplier > 31 ||
+      !Number.isFinite(effect.seconds) ||
+      effect.seconds <= 0 ||
+      effect.seconds > 120
     ) {
-      throw new Error('カードの効果量が正しくありません。');
+      throw new Error('得点倍率と効果時間が正しくありません。');
     }
+  } else if (
+    !('amount' in effect) ||
+    !Number.isSafeInteger(effect.amount) ||
+    effect.amount <= 0 ||
+    effect.amount >
+      (effect.kind === 'beat-hearts' ? 3000 : effect.kind === 'excitement' ? 3000 : 100)
+  ) {
+    throw new Error('カードの効果量が正しくありません。');
   }
 }
 

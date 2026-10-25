@@ -36,7 +36,7 @@ describe('ライブの進行', () => {
   it('エネルギーが回復し、上限を超えない', () => {
     const empty = { ...game(), energy: 0 };
     expect(advanceTo(empty, 0.5).energy).toBe(1);
-    expect(advanceTo(empty, 0.6).energy).toBeGreaterThan(1);
+    expect(advanceTo(empty, 0.6).energy).toBe(1);
     expect(advanceTo(empty, 30).energy).toBe(10);
   });
 

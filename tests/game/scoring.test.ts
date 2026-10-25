@@ -44,7 +44,7 @@ describe('ハートと得点', () => {
   it('得点増加の効果が切れると倍率が戻る', () => {
     const base = game();
     const normal = act(addHearts(base, 10), { type: 'collect' });
-    const boosted = { ...base, boosts: [{ percent: 100n, untilTick: 60 }] };
+    const boosted = { ...base, boosts: [{ percent: 100, untilTick: 60 }] };
     expect(act(addHearts(boosted, 10), { type: 'collect' }).score).toBe(normal.score * 2n);
     const expired = advanceTo(boosted, 1);
     expect(expired.boosts).toHaveLength(0);

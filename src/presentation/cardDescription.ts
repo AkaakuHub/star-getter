@@ -1,4 +1,5 @@
 import { scoreUnits } from './score/units';
+import { describeAbilities } from './cards/describeAbilities';
 import type { Card, Effect } from '../domain/game/model';
 
 function describeEffect(effect: Effect): string {
@@ -20,6 +21,12 @@ function describeEffect(effect: Effect): string {
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':
       return '他の手札のスキルを一斉に使用する。必要APは他の手札の合計からデッキ枚数に応じた値を引いて決まり、このカードは使用後に除外される。';
+    case 'mood':
+      return `このパート中、空模様を晴れ方向へ${effect.amount}%変化させる。`;
+    case 'conditional':
+      return `空模様が晴れ100%のとき、${effect.effects.map(describeEffect).join('')}`;
+    case 'beat-hearts':
+      return `自然発生${effect.amount}回分のきらめきを獲得する。`;
     case 'hearts':
       return `スキルハートを${effect.amount}個獲得する。`;
     case 'energy':
@@ -44,12 +51,13 @@ function describeEffect(effect: Effect): string {
 export function describeCard(card: Card): string {
   const skill =
     card.effects.map(describeEffect).join('') +
+    describeAbilities(card) +
     (card.passive
       ? `手札にある間、スキルハート獲得数を+${card.passive.heartsPercent}%し、手札上限を${Math.abs(card.passive.handLimitDelta)}枚減少する。`
       : '');
   return card.relay
     ? skill +
-        `手札にある間、${card.relay.threshold}個以上を一度に回収したとき、ハートを${card.relay.hearts}個獲得する。この特性は再ドローで再発動できる。`
+        `手札にある間、${card.relay.threshold}個以上を一度に回収したとき、${card.relay.beats ? '自然発生' : 'ハートを'}${card.relay.hearts}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`
     : skill;
 }
 

@@ -20,10 +20,17 @@ export const costumeIds = [
 ] as const;
 export type CostumeId = (typeof costumeIds)[number];
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark';
+export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
-  | Readonly<{ kind: 'hearts' | 'energy' | 'stamina' | 'excitement'; amount: number }>
-  | Readonly<{ kind: 'boost'; multiplier: number; seconds: number }>
-  | Readonly<{ kind: 'amplify'; percent: number }>
+  | Readonly<{
+      kind: 'hearts' | 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
+      amount: number;
+      moodBonus?: MoodBonus;
+    }>
+  | Readonly<{ kind: 'boost'; multiplier: number; seconds: number; moodBonus?: MoodBonus }>
+  | Readonly<{ kind: 'amplify'; percent: number; moodBonus?: MoodBonus }>
+  | Readonly<{ kind: 'mood'; amount: number }>
+  | Readonly<{ kind: 'conditional'; condition: 'happy100'; effects: readonly Effect[] }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'shuffle' | 'use-hand' }>
@@ -34,6 +41,7 @@ export type Effect =
       percent: number;
       uses: number;
       condition: 'voltage20' | 'mental100';
+      moodBonus?: MoodBonus;
     }>
   | Readonly<{ kind: 'collect' }>;
 
@@ -44,11 +52,14 @@ export type Card = Readonly<{
   performer: PerformerId;
   cost: number;
   appeal: LoveGatherCardAppealParameters;
+  beatPoint: number;
   effects: readonly Effect[];
-  relay?: Readonly<{ threshold: number; hearts: number }>;
+  relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean }>;
   token?: TokenKind;
   drawPreference?: TokenKind;
-  passive?: Readonly<{ heartsPercent: number; handLimitDelta: number }>;
+  passive?: Readonly<{ heartsPercent: number; handLimitDelta: number; moodBonus?: MoodBonus }>;
+  drawAbility?: 'clock' | 'bookmark' | 'story' | 'library';
+  useAbility?: 'story-boost';
 }>;
 
 export type Section = Readonly<{
@@ -77,15 +88,15 @@ export type CardUse = Readonly<{
   handCount: number;
   cost: number;
 }>;
-export type Boost = Readonly<{ percent: bigint; untilTick: number }>;
+export type Boost = Readonly<{ percent: number; untilTick: number }>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina';
-  percent: bigint;
+  percent: number;
   uses: number;
 }>;
 export type Bloom = Readonly<{
   progress: bigint;
-  strength: bigint;
+  strength: number;
   rollback: Readonly<{ energy: number; stamina: number; excitement: number }>;
 }>;
 export type PlayStats = Readonly<{
@@ -111,6 +122,11 @@ export type GameState = Readonly<{
   nextDrawPreference: TokenKind | null;
   randomSeed: number;
   energy: number;
+  apIntervalFactor: number;
+  apTimerSeconds: number;
+  moodOffset: number;
+  costReductions: Readonly<Record<string, number>>;
+  storyAmplification: number;
   stamina: number;
   resting: boolean;
   excitement: number;
@@ -120,7 +136,7 @@ export type GameState = Readonly<{
   automaticHeart: AutomaticHeartState;
   heartRandomSeed: number;
   boosts: readonly Boost[];
-  amplification: bigint;
+  amplification: number;
   resourceBoosts: readonly ResourceBoost[];
   bloom: Bloom | null;
   relayUsed: readonly string[];
@@ -144,7 +160,6 @@ export const rules = {
   handSize: 5,
   deckSize: 9,
   maxEnergy: 10,
-  actionCooldownTicks: 6,
   comboWindowTicks: 120,
   maxScore: 9999n * 10n ** 68n,
 } as const;

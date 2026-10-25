@@ -1,3 +1,4 @@
+import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { cardCost } from './cards/cost';
 import { type Card, type GameState, type Section, rules } from './model';
 
@@ -20,7 +21,11 @@ export function cardAt(state: GameState, index: number): Card {
 }
 
 export function canActivateBloom(state: GameState): boolean {
-  return sectionAt(state).moodValue <= -100;
+  return moodValue(state) <= -100;
+}
+
+export function moodValue(state: GameState): number {
+  return Math.max(-100, Math.min(100, sectionAt(state).moodValue + state.moodOffset));
 }
 
 export function canUseCard(state: GameState, index: number): boolean {
@@ -32,7 +37,11 @@ export function canUseCard(state: GameState, index: number): boolean {
     (canActivateBloom(state) ||
       !cardAt(state, index).effects.some((effect) => effect.kind === 'bloom')) &&
     !state.resting &&
-    state.tick - state.lastActionTick >= rules.actionCooldownTicks &&
+    state.tick - state.lastActionTick >=
+      Math.ceil(
+        calculateStarGatherBaseSkillCooldownSeconds(Math.round(durationSeconds(state) * 1000)) *
+          rules.ticksPerSecond,
+      ) &&
     (state.bloom !== null || state.energy >= cardCost(state, cardAt(state, index)))
   );
 }

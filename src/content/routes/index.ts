@@ -33,12 +33,14 @@ export const routes: Readonly<Record<RouteId, Route>> = {
           name: '書架の招待状',
           cost: 8,
           drawPreference: 'ensemble',
+          drawAbility: 'library',
           effects: [{ kind: 'tokens', token: 'ensemble', count: 3 }],
         };
       if (card.id === 'sunrise')
         return {
           ...card,
           cost: 8,
+          useAbility: 'story-boost',
           effects: [
             { kind: 'tokens', token: 'story', count: 8 },
             { kind: 'tokens', token: 'clock', count: 1 },
@@ -54,7 +56,14 @@ export const routes: Readonly<Record<RouteId, Route>> = {
     tokens: [],
     deck: resolveDeck(defaultDeckIds).map((card): Card =>
       card.id === 'ripple'
-        ? { ...card, passive: { heartsPercent: 300, handLimitDelta: -3 } }
+        ? {
+            ...card,
+            passive: {
+              heartsPercent: 300,
+              handLimitDelta: -3,
+              moodBonus: { target: 2, perPoint: 1.5 },
+            },
+          }
         : card,
     ),
   },

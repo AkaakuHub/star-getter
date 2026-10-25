@@ -1,3 +1,4 @@
+import { voltageLevel, voltageProgress } from '../../domain/game/live/voltageLevel';
 import { Flower2, Heart, Sparkles, Zap } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import { type GameState, rules } from '../../domain/game/model';
@@ -16,7 +17,7 @@ export function LiveHud({
   const lead = state.deck[0];
   if (!lead) throw new Error('センターカードがありません。');
   const seconds = state.tick / rules.ticksPerSecond;
-  const voltage = Math.floor(state.excitement / 2);
+  const voltage = voltageLevel(state.excitement);
   const CollectIcon = state.bloom ? Flower2 : Heart;
   return (
     <>
@@ -85,13 +86,13 @@ export function LiveHud({
         role="progressbar"
         aria-label="ボルテージ"
         aria-valuemin={0}
-        aria-valuemax={50}
+        aria-valuemax={1000}
         aria-valuenow={voltage}
       >
         <span>VOLTAGE</span>
         <strong>{voltage}</strong>
         <div>
-          <i style={{ width: state.excitement + '%' }} />
+          <i style={{ width: voltageProgress(state.excitement) + '%' }} />
         </div>
       </div>
       <div
@@ -134,7 +135,7 @@ export function LiveHud({
         </div>
       )}
       <div className="live-amplification">
-        スキル効果+{formatScore(state.amplification - 100n)}%
+        スキル効果+{(state.amplification - 100).toLocaleString('ja-JP')}%
       </div>
     </>
   );

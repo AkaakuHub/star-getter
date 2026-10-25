@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'preact/hooks';
 import { type GameState, rules } from '../../domain/game/model';
-import { durationSeconds, sectionAt } from '../../domain/game/projection';
+import { durationSeconds, moodValue } from '../../domain/game/projection';
 import { liveLayout } from './layout';
 import { paintMoodGraph } from './paintMoodGraph';
 
 export function MoodGraph({ state }: Readonly<{ state: GameState }>) {
   const ref = useRef<HTMLCanvasElement>(null);
   const { track } = state;
-  const mood = sectionAt(state).moodValue;
+  const mood = moodValue(state);
   const progress = Math.min(1, state.tick / rules.ticksPerSecond / durationSeconds(state));
   useEffect(() => {
     const canvas = ref.current;

@@ -1,3 +1,5 @@
+import { applyEffect } from './effects';
+import { fillHand, shuffleHand } from './cards/drawing';
 import { type GameState, rules } from './model';
 import { collectionScore, limitValue } from './scoring';
 import { collectLoveGatherHeartRuntime, advanceLoveGatherHeartRuntime } from './live/heartRuntime';
@@ -51,11 +53,39 @@ export function collectHearts(state: GameState): GameState {
       card.relay &&
       collected.collectCount >= card.relay.threshold,
   );
-  const generated = relays.reduce((sum, card) => sum + (card.relay?.hearts ?? 0), 0);
-  return addHearts(
-    { ...next, relayUsed: [...next.relayUsed, ...relays.map((card) => card.id)] },
-    generated,
+  let triggered: GameState = {
+    ...next,
+    relayUsed: [...next.relayUsed, ...relays.map((card) => card.id)],
+  };
+  for (const card of relays) {
+    const relay = card.relay;
+    if (!relay) throw new Error('回収能力がありません。');
+    triggered = applyEffect(
+      triggered,
+      { kind: relay.beats ? 'beat-hearts' : 'hearts', amount: relay.hearts },
+      card,
+    );
+  }
+  const tokenReactions = state.deck.filter(
+    (card) =>
+      state.hand.includes(card.id) &&
+      !state.relayUsed.includes(card.id) &&
+      state.deck.length >= 95 &&
+      collected.collectCount >= 500_000 &&
+      (card.token === 'story' || card.token === 'bookmark'),
   );
+  for (const card of tokenReactions) {
+    triggered = { ...triggered, relayUsed: [...triggered.relayUsed, card.id] };
+    triggered =
+      card.token === 'story'
+        ? applyEffect(
+            triggered,
+            { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
+            card,
+          )
+        : fillHand(shuffleHand(triggered));
+  }
+  return triggered;
 }
 
 export function addHearts(state: GameState, count: number): GameState {

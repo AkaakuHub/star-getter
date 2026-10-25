@@ -16,6 +16,38 @@ function game() {
 }
 
 describe('開花とスキルの相乗効果', () => {
+  it('増幅と元気の回復を開花前に準備したときだけ、発動時の強度と条件付き増幅が上がる', () => {
+    const base = { ...advanceTo(game(), 6), excitement: 200001 };
+    const prepare = (state: typeof base) =>
+      applyEffect(
+        applyEffect(state, {
+          kind: 'amplify',
+          percent: 50,
+          moodBonus: { target: 2, perPoint: 0.25 },
+        }),
+        { kind: 'stamina', amount: 24 },
+      );
+    const prepared = applyEffect(prepare(base), { kind: 'bloom', strength: 3.5 });
+    const reversed = prepare(applyEffect(base, { kind: 'bloom', strength: 3.5 }));
+    expect(prepared.amplification).toBe(162.5);
+    expect(prepared.bloom?.strength).toBe(5.6875);
+    expect(reversed.bloom?.strength).toBe(3.5);
+    const ability = {
+      kind: 'resource-boost',
+      target: 'stamina',
+      percent: 300,
+      uses: 3,
+      condition: 'mental100',
+    } as const;
+    expect(applyEffect(prepared, ability).resourceBoosts).toHaveLength(1);
+    expect(applyEffect(reversed, ability).resourceBoosts).toHaveLength(0);
+    const recover = { kind: 'energy', amount: 13 } as const;
+    const preparedGain =
+      (applyEffect(prepared, recover).bloom?.progress ?? 0n) - (prepared.bloom?.progress ?? 0n);
+    const reversedGain =
+      (applyEffect(reversed, recover).bloom?.progress ?? 0n) - (reversed.bloom?.progress ?? 0n);
+    expect(preparedGain).toBeGreaterThan(reversedGain);
+  });
   for (const mood of [-99, 0, 100]) {
     it(`ムード${mood}%ではAPが足りていても開花を使用・発動できない`, () => {
       const base = game();
@@ -30,7 +62,7 @@ describe('開花とスキルの相乗効果', () => {
       expect(index).toBeGreaterThanOrEqual(0);
       expect(canUseCard(state, index)).toBe(false);
       expect(act(state, { type: 'card', index })).toBe(state);
-      expect(activateBloom(state, 100n)).toBe(state);
+      expect(activateBloom(state, 1)).toBe(state);
     });
   }
 
@@ -51,25 +83,25 @@ describe('開花とスキルの相乗効果', () => {
   it('増幅を重ね、後続の効果に適用し、次のライブには引き継がない', () => {
     let state = applyEffect(game(), { kind: 'amplify', percent: 50 });
     state = applyEffect(state, { kind: 'amplify', percent: 50 });
-    expect(state.amplification).toBe(200n);
+    expect(state.amplification).toBe(200);
     state = applyEffect({ ...state, energy: 0 }, { kind: 'energy', amount: 4 });
     expect(state.energy).toBe(8);
-    expect(game().amplification).toBe(100n);
+    expect(game().amplification).toBe(100);
   });
 
   it('AP・メンタル・ボルテージを専用ゲージへ変換し、元の値を復元する', () => {
     const base = { ...advanceTo(game(), 6), energy: 0, excitement: 40, stamina: 80 };
-    const active = activateBloom(base, 100n);
-    expect(active.bloom?.progress).toBe(120n);
+    const active = activateBloom(base, 1);
+    expect(active.bloom?.progress).toBe(30n);
     expect(canUseCard(active, 0)).toBe(true);
     let changed = changeBloomResource(active, 'energy', 9n);
-    expect(changed.bloom?.progress).toBe(123n);
+    expect(changed.bloom?.progress).toBe(33n);
     changed = changeBloomResource(changed, 'stamina', 100n);
-    expect(changed.bloom?.progress).toBe(143n);
+    expect(changed.bloom?.progress).toBe(53n);
     changed = changeBloomResource(changed, 'excitement', 2n);
-    expect(changed.bloom?.progress).toBe(153n);
+    expect(changed.bloom?.progress).toBe(63n);
     changed = changeBloomResource(changed, 'energy', -4n);
-    expect(changed.bloom?.progress).toBe(151n);
+    expect(changed.bloom?.progress).toBe(61n);
     expect(changed.energy).toBe(0);
     expect(changed.stamina).toBe(80);
     expect(changed.excitement).toBe(40);
@@ -82,7 +114,7 @@ describe('開花とスキルの相乗効果', () => {
 
   it('AP回復の効果増幅はFloat32計算後に端数を切り上げる', () => {
     const state = applyEffect(
-      { ...game(), energy: 0, amplification: 150n },
+      { ...game(), energy: 0, amplification: 150 },
       { kind: 'energy', amount: 3 },
     );
     expect(state.energy).toBe(5);
@@ -98,7 +130,7 @@ describe('開花とスキルの相乗効果', () => {
     } as const;
     expect(applyEffect(game(), effect).resourceBoosts).toHaveLength(0);
     let state = applyEffect(
-      activateBloom({ ...advanceTo(game(), 6), excitement: 40 }, 100n),
+      activateBloom({ ...advanceTo(game(), 6), excitement: 200001 }, 1),
       effect,
     );
     state = applyEffect(state, { kind: 'stamina', amount: 1 });
@@ -108,16 +140,17 @@ describe('開花とスキルの相乗効果', () => {
     expect(state.resourceBoosts).toHaveLength(0);
   });
 
-  it('回収特性は手札内で一度だけ発動し、空押しで得点を増やさない', () => {
+  it('回収特性は3000個に達したときだけ発動し、同じ手札では一度だけ発動する', () => {
     const base = game();
     const relay = base.deck.find((card) => card.id === 'spark');
     if (!relay) throw new Error('回収特性のカードがありません。');
-    const state = { ...base, hand: [relay.id] };
-    const first = act(addHearts(state, 3), { type: 'collect' });
-    expect(heartCount(first)).toBe(6);
+    const state = { ...base, hand: [relay.id], hearts: { ...base.hearts, heartLimit: 10000 } };
+    const small = act(addHearts(state, 2999), { type: 'collect' });
+    expect(heartCount(small)).toBe(0);
+    const first = act(addHearts(state, 3000), { type: 'collect' });
+    expect(heartCount(first)).toBeGreaterThanOrEqual(3000);
     const second = act(first, { type: 'collect' });
     expect(heartCount(second)).toBe(0);
-    expect(second.combo).toBe(2);
     expect(act(second, { type: 'collect' })).toBe(second);
   });
 

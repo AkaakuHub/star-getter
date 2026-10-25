@@ -7,12 +7,13 @@ export const baseCards: readonly Card[] = [
     costume: 'star',
     performer: 'nova',
     cost: 3,
+    beatPoint: 100,
     appeal: { smile: 125, pure: 125, cool: 125 },
     effects: [
-      { kind: 'bloom', strength: 100 },
+      { kind: 'bloom', strength: 3.5 },
       { kind: 'hearts', amount: 8 },
     ],
-    relay: { threshold: 3, hearts: 6 },
+    relay: { threshold: 3000, hearts: 3000, beats: true },
   },
   {
     id: 'flare',
@@ -20,12 +21,12 @@ export const baseCards: readonly Card[] = [
     costume: 'moon',
     performer: 'nova',
     cost: 4,
+    beatPoint: 100,
     appeal: { smile: 135, pure: 135, cool: 135 },
     effects: [
       { kind: 'excitement', amount: 40 },
       { kind: 'boost', multiplier: 2, seconds: 30 },
     ],
-    relay: { threshold: 6, hearts: 3 },
   },
   {
     id: 'sunrise',
@@ -33,9 +34,10 @@ export const baseCards: readonly Card[] = [
     costume: 'blossom',
     performer: 'nova',
     cost: 2,
+    beatPoint: 100,
     appeal: { smile: 145, pure: 145, cool: 145 },
     effects: [
-      { kind: 'amplify', percent: 50 },
+      { kind: 'amplify', percent: 50, moodBonus: { target: 2, perPoint: 0.25 } },
       { kind: 'boost', multiplier: 2, seconds: 30 },
       { kind: 'hearts', amount: 4 },
     ],
@@ -46,6 +48,7 @@ export const baseCards: readonly Card[] = [
     costume: 'encore',
     performer: 'nova',
     cost: 2,
+    beatPoint: 100,
     appeal: { smile: 110, pure: 110, cool: 110 },
     effects: [
       { kind: 'energy', amount: 3 },
@@ -59,9 +62,10 @@ export const baseCards: readonly Card[] = [
     costume: 'sailor',
     performer: 'lumen',
     cost: 3,
+    beatPoint: 100,
     appeal: { smile: 115, pure: 115, cool: 115 },
     effects: [
-      { kind: 'hearts', amount: 30 },
+      { kind: 'beat-hearts', amount: 300, moodBonus: { target: 2, perPoint: 1.5 } },
       { kind: 'energy', amount: 13 },
       {
         kind: 'resource-boost',
@@ -69,6 +73,7 @@ export const baseCards: readonly Card[] = [
         percent: 300,
         uses: 3,
         condition: 'voltage20',
+        moodBonus: { target: 2, perPoint: 1.5 },
       },
       {
         kind: 'resource-boost',
@@ -76,6 +81,7 @@ export const baseCards: readonly Card[] = [
         percent: 300,
         uses: 3,
         condition: 'mental100',
+        moodBonus: { target: 2, perPoint: 1.5 },
       },
     ],
   },
@@ -85,6 +91,7 @@ export const baseCards: readonly Card[] = [
     costume: 'witch',
     performer: 'lumen',
     cost: 4,
+    beatPoint: 100,
     appeal: { smile: 130, pure: 130, cool: 130 },
     effects: [
       { kind: 'hearts', amount: 6 },
@@ -92,7 +99,6 @@ export const baseCards: readonly Card[] = [
       { kind: 'excitement', amount: 22 },
       { kind: 'stamina', amount: 15 },
     ],
-    relay: { threshold: 3, hearts: 9 },
   },
   {
     id: 'prism',
@@ -100,9 +106,10 @@ export const baseCards: readonly Card[] = [
     costume: 'prism',
     performer: 'lumen',
     cost: 2,
+    beatPoint: 100,
     appeal: { smile: 140, pure: 140, cool: 140 },
     effects: [
-      { kind: 'amplify', percent: 50 },
+      { kind: 'amplify', percent: 50, moodBonus: { target: 2, perPoint: 0.25 } },
       { kind: 'stamina', amount: 24 },
     ],
   },
@@ -112,12 +119,12 @@ export const baseCards: readonly Card[] = [
     costume: 'snow',
     performer: 'lumen',
     cost: 2,
+    beatPoint: 100,
     appeal: { smile: 105, pure: 105, cool: 105 },
     effects: [
       { kind: 'stamina', amount: 12 },
       { kind: 'hearts', amount: 2 },
     ],
-    relay: { threshold: 3, hearts: 3 },
   },
   {
     id: 'bounce',
@@ -125,13 +132,13 @@ export const baseCards: readonly Card[] = [
     costume: 'sunny',
     performer: 'tetra',
     cost: 3,
+    beatPoint: 100,
     appeal: { smile: 120, pure: 120, cool: 120 },
     effects: [
       { kind: 'hearts', amount: 12 },
       { kind: 'energy', amount: 3 },
       { kind: 'excitement', amount: 10 },
     ],
-    relay: { threshold: 3, hearts: 6 },
   },
   {
     id: 'orbit',
@@ -139,12 +146,12 @@ export const baseCards: readonly Card[] = [
     costume: 'space',
     performer: 'tetra',
     cost: 2,
+    beatPoint: 100,
     appeal: { smile: 110, pure: 110, cool: 110 },
     effects: [
       { kind: 'energy', amount: 6 },
       { kind: 'stamina', amount: 10 },
     ],
-    relay: { threshold: 6, hearts: 3 },
   },
   {
     id: 'comet',
@@ -152,6 +159,7 @@ export const baseCards: readonly Card[] = [
     costume: 'march',
     performer: 'tetra',
     cost: 5,
+    beatPoint: 100,
     appeal: { smile: 150, pure: 150, cool: 150 },
     effects: [{ kind: 'hearts', amount: 20 }, { kind: 'collect' }],
   },
@@ -161,9 +169,10 @@ export const baseCards: readonly Card[] = [
     costume: 'ribbon',
     performer: 'tetra',
     cost: 3,
+    beatPoint: 100,
     appeal: { smile: 125, pure: 125, cool: 125 },
     effects: [
-      { kind: 'amplify', percent: 50 },
+      { kind: 'amplify', percent: 50, moodBonus: { target: 2, perPoint: 0.25 } },
       { kind: 'excitement', amount: 12 },
       { kind: 'stamina', amount: 10 },
     ],

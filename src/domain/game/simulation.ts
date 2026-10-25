@@ -1,3 +1,7 @@
+import { advanceStarGatherApGauge } from './live/apGauge';
+import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
+import { applyDrawAbility } from './cards/drawAbilities';
+import { beatHeartCount } from './beat';
 import { validateDeck, validateCard, shuffle } from './deck';
 import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
 import { advanceAutomaticHeart } from './live/automaticHeart';
@@ -43,6 +47,11 @@ export function createGame(
     nextDrawPreference: null,
     randomSeed: shuffled.seed,
     energy: 10,
+    apIntervalFactor: 1,
+    apTimerSeconds: 0,
+    moodOffset: 0,
+    costReductions: {},
+    storyAmplification: 0,
     stamina: 100,
     resting: false,
     excitement: 0,
@@ -57,13 +66,17 @@ export function createGame(
     heartRandomSeed: seed,
     automaticHeart: { enabled: true, timerSeconds: 0 },
     boosts: [],
-    amplification: 100n,
+    amplification: 100,
     resourceBoosts: [],
     bloom: null,
     relayUsed: [],
     combo: 0,
     lastCollectTick: -rules.comboWindowTicks - 1,
-    lastActionTick: -rules.actionCooldownTicks,
+    lastActionTick: -Math.ceil(
+      calculateStarGatherBaseSkillCooldownSeconds(
+        Math.round(((track.beats * 60) / track.bpm) * 1000),
+      ) * rules.ticksPerSecond,
+    ),
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],
@@ -77,7 +90,12 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  return fillHand(initial);
+  const drawn = initial.hand.reduce((next, id) => {
+    const card = next.deck.find((item) => item.id === id);
+    if (!card) throw new Error('開始時の手札がありません。');
+    return applyDrawAbility(next, card);
+  }, initial);
+  return fillHand(drawn);
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {
@@ -103,37 +121,50 @@ function advanceTick(state: GameState): GameState {
       ? Math.min(100, state.stamina + 4 * dt)
       : Math.max(0, state.stamina - 0.9 * dt);
   const resting = state.resting ? stamina < 40 : stamina <= 0;
+  const ap = advanceStarGatherApGauge(
+    {
+      currentAp: state.bloom ? 0 : Math.floor(state.energy),
+      maxAp: rules.maxEnergy,
+      timerSeconds: state.apTimerSeconds,
+    },
+    {
+      deltaTimeSeconds: dt,
+      mentalDown: resting,
+      increaseIntervalSeconds:
+        state.apIntervalFactor * (rules.energyTicksPerPoint / rules.ticksPerSecond),
+    },
+  );
   let next: GameState = advanceHearts({
     ...state,
     tick,
     stamina,
     resting,
-    energy: state.bloom
-      ? state.energy
-      : Math.min(
-          rules.maxEnergy,
-          (Math.round(state.energy * rules.energyTicksPerPoint) + (resting ? 0 : 1)) /
-            rules.energyTicksPerPoint,
-        ),
+    energy: state.bloom ? state.energy : ap.state.currentAp,
+    apTimerSeconds: ap.state.timerSeconds,
     excitement: state.bloom ? state.excitement : Math.min(100, state.excitement + dt * 0.25),
     cardUses: state.cardUses.filter((use) => tick - use.tick < rules.ticksPerSecond),
     combo: tick - state.lastCollectTick > rules.comboWindowTicks ? 0 : state.combo,
     boosts: state.boosts.filter((boost) => boost.untilTick > tick),
   });
-  if (next.bloom && tick % rules.energyTicksPerPoint === 0)
-    next = changeBloomResource(next, 'energy', 1n);
+  if (next.bloom && ap.state.currentAp > 0) {
+    const progress = next.bloom.progress;
+    const increased = changeBloomResource(next, 'energy', 1n);
+    if (!increased.bloom) throw new Error('開花ゲージがありません。');
+    next = {
+      ...increased,
+      bloom: {
+        ...increased.bloom,
+        progress: progress + (increased.bloom.progress - progress) * BigInt(ap.state.currentAp),
+      },
+    };
+  }
   const previousBeat = Math.floor((state.tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   const beat = Math.floor((tick * state.track.bpm) / (60 * rules.ticksPerSecond));
   if (beat !== previousBeat && beat % 2 === 0 && !resting) {
-    const section = sectionAt(next);
-    const moodPerformer = { warm: 'nova', cool: 'lumen', bright: 'tetra' } as const;
-    const affinity = state.deck.filter(
-      (card) => card.performer === moodPerformer[section.mood],
-    ).length;
-    const count = 1 + Math.floor(affinity / 3) + (section.climax ? 1 : 0);
-    next = addHearts(next, stamina >= 30 ? count : 1);
+    next = addHearts(next, beatHeartCount(next));
   }
-  if (sectionAt(next) !== sectionAt(state)) next = fillHand({ ...next, handLimit: rules.handSize });
+  if (sectionAt(next) !== sectionAt(state))
+    next = fillHand({ ...next, handLimit: rules.handSize, moodOffset: 0, apIntervalFactor: 1 });
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
   return automatic.shouldCollect ? collectHearts(next) : next;

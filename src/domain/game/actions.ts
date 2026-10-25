@@ -1,3 +1,4 @@
+import { moodValue } from './projection';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type GameState, rules } from './model';
 import { applyEffect, changeResource } from './effects';
@@ -54,8 +55,29 @@ function useCard(state: GameState, index: number): GameState {
       ],
     };
     next = retireCard(next, card);
+    if (card.useAbility === 'story-boost') {
+      const count = next.deck.length;
+      const percent =
+        count >= 100
+          ? 1001
+          : count >= 80
+            ? 700
+            : count >= 60
+              ? 500
+              : count >= 40
+                ? 300
+                : count >= 20
+                  ? 200
+                  : 100;
+      next = {
+        ...next,
+        storyAmplification: Math.fround(
+          next.storyAmplification + percent + Math.max(0, moodValue(next)) * percent * 0.005,
+        ),
+      };
+    }
     for (const effect of card.effects)
-      if (effect.kind !== 'use-hand') next = applyEffect(next, effect);
+      if (effect.kind !== 'use-hand') next = applyEffect(next, effect, card);
   }
   return fillHand(next);
 }
@@ -82,7 +104,7 @@ function useSpecial(state: GameState): GameState {
         boosts: [
           ...state.boosts,
           {
-            percent: (80n * state.amplification) / 100n,
+            percent: (80 * state.amplification) / 100,
             untilTick: state.tick + 8 * rules.ticksPerSecond,
           },
         ],

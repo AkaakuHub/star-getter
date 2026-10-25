@@ -34,14 +34,14 @@ describe('ラブギャザーの回収得点', () => {
   });
 
   it('回収数×ボルテージによるハートランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 20 }, 10, false)).toBe(45000n);
+    expect(collectionScore({ ...game(), excitement: 601 }, 10, false)).toBe(45000n);
   });
 
   it('LOVE増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
     const base = game();
     const boosts = [
-      { percent: 100n, untilTick: 100 },
-      { percent: 100n, untilTick: 100 },
+      { percent: 100, untilTick: 100 },
+      { percent: 100, untilTick: 100 },
     ];
     expect(collectionScore({ ...base, boosts }, 10, false)).toBe(67500n);
     expect(
@@ -50,7 +50,7 @@ describe('ラブギャザーの回収得点', () => {
           ...base,
           bloom: {
             progress: 4n,
-            strength: 100n,
+            strength: 1,
             rollback: { energy: 10, stamina: 100, excitement: 0 },
           },
         },
@@ -81,7 +81,7 @@ describe('ラブギャザーの回収得点', () => {
 
   it('1回の通常回収は本家の既定上限を適用する', () => {
     expect(calculateLoveGatherAddScoreMax(100, [])).toBe(2147483647n);
-    const huge = { ...game(), boosts: [{ percent: 10n ** 20n, untilTick: 100 }] };
+    const huge = { ...game(), boosts: [{ percent: 10 ** 20, untilTick: 100 }] };
     expect(collectionScore(huge, 100, false)).toBe(2147483647n);
   });
 });

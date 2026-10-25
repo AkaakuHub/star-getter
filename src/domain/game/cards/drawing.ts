@@ -1,3 +1,4 @@
+import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
 import type { GameState } from '../model';
 
@@ -6,11 +7,12 @@ function handLimit(state: GameState): number {
     (sum, card) => sum + (state.hand.includes(card.id) ? (card.passive?.handLimitDelta ?? 0) : 0),
     0,
   );
-  return Math.max(3, Math.min(8, state.handLimit + penalty));
+  return Math.max(1, Math.min(8, state.handLimit + penalty));
 }
 
 export function fillHand(state: GameState): GameState {
   let next = state;
+
   while (next.hand.length < handLimit(next)) {
     if (!next.drawPile.length) {
       if (!next.discard.length) break;
@@ -30,6 +32,9 @@ export function fillHand(state: GameState): GameState {
       drawPile: next.drawPile.filter((id) => id !== drawn),
       relayUsed: next.relayUsed.filter((id) => id !== drawn),
     };
+    const card = next.deck.find((item) => item.id === drawn);
+    if (!card) throw new Error('引いたカードがありません。');
+    next = applyDrawAbility(next, card);
   }
   const limit = handLimit(next);
   if (next.hand.length > limit) {
