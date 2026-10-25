@@ -12,7 +12,7 @@ import { voltageLevel } from './live/voltageLevel';
 import { activateBloom } from './bloom';
 import { collectHearts } from './hearts';
 import { type Card, type Effect, type GameState } from './model';
-import { requestTokens } from './cards/tokens';
+import { applyTokenCardEffect, requestTokens } from './cards/tokens';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
@@ -38,7 +38,6 @@ import { activateComboInduce } from './effects/comboInduce';
 import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
 import { activateAdditionalHeartInduce } from './effects/additionalHeart';
 export { skillValue } from './effects/skillValue';
-
 export function applyEffect(
   state: GameState,
   effect: Effect,
@@ -132,6 +131,8 @@ export function applyEffect(
       return createHeartsFromEffect(state, value(effect.amount), card, true);
     case 'tokens':
       return requestTokens(state, effect.token, effect.count, card?.id ?? null, effect.seriesIds);
+    case 'token-card':
+      return applyTokenCardEffect(state, effect, card?.id ?? null);
     case 'token-boost': {
       const base = Math.fround(
         (Math.fround(effect.num / 10_000) + (effect.addValue ?? 0) + addValue) * multiplier,

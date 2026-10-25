@@ -1,3 +1,4 @@
+import type { TokenCardEffect } from './tokenRequestTypes';
 import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
@@ -5,7 +6,6 @@ import type { StopVoltageIncreaseEffect, VoltageConvertEffect } from './voltageC
 import type { Action52BuffEffect } from './skillBoostTypes';
 import type { MentalHeartInduceEffect } from './mentalHeartInduceTypes';
 import type { AdditionalHeartInduceEffect } from './additionalHeartTypes';
-
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
   gauge: 'ap' | 'voltage' | 'mental';
@@ -212,7 +212,6 @@ type ProxyForcedActivationEffect = Readonly<{
   kind: 'proxy-skill-forced-activation';
   targetType: 1 | 2 | 3 | 4 | 5;
 }>;
-
 type EffectShape =
   | Readonly<{
       kind: 'branch';
@@ -297,6 +296,7 @@ type EffectShape =
   | VoltageConvertEffect
   | MentalHeartInduceEffect
   | AdditionalHeartInduceEffect
+  | TokenCardEffect
   | ComboInduceEffect
   | Action52BuffEffect
   | ResetSpecial
@@ -347,6 +347,4 @@ type EffectShape =
   | ProxySkillEffect
   | ProxyForcedActivationEffect;
 export type Effect = EffectShape &
-  Readonly<{
-    parameterDetails?: Readonly<Record<string, ParameterDetailValue>>;
-  }>;
+  Readonly<{ parameterDetails?: Readonly<Record<string, ParameterDetailValue>> }>;

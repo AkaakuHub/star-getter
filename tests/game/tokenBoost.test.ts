@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import {
   beginTokenGeneration,
   finishTokenGeneration,
+  requestTokenCard,
   requestTokens,
 } from '../../src/domain/game/cards/tokens';
 import { applyEffect } from '../../src/domain/game/effects';
@@ -104,4 +105,55 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
   const generated = requestTokens(boosted, 'story', 2, source.id);
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(4);
   expect(generated.tokenBoosts).toHaveLength(0);
+});
+
+it('ActionType28は指定したトークンカードを直接追加し、データ項目を保つ', () => {
+  const initial = game('library');
+  const template = initial.tokenCatalog.find((card) => card.token === 'story');
+  if (!template) throw new Error('トークンカードがありません。');
+  const customized = {
+    ...initial,
+    tokenCatalog: initial.tokenCatalog.map((card) =>
+      card.id === template.id ? { ...card, id: 'action28-template', style: 2 as const } : card,
+    ),
+  };
+  const generated = applyEffect(
+    customized,
+    { kind: 'token-card', templateId: 'action28-template', count: 2, seriesIds: [42] },
+    undefined,
+  );
+  const added = generated.deck.filter((card) => card.id.startsWith('action28-template-'));
+  expect(added).toHaveLength(2);
+  expect(added.every((card) => card.style === 2)).toBe(true);
+  expect(generated.drawPile.filter((id) => id.startsWith('action28-template-'))).toHaveLength(2);
+});
+
+it('ActionType28は同一スキル内で指定カードを増幅後に交互追加する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const template = initial.tokenCatalog.find((card) => card.token === 'story');
+  if (!source || !template) throw new Error('カードがありません。');
+  const customized = {
+    ...initial,
+    tokenCatalog: initial.tokenCatalog.map((card) =>
+      card.id === template.id ? { ...card, id: 'action28-template' } : card,
+    ),
+  };
+  const boosted = applyEffect(
+    customized,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: 10_000,
+      target: { kind: 'member', member: source.member },
+      seriesIds: [42],
+      uses: 1,
+    },
+    source,
+  );
+  let state = beginTokenGeneration(boosted, source.id);
+  state = requestTokenCard(state, 'action28-template', 2, source.id, [42]);
+  state = finishTokenGeneration(state, source.id);
+  expect(state.deck.filter((card) => card.id.startsWith('action28-template-'))).toHaveLength(2);
+  expect(state.tokenBoosts).toHaveLength(0);
 });

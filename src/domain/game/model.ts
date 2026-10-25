@@ -14,6 +14,7 @@ import type { Action52Buff } from './skillBoostTypes';
 import type { MentalHeartInducer } from './mentalHeartInduceTypes';
 import type { ComboInducer } from './comboInduceTypes';
 import type { AdditionalHeartInducer } from './additionalHeartTypes';
+import type { TokenRequest } from './tokenRequestTypes';
 import type {
   GaugeInfinity,
   GaugeRegeneration,
@@ -192,11 +193,7 @@ export type GameState = Readonly<{
   nextTokenId: number;
   tokenGroups: readonly Readonly<{
     sourceId: string;
-    requests: readonly Readonly<{
-      token: TokenKind;
-      count: number;
-      seriesIds?: readonly number[];
-    }>[];
+    requests: readonly TokenRequest[];
   }>[];
   tokenBoosts: readonly TokenBoost[];
   handLimit: number;

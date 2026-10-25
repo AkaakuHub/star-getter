@@ -1,10 +1,5 @@
-import type { Card, GameState, TokenBoost, TokenKind } from '../model';
-
-type TokenRequest = Readonly<{
-  token: TokenKind;
-  count: number;
-  seriesIds?: readonly number[];
-}>;
+import type { Card, GameState, TokenBoost } from '../model';
+import type { TokenRequest } from '../tokenRequestTypes';
 
 function matches(boost: TokenBoost, source: Card | undefined, request: TokenRequest): boolean {
   const target = boost.target;

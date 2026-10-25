@@ -1,6 +1,6 @@
+import { validateTokenCardEffect } from './tokenRequestTypes';
 import { type Card, type Effect, costumeIds, rules } from './model';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
-
 export function validateDeck(deck: readonly Card[]): void {
   if (
     deck.length < 3 ||
@@ -13,7 +13,6 @@ export function validateDeck(deck: readonly Card[]): void {
     validateCard(card);
   }
 }
-
 export function validateCard(card: Card): void {
   if (
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(card.id) ||
@@ -58,7 +57,6 @@ export function validateCard(card: Card): void {
       validateEffect(effect);
   }
 }
-
 function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
@@ -117,6 +115,10 @@ function validateEffect(effect: Effect): void {
   if (effect.kind === 'tokens') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('追加カードの枚数が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'token-card') {
+    validateTokenCardEffect(effect);
     return;
   }
   if (effect.kind === 'token-boost') {
