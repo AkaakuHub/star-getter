@@ -27,6 +27,7 @@ export function finishCardActivation(state: GameState): GameState {
     ...next,
     lastUsedMember: source.member,
     lastUsedUnit: source.unit,
+    lastUsedSkillIcon: source.skillIcon ?? null,
     drawContext: 'skill',
   });
   next = disposeHandEffects(next, [source.id]);

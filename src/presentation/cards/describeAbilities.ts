@@ -60,10 +60,27 @@ export function describeAbilities(card: Card): string {
         '14回使用後、このカードを除外し、このライブ中、元気が0%でも休憩しない。元気を1000%減らし、熱気を655000001に変更する。';
       break;
   }
-  if (card.drawRule?.unit === 1)
+  if (
+    card.drawRules?.some(
+      (rule) =>
+        rule.condition.kind === 'unit' &&
+        rule.condition.value === 1 &&
+        rule.negated &&
+        rule.weight === 0,
+    )
+  )
     text +=
       '潮の便り・空のはじまり・港の待ち合わせ・船出の合図・追い風使用後だけ山札から引くことができる。';
-  if (card.drawRule?.unit === 2 && card.token !== 'shadow')
+  if (
+    card.drawRules?.some(
+      (rule) =>
+        rule.condition.kind === 'unit' &&
+        rule.condition.value === 2 &&
+        rule.negated &&
+        rule.weight === 0,
+    ) &&
+    card.token !== 'shadow'
+  )
     text += '雨音の反響・凍空の鼓動使用後だけ山札から引くことができる。';
   if (
     card.token === 'story' ||

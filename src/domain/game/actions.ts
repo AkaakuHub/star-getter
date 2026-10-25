@@ -57,6 +57,7 @@ function activateCard(
     lastPerformer: card.performer,
     lastUsedMember: card.member,
     lastUsedUnit: card.unit,
+    lastUsedSkillIcon: card.skillIcon ?? null,
     drawContext: 'skill',
     cardUseCounts: { ...state.cardUseCounts, [card.id]: (state.cardUseCounts[card.id] ?? 0) + 1 },
     lastCardName: card.name,

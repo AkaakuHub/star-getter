@@ -10,6 +10,13 @@ export function sectionAt(state: GameState): Section {
   return section;
 }
 
+export function sectionNumber(state: GameState): number {
+  const current = sectionAt(state);
+  const index = state.track.sections.indexOf(current);
+  const climax = state.track.sections.findIndex((part) => part.climax);
+  return current.climax ? 99 : index - (climax >= 0 && climax < index ? 1 : 0) + 1;
+}
+
 export function durationSeconds(state: GameState): number {
   return (state.track.beats * 60) / state.track.bpm;
 }

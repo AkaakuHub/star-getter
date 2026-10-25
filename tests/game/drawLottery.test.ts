@@ -58,7 +58,7 @@ it('条件一致時だけ対象を優先し、極光は開始時の優先を持�
     lastUsedUnit: 2 as const,
   };
   const cerise = { ...doll, lastUsedMember: 1031 as const, lastUsedUnit: 1 as const };
-  expect(drawWeight(source('aurora-ensemble'), initial)).toBe(1);
+  expect(drawWeight(source('aurora-ensemble'), initial)).toBe(10_000);
   expect(drawWeight(source('aurora-ensemble'), doll)).toBe(-1);
   expect(drawWeight(source('library-ensemble'), initial)).toBe(0);
   expect(drawWeight(source('library-ensemble'), doll)).toBe(0);
@@ -79,4 +79,12 @@ it('tokenと編成の検索を後入れ先出しにして交互の対象へ引�
   const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.id === id));
   expect(hand.map((card) => card?.token ?? card?.unit)).toEqual([1, 'clock', 1, 'clock']);
   expect(drawn.deckActions.searches).toHaveLength(0);
+});
+
+it('検索先があるときは検索外の優先カードを先に引かない', () => {
+  let state = withHand(addTokens(game('library'), 'clock', 2), []);
+  state = { ...state, drawContext: 'skill', lastUsedUnit: 1 };
+  state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
+  const drawn = fillHandToCount(state, 1);
+  expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
 });

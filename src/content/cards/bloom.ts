@@ -109,7 +109,10 @@ export const bloomCards: readonly Card[] = [
     cost: 14,
     appeal: { smile: 4900, pure: 4600, cool: 7000 },
     beatPoint: 100,
-    drawRule: { unit: 2, priority: 'always' },
+    drawRules: [
+      { condition: { kind: 'unit', value: 2 }, negated: true, weight: 0 },
+      { condition: { kind: 'unit', value: 2 }, negated: false, weight: -1 },
+    ],
     collectionEffects: {
       threshold: 300_000,
       effects: [

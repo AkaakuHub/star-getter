@@ -1,3 +1,5 @@
+import { drawProbability } from './drawProbability';
+import { sectionNumber } from '../projection';
 import type { Card, GameState } from '../model';
 
 type DrawCandidate = Readonly<{ id: string; weight: number }>;
@@ -19,23 +21,13 @@ export function drawCandidate(
   throw new Error('カードの抽選が成立しません。');
 }
 
-export function drawWeight(
-  card: Card,
-  state: Pick<GameState, 'drawContext' | 'lastUsedMember' | 'lastUsedUnit'>,
-): number {
-  const rule = card.drawRule;
-  if (
-    rule?.member !== undefined &&
-    (state.drawContext !== 'skill' || state.lastUsedMember !== rule.member)
-  )
-    return 0;
-  if (
-    rule?.unit !== undefined &&
-    (state.drawContext !== 'skill' || state.lastUsedUnit !== rule.unit)
-  )
-    return 0;
-  return rule?.priority === 'always' ||
-    (rule?.priority === 'after-start' && state.drawContext !== 'initial')
-    ? -1
-    : 1;
+export function drawWeight(card: Card, state: GameState): number {
+  return drawProbability(card.drawRules ?? [], {
+    initial: state.drawContext === 'initial',
+    skill: state.drawContext === 'skill',
+    member: state.lastUsedMember,
+    unit: state.lastUsedUnit,
+    icon: state.lastUsedSkillIcon,
+    section: sectionNumber(state),
+  });
 }

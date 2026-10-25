@@ -56,6 +56,7 @@ export function createGame(
     deckActions: { shuffles: [], searches: [] },
     lastUsedMember: null,
     lastUsedUnit: null,
+    lastUsedSkillIcon: null,
     cardUseCounts: {},
     activation: null,
     randomSeed: shuffled.seed,

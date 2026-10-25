@@ -1,3 +1,4 @@
+import type { DrawProbabilityRule } from './cards/drawProbability';
 import type { ScoreLimitSettings } from './live/scoreLimit';
 import type { GameCondition } from './conditions/model';
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
@@ -124,7 +125,8 @@ export type Card = Readonly<{
   allHandCost?: Readonly<{
     reductions: readonly Readonly<{ minimumCards: number; amount: number }>[];
   }>;
-  drawRule?: Readonly<{ member?: MemberId; unit?: UnitId; priority?: 'always' | 'after-start' }>;
+  drawRules?: readonly DrawProbabilityRule[];
+  skillIcon?: number;
   passive?: Readonly<{
     heartsPercent?: number;
     handLimitDelta?: number;
@@ -231,6 +233,7 @@ export type GameState = Readonly<{
   }>;
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;
+  lastUsedSkillIcon: number | null;
   cardUseCounts: Readonly<Record<string, number>>;
   activation: Readonly<{
     sourceId: string;

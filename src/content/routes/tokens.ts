@@ -116,7 +116,10 @@ export const routeTokens: readonly Card[] = [
     appeal,
     beatPoint: 0,
     token: 'shadow',
-    drawRule: { unit: 2, priority: 'always' },
+    drawRules: [
+      { condition: { kind: 'unit', value: 2 }, negated: true, weight: 0 },
+      { condition: { kind: 'unit', value: 2 }, negated: false, weight: -1 },
+    ],
     drawAbility: 'shadow',
     useAbility: 'shadow',
     effects: [

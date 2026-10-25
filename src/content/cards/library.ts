@@ -61,7 +61,10 @@ export const libraryCards: readonly Card[] = [
     allHandCost: {
       reductions: [0, 20, 40, 60, 80, 100].map((minimumCards) => ({ minimumCards, amount: 10 })),
     },
-    drawRule: { unit: 1, priority: 'always' },
+    drawRules: [
+      { condition: { kind: 'unit', value: 1 }, negated: true, weight: 0 },
+      { condition: { kind: 'unit', value: 1 }, negated: false, weight: -1 },
+    ],
     collectionEffects: {
       threshold: 300_000,
       effects: [{ kind: 'energy', amount: baselineMemberFanLevels[1021] * 0.1 }],

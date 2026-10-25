@@ -11,7 +11,10 @@ export const setupCards: readonly Card[] = [
     cost: 6,
     appeal: { smile: 4200, pure: 4200, cool: 4200 },
     beatPoint: 100,
-    drawRule: { member: 1031, priority: 'always' },
+    drawRules: [
+      { condition: { kind: 'member', value: 1031 }, negated: true, weight: 0 },
+      { condition: { kind: 'member', value: 1031 }, negated: false, weight: -1 },
+    ],
     drawAbility: 'camera',
     effects: [
       { kind: 'ap-speed', percent: 30, duration: 'section' },
@@ -52,7 +55,7 @@ export const setupCards: readonly Card[] = [
     appeal: { smile: 5300, pure: 5300, cool: 5300 },
     beatPoint: 100,
     allHandCost: { reductions: [] },
-    drawRule: { priority: 'after-start' },
+    drawRules: [{ condition: { kind: 'initial' }, negated: true, weight: -1 }],
     useEffects: [{ kind: 'energy', amount: -99 }],
     effects: [
       { kind: 'use-hand' },
