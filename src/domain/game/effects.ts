@@ -50,7 +50,7 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     case 'tokens':
       return addTokens(state, effect.token, effect.count);
     case 'hand-limit':
-      return { ...state, handLimit: Math.min(8, state.handLimit + effect.amount) };
+      return { ...state, handLimit: state.handLimit + effect.amount };
     case 'heart-limit':
       return {
         ...state,

@@ -70,6 +70,7 @@ export function createGame(
     resourceBoosts: [],
     bloom: null,
     relayUsed: [],
+    handHeartCollectCounts: {},
     combo: 0,
     lastCollectTick: -rules.comboWindowTicks - 1,
     lastActionTick: -Math.ceil(

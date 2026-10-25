@@ -31,6 +31,7 @@ export function fillHand(state: GameState): GameState {
       hand: [...next.hand, drawn],
       drawPile: next.drawPile.filter((id) => id !== drawn),
       relayUsed: next.relayUsed.filter((id) => id !== drawn),
+      handHeartCollectCounts: { ...next.handHeartCollectCounts, [drawn]: 0 },
     };
     const card = next.deck.find((item) => item.id === drawn);
     if (!card) throw new Error('引いたカードがありません。');
@@ -54,5 +55,13 @@ export function fillHand(state: GameState): GameState {
 
 export function shuffleHand(state: GameState): GameState {
   const shuffled = shuffle([...state.hand, ...state.drawPile, ...state.discard], state.randomSeed);
-  return { ...state, hand: [], drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
+  return {
+    ...state,
+    hand: [],
+    drawPile: shuffled.items,
+    discard: [],
+    randomSeed: shuffled.seed,
+    relayUsed: [],
+    handHeartCollectCounts: {},
+  };
 }

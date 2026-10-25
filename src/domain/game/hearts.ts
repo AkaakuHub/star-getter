@@ -6,6 +6,7 @@ import { collectStarGatherHeartRuntime, advanceStarGatherHeartRuntime } from './
 import { spawnStarGatherBeatHearts } from './live/heartSpawn';
 import { starGatherHeartCount } from './live/heartState';
 import { createRangeRandom } from './random';
+import { advanceHandCollectionAbilities } from './cards/collectionAbilities';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -46,44 +47,26 @@ export function collectHearts(state: GameState): GameState {
     collected.collectCount,
     false,
   );
-  const relays = state.deck.filter(
-    (card) =>
-      state.hand.includes(card.id) &&
-      !state.relayUsed.includes(card.id) &&
-      card.relay &&
-      collected.collectCount >= card.relay.threshold,
-  );
-  let triggered: GameState = {
-    ...next,
-    relayUsed: [...next.relayUsed, ...relays.map((card) => card.id)],
-  };
-  for (const card of relays) {
+  const abilities = advanceHandCollectionAbilities(next, collected.collectCount);
+  let triggered = abilities.state;
+  for (const card of abilities.activated) {
     const relay = card.relay;
-    if (!relay) throw new Error('回収能力がありません。');
-    triggered = applyEffect(
-      triggered,
-      { kind: relay.beats ? 'beat-hearts' : 'hearts', amount: relay.hearts },
-      card,
-    );
-  }
-  const tokenReactions = state.deck.filter(
-    (card) =>
-      state.hand.includes(card.id) &&
-      !state.relayUsed.includes(card.id) &&
-      state.deck.length >= 95 &&
-      collected.collectCount >= 500_000 &&
-      (card.token === 'story' || card.token === 'bookmark'),
-  );
-  for (const card of tokenReactions) {
-    triggered = { ...triggered, relayUsed: [...triggered.relayUsed, card.id] };
-    triggered =
-      card.token === 'story'
-        ? applyEffect(
-            triggered,
-            { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
-            card,
-          )
-        : fillHand(shuffleHand(triggered));
+    if (relay) {
+      triggered = applyEffect(
+        triggered,
+        { kind: relay.beats ? 'beat-hearts' : 'hearts', amount: relay.hearts },
+        card,
+      );
+    } else if (state.deck.length >= 95) {
+      triggered =
+        card.token === 'story'
+          ? applyEffect(
+              triggered,
+              { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
+              card,
+            )
+          : fillHand(shuffleHand(triggered));
+    }
   }
   return triggered;
 }

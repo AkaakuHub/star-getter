@@ -140,6 +140,7 @@ export type GameState = Readonly<{
   resourceBoosts: readonly ResourceBoost[];
   bloom: Bloom | null;
   relayUsed: readonly string[];
+  handHeartCollectCounts: Readonly<Record<string, number>>;
   combo: number;
   lastCollectTick: number;
   lastActionTick: number;

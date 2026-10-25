@@ -57,7 +57,7 @@ export function describeCard(card: Card): string {
       : '');
   return card.relay
     ? skill +
-        `手札にある間、${card.relay.threshold}個以上を一度に回収したとき、${card.relay.beats ? '自然発生' : 'きらめきを'}${card.relay.hearts}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`
+        `手札にある間、累計${card.relay.threshold}個を回収したとき、${card.relay.beats ? '自然発生' : 'きらめきを'}${card.relay.hearts}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`
     : skill;
 }
 
