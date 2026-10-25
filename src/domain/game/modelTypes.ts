@@ -1,3 +1,5 @@
+import type { GameCondition } from './conditions/model';
+import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
 
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
@@ -6,7 +8,7 @@ export type GaugeInfinity = Readonly<{
   remainingSeconds: number | null;
   remainingSections: number | null;
 }>;
-export type InfinityGaugeEffect = Readonly<{
+type InfinityGaugeEffect = Readonly<{
   kind: 'infinity-gauge';
   gauge: 'ap' | 'voltage' | 'mental';
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
@@ -92,6 +94,45 @@ export type HeartBoostState = Readonly<{
   remainingSeconds: number | null;
   remainingSections: number | null;
 }>;
+export type HandCardStats = Readonly<{
+  enteredSectionIndex: number;
+  cardUseCountsAtEntry: Readonly<Record<string, number>>;
+}>;
+export type SkillCostConditionType =
+  | 1
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14
+  | 15;
+export type SkillCostChangeEffect = Readonly<{
+  kind: 'skill-cost-change';
+  amount: number;
+  minimum: number;
+  maximum: number;
+  conditionType: SkillCostConditionType;
+  conditionId?: number;
+  addValue?: number;
+  duration?: Readonly<{ sections: number }>;
+}>;
+export type SkillCostChange = Readonly<{
+  sourceId: string;
+  amount: number;
+  minimum: number;
+  maximum: number;
+  conditionType: SkillCostConditionType;
+  conditionId: number;
+  remainingSections: number | null;
+}>;
 export type TokenBoost = Readonly<{
   calculation: 'add' | 'multiply-percent';
   value: number;
@@ -101,3 +142,98 @@ export type TokenBoost = Readonly<{
   remainingSeconds: number | null;
   remainingSections: number | null;
 }>;
+
+export type Effect =
+  | Readonly<{
+      kind: 'branch';
+      condition: GameCondition;
+      whenTrue: readonly Effect[];
+      whenFalse: readonly Effect[];
+    }>
+  | Readonly<{
+      kind: 'hearts' | 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
+      amount: number;
+      moodBonus?: MoodBonus;
+    }>
+  | Readonly<{ kind: 'boost'; multiplier: number; moodBonus?: MoodBonus }>
+  | Readonly<{
+      kind: 'amplify';
+      percent: number;
+      moodBonus?: MoodBonus;
+      members?: readonly MemberId[];
+      duration?: 'section';
+    }>
+  | Readonly<{ kind: 'mood'; amount: number }>
+  | Readonly<{
+      kind: 'conditional';
+      condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
+      effects: readonly Effect[];
+    }>
+  | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
+  | Readonly<{
+      kind: 'token-boost';
+      calculation: TokenBoost['calculation'];
+      num: number;
+      addValue?: number;
+      target: TokenBoostTarget;
+      seriesIds?: readonly number[];
+      uses?: number;
+      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    }>
+  | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
+  | Readonly<{ kind: 'use-hand'; addAp?: number }>
+  | Readonly<{ kind: 'shuffle'; recoverDiscard: boolean; destination: 'draw' | 'discard' }>
+  | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
+  | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
+  | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
+  | Readonly<{ kind: 'bloom'; strength: number }>
+  | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
+  | Readonly<{ kind: 'energy-limit'; amount: number }>
+  | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
+  | ResetSpecial
+  | Readonly<{ kind: 'voltage-limit'; amount: number }>
+  | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
+  | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
+  | Readonly<{ kind: 'beat-count'; amount: number }>
+  | Readonly<{
+      kind: 'beat-point-buff';
+      amount: number;
+      addValue?: number;
+      multiplier?: number;
+      moodBonus?: MoodBonus;
+      duration?: Readonly<{ sections: number }>;
+    }>
+  | HeartBoostEffect
+  | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
+  | Readonly<{
+      kind: 'cost-reduction';
+      amount: number;
+      target:
+        | Readonly<{ kind: 'unit'; unit: UnitId }>
+        | Readonly<{ kind: 'token'; token: TokenKind }>;
+    }>
+  | SkillCostChangeEffect
+  | Readonly<{ kind: 'voltage-set'; amount: number }>
+  | GaugeEffect
+  | Readonly<{
+      kind: 'stop-voltage-increase';
+      duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    }>
+  | Readonly<{
+      kind: 'resource-boost';
+      target: 'excitement' | 'stamina' | 'attract';
+      percent: number;
+      uses: number | null;
+      condition: 'voltage20' | 'mental100' | 'always';
+      members?: readonly MemberId[];
+      moodBonus?: MoodBonus;
+    }>
+  | Readonly<{ kind: 'mode'; modeId: number; change: ModeChange['change'] }>
+  | Readonly<{
+      kind: 'mode-reaction';
+      modeId: number;
+      thresholds: readonly number[];
+      effects: readonly Effect[];
+      buffNum: number;
+    }>
+  | Readonly<{ kind: 'collect' }>;

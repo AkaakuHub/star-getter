@@ -154,6 +154,20 @@ function validateEffect(effect: Effect): void {
       throw new Error('自然発生ビートポイントの設定が正しくありません。');
     return;
   }
+  if (effect.kind === 'skill-cost-change') {
+    if (
+      !Number.isFinite(effect.amount) ||
+      !Number.isFinite(effect.minimum) ||
+      !Number.isFinite(effect.maximum) ||
+      ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(effect.conditionType) ||
+      (effect.conditionId !== undefined && !Number.isSafeInteger(effect.conditionId)) ||
+      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
+      (effect.duration !== undefined &&
+        (!Number.isSafeInteger(effect.duration.sections) || effect.duration.sections < 0))
+    )
+      throw new Error('スキルコスト変更の設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'skill-cooldown') {
     if (!Number.isFinite(effect.ratio) || effect.ratio < 0)
       throw new Error('アクション間隔が正しくありません。');

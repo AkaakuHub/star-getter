@@ -1,31 +1,29 @@
 import type { DrawProbabilityRule } from './cards/drawProbability';
 import type { ScoreLimitSettings } from './live/scoreLimit';
-import type { GameCondition } from './conditions/model';
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
 import type { StarGatherCardAppealParameters } from './live/clientScoreInput';
 import type { StageGauges } from './live/gaugeTiming';
 import type { AutomaticHeartState } from './live/automaticHeart';
 import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
-import type { ModeChange, ModeState } from './live/modes';
+import type { ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
+import type { Effect } from './modelTypes';
 import type {
-  GaugeEffect,
   GaugeInfinity,
   GaugeRegeneration,
-  HeartBoostEffect,
   HeartBoostState,
+  HandCardStats,
   MentalBarrier,
   MoodBonus,
-  ResetSpecial,
   SearchRequest,
-  SearchTarget,
+  SkillCostChange,
   TokenBoost,
-  TokenBoostTarget,
 } from './modelTypes';
 
-export type { MoodBonus, ResetSpecial, SearchRequest } from './modelTypes';
-export type { SearchTarget, TokenBoost, TokenBoostTarget } from './modelTypes';
+export type { MoodBonus, SearchRequest } from './modelTypes';
+export type { SearchTarget, TokenBoost } from './modelTypes';
+export type { Effect } from './modelTypes';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
@@ -49,100 +47,6 @@ export type CostumeId = (typeof costumeIds)[number];
 export type HandShuffle = Readonly<{ recoverDiscard: boolean; destination: 'draw' | 'discard' }>;
 
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark' | 'shadow';
-export type Effect =
-  | Readonly<{
-      kind: 'branch';
-      condition: GameCondition;
-      whenTrue: readonly Effect[];
-      whenFalse: readonly Effect[];
-    }>
-  | Readonly<{
-      kind: 'hearts' | 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
-      amount: number;
-      moodBonus?: MoodBonus;
-    }>
-  | Readonly<{ kind: 'boost'; multiplier: number; moodBonus?: MoodBonus }>
-  | Readonly<{
-      kind: 'amplify';
-      percent: number;
-      moodBonus?: MoodBonus;
-      members?: readonly MemberId[];
-      duration?: 'section';
-    }>
-  | Readonly<{ kind: 'mood'; amount: number }>
-  | Readonly<{
-      kind: 'conditional';
-      condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
-      effects: readonly Effect[];
-    }>
-  | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
-  | Readonly<{
-      kind: 'token-boost';
-      calculation: TokenBoost['calculation'];
-      num: number;
-      addValue?: number;
-      target: TokenBoostTarget;
-      seriesIds?: readonly number[];
-      uses?: number;
-      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
-    }>
-  | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
-  | Readonly<{ kind: 'use-hand'; addAp?: number }>
-  | (Readonly<{ kind: 'shuffle' }> & HandShuffle)
-  | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
-  | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
-  | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
-  | Readonly<{ kind: 'bloom'; strength: number }>
-  | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
-  | Readonly<{ kind: 'energy-limit'; amount: number }>
-  | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
-  | ResetSpecial
-  | Readonly<{ kind: 'voltage-limit'; amount: number }>
-  | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
-  | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
-  | Readonly<{ kind: 'beat-count'; amount: number }>
-  | Readonly<{
-      kind: 'beat-point-buff';
-      amount: number;
-      addValue?: number;
-      multiplier?: number;
-      moodBonus?: MoodBonus;
-      duration?: Readonly<{ sections: number }>;
-    }>
-  | HeartBoostEffect
-  | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
-  | Readonly<{
-      kind: 'cost-reduction';
-      amount: number;
-      target:
-        | Readonly<{ kind: 'unit'; unit: UnitId }>
-        | Readonly<{ kind: 'token'; token: TokenKind }>;
-    }>
-  | Readonly<{ kind: 'voltage-set'; amount: number }>
-  | GaugeEffect
-  | Readonly<{
-      kind: 'stop-voltage-increase';
-      duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
-    }>
-  | Readonly<{
-      kind: 'resource-boost';
-      target: 'excitement' | 'stamina' | 'attract';
-      percent: number;
-      uses: number | null;
-      condition: 'voltage20' | 'mental100' | 'always';
-      members?: readonly MemberId[];
-      moodBonus?: MoodBonus;
-    }>
-  | Readonly<{ kind: 'mode'; modeId: number; change: ModeChange['change'] }>
-  | Readonly<{
-      kind: 'mode-reaction';
-      modeId: number;
-      thresholds: readonly number[];
-      effects: readonly Effect[];
-      buffNum: number;
-    }>
-  | Readonly<{ kind: 'collect' }>;
-
 export type Card = Readonly<{
   id: string;
   name: string;
@@ -151,6 +55,7 @@ export type Card = Readonly<{
   member: MemberId;
   unit: UnitId | null;
   cost: number;
+  style?: number;
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   modeIds?: readonly number[];
@@ -283,6 +188,8 @@ export type GameState = Readonly<{
   lastUsedUnit: UnitId | null;
   lastUsedSkillIcon: number | null;
   cardUseCounts: Readonly<Record<string, number>>;
+  handCardStats: Readonly<Record<string, HandCardStats>>;
+  skillCostChanges: readonly SkillCostChange[];
   activation: Readonly<{
     sourceId: string;
     usedCards: readonly string[];

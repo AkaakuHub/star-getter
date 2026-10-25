@@ -100,6 +100,9 @@ function retireCard(state: GameState, card: Card): GameState {
   return {
     ...state,
     hand: state.hand.filter((id) => id !== card.id),
+    handCardStats: Object.fromEntries(
+      Object.entries(state.handCardStats).filter(([id]) => id !== card.id),
+    ),
     drawPile: state.drawPile.filter((id) => id !== card.id),
     discard: state.discard.filter((id) => id !== card.id),
     relayUsed: state.relayUsed.filter((id) => id !== card.id),

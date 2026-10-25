@@ -21,6 +21,7 @@ import { expireGaugeInfinities } from './resources';
 import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
+import { initializeHandCardStats } from './cards/skillCostChanges';
 
 export function createGame(
   track: Track,
@@ -45,6 +46,8 @@ export function createGame(
     deck: [...deck],
     cardPool: [...deck],
     hand: [lead.id],
+    handCardStats: {},
+    skillCostChanges: [],
     handEffectCardIds: [lead.id],
     drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
     deckOutCount: 0,
@@ -128,7 +131,7 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  return fillHand(initial);
+  return fillHand(initializeHandCardStats(initial, [lead.id]));
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {
@@ -218,6 +221,11 @@ function advanceTick(state: GameState): GameState {
         return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
       }),
       heartBoosts: expireSectionHeartBoosts(next.heartBoosts),
+      skillCostChanges: next.skillCostChanges.flatMap((change) => {
+        if (change.remainingSections === null) return [change];
+        const remainingSections = change.remainingSections - 1;
+        return remainingSections > 0 ? [{ ...change, remainingSections }] : [];
+      }),
       apIntervalFactor: 1,
       amplification: next.amplification - next.sectionAmplification,
       sectionAmplification: 0,

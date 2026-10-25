@@ -20,6 +20,7 @@ import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
 import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
+import { addSkillCostChange } from './cards/skillCostChanges';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -166,6 +167,8 @@ export function applyEffect(
       return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
     case 'cost-reduction':
       return applyCostReduction(state, effect);
+    case 'skill-cost-change':
+      return addSkillCostChange(state, effect, card, multiplier);
     case 'protect-mental':
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }

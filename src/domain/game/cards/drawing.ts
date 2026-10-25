@@ -4,6 +4,7 @@ import { consumeSearch } from './search';
 import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import type { Card, GameState, HandShuffle } from '../model';
+import { initializeHandCardStats } from './skillCostChanges';
 
 export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
@@ -69,6 +70,7 @@ function drawUntil(state: GameState, count: number): GameState {
       relayUsed: next.relayUsed.filter((id) => id !== drawn),
       handHeartCollectCounts: { ...next.handHeartCollectCounts, [drawn]: 0 },
     };
+    next = initializeHandCardStats(next, [drawn]);
     const card = next.deck.find((item) => item.id === drawn);
     if (!card) throw new Error('引いたカードがありません。');
     drawnCards.push(card);
@@ -90,6 +92,9 @@ function drawUntil(state: GameState, count: number): GameState {
     next = {
       ...disposeHandEffects(next, ordered.slice(maximum)),
       hand: ordered.slice(0, maximum),
+      handCardStats: Object.fromEntries(
+        Object.entries(next.handCardStats).filter(([id]) => ordered.slice(0, maximum).includes(id)),
+      ),
       discard: [...next.discard, ...ordered.slice(maximum)],
     };
   }
@@ -103,6 +108,7 @@ export function shuffleHand(state: GameState, options: HandShuffle): GameState {
   return {
     ...state,
     hand: [],
+    handCardStats: {},
     handEffectCardIds: state.handEffectCardIds.filter((id) => !state.hand.includes(id)),
     drawPile: state.deck.filter((card) => returnedIds.includes(card.id)).map((card) => card.id),
     discard: [
