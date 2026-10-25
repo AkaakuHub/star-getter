@@ -32,6 +32,8 @@ export function describeEffect(effect: Effect): string {
       return `次の${effect.count}回、「${tokenNames[effect.token]}」を優先して引く。`;
     case 'search-unit':
       return `次の${effect.count}回、対象の編成のカードを優先して引く。`;
+    case 'search':
+      return `次の${effect.count}回、指定されたカードを優先して引く。`;
     case 'shuffle':
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':

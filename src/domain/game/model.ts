@@ -31,6 +31,16 @@ export type CostumeId = (typeof costumeIds)[number];
 export type HandShuffle = Readonly<{ recoverDiscard: boolean; destination: 'draw' | 'discard' }>;
 
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark' | 'shadow';
+export type SearchTarget =
+  | Readonly<{ kind: 'icon'; icon: number }>
+  | Readonly<{ kind: 'member'; member: MemberId }>
+  | Readonly<{ kind: 'unit'; unit: UnitId }>
+  | Readonly<{ kind: 'token-series'; seriesId: number }>
+  | Readonly<{ kind: 'token'; token: TokenKind }>;
+export type SearchRequest = Readonly<{
+  scope: 'grade' | 'section' | 'skill';
+  target: SearchTarget;
+}>;
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
   | Readonly<{
@@ -64,6 +74,7 @@ export type Effect =
   | (Readonly<{ kind: 'shuffle' }> & HandShuffle)
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
+  | Readonly<{ kind: 'search'; scope: SearchRequest['scope']; target: SearchTarget; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
@@ -236,10 +247,7 @@ export type GameState = Readonly<{
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
   deckActions: Readonly<{
     shuffles: readonly Readonly<{ sourceId: string | null; options: HandShuffle }>[];
-    searches: readonly (
-      | Readonly<{ kind: 'unit'; unit: UnitId }>
-      | Readonly<{ kind: 'token'; token: TokenKind }>
-    )[];
+    searches: readonly SearchRequest[];
   }>;
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;

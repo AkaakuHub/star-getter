@@ -89,6 +89,69 @@ it('検索先があるときは検索外の優先カードを先に引かない'
   expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
 });
 
+it('グレード、パート、スキルの順に検索し、グレード検索は捨て札からも引く', () => {
+  let state = withHand(addTokens(addTokens(game('library'), 'clock', 1), 'story', 1), []);
+  const story = state.deck.find((card) => card.token === 'story');
+  if (!story) throw new Error('追加カードがありません。');
+  state = {
+    ...state,
+    drawContext: 'skill',
+    lastUsedMember: 1031,
+    drawPile: state.drawPile.filter((id) => id !== story.id),
+    discard: [story.id],
+  };
+  state = applyEffect(state, {
+    kind: 'search',
+    scope: 'skill',
+    target: { kind: 'token', token: 'clock' },
+    count: 1,
+  });
+  state = applyEffect(state, {
+    kind: 'search',
+    scope: 'section',
+    target: { kind: 'member', member: 1053 },
+    count: 1,
+  });
+  state = applyEffect(state, {
+    kind: 'search',
+    scope: 'grade',
+    target: { kind: 'token-series', seriesId: 42 },
+    count: 1,
+  });
+  state = {
+    ...state,
+    deck: state.deck.map((card) =>
+      card.id === story.id ? { ...card, tokenSeriesIds: [42] } : card,
+    ),
+  };
+  const drawn = fillHandToCount(state, 3);
+  expect(drawn.hand[0]).toBe(story.id);
+  expect(drawn.discard).not.toContain(story.id);
+  expect(drawn.hand[1]).toBe('camera');
+  expect(drawn.deck.find((card) => card.id === drawn.hand[2])?.token).toBe('clock');
+  expect(drawn.deckActions.searches).toHaveLength(0);
+});
+
+it('検索条件に一致するカードがない階層は消費し、次の階層の検索を使う', () => {
+  let state = withHand(addTokens(game('library'), 'clock', 1), []);
+  state = { ...state, drawContext: 'initial' };
+  state = applyEffect(state, {
+    kind: 'search',
+    scope: 'grade',
+    target: { kind: 'icon', icon: 987654 },
+    count: 1,
+  });
+  state = applyEffect(state, {
+    kind: 'search',
+    scope: 'section',
+    target: { kind: 'token', token: 'clock' },
+    count: 1,
+  });
+  const drawn = fillHandToCount(state, 1);
+  expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
+  expect(drawn.deckActions.searches).toHaveLength(0);
+});
+
 it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {
   const initial = withHand(game('library'), ['class']);
   const state = {

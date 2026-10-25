@@ -103,18 +103,24 @@ export function applyEffect(
     case 'shuffle':
       return enqueueHandShuffle(state, effect, card?.id ?? null);
     case 'search-unit':
-    case 'search-token': {
+    case 'search-token':
+    case 'search': {
       const target =
-        effect.kind === 'search-unit'
-          ? { kind: 'unit' as const, unit: effect.unit }
-          : { kind: 'token' as const, token: effect.token };
+        effect.kind === 'search'
+          ? effect.target
+          : effect.kind === 'search-unit'
+            ? { kind: 'unit' as const, unit: effect.unit }
+            : { kind: 'token' as const, token: effect.token };
       return {
         ...state,
         deckActions: {
           ...state.deckActions,
           searches: [
             ...state.deckActions.searches,
-            ...Array.from({ length: effect.count }, () => target),
+            ...Array.from({ length: effect.count }, () => ({
+              scope: effect.kind === 'search' ? effect.scope : ('skill' as const),
+              target,
+            })),
           ],
         },
       };

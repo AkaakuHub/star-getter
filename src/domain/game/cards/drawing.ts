@@ -1,5 +1,6 @@
 import { createRangeRandom } from '../random';
 import { drawCandidate, drawWeight } from './drawLottery';
+import { consumeSearch } from './search';
 import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import type { Card, GameState, HandShuffle } from '../model';
@@ -44,38 +45,27 @@ function drawUntil(state: GameState, count: number): GameState {
     const available = next.deck
       .filter((card) => next.drawPile.includes(card.id))
       .map((card) => card.id);
-    let candidates = available.filter((id) => probability(id) !== 0);
-    const search = next.deckActions.searches.at(-1);
-    if (search !== undefined) {
-      const matches = candidates.filter((id) =>
-        next.deck.some(
-          (card) =>
-            card.id === id &&
-            (search.kind === 'unit' ? card.unit === search.unit : card.token === search.token),
-        ),
-      );
-      if (matches.length) candidates = matches;
-      next = {
-        ...next,
-        deckActions: { ...next.deckActions, searches: next.deckActions.searches.slice(0, -1) },
-      };
-    }
     const random = createRangeRandom(next.randomSeed);
     const randomIndex = (maximumExclusive: number) => Math.floor(random.range(0, maximumExclusive));
+    const searched = consumeSearch(next, randomIndex);
+    next = searched.state;
     const drawn =
+      searched.selected ??
       drawCandidate(
-        candidates.map((id) => ({
+        available.map((id) => ({
           id,
           weight: probability(id),
         })),
         randomIndex,
-      ) ?? available[randomIndex(available.length)];
+      ) ??
+      available[randomIndex(available.length)];
     if (!drawn) break;
     next = {
       ...next,
       randomSeed: random.seed,
       hand: [...next.hand, drawn],
       drawPile: next.drawPile.filter((id) => id !== drawn),
+      discard: next.discard.filter((id) => id !== drawn),
       relayUsed: next.relayUsed.filter((id) => id !== drawn),
       handHeartCollectCounts: { ...next.handHeartCollectCounts, [drawn]: 0 },
     };
