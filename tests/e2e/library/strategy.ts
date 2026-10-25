@@ -29,14 +29,14 @@ function isPrepared(state: GameState): boolean {
   );
 }
 
-export function prepare(driver: GameDriver): void {
+export async function prepare(driver: GameDriver): Promise<void> {
   let normalUsed = false;
   let extraUsed = false;
-  driver.until(isPrepared, () => {
+  await driver.until(isPrepared, async () => {
     if (
       !normalUsed &&
       (driver.state.cardUseCounts.class ?? 0) >= 1 &&
-      driver.special('library-pages')
+      (await driver.special('library-pages'))
     )
       normalUsed = true;
     if (
@@ -44,13 +44,13 @@ export function prepare(driver: GameDriver): void {
       !extraUsed &&
       driver.state.deck.some((card) => card.token === 'clock') &&
       driver.state.deck.some((card) => card.token === 'bookmark') &&
-      driver.special('library-ensemble')
+      (await driver.special('library-ensemble'))
     )
       extraUsed = true;
     const dresses = driver.state.deck.filter(
       (card) => card.token === 'ensemble' && driver.state.hand.includes(card.id),
     ).length;
-    driver.useFirst(
+    await driver.useFirst(
       dresses >= 2
         ? ['ensemble']
         : driver.state.deck.length < 95
@@ -91,8 +91,8 @@ function hasAvailableBookmark(state: GameState): boolean {
   );
 }
 
-function restoreDeck(driver: GameDriver): void {
-  driver.useFirst([
+async function restoreDeck(driver: GameDriver): Promise<void> {
+  await driver.useFirst([
     'library-invitation',
     'ensemble',
     'library-ensemble',
@@ -106,13 +106,13 @@ function restoreDeck(driver: GameDriver): void {
   if (driver.state.tick % 6 === 0) driver.collect();
 }
 
-function maintainLoop(driver: GameDriver): void {
+async function maintainLoop(driver: GameDriver): Promise<void> {
   if (driver.state.deck.length < 95) {
-    restoreDeck(driver);
+    await restoreDeck(driver);
     return;
   }
   if (moodValue(driver.state) < 100 || !hasAvailableBookmark(driver.state)) {
-    driver.useFirst([
+    await driver.useFirst([
       'clock',
       'bookmark',
       'ensemble',
@@ -124,7 +124,7 @@ function maintainLoop(driver: GameDriver): void {
       'aurora-ensemble',
     ]);
   } else if (heartCount(driver.state) < 500_000) {
-    driver.useFirst([
+    await driver.useFirst([
       'bookmark',
       'clock',
       'ensemble',
@@ -139,20 +139,20 @@ function maintainLoop(driver: GameDriver): void {
   if (driver.state.tick % 6 === 0) driver.collect();
 }
 
-export function amplifyAndWiden(driver: GameDriver): void {
+export async function amplifyAndWiden(driver: GameDriver): Promise<void> {
   const initialAmplification = driver.state.storyAmplification;
-  driver.until(
+  await driver.until(
     (state) => driver.collectionRedraws >= 5 && state.storyAmplification > initialAmplification,
     () => maintainLoop(driver),
   );
   driver.report('回収リドローを反復し舵のドローで増幅');
-  driver.until(
+  await driver.until(
     (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 95,
-    () => {
+    async () => {
       if (driver.state.deck.length < 95) {
-        restoreDeck(driver);
+        await restoreDeck(driver);
       } else {
-        driver.useFirst([
+        await driver.useFirst([
           'story',
           'clock',
           'ensemble',
@@ -173,8 +173,8 @@ export function amplifyAndWiden(driver: GameDriver): void {
   expect(driver.collectionAmplification).toBeGreaterThan(0);
 }
 
-export function armAutomaticCollection(driver: GameDriver): void {
-  driver.until(
+export async function armAutomaticCollection(driver: GameDriver): Promise<void> {
+  await driver.until(
     (state) =>
       isPrepared(state) &&
       state.deck.some(
@@ -187,11 +187,11 @@ export function armAutomaticCollection(driver: GameDriver): void {
   );
 }
 
-export function playUnplanned(driver: GameDriver): void {
+export async function playUnplanned(driver: GameDriver): Promise<void> {
   while (driver.state.phase === 'playing') {
-    driver.special('library-pages');
-    driver.special('library-ensemble');
-    driver.useFirst(
+    await driver.special('library-pages');
+    await driver.special('library-ensemble');
+    await driver.useFirst(
       driver.state.hand.map((id) => {
         const card = driver.state.deck.find((candidate) => candidate.id === id);
         if (!card) throw new Error('手札のカードがありません。');
@@ -199,11 +199,11 @@ export function playUnplanned(driver: GameDriver): void {
       }),
     );
     if (driver.state.tick % 6 === 0) driver.collect();
-    driver.tick();
+    await driver.tick();
   }
 }
 
-export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5 | 10 | 15) {
+export async function runCollections(driver: GameDriver, stopSeconds: number, speed: 5 | 10 | 15) {
   const before = driver.state.score;
   const cards = driver.cardActions;
   const collections = driver.collections;
@@ -224,7 +224,7 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
         const deckBefore = driver.state.deck.length;
         const used =
           driver.state.deck.length <= 96
-            ? driver.useFirst([
+            ? await driver.useFirst([
                 'library-invitation',
                 'ensemble',
                 'library-ensemble',
@@ -235,7 +235,7 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
                 'camera',
                 'story',
               ])
-            : driver.useFirst(
+            : await driver.useFirst(
                 hasAvailableBookmark(driver.state)
                   ? [
                       'story',
@@ -277,7 +277,7 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
         maximumStreak = Math.max(maximumStreak, streak);
       }
     }
-    driver.tick();
+    await driver.tick();
   }
   const gain = driver.state.score - before;
   const result = {

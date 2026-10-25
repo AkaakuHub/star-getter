@@ -8,7 +8,7 @@ import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 
-test('60秒のカード使用と回収を最後まで処理する', () => {
+test('全区間のカード使用と回収を最後まで処理する', () => {
   let state = act(createPresetGame('bloom', 1234, 100), { type: 'start' });
   for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
     state = advanceTo(state, frame / 4);
@@ -35,11 +35,11 @@ function expectOwnedOnce(state: GameState) {
 
 for (const routeId of routeIds) {
   for (const seed of [7, 456, 1234]) {
-    test(`${routeId}を60秒循環し、カード所有と本家の得点上限を維持する（seed ${seed}）`, () => {
+    test(`${routeId}を全区間循環し、カード所有と本家の得点上限を維持する（seed ${seed}）`, () => {
       let state = act(createPresetGame(routeId, seed, 100), { type: 'start' });
       let turn = 0;
-      for (let tick = 1; tick <= 3600; tick++) {
-        state = advanceTo(state, tick / 60);
+      for (let tick = 1; tick <= durationSeconds(state) * rules.ticksPerSecond; tick++) {
+        state = advanceTo(state, tick / rules.ticksPerSecond);
         if (tick % 24 === 0) {
           const available = Array.from(
             { length: state.hand.length },

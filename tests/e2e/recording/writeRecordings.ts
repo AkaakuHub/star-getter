@@ -9,17 +9,28 @@ function describe(record: InputRecord): string {
   const input = record.input;
   if (input.kind === 'collect') return 'スターを回収';
   if (input.kind === 'automatic-hearts') return '自動回収を' + (input.enabled ? 'ON' : 'OFF');
+  if (input.kind === 'wait-mode')
+    return 'カード使用可能時の自動停止を' + (input.enabled ? 'ON' : 'OFF');
   const position =
     input.card.handIndex === null ? '' : '・手札' + (input.card.handIndex + 1) + '枚目';
   return (
-    (input.kind === 'special' ? '共鳴' : 'カード') +
+    (input.kind === 'special' || input.kind === 'special-menu' ? '共鳴' : 'カード') +
     '「' +
     input.card.name +
     '」' +
     position +
     '（' +
     input.card.instanceId +
-    '）'
+    '）' +
+    (input.kind === 'card-inspect'
+      ? 'の判断開始'
+      : input.kind === 'card-select'
+        ? 'を選択'
+        : input.kind === 'special-menu'
+          ? 'の一覧を開く'
+          : input.kind === 'card-cancel'
+            ? 'の使用を中止'
+            : 'を発動')
   );
 }
 
@@ -28,9 +39,10 @@ function markdown(label: string, recording: GameRecording): string {
     '# ' + label,
     '',
     '編成:' + routes[recording.route].name + ' / seed:' + recording.seed,
+    '操作時間の仮定:' + JSON.stringify(recording.timing),
     '',
-    '|秒|tick|操作|スター前→後|専用値前→後|デッキ前→後|上限前→後|貝がら蓄積増幅前→後|',
-    '|---:|---:|---|---:|---:|---:|---:|---:|',
+    '|ゲーム秒|操作開始からの秒|tick|操作|スター前→後|専用値前→後|デッキ前→後|上限前→後|貝がら蓄積増幅前→後|',
+    '|---:|---:|---:|---|---:|---:|---:|---:|---:|',
   ];
   for (let index = 0; index < recording.inputs.length; index++) {
     const first = recording.inputs[index];
@@ -58,6 +70,9 @@ function markdown(label: string, recording: GameRecording): string {
       '|' +
         first.seconds.toFixed(3) +
         (elapsed === 0 ? '' : '〜' + last.seconds.toFixed(3)) +
+        '|' +
+        first.wallSeconds.toFixed(3) +
+        (last.wallSeconds === first.wallSeconds ? '' : '〜' + last.wallSeconds.toFixed(3)) +
         '|' +
         first.tick +
         '|' +
@@ -131,6 +146,7 @@ export function writeRecordings(label: string, recordings: readonly GameRecordin
           test: label,
           route: recording.route,
           seed: recording.seed,
+          inputTiming: recording.timing,
           ticksPerSecond: rules.ticksPerSecond,
           finalState: recording.finalState,
           inputs: recording.inputs,

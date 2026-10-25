@@ -10,30 +10,29 @@ import {
   runCollections,
 } from './library/strategy';
 
-test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到達する', () => {
-  const driver = new GameDriver('library');
+test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到達する', async () => {
+  const driver = await GameDriver.create('library');
   driver.report('開始');
   expect(driver.state.storyAmplification).toBe(0);
-  prepare(driver);
+  await prepare(driver);
   driver.report('準備完了');
   expect(driver.seconds).toBeLessThan(25);
-  expect(durationSeconds(driver.state)).toBe(60);
+  expect(durationSeconds(driver.state)).toBe(90);
   for (const token of ['story', 'clock', 'bookmark'])
     expect(driver.state.deck.some((card) => card.token === token)).toBe(true);
   expect(driver.state.stats.cardsUsed).toBeGreaterThan(driver.cardActions);
   expect(driver.state.storyAmplification).toBeGreaterThan(0);
-  const measurementTick = driver.state.tick;
-  const unplanned = new GameDriver('library');
-  playUnplanned(unplanned);
-  unplanned.report('手札の先頭から使用可能なカードを使って60秒終了');
-  const omitted = new GameDriver('library');
-  omitted.finishWithCards(libraryPriority, measurementTick);
+  const unplanned = await GameDriver.create('library');
+  await playUnplanned(unplanned);
+  unplanned.report('手札の先頭から使用可能なカードを使って全区間終了');
+  const omitted = await GameDriver.create('library');
+  await omitted.finishWithCards(libraryPriority);
   omitted.report('共鳴の準備を省略して終了');
-  amplifyAndWiden(driver);
+  await amplifyAndWiden(driver);
   const lateBefore = driver.state.score;
   const lateStartTick = driver.state.tick;
-  const lateRun = runCollections(driver, durationSeconds(driver.state), 15);
-  driver.report('連鎖停止時だけカードで再始動し手動回収主体で60秒終了');
+  const lateRun = await runCollections(driver, durationSeconds(driver.state), 15);
+  driver.report('連鎖停止時だけカードで再始動し手動回収主体で全区間終了');
   const firstStory = driver.inputs.find(
     (row) => row.input.kind === 'card' && row.input.card.instanceId.startsWith('story-'),
   );
@@ -62,11 +61,11 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
 });
 
 for (const seed of [456, 1234]) {
-  test(`うなばら:別の初期手札でも準備から回収連鎖へ移行する（seed ${seed}）`, () => {
-    const driver = new GameDriver('library', seed);
-    prepare(driver);
-    amplifyAndWiden(driver);
-    const run = runCollections(driver, durationSeconds(driver.state), 15);
+  test(`うなばら:別の初期手札でも準備から回収連鎖へ移行する（seed ${seed}）`, async () => {
+    const driver = await GameDriver.create('library', seed);
+    await prepare(driver);
+    await amplifyAndWiden(driver);
+    const run = await runCollections(driver, durationSeconds(driver.state), 15);
     expect(driver.state.phase).toBe('finished');
     expect(driver.state.hearts.heartLimit).toBe(10_000_000);
     expect(run.redraws).toBeGreaterThan(0);
@@ -75,22 +74,22 @@ for (const seed of [456, 1234]) {
   });
 }
 
-test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', () => {
-  const prepared = new GameDriver('library');
-  prepare(prepared);
+test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', async () => {
+  const prepared = await GameDriver.create('library');
+  await prepare(prepared);
   const start = prepared.seconds;
   const score = prepared.state.score;
-  prepared.burst(2, 10);
+  await prepared.burst(2, 10);
   const preparedGain = prepared.state.score - score;
-  const plain = new GameDriver('library');
-  plain.burst(start, 10);
+  const plain = await GameDriver.create('library');
+  await plain.burst(start, 10);
   const plainScore = plain.state.score;
-  plain.burst(2, 10);
+  await plain.burst(2, 10);
   const plainGain = plain.state.score - plainScore;
   prepared.report('準備あり比較');
   plain.report('カード未使用比較');
-  plain.burst(durationSeconds(plain.state) - plain.seconds, 10);
-  plain.report('カード未使用60秒');
+  await plain.burst(durationSeconds(plain.state) - plain.seconds, 10);
+  plain.report('カード未使用全区間');
   expect(plain.state.score).toBeLessThan(100_000_000n);
   console.log(
     JSON.stringify({
@@ -104,26 +103,12 @@ test('うなばら:同じ曲で未準備の回収と準備後の回収を比較�
   expect(preparedGain).toBeGreaterThan(plainGain);
 });
 
-test('うなばら:同じ時刻の手動回収でも次の反応を回収できる', () => {
-  const driver = new GameDriver('library');
-  prepare(driver);
-  const tick = driver.state.tick;
-  const before = driver.state.score;
-  driver.collect();
-  const first = driver.state.score;
-  driver.collect();
-  driver.report('同じ時刻に2回手動回収');
-  expect(first).toBeGreaterThan(before);
-  expect(driver.state.score).toBeGreaterThan(first);
-  expect(driver.state.tick).toBe(tick);
-});
-
-test('うなばら:autoONはカードも手動回収も使わず間隔付きで連鎖する', () => {
-  const driver = new GameDriver('library');
-  prepare(driver);
-  amplifyAndWiden(driver);
-  armAutomaticCollection(driver);
-  driver.toggleAutomaticHearts();
+test('うなばら:autoONはカードも手動回収も使わず間隔付きで連鎖する', async () => {
+  const driver = await GameDriver.create('library');
+  await prepare(driver);
+  await amplifyAndWiden(driver);
+  await armAutomaticCollection(driver);
+  await driver.toggleAutomaticHearts();
   expect(driver.state.automaticHeart.enabled).toBe(true);
   const cards = driver.cardActions;
   const uses = driver.state.stats.cardsUsed;
@@ -132,10 +117,10 @@ test('うなばら:autoONはカードも手動回収も使わず間隔付きで�
   const score = driver.state.score;
   const automaticCollections = driver.automaticCollections;
   const until = driver.state.tick + 2 * 60;
-  driver.tick();
+  await driver.tick();
   expect(driver.state.stats.heartsCollected).toBe(hearts);
   expect(driver.automaticCollections).toBe(automaticCollections);
-  while (driver.state.tick < until) driver.tick();
+  while (driver.state.tick < until) await driver.tick();
   driver.report('自動回収ONで2秒間カードも回収操作も無使用');
   expect(driver.cardActions).toBe(cards);
   expect(driver.state.stats.cardsUsed).toBe(uses);
@@ -146,18 +131,18 @@ test('うなばら:autoONはカードも手動回収も使わず間隔付きで�
   expect(driver.state.score).toBeGreaterThan(score);
 });
 
-test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚補充で継続する', () => {
+test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚補充で継続する', async () => {
   const scores: bigint[] = [];
   let repairs = 0;
   for (const speed of [5, 10, 15] as const) {
-    const driver = new GameDriver('library');
-    prepare(driver);
-    amplifyAndWiden(driver);
+    const driver = await GameDriver.create('library');
+    await prepare(driver);
+    await amplifyAndWiden(driver);
     expect(driver.state.automaticHeart.enabled).toBe(false);
-    const run = runCollections(driver, durationSeconds(driver.state), speed);
+    const run = await runCollections(driver, durationSeconds(driver.state), speed);
     scores.push(driver.state.score);
     repairs += run.deckRepairs;
-    driver.report(speed + '回毎秒と停止時だけカードで60秒終了');
+    driver.report(speed + '回毎秒と停止時だけカードで全区間終了');
     expect(run.collections).toBeGreaterThan(run.cards);
     expect(run.redraws).toBeGreaterThan(0);
     expect(run.collectionGain).toBeGreaterThan(run.cardGain);

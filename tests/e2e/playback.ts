@@ -23,13 +23,17 @@ export class ScenarioAudio implements GameAudio {
 
 export class ScenarioClock implements PlaybackClock {
   seconds = 0;
+  paused = false;
   pause(): Promise<void> {
+    this.paused = true;
     return Promise.resolve();
   }
   resume(): Promise<void> {
+    this.paused = false;
     return Promise.resolve();
   }
   close(): Promise<void> {
+    this.paused = true;
     return Promise.resolve();
   }
 }
