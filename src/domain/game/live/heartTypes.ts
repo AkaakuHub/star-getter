@@ -24,6 +24,9 @@ export type StarGatherHeartRuntimeState = Readonly<{
   throwLimit: number;
   showPercentage: number;
   baseLifeTimeSeconds: number;
+  generationCount: number;
+  collectionSoundCount: number;
+  collectionSoundDelays: readonly number[];
   stageHearts: readonly StarGatherStageHeart[];
   hiddenHeartBatches: readonly Readonly<{
     count: number;

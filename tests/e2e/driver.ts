@@ -1,10 +1,9 @@
-import { routes, type RouteId } from '../../src/content/routes';
-import { tracks } from '../../src/content/tracks';
+import type { RouteId } from '../../src/content/routes';
+import { createPresetGame } from '../../src/app/createPresetGame';
 import { GameController } from '../../src/app/gameController';
-import { ScenarioClock, ScenarioFrames } from './playback';
+import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
 import { cardAt, canUseCard } from '../../src/domain/game/projection';
 import { canUseSpecial } from '../../src/domain/game/special';
-import { createGame } from '../../src/domain/game/simulation';
 import { type GameState, type Card, rules } from '../../src/domain/game/model';
 
 export class GameDriver {
@@ -23,13 +22,11 @@ export class GameDriver {
     readonly route: RouteId,
     seed = 7,
   ) {
-    const track = tracks[0];
-    if (!track) throw new Error('曲がありません。');
-    const preset = routes[route];
     this.controller = new GameController(
-      createGame(track, preset.deck, seed, 100, preset.tokens),
+      createPresetGame(route, seed, 100),
       this.clock,
       this.frames,
+      new ScenarioAudio(),
     );
     this.controller.toggleAutomaticHearts();
     this.observe();

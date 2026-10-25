@@ -137,6 +137,13 @@
   height: 10cqw;
   z-index: 60;
 }
+.live-sound-button {
+  top: 3%;
+  left: 3%;
+  width: 10cqw;
+  height: 10cqw;
+  z-index: 60;
+}
 .game-menu fieldset {
   margin: 0;
   padding: 0;

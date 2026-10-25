@@ -5,12 +5,14 @@ import { resolveStarGatherHeartDrawCount } from '../domain/game/live/heartPresen
 import { advanceWaitMode, releaseWaitMode, type WaitModeState } from '../domain/game/live/waitMode';
 import { advanceTo } from '../domain/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
+import type { GameAudio } from './gameAudio';
 
 export class GameController {
   error = '';
   private currentState: GameState;
   private readonly clock: PlaybackClock;
   private readonly frames: FrameScheduler;
+  private readonly audio: GameAudio;
   private readonly listeners = new Set<() => void>();
   private frame = 0;
   private lastNotification = 0;
@@ -81,16 +83,28 @@ export class GameController {
     }
   }
 
-  constructor(state: GameState, clock: PlaybackClock, frames: FrameScheduler) {
+  constructor(state: GameState, clock: PlaybackClock, frames: FrameScheduler, audio: GameAudio) {
     if (state.phase !== 'ready') throw new Error('開始前のライブを指定してください。');
     this.currentState = act(state, { type: 'start' });
     this.clock = clock;
     this.frames = frames;
+    this.audio = audio;
     this.requestFrame();
   }
 
   get state(): GameState {
     return this.currentState;
+  }
+
+  unlockAudio(): void {
+    if (this.disposed) return;
+    void this.audio.unlock().catch((error: unknown) => this.fail(error));
+  }
+
+  setMuted(muted: boolean): void {
+    if (this.disposed) return;
+    this.audio.setMuted(muted);
+    if (!muted) this.unlockAudio();
   }
 
   get selectedCard(): Card | null {
@@ -137,7 +151,7 @@ export class GameController {
     if (this.disposed || this.busy || this.currentState.phase !== 'playing') return;
     this.advance();
     const previousUses = this.currentState.stats.cardsUsed;
-    this.currentState = act(this.currentState, action);
+    this.applyState(act(this.currentState, action));
     if (this.waiting && this.currentState.stats.cardsUsed > previousUses) {
       this.waitState = releaseWaitMode();
       void this.resumeFromWait();
@@ -197,7 +211,7 @@ export class GameController {
     this.disposed = true;
     this.stopFrames();
     this.listeners.clear();
-    await this.closeClock();
+    await this.closeSession();
   }
 
   private readonly update = (timestamp: number): void => {
@@ -219,19 +233,37 @@ export class GameController {
   private advance(): GameState {
     if (this.waiting) return this.currentState;
     const previousTick = this.currentState.tick;
-    this.currentState = advanceTo(this.currentState, this.clock.seconds);
+    this.applyState(advanceTo(this.currentState, this.clock.seconds));
     if (!this.busy)
       this.synchronizeWaitMode((this.currentState.tick - previousTick) / rules.ticksPerSecond);
     if (this.currentState.phase === 'finished') {
       this.selection = null;
       this.stopFrames();
-      void this.closeClock().catch((error: unknown) => this.fail(error));
+      void this.closeSession().catch((error: unknown) => this.fail(error));
     }
     return this.currentState;
   }
 
-  private closeClock(): Promise<void> {
-    if (!this.closing) this.closing = this.clock.close();
+  private applyState(next: GameState): void {
+    const previous = this.currentState.hearts;
+    this.currentState = next;
+    try {
+      for (let index = previous.generationCount; index < next.hearts.generationCount; index++)
+        this.audio.play('heart-spawn');
+      for (
+        let index = previous.collectionSoundCount;
+        index < next.hearts.collectionSoundCount;
+        index++
+      )
+        this.audio.play('heart-collect');
+    } catch (error) {
+      this.fail(error);
+    }
+  }
+
+  private closeSession(): Promise<void> {
+    if (!this.closing)
+      this.closing = Promise.all([this.clock.close(), this.audio.close()]).then(() => undefined);
     return this.closing;
   }
 

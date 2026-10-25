@@ -1,4 +1,25 @@
 import type { FrameScheduler, PlaybackClock } from '../../src/app/playbackPorts';
+import type { GameAudio, GameSound } from '../../src/app/gameAudio';
+
+export class ScenarioAudio implements GameAudio {
+  muted = false;
+  closed = false;
+  readonly sounds: GameSound[] = [];
+
+  unlock(): Promise<void> {
+    return Promise.resolve();
+  }
+  setMuted(muted: boolean): void {
+    this.muted = muted;
+  }
+  play(sound: GameSound): void {
+    if (!this.muted && !this.closed) this.sounds.push(sound);
+  }
+  close(): Promise<void> {
+    this.closed = true;
+    return Promise.resolve();
+  }
+}
 
 export class ScenarioClock implements PlaybackClock {
   seconds = 0;

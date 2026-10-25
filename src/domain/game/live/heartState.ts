@@ -13,6 +13,8 @@ export function validateState(state: StarGatherHeartRuntimeState): void {
     ['show limit', state.showLimit],
     ['throw limit', state.throwLimit],
     ['show percentage', state.showPercentage],
+    ['generation count', state.generationCount],
+    ['collection sound count', state.collectionSoundCount],
   ] as const) {
     if (!Number.isSafeInteger(value) || value < 0) {
       throw new Error(`StarGather Heart ${label} is invalid`);
@@ -22,6 +24,7 @@ export function validateState(state: StarGatherHeartRuntimeState): void {
     state.showPercentage > 100 ||
     !Number.isFinite(state.baseLifeTimeSeconds) ||
     state.baseLifeTimeSeconds < 0 ||
+    state.collectionSoundDelays.some((delay) => !Number.isFinite(delay) || delay < 0) ||
     state.stageHearts.some(
       (heart) =>
         !Number.isFinite(heart.lifeTimeSeconds) ||

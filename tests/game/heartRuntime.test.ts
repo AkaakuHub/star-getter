@@ -12,12 +12,48 @@ import { projectStarGatherHeartPresentations } from '../../src/domain/game/live/
 import { createRangeRandom } from '../../src/domain/game/random';
 
 describe('きらめきの生成と移動', () => {
+  it('生成音は個数や表示上限ではなく非0の生成要求ごとに数える', () => {
+    const maximum = (_minimum: number, upper: number) => upper;
+    const initial = createStarGatherHeartRuntimeState(30);
+    const empty = spawnStarGatherBeatHearts(initial, 0, maximum);
+    expect(empty.state.generationCount).toBe(0);
+    const full = spawnStarGatherBeatHearts(empty.state, 100, maximum);
+    expect(full.state.generationCount).toBe(1);
+    const overflow = spawnStarGatherBeatHearts(full.state, 100, maximum);
+    expect(overflow.state.generationCount).toBe(2);
+    expect(starGatherHeartCount(overflow.state)).toBe(100);
+  });
+
   it('回収時間のFloat32上端でも連打の次の更新を受け付ける', () => {
     const maximum = (_minimum: number, upper: number) => upper;
     const spawned = spawnStarGatherBeatHearts(createStarGatherHeartRuntimeState(30), 1, maximum);
     const collected = collectStarGatherHeartRuntime(spawned.state, maximum);
     expect(collected.state.stageHearts[0]?.collectMoveDurationSeconds).toBe(Math.fround(1.1));
     expect(() => advanceStarGatherHeartRuntime(collected.state, 1 / 60, false)).not.toThrow();
+  });
+
+  it('回収音は表示分だけ到着前70〜100%で鳴り、連打で前の予約が消えない', () => {
+    const maximum = (_minimum: number, upper: number) => upper;
+    const initial = {
+      ...createStarGatherHeartRuntimeState(30),
+      showPercentage: 100,
+      showLimit: 10,
+    };
+    const first = spawnStarGatherBeatHearts(initial, 100, maximum);
+    const collected = collectStarGatherHeartRuntime(first.state, maximum);
+    expect(collected.state.collectionSoundDelays).toHaveLength(10);
+    expect(
+      advanceStarGatherHeartRuntime(collected.state, 1, false).state.collectionSoundCount,
+    ).toBe(0);
+    const second = spawnStarGatherBeatHearts(collected.state, 5, maximum);
+    const recollected = collectStarGatherHeartRuntime(second.state, maximum);
+    expect(recollected.state.collectionSoundDelays).toHaveLength(10);
+    const arrived = advanceStarGatherHeartRuntime(recollected.state, 1.2, false);
+    expect(arrived.state.collectionSoundCount).toBe(10);
+    expect(arrived.state.collectionSoundDelays).toHaveLength(0);
+    expect(advanceStarGatherHeartRuntime(arrived.state, 1, false).state.collectionSoundCount).toBe(
+      10,
+    );
   });
 
   it('本家の生成範囲・飛び出す距離・時間を乱数で決める', () => {

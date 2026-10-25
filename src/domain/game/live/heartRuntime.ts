@@ -65,8 +65,20 @@ export function advanceStarGatherHeartRuntime(
     return [{ ...batch, lifeTimeSeconds }];
   });
   const expiredCount = expiredStageCount + expiredHiddenCount;
+  const collectionSoundDelays = state.collectionSoundDelays
+    .map((delay) => delay - deltaTimeSeconds)
+    .filter((delay) => delay > Number.EPSILON);
   return {
-    state: { ...state, stageHearts, hiddenHeartBatches },
+    state: {
+      ...state,
+      stageHearts,
+      hiddenHeartBatches,
+      collectionSoundDelays,
+      collectionSoundCount:
+        state.collectionSoundCount +
+        state.collectionSoundDelays.length -
+        collectionSoundDelays.length,
+    },
     lapsedCount: autoPlay ? 0 : expiredCount,
     autoCollectCount: autoPlay ? expiredCount : 0,
   };
@@ -81,16 +93,23 @@ export function collectStarGatherHeartRuntime(
   const collectingHearts = state.stageHearts.filter(
     (heart) => heart.phase !== 'collect' && heart.showState === 'show',
   );
+  const animations = collectingHearts.map((heart) => ({
+    ...heart,
+    phase: 'collect' as const,
+    collectElapsedSeconds: 0,
+    collectMoveDurationSeconds: Math.fround(randomValue(randomRange, 0.9, 1.1)),
+    collectJumpHeight: Math.fround(randomValue(randomRange, 0.5, 1)),
+  }));
   return {
     state: {
       ...state,
-      stageHearts: collectingHearts.map((heart) => ({
-        ...heart,
-        phase: 'collect' as const,
-        collectElapsedSeconds: 0,
-        collectMoveDurationSeconds: Math.fround(randomValue(randomRange, 0.9, 1.1)),
-        collectJumpHeight: Math.fround(randomValue(randomRange, 0.5, 1)),
-      })),
+      stageHearts: animations,
+      collectionSoundDelays: [
+        ...state.collectionSoundDelays,
+        ...animations.map(
+          (heart) => heart.collectMoveDurationSeconds * randomValue(randomRange, 0.7, 1),
+        ),
+      ],
       hiddenHeartBatches: [],
     },
     collectCount,

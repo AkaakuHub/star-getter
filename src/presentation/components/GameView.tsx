@@ -1,4 +1,4 @@
-import { Pause, Menu, List, Layers, Star } from 'lucide-preact';
+import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import { type GameState, rules } from '../../domain/game/model';
@@ -21,6 +21,8 @@ export function GameView({
   onHand,
   onDeck,
   onSpecial,
+  muted,
+  onMuted,
   busy,
 }: Readonly<{
   controller: GameController;
@@ -32,6 +34,8 @@ export function GameView({
   onHand: () => void;
   onDeck: () => void;
   onSpecial: () => void;
+  muted: boolean;
+  onMuted: () => void;
   busy: boolean;
 }>) {
   return (
@@ -82,6 +86,19 @@ export function GameView({
         >
           <Star size={20} aria-hidden="true" />
           <span>100</span>
+        </button>
+        <button
+          type="button"
+          className="live-tool live-sound-button"
+          aria-label={muted ? '音声をオンにする' : '音声をオフにする'}
+          aria-pressed={!muted}
+          onClick={onMuted}
+        >
+          {muted ? (
+            <VolumeX size={20} aria-hidden="true" />
+          ) : (
+            <Volume2 size={20} aria-hidden="true" />
+          )}
         </button>
         <button
           type="button"

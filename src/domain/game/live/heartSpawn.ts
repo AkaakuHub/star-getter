@@ -31,6 +31,9 @@ export function createStarGatherHeartRuntimeState(
     throwLimit: defaultHeartLimit,
     showPercentage: defaultShowPercentage,
     baseLifeTimeSeconds: calculateStarGatherHeartBaseLifeTimeSeconds(musicFinishTimeSeconds),
+    generationCount: 0,
+    collectionSoundCount: 0,
+    collectionSoundDelays: [],
     stageHearts: [],
     hiddenHeartBatches: [],
   };
@@ -97,6 +100,7 @@ function spawnStarGatherHearts(
   return {
     state: {
       ...state,
+      generationCount: state.generationCount + (requestedCount > 0 ? 1 : 0),
       stageHearts: [
         ...state.stageHearts,
         ...Array.from({ length: showCount }, () => createStageHeart('show')),

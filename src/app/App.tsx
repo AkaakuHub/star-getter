@@ -15,7 +15,10 @@ type Panel = 'menu' | 'hand' | 'deck' | 'special';
 export function App() {
   const [route, setRoute] = useState(() => initialRoute(location.href));
   const [heartShowLimit, setHeartShowLimit] = useState(() => readHeartShowLimit(localStorage));
-  const [controller, setController] = useState(() => createGameController(route, heartShowLimit));
+  const [muted, setMuted] = useState(false);
+  const [controller, setController] = useState(() =>
+    createGameController(route, heartShowLimit, muted),
+  );
   const [panel, setPanel] = useState<Panel | null>(null);
   const [resumeAfterPanel, setResumeAfterPanel] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -34,7 +37,7 @@ export function App() {
     setBusy(true);
     try {
       await controller.dispose();
-      const next = createGameController(nextRoute, heartShowLimit);
+      const next = createGameController(nextRoute, heartShowLimit, muted);
       const url = new URL(location.href);
       url.searchParams.set('route', nextRoute);
       history.replaceState(null, '', url);
@@ -99,7 +102,11 @@ export function App() {
   }
 
   return (
-    <div className="app-shell is-playing">
+    <div
+      className="app-shell is-playing"
+      onPointerDownCapture={() => controller.unlockAudio()}
+      onKeyDownCapture={() => controller.unlockAudio()}
+    >
       {(error || controller.error) && (
         <p role="alert" className="error-banner">
           {error || controller.error}
@@ -115,6 +122,11 @@ export function App() {
         onHand={() => void openPanel('hand')}
         onDeck={() => void openPanel('deck')}
         onSpecial={openSpecial}
+        muted={muted}
+        onMuted={() => {
+          controller.setMuted(!muted);
+          setMuted(!muted);
+        }}
         busy={busy}
       />
       {panel === 'menu' && (
