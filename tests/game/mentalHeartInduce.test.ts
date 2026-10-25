@@ -7,7 +7,7 @@ import {
 import { heartCount } from '../../src/domain/game/hearts';
 import { game } from './support/game';
 
-it('Action23はActionType1の1.5ハートをMathf.Roundで2個にする', () => {
+it('Action23はActionType1の値をC#のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const withBuff = {
     ...initial,
@@ -29,10 +29,10 @@ it('Action23はActionType1の1.5ハートをMathf.Roundで2個にする', () => 
     1,
     0,
   );
-  expect(heartCount(induceMentalHearts(inducing, 1))).toBe(2);
+  expect(heartCount(induceMentalHearts(inducing, 1))).toBe(1);
 });
 
-it('Action23はActionType52の1.5ハートもMathf.Roundで2個にする', () => {
+it('Action23はActionType52の値もC#のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const withBuff = applyEffect(initial, {
     kind: 'skill-boost',
@@ -57,5 +57,5 @@ it('Action23はActionType52の1.5ハートもMathf.Roundで2個にする', () =>
     1,
     0,
   );
-  expect(heartCount(induceMentalHearts(inducing, 1))).toBe(2);
+  expect(heartCount(induceMentalHearts(inducing, 1))).toBe(1);
 });
