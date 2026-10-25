@@ -23,23 +23,28 @@ export function activateAddVoltageSkill(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const initial = Math.fround(Math.fround(effect.amount / 10_000) + correction);
-  const combined = Math.fround(Math.fround(initial + addValue) * multiplier);
-  const base = Math.fround(Math.trunc(Math.fround(combined * effectPower)));
-  const additional = applyAdditionalBuff(state, 'excitement', base, card);
-  const boosted = applyAction52SkillBoostForCard(
-    additional.state,
-    card,
-    Math.trunc(additional.value),
+  const initial = Math.fround(
+    Math.fround(int32(effect.amount)) / Math.fround(10_000) + Math.fround(correction),
   );
+  const combined = Math.fround(
+    Math.fround(Math.fround(initial + Math.fround(addValue)) * Math.fround(multiplier)) *
+      Math.fround(effectPower),
+  );
+  const base = Math.fround(int32(combined));
+  const additional = applyAdditionalBuff(state, 'excitement', base, card);
+  const boosted = applyAction52SkillBoostForCard(additional.state, card, int32(additional.value));
   if (effect.numberType !== 1) return boosted.state;
   return changeResource(
     boosted.state,
     'excitement',
-    BigInt(Math.trunc(boosted.value)),
+    BigInt(int32(boosted.value)),
     'skill',
     card,
     apply,
     true,
   );
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }

@@ -41,3 +41,15 @@ it('Action10は数値種別1以外では補正を消費して熱気を加算し�
   expect(unchanged.excitement).toBe(initial.excitement);
   expect(unchanged.action52Buffs).toHaveLength(0);
 });
+
+it('Action10の詳細値と補正値をC#のint32として扱う', () => {
+  const initial = { ...game(), excitement: 500_000_000 };
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const changed = applyEffect(
+    initial,
+    { kind: 'add-voltage-skill', amount: 2_147_483_648, numberType: 1 },
+    source,
+  );
+  expect(changed.excitement).toBe(499_785_252);
+});
