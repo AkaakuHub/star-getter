@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
+import { act } from '../../src/domain/game/actions';
 import { activateBloom } from '../../src/domain/game/bloom';
 import { applyEffect } from '../../src/domain/game/effects';
 import { advanceTo } from '../../src/domain/game/simulation';
@@ -100,4 +101,32 @@ it('パート数で指定した熱気停止は指定回数の切替まで継続�
   const second = advanceTo(first, (secondSection.startBeat * 60) / initial.track.bpm + 1 / 60);
   expect(second.voltageStops).toHaveLength(0);
   expect(second.excitement).toBe(0);
+});
+
+it('外部解除型は指定期限で自動解除せず、Deactivatorで解除する', () => {
+  const initial = game('library');
+  const stopped = applyEffect(initial, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'sections', value: 1 },
+    invocationType: 0x388,
+    deactivationKey: 'voltage-stop',
+  });
+  const section = initial.track.sections[1];
+  if (!section) throw new Error('パートが不足しています。');
+  const afterSection = advanceTo(stopped, (section.startBeat * 60) / initial.track.bpm + 1 / 60);
+  expect(afterSection.voltageStops).toHaveLength(1);
+  expect(
+    act(afterSection, { type: 'deactivate-voltage-increase', deactivationKey: 'voltage-stop' })
+      .voltageStops,
+  ).toHaveLength(0);
+});
+
+it('負のミリ秒期限はC#同様に次の更新で停止を解除する', () => {
+  const initial = game('library');
+  const stopped = applyEffect(initial, {
+    kind: 'stop-voltage-increase',
+    duration: { kind: 'milliseconds', value: -1 },
+  });
+  expect(stopped.voltageStops).toHaveLength(1);
+  expect(advanceTo(stopped, 1 / 60).voltageStops).toHaveLength(0);
 });

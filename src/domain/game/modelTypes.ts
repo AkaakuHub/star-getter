@@ -2,6 +2,7 @@ import type { GameCondition } from './conditions/model';
 import type { ModeChange } from './live/modes';
 import type { MemberId, TokenKind, UnitId } from './model';
 import type { VoltageConvertEffect } from './voltageConversionTypes';
+import type { StopVoltageIncreaseEffect } from './voltageConversionTypes';
 import type { Action52BuffEffect } from './skillBoostTypes';
 import type { MentalHeartInduceEffect } from './mentalHeartInduceTypes';
 
@@ -322,10 +323,7 @@ type EffectShape =
   | ParameterValueChangeEffect
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | GaugeEffect
-  | Readonly<{
-      kind: 'stop-voltage-increase';
-      duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
-    }>
+  | StopVoltageIncreaseEffect
   | Readonly<{
       kind: 'resource-boost';
       target: 'excitement' | 'stamina' | 'attract';

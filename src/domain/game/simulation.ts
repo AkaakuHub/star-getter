@@ -32,6 +32,10 @@ import { advanceProxySkillPeriods, advanceProxySkillSections } from './effects/p
 import { applyEffect } from './effects';
 import { advanceComboInducer, expireComboInducerSections } from './effects/comboInduce';
 import { advanceHeartLimitBuffs, expireHeartLimitBuffSections } from './effects/heartLimit';
+import {
+  advanceVoltageIncreaseStops,
+  expireVoltageIncreaseStopSections,
+} from './effects/stopVoltageIncrease';
 import { advanceApSpeedEffects, expireApSpeedSections } from './effects/apSpeed';
 import {
   advanceVoltageConversions,
@@ -116,6 +120,7 @@ export function createGame(
     mentalTimerSeconds: 0,
     voltageTimerSeconds: 0,
     voltageStops: [],
+    nextVoltageStopId: 1,
     gaugeInfinities: [],
     gaugeRegenerations: [],
     moodOffset: 0,
@@ -233,11 +238,6 @@ function advanceTick(state: GameState): GameState {
   let next: GameState = advanceHearts({
     ...advanceHeartBoosts(comboState, dt),
     tick,
-    voltageStops: state.voltageStops.flatMap((stop) => {
-      if (stop.remainingSeconds === null) return [stop];
-      const remainingSeconds = Math.fround(stop.remainingSeconds - Math.fround(dt));
-      return remainingSeconds > 0 ? [{ ...stop, remainingSeconds }] : [];
-    }),
     tokenBoosts: state.tokenBoosts.flatMap((boost) => {
       if (boost.remainingSeconds === null) return [boost];
       const remainingSeconds = Math.fround(boost.remainingSeconds - Math.fround(dt));
@@ -250,6 +250,7 @@ function advanceTick(state: GameState): GameState {
   const elapsedHandLimit = advanceHandLimitEffects(next, dt);
   next = elapsedHandLimit.state;
   next = advanceHeartLimitBuffs(next, dt);
+  next = advanceVoltageIncreaseStops(next, dt);
   if (elapsedHandLimit.handAdjustment > 0) {
     next = restoreHandLimitCount(next, elapsedHandLimit.handAdjustment);
   }
@@ -275,13 +276,9 @@ function advanceTick(state: GameState): GameState {
     next = expireGaugeInfinities(next, 'sections', 1);
     next = expireGaugeRegenerations(next, 'sections');
     next = expireMentalBarriers(next, 'sections', 1);
+    next = expireVoltageIncreaseStopSections(next);
     next = {
       ...next,
-      voltageStops: next.voltageStops.flatMap((stop) => {
-        if (stop.remainingSections === null) return [stop];
-        const remainingSections = stop.remainingSections - 1;
-        return remainingSections > 0 ? [{ ...stop, remainingSections }] : [];
-      }),
       tokenBoosts: next.tokenBoosts.flatMap((boost) => {
         if (boost.remainingSections === null) return [boost];
         const remainingSections = boost.remainingSections - 1;

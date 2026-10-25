@@ -264,9 +264,12 @@ export type GameState = Readonly<{
   mentalTimerSeconds: number;
   voltageTimerSeconds: number;
   voltageStops: readonly Readonly<{
+    id: number;
     remainingSeconds: number | null;
     remainingSections: number | null;
+    deactivationKey: string | null;
   }>[];
+  nextVoltageStopId: number;
   nextVoltageConversionId: number;
   nextAction52BuffId: number;
   temporaryScoreBoosts: readonly TemporaryScoreBoost[];
@@ -323,7 +326,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-voltage-convert'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-heart-induce'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-combo-induce'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-heart-limit'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-voltage-increase'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

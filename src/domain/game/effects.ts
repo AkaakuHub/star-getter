@@ -35,6 +35,7 @@ import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
 import { activateVoltageConversion } from './effects/voltageConversion';
 import { activateMentalHeartInduce } from './effects/mentalHeartInduce';
 import { activateComboInduce } from './effects/comboInduce';
+import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -264,20 +265,7 @@ export function applyEffect(
         BigInt(Math.trunc(Math.fround(effect.amount)) - Math.trunc(state.excitement)),
       );
     case 'stop-voltage-increase':
-      if (effect.duration.value === 0) return state;
-      return {
-        ...state,
-        voltageStops: [
-          ...state.voltageStops,
-          {
-            remainingSeconds:
-              effect.duration.kind === 'milliseconds'
-                ? Math.fround(effect.duration.value / 1000)
-                : null,
-            remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
-          },
-        ],
-      };
+      return activateVoltageIncreaseStop(state, effect);
     case 'infinity-gauge':
       return activateInfinityGauge(state, effect);
     case 'gauge-regeneration':

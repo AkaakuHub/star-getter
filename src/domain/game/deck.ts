@@ -129,7 +129,11 @@ function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'stop-voltage-increase') {
-    if (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)
+    if (
+      !Number.isSafeInteger(effect.duration.value) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
       throw new Error('熱気停止の期限が正しくありません。');
     return;
   }

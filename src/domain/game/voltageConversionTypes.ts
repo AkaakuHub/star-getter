@@ -3,6 +3,13 @@ export type VoltageConversionDuration = Readonly<{
   value: number;
 }>;
 
+export type StopVoltageIncreaseEffect = Readonly<{
+  kind: 'stop-voltage-increase';
+  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
 export type VoltageConversion = Readonly<{
   id: number;
   destination: 'hearts' | 'love' | 'stamina' | 'mental-barrier';
