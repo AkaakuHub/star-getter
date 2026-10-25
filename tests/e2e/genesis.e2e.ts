@@ -36,10 +36,10 @@ function activate(driver: GameDriver): number {
   return payment;
 }
 
-function prepare(driver: GameDriver): void {
+function prepare(driver: GameDriver, stableCollection = true): void {
   const target = (rules.maxBloomGauge * 99n) / 100n;
   while (
-    driver.seconds < durationSeconds(driver.state) - 3 &&
+    driver.seconds < durationSeconds(driver.state) - 2 &&
     (driver.state.bloom?.progress ?? 0n) < target
   ) {
     const created = driver.state.deck.some((card) => card.token === 'shadow');
@@ -56,12 +56,18 @@ function prepare(driver: GameDriver): void {
             : priority;
     const beforeRedraw = driver.collectionRedraws;
     if (
+      stableCollection &&
       shadowUses >= 14 &&
       moodValue(driver.state) <= -100 &&
       heartCount(driver.state) >= 500_000
     ) {
       driver.collect();
-      if (driver.collectionRedraws > beforeRedraw && heartCount(driver.state) >= 500_000) return;
+      if (driver.collectionRedraws > beforeRedraw && heartCount(driver.state) >= 500_000) {
+        const redraws = driver.collectionRedraws;
+        driver.burst(2, 10);
+        if (driver.collectionRedraws - redraws === 20 && heartCount(driver.state) >= 500_000)
+          return;
+      }
     }
     driver.useFirst(
       shadowUses >= 14 && moodValue(driver.state) <= -100 && heartCount(driver.state) < 500_000
@@ -117,10 +123,10 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   plain.report('カード未使用60秒');
   while (driver.state.phase === 'playing') {
     if (moodValue(driver.state) > -100) driver.useFirst(['rain-preparation', 'sunrise']);
-    if (driver.state.tick % 6 === 0) driver.collect();
+    if (driver.state.tick % 4 === 0) driver.collect();
     driver.tick();
   }
-  driver.report('60秒終了');
+  driver.report('15回毎秒で60秒終了');
   const omitted = new GameDriver('bloom');
   const omittedGain = omitted.finishWithCards(priority, measurementTick);
   omitted.report('順序を省略した連打');
@@ -138,7 +144,18 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   expect(plain.state.score).toBeLessThan(100_000_000n);
   expect(preparedGain).toBeGreaterThan(earlyGain);
   expect(preparedGain).toBeGreaterThan(plainGain);
-  expect.soft(driver.peakGauge).toBeGreaterThanOrEqual((rules.maxBloomGauge * 99n) / 100n);
   expect(driver.state.score).toBeGreaterThan(omitted.state.score);
   expect.soft(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
+});
+
+test('開花:カード準備を専用値上限の直前まで継続する', () => {
+  const driver = new GameDriver('bloom');
+  activate(driver);
+  driver.burst(2, 10);
+  prepare(driver, false);
+  driver.report('専用値目標までカード準備を継続');
+  driver.burst(durationSeconds(driver.state) - driver.seconds, 15);
+  driver.report('専用値準備後の15回毎秒で60秒終了');
+  expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
+  expect(driver.peakGauge).toBeGreaterThanOrEqual((rules.maxBloomGauge * 99n) / 100n);
 });
