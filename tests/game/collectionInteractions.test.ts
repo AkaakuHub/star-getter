@@ -22,6 +22,7 @@ it('手札の回収条件は複数回の合計で成立し、自動回収の0.3�
   let state: GameState = {
     ...initial,
     hand: ['horizon'],
+    handEffectCardIds: ['horizon'],
     hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
   };
   state = act(addHearts(state, 2_999), { type: 'collect' });
@@ -42,6 +43,7 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
   let state: GameState = {
     ...initial,
     hand: ['horizon'],
+    handEffectCardIds: ['horizon'],
     hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
   };
   state = act(addHearts(state, 9_000), { type: 'collect' });
@@ -71,6 +73,7 @@ function preparedLibrary(): GameState {
     {
       ...state,
       hand,
+      handEffectCardIds: hand,
       drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
       discard: [],
       storyAmplification: 10_000,
@@ -113,6 +116,7 @@ for (const mood of [-100, 0, 100]) {
         moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
       },
       hand: ['horizon'],
+      handEffectCardIds: ['horizon'],
       hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 1_000_000 },
     };
     const collected = act(addHearts(state, 3_000), { type: 'collect' });

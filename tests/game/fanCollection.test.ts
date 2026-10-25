@@ -52,19 +52,19 @@ it('共演の30万回収は最低値1の0.1APを最後に切り捨て、増幅�
 it('APは小数のまま増幅して最後に切り捨て、先に1へ切り上げない', () => {
   expect(
     applyEffect(
-      { ...game(), energy: 0, hand: [], amplification: 100 },
+      { ...game(), energy: 0, hand: [], handEffectCardIds: [], amplification: 100 },
       { kind: 'energy', amount: 0.1 },
     ).energy,
   ).toBe(0);
   expect(
     applyEffect(
-      { ...game(), energy: 0, hand: [], amplification: 1100 },
+      { ...game(), energy: 0, hand: [], handEffectCardIds: [], amplification: 1100 },
       { kind: 'energy', amount: 0.1 },
     ).energy,
   ).toBe(1);
   expect(
     applyEffect(
-      { ...game(), energy: 0, hand: [], amplification: 150 },
+      { ...game(), energy: 0, hand: [], handEffectCardIds: [], amplification: 150 },
       { kind: 'energy', amount: 3 },
     ).energy,
   ).toBe(4);

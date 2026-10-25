@@ -58,7 +58,7 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
       const percent = state.deck.reduce(
         (sum, card) =>
           sum +
-          (state.hand.includes(card.id) && card.passive
+          (state.handEffectCardIds.includes(card.id) && card.passive
             ? skillValue(state, card.passive.heartsPercent ?? 0, {
                 kind: 'amplify',
                 percent: card.passive.heartsPercent ?? 0,
@@ -292,7 +292,7 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   const handBoost = state.deck.reduce(
     (sum, item) =>
       sum +
-      (state.hand.includes(item.id) &&
+      (state.handEffectCardIds.includes(item.id) &&
       (item.token === 'bookmark' || item.token === 'story') &&
       state.deck.length >= 80
         ? Math.fround(1001 + Math.max(0, moodValue(state)) * 5.005)
@@ -309,7 +309,8 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   const passive = card
     ? state.deck.reduce((sum, item) => {
         const boost = item.passive?.skillBoost;
-        if (!state.hand.includes(item.id) || !boost?.members.includes(card.member)) return sum;
+        if (!state.handEffectCardIds.includes(item.id) || !boost?.members.includes(card.member))
+          return sum;
         const mood = boost.moodBonus
           ? calculateSkillMoodCorrection(
               boost.moodBonus.target,

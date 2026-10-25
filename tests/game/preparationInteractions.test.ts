@@ -37,6 +37,7 @@ it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍�
   const state = {
     ...initial,
     hand: [],
+    handEffectCardIds: [],
     targetBoosts: [],
     excitement: 655_000_001,
     moodOffset: -150,
@@ -63,7 +64,7 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
 });
 
 it('シールドは負の回復効果を防ぎ、自然減少は防がない', () => {
-  const initial = { ...game(), hand: [], stamina: 100, targetBoosts: [] };
+  const initial = { ...game(), hand: [], handEffectCardIds: [], stamina: 100, targetBoosts: [] };
   const shield = applyEffect(initial, { kind: 'mental-shield', amount: 10 });
   const damaged = applyEffect(shield, { kind: 'stamina', amount: -14 });
   expect(damaged.stamina).toBe(96);
@@ -159,6 +160,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     deck,
     cardPool: deck,
     hand: [],
+    handEffectCardIds: [],
     drawPile: deck.map((card) => card.id),
     discard: [],
     handLimit: 8,

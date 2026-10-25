@@ -19,6 +19,7 @@ export function withHand(state: GameState, hand: readonly string[]): GameState {
   return {
     ...state,
     hand,
+    handEffectCardIds: hand,
     drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
     discard: [],
   };

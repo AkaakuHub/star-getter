@@ -1,12 +1,14 @@
 import { createRangeRandom } from '../random';
 import { drawCandidate, drawWeight } from './drawLottery';
+import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
 import type { Card, GameState } from '../model';
 
 export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
-    (sum, card) => sum + (state.hand.includes(card.id) ? (card.passive?.handLimitDelta ?? 0) : 0),
+    (sum, card) =>
+      sum + (state.handEffectCardIds.includes(card.id) ? (card.passive?.handLimitDelta ?? 0) : 0),
     0,
   );
   return Math.max(3, Math.min(8, state.handLimit + penalty));
@@ -79,7 +81,13 @@ function drawUntil(state: GameState, count: number): GameState {
     if (!card) throw new Error('引いたカードがありません。');
     drawnCards.push(card);
   }
-  for (const card of drawnCards) next = applyDrawAbility(next, card);
+  for (const card of drawnCards) {
+    if (state.drawContext !== 'initial') next = applyDrawAbility(next, card);
+    next = {
+      ...next,
+      handEffectCardIds: [...next.handEffectCardIds.filter((id) => id !== card.id), card.id],
+    };
+  }
   const maximum = handCapacity(next);
   if (next.hand.length > maximum) {
     const ordered = [...next.hand].sort(
@@ -88,7 +96,7 @@ function drawUntil(state: GameState, count: number): GameState {
         Number(Boolean(next.deck.find((card) => card.id === left)?.passive)),
     );
     next = {
-      ...next,
+      ...disposeHandEffects(next, ordered.slice(maximum)),
       hand: ordered.slice(0, maximum),
       discard: [...next.discard, ...ordered.slice(maximum)],
     };
@@ -101,6 +109,7 @@ export function shuffleHand(state: GameState): GameState {
   return {
     ...state,
     hand: [],
+    handEffectCardIds: state.handEffectCardIds.filter((id) => !state.hand.includes(id)),
     drawPile: shuffled.items,
     discard: [],
     randomSeed: shuffled.seed,

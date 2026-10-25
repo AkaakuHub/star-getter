@@ -1,5 +1,6 @@
 import type { Card, GameState } from '../model';
 import { applyEffect } from '../effects';
+import { handEffectCards } from './handEffects';
 import { moodValue } from '../projection';
 
 export function applyUseAbility(state: GameState, card: Card): GameState {
@@ -58,8 +59,8 @@ export function notifyHandSkillUse(state: GameState, used: Card): GameState {
     (next, effect) => applyEffect(next, effect, used),
     state,
   );
-  const listeners = activated.deck.filter(
-    (card) => activated.hand.includes(card.id) && card.handUse?.trigger === used.unit,
+  const listeners = handEffectCards(activated).filter(
+    (card) => card.handUse?.trigger === used.unit,
   );
   return listeners.reduce(
     (next, card) =>

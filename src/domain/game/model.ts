@@ -182,6 +182,7 @@ export type GameState = Readonly<{
   deck: readonly Card[];
   cardPool: readonly Card[];
   hand: readonly string[];
+  handEffectCardIds: readonly string[];
   drawPile: readonly string[];
   discard: readonly string[];
   tokenCatalog: readonly Card[];

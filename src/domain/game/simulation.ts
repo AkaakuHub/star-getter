@@ -1,7 +1,6 @@
 import { advanceAutomaticGauges } from './automaticGauges';
 import { moodAtTime, validateMoodTimeline } from './live/moodTimeline';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
-import { applyDrawAbility } from './cards/drawAbilities';
 import { beatHeartCount } from './beat';
 import { validateDeck, validateCard, shuffle } from './deck';
 import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
@@ -43,6 +42,7 @@ export function createGame(
     deck: [...deck],
     cardPool: [...deck],
     hand: [lead.id],
+    handEffectCardIds: [lead.id],
     drawPile: ordered.slice(1),
     discard: [],
     tokenCatalog,
@@ -116,12 +116,7 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  const drawn = initial.hand.reduce((next, id) => {
-    const card = next.deck.find((item) => item.id === id);
-    if (!card) throw new Error('開始時の手札がありません。');
-    return applyDrawAbility(next, card);
-  }, initial);
-  return fillHand(drawn);
+  return fillHand(initial);
 }
 
 export function advanceTo(state: GameState, seconds: number): GameState {

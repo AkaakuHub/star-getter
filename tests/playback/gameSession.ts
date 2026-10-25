@@ -73,7 +73,7 @@ export function session(energy = 10) {
   const frames = new TestFrames();
   const audio = new TestAudio();
   const controller = new GameController(
-    { ...createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), energy },
+    { ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens), energy },
     clock,
     frames,
     audio,

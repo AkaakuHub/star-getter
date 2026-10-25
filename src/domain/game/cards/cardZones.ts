@@ -1,4 +1,5 @@
 import type { GameState } from '../model';
+import { disposeHandEffects } from './handEffects';
 import { flushDeckActions } from './boardActions';
 import { fillHand, shuffleHand } from './drawing';
 
@@ -9,7 +10,7 @@ export function finishCardActivation(state: GameState): GameState {
   if (!source) throw new Error('使用したカードがありません。');
   const children = activation.usedCards.filter((id) => id !== source.id);
   let next = excludeCards(
-    state,
+    disposeHandEffects(state, children),
     activation.excluded.filter((id) => id !== source.id),
   );
   const activeChildren = children.filter((id) => next.deck.some((card) => card.id === id));
@@ -23,6 +24,7 @@ export function finishCardActivation(state: GameState): GameState {
     lastUsedUnit: source.unit,
     drawContext: 'skill',
   });
+  next = disposeHandEffects(next, [source.id]);
   next = activation.excluded.includes(source.id)
     ? excludeCards(next, [source.id])
     : { ...next, discard: [...next.discard, source.id] };

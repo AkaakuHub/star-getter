@@ -19,6 +19,7 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
     ...advanceTo(game(), 12),
     moodOffset: -100,
     hand: ['horizon'],
+    handEffectCardIds: ['horizon'],
     mentalProtected: true,
     apTimerSeconds: 0,
     apIntervalFactor: 1,
@@ -36,12 +37,14 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
 });
 
 it('開花中の自然元気減少は専用値を減らし、休憩防止の付与後だけ停止する', () => {
+  const base = advanceTo(game(), 12);
   const initial = activateBloom(
     {
-      ...advanceTo(game(), 12),
+      ...base,
       moodOffset: -100,
       hand: ['horizon'],
-      energy: 10,
+      handEffectCardIds: ['horizon'],
+      energy: base.maxEnergy,
       apTimerSeconds: 0,
       voltageTimerSeconds: 0,
       mentalTimerSeconds: 0,
