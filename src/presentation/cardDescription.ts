@@ -2,21 +2,30 @@ import { scoreUnits } from './score/units';
 import { describeAbilities } from './cards/describeAbilities';
 import { describeEffect } from './cards/describeEffect';
 import type { Card } from '../domain/game/model';
+import { targetNames } from './cards/targetNames';
 
 export function describeCard(card: Card): string {
-  const skill =
-    card.effects.map(describeEffect).join('') +
-    describeAbilities(card) +
-    (card.passive?.heartsPercent
-      ? `手札にある間、きらめき獲得数を+${card.passive.heartsPercent}%し、手札上限を${Math.abs(card.passive.handLimitDelta ?? 0)}枚減少する。`
-      : '');
-  return card.relay
-    ? skill +
-        `手札にある間、累計${card.relay.threshold}個を回収したとき、${card.relay.beats ? '自然発生' : 'きらめきを'}${card.relay.hearts}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`
-    : skill +
-        (card.passive?.skillBoost
-          ? '手札にある間、太陽の起点と雨音のアクション効果を+300%増幅する。'
-          : '');
+  return card.effects.map(describeEffect).join('') + describeCardTraits(card).join('');
+}
+
+export function describeCardTraits(card: Card): readonly string[] {
+  const traits = describeAbilities(card)
+    .split('。')
+    .filter(Boolean)
+    .map((sentence) => sentence + '。');
+  if (card.passive?.heartsPercent)
+    traits.push(
+      `手札にある間、きらめき獲得数を+${card.passive.heartsPercent}%し、手札上限を${Math.abs(card.passive.handLimitDelta ?? 0)}枚減少する。`,
+    );
+  if (card.relay)
+    traits.push(
+      `手札にある間、累計${card.relay.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.relay.beats ? '自然発生' : 'きらめきを'}${card.relay.hearts.toLocaleString('ja-JP')}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`,
+    );
+  if (card.passive?.skillBoost)
+    traits.push(
+      `手札にある間、${targetNames(card.passive.skillBoost.members)}のアクション効果を+${card.passive.skillBoost.percent}%増幅する。`,
+    );
+  return traits;
 }
 
 export function formatTime(seconds: number): string {

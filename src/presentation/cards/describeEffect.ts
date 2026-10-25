@@ -1,5 +1,14 @@
 import { tokenNames } from '../../content/labels/tokens';
 import type { Effect } from '../../domain/game/model';
+import { targetNames } from './targetNames';
+
+export const effectConditions = {
+  happy100: '空模様が晴れ100%',
+  mellow100: '空模様が雨100%',
+  deck80: '編成が80枚以上',
+  'first-section': '最初のパート',
+  'last-section': '最後のパート',
+} as const;
 
 export function describeEffect(effect: Effect): string {
   switch (effect.kind) {
@@ -16,16 +25,8 @@ export function describeEffect(effect: Effect): string {
       return '他の手札のアクションを一斉に使用する。必要エナジーは他の手札の合計からデッキ枚数に応じた値を引いて決まる。';
     case 'mood':
       return `このパート中、空模様を${effect.amount < 0 ? '雨' : '晴れ'}方向へ${Math.abs(effect.amount)}%変化させる。`;
-    case 'conditional': {
-      const conditions = {
-        happy100: '空模様が晴れ100%',
-        mellow100: '空模様が雨100%',
-        deck80: '編成が80枚以上',
-        'first-section': '最初のパート',
-        'last-section': '最後のパート',
-      };
-      return `${conditions[effect.condition]}のとき、${effect.effects.map(describeEffect).join('')}`;
-    }
+    case 'conditional':
+      return `${effectConditions[effect.condition]}のとき、${effect.effects.map(describeEffect).join('')}`;
     case 'voltage-tier':
       return `熱気Lv.200ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * 200}以上：${tier.map(describeEffect).join('')}`).join('')}`;
     case 'energy-limit':
@@ -55,7 +56,7 @@ export function describeEffect(effect: Effect): string {
     case 'boost':
       return `このステージ中、獲得するSTARを${Math.round((effect.multiplier - 1) * 100)}%増加させる。この効果は重複し、効果増幅の対象となる。`;
     case 'amplify':
-      return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、${effect.members ? '対象メンバーの' : '全ての'}アクションの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
+      return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、${effect.members ? targetNames(effect.members) + 'の' : '全ての'}アクションの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
     case 'bloom':
       return '空模様が−100%のときに使用できる。このステージ中、開花を発動し、きらめきを結晶に変化させる。エナジー・熱気・元気の増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のSTARが増加する。発動時のゲージを保持し、開花中はエナジー残量に関係なくアクションを使用できる。';
     case 'resource-boost':

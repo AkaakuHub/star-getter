@@ -1,0 +1,71 @@
+.effect-details,
+.card-traits {
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.effect-details > li + li,
+.card-traits > li + li {
+  margin-top: 12px;
+}
+.effect-details p {
+  margin: 0;
+}
+.effect-details .effect-mood {
+  margin-top: 6px;
+}
+.effect-condition {
+  padding: 10px 12px;
+  border-left: 3px solid #b88eae;
+  background: #f7eef4;
+}
+.effect-condition h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.effect-tiers {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.effect-tiers caption {
+  margin-bottom: 10px;
+  text-align: left;
+}
+.effect-tiers th,
+.effect-tiers td {
+  padding: 12px 8px;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid #d8cbd5;
+}
+.effect-tiers th {
+  font-size: 0.95rem;
+  background: #f7eef4;
+}
+.effect-tiers th:first-child {
+  width: 4.5rem;
+}
+.effect-tiers thead span {
+  display: block;
+}
+.tier-details > section + section,
+.tier-details > table + section {
+  margin-top: 20px;
+}
+.tier-details h4 {
+  margin-bottom: 10px;
+}
+.effect-tiers .effect-details {
+  padding: 0;
+  list-style: none;
+}
+.card-performance-effect > section + section {
+  margin-top: 24px;
+}
+.card-performance-effect h3 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}

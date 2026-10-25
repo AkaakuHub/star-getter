@@ -79,13 +79,9 @@
   align-self: center;
   font-size: 1rem;
 }
-.special-option p,
+.special-option > .effect-details,
 .special-option .button {
   grid-column: 1 / -1;
-}
-.special-option p {
-  font-size: 0.9rem;
-  line-height: 1.7;
 }
 .special-option .button {
   padding-inline: 12px;

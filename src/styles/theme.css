@@ -9,6 +9,7 @@
 @import './stage.css';
 @import './dialogs.css';
 @import './cardBrowser.css';
+@import './effectDetails.css';
 @import './results.css';
 
 @theme {

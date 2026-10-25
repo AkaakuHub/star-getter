@@ -1,8 +1,10 @@
 import type { Card } from '../../domain/game/model';
-import { describeCard } from '../cardDescription';
+import { describeCardTraits } from '../cardDescription';
 import { CardArtwork } from '../mascots/CardArtwork';
+import { EffectDetails } from './EffectDetails';
 
 export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
+  const traits = describeCardTraits(card);
   return (
     <div className="card-performance">
       <div className={'card-performance-art color-' + card.performer}>
@@ -26,7 +28,22 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <dd>{card.appeal.cool}</dd>
         </div>
       </dl>
-      <p className="card-performance-effect">{describeCard(card)}</p>
+      <div className="card-performance-effect">
+        <section>
+          <h3>アクション</h3>
+          <EffectDetails effects={card.effects} />
+        </section>
+        {traits.length > 0 && (
+          <section>
+            <h3>特性</h3>
+            <ul className="card-traits">
+              {traits.map((trait) => (
+                <li key={trait}>{trait}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

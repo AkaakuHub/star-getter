@@ -5,7 +5,7 @@ import {
   specialCards,
   specialCost,
 } from '../../domain/game/special';
-import { describeSpecial } from '../cards/describeSpecial';
+import { EffectDetails } from '../cards/EffectDetails';
 import { Modal } from '../components/Modal';
 import { CardArtwork } from '../mascots/CardArtwork';
 
@@ -34,7 +34,7 @@ export function SpecialSelection({
                 <CardArtwork card={card} />
               </div>
               <h3>{card.name}</h3>
-              <p>{describeSpecial(card)}</p>
+              {card.special && <EffectDetails effects={card.special.effects} />}
               <button
                 type="button"
                 className="button primary"
