@@ -12,7 +12,7 @@ export const liveLayout = {
   automaticHeart: hudRect(32, 975, 100, 125),
   mental: hudRect(-15, 1216, 176, 264),
   ap: hudRect(919, 1216, 176, 264),
-  hearts: hudRect(215, 1124, 384, 139),
+  hearts: hudRect(90, 1124, 510, 139),
   voltage: hudRect(600, 1075, 182, 190),
   analyzer: hudRect(148, 1232, 784, 256),
   special: hudRect(882, 945, 170, 238),

@@ -79,7 +79,14 @@ export function LiveHud({
         onClick={(event) => {
           if (event.detail === 0) controller.command({ type: 'collect' });
         }}
-        aria-label={heartCount(state) + '個の' + (state.bloom ? '結晶' : 'きらめき') + 'を回収'}
+        aria-label={
+          heartCount(state) +
+          '個の' +
+          (state.bloom ? '結晶' : 'きらめき') +
+          'を回収、上限' +
+          state.hearts.heartLimit +
+          '個'
+        }
       >
         <CollectIcon
           className="heart-count-icon"
@@ -88,7 +95,8 @@ export function LiveHud({
           aria-hidden="true"
         />
         <strong className="heart-count-current">{heartCount(state)}</strong>
-        <span className="heart-count-limit">/{state.hearts.heartLimit}</span>
+        <span aria-hidden="true">/</span>
+        <span className="heart-count-limit">{state.hearts.heartLimit}</span>
       </button>
       <ResourceGauges state={state} />
       <MoodGraph state={state} />
