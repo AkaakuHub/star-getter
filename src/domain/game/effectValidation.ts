@@ -12,6 +12,7 @@ import { validateGenesisSkill } from './genesisSkillTypes';
 import { validateGaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import { validateSkillCostChangeEffect } from './skillCostChangeTypes';
 import { validateAddVoltageSkillEffect } from './addVoltageTypes';
+import { validateHeartBoostEffect } from './heartBoostTypes';
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'add-voltage-skill') return validateAddVoltageSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -266,22 +267,7 @@ export function validateEffect(effect: Effect): void {
       throw new Error('ActionType52の設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'heart-boost') {
-    const target = effect.target;
-    if (
-      !Number.isFinite(effect.percent) ||
-      !Number.isSafeInteger(effect.uses) ||
-      effect.uses < 1 ||
-      (target?.kind === 'member' && !Number.isSafeInteger(target.member)) ||
-      (target?.kind === 'unit' && ![1, 2, 3].includes(target.unit)) ||
-      (target?.kind === 'card-series' && !Number.isSafeInteger(target.seriesId)) ||
-      (effect.duration !== undefined &&
-        (!Number.isSafeInteger(effect.duration.value) ||
-          effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0)))
-    )
-      throw new Error('きらめき増幅の設定が正しくありません。');
-    return;
-  }
+  if (effect.kind === 'heart-boost') return validateHeartBoostEffect(effect);
   if (effect.kind === 'beat-heart-value-buff') {
     validateBeatHeartValueBuff(effect);
     return;

@@ -43,6 +43,7 @@ import { refreshEffectInducers } from './effects/effectInduce';
 import { deactivateBeatPointBuffs } from './effects/beatPointBuff';
 import { deactivateGaugeRegenerations } from './live/gaugeRegeneration';
 import { deactivateSearchRequests } from './cards/search';
+import { deactivateHeartBoosts } from './live/heartBoosts';
 
 export function act(state: GameState, action: Action): GameState {
   return refreshEffectInducers(actInternal(state, action), applyEffect);
@@ -127,6 +128,8 @@ function actInternal(state: GameState, action: Action): GameState {
       return deactivateGaugeRegenerations(state, action.deactivationKey);
     case 'deactivate-search':
       return deactivateSearchRequests(state, action.deactivationKey);
+    case 'deactivate-heart-boost':
+      return deactivateHeartBoosts(state, action.deactivationKey);
   }
 }
 

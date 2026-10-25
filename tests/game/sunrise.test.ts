@@ -1,7 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '../../src/domain/game/actions';
 import { addHearts, collectHearts } from '../../src/domain/game/hearts';
 import { advanceTo } from '../../src/domain/game/simulation';
+import { advanceHeartBoosts } from '../../src/domain/game/live/heartBoosts';
 import { game, withHand } from './support/game';
 
 it('開花中の元気条件は成立し、雨100のときだけ対象限定の追加効果を付与する', () => {
@@ -97,6 +99,24 @@ it('きらめき増幅は対象カードだけに適用し、別対象の獲得�
 it('きらめき増幅値をC#の整数キャストと同じく0方向へ切り捨てる', () => {
   const state = applyEffect(game(), { kind: 'heart-boost', percent: 12.9, uses: 2 });
   expect(state.heartBoosts[0]?.percent).toBe(12);
+});
+
+it('回数制限なしのきらめき増幅は使用後も残り、InvocationType中は解除まで継続する', () => {
+  const initial = game();
+  const active = applyEffect(initial, {
+    kind: 'heart-boost',
+    percent: 50,
+    uses: null,
+    duration: { kind: 'milliseconds', value: 100 },
+    invocationType: 0x388,
+    deactivationKey: 'heart-boost-test',
+  });
+  const timed = advanceHeartBoosts(active, 1);
+  const used = applyEffect(timed, { kind: 'hearts', amount: 10 });
+  expect(used.heartBoosts).toHaveLength(1);
+  expect(
+    act(used, { type: 'deactivate-heart-boost', deactivationKey: 'heart-boost-test' }).heartBoosts,
+  ).toHaveLength(0);
 });
 
 it('きらめき増幅をミリ秒期限とパート期限で解除する', () => {

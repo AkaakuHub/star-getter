@@ -13,6 +13,7 @@ export function addHeartBoost(
   const boosted = card
     ? applyAction52SkillBoost(state, card, Math.trunc(base))
     : { state, value: base };
+  const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...boosted.state,
     heartBoosts: [
@@ -21,13 +22,16 @@ export function addHeartBoost(
         percent: Math.trunc(boosted.value),
         uses: effect.uses,
         target: effect.target ?? { kind: 'all' },
-        remainingSeconds:
-          effect.duration === undefined
+        remainingSeconds: suppressDuration
+          ? null
+          : effect.duration === undefined
             ? 0
             : effect.duration.kind === 'milliseconds'
               ? Math.fround(effect.duration.value / 1000)
               : null,
-        remainingSections: effect.duration?.kind === 'sections' ? effect.duration.value : null,
+        remainingSections:
+          !suppressDuration && effect.duration?.kind === 'sections' ? effect.duration.value : null,
+        deactivationKey: effect.deactivationKey ?? null,
       },
     ],
   };
@@ -52,10 +56,18 @@ export function consumeHeartBoosts(
       ...state,
       heartBoosts: state.heartBoosts.flatMap((boost) => {
         if (!matchingSet.has(boost)) return [boost];
+        if (boost.uses === null) return [boost];
         return boost.uses > 1 ? [{ ...boost, uses: boost.uses - 1 }] : [];
       }),
     },
     percent: matching.reduce((total, boost) => Math.fround(total + boost.percent), 0),
+  };
+}
+
+export function deactivateHeartBoosts(state: GameState, deactivationKey: string): GameState {
+  return {
+    ...state,
+    heartBoosts: state.heartBoosts.filter((boost) => boost.deactivationKey !== deactivationKey),
   };
 }
 

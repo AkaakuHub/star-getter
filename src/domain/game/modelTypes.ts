@@ -114,17 +114,20 @@ export type HeartBoostTarget =
 type HeartBoostEffect = Readonly<{
   kind: 'heart-boost';
   percent: number;
-  uses: number;
+  uses: number | null;
   target?: HeartBoostTarget;
   duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  invocationType?: number;
+  deactivationKey?: string;
   moodBonus?: MoodBonus;
 }>;
 export type HeartBoostState = Readonly<{
   percent: number;
-  uses: number;
+  uses: number | null;
   target: HeartBoostTarget;
   remainingSeconds: number | null;
   remainingSections: number | null;
+  deactivationKey: string | null;
 }>;
 export type HandCardStats = Readonly<{
   enteredSectionIndex: number;
