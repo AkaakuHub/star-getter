@@ -4,3 +4,4 @@ dist/
 .vite-plus/
 coverage/
 *.local
+/artifacts/e2e/

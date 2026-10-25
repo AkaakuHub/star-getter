@@ -6,11 +6,13 @@ import { cardAt, canUseCard, moodValue } from '../../src/domain/game/projection'
 import { canUseSpecial } from '../../src/domain/game/special';
 import { heartCount } from '../../src/domain/game/hearts';
 import { type GameState, type Card, rules } from '../../src/domain/game/model';
+import { GameRecording } from './recording/gameRecording';
 
 export class GameDriver {
   private readonly controller: GameController;
   private readonly clock = new ScenarioClock();
   private readonly frames = new ScenarioFrames();
+  private readonly recording: GameRecording;
   collections = 0;
   automaticCollections = 0;
   successfulCollections = 0;
@@ -24,7 +26,7 @@ export class GameDriver {
 
   constructor(
     readonly route: RouteId,
-    seed = 7,
+    readonly seed = 7,
   ) {
     this.controller = new GameController(
       createPresetGame(route, seed, 100),
@@ -32,6 +34,7 @@ export class GameDriver {
       this.frames,
       new ScenarioAudio(),
     );
+    this.recording = new GameRecording(route, seed);
     this.toggleAutomaticHearts();
   }
 
@@ -44,7 +47,13 @@ export class GameDriver {
   }
 
   toggleAutomaticHearts(): void {
+    const before = this.state;
     this.controller.toggleAutomaticHearts();
+    this.recording.record(
+      { kind: 'automatic-hearts', enabled: this.state.automaticHeart.enabled },
+      before,
+      this.state,
+    );
     this.observe();
   }
 
@@ -58,10 +67,12 @@ export class GameDriver {
   }
 
   collect(): void {
+    const previous = this.state;
     const before = this.state.stats.heartsCollected;
     const hand = this.state.hand.join(',');
     const amplification = this.state.storyAmplification;
     this.controller.command({ type: 'collect' });
+    this.recording.record({ kind: 'collect' }, previous, this.state);
     this.collections++;
     if (this.state.stats.heartsCollected > before) this.successfulCollections++;
     if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
@@ -71,7 +82,19 @@ export class GameDriver {
 
   special(id: string): boolean {
     if (!canUseSpecial(this.state, id)) return false;
+    const before = this.state;
+    const card = before.deck.find((candidate) => candidate.id === id);
+    if (!card) throw new Error('共鳴のカードがありません。');
     this.controller.command({ type: 'special', cardId: id });
+    const handIndex = before.hand.indexOf(id);
+    this.recording.record(
+      {
+        kind: 'special',
+        card: { instanceId: id, name: card.name, handIndex: handIndex < 0 ? null : handIndex },
+      },
+      before,
+      this.state,
+    );
     this.specialActions++;
     this.observe();
     return true;
@@ -88,7 +111,13 @@ export class GameDriver {
       });
       if (index === undefined) continue;
       const card = cardAt(this.state, index);
+      const before = this.state;
       this.controller.command({ type: 'card', index });
+      this.recording.record(
+        { kind: 'card', card: { instanceId: card.id, name: card.name, handIndex: index } },
+        before,
+        this.state,
+      );
       this.cardActions++;
 
       this.observe();
