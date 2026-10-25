@@ -2,6 +2,7 @@ import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
 import type { GameState } from '../../domain/game/model';
+import { handCapacity } from '../../domain/game/cards/drawing';
 import { LiveHud } from '../live/LiveHud';
 import { liveLayout } from '../live/layout';
 import { Stage } from '../stage/Stage';
@@ -48,7 +49,7 @@ export function GameView({
           disabled={busy}
         >
           <List size={13} aria-hidden="true" />
-          手札 {state.hand.length}
+          手札 {state.hand.length}/{handCapacity(state)}
         </button>
         <button
           type="button"
@@ -58,7 +59,7 @@ export function GameView({
           disabled={busy}
         >
           <Layers size={13} aria-hidden="true" />
-          山札 {state.drawPile.length}
+          山札{state.drawPile.length}・捨札{state.discard.length}
         </button>
         <button
           type="button"

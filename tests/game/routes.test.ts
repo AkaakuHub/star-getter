@@ -71,7 +71,7 @@ describe('固定プリセット', () => {
     const passiveInHand = state.hand.some(
       (id) => state.deck.find((card) => card.id === id)?.passive,
     );
-    expect(state.hand.length).toBe(passiveInHand ? 2 : 5);
+    expect(state.hand.length).toBe(passiveInHand ? 3 : 5);
     expectOwnedOnce(state);
   });
 

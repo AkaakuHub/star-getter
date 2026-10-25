@@ -2,18 +2,18 @@ import { applyDrawAbility } from './drawAbilities';
 import { shuffle } from '../deck';
 import type { GameState } from '../model';
 
-function handLimit(state: GameState): number {
+export function handCapacity(state: GameState): number {
   const penalty = state.deck.reduce(
     (sum, card) => sum + (state.hand.includes(card.id) ? (card.passive?.handLimitDelta ?? 0) : 0),
     0,
   );
-  return Math.max(1, Math.min(8, state.handLimit + penalty));
+  return Math.max(3, Math.min(8, state.handLimit + penalty));
 }
 
 export function fillHand(state: GameState): GameState {
   let next = state;
 
-  while (next.hand.length < handLimit(next)) {
+  while (next.hand.length < handCapacity(next)) {
     if (!next.drawPile.length) {
       if (!next.discard.length) break;
       const shuffled = shuffle(next.discard, next.randomSeed);
@@ -36,7 +36,7 @@ export function fillHand(state: GameState): GameState {
     if (!card) throw new Error('引いたカードがありません。');
     next = applyDrawAbility(next, card);
   }
-  const limit = handLimit(next);
+  const limit = handCapacity(next);
   if (next.hand.length > limit) {
     const ordered = [...next.hand].sort(
       (left, right) =>

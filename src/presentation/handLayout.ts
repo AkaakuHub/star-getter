@@ -4,7 +4,7 @@ export function handGeometry(
 ): Readonly<{ x: number; y: number; width: number; height: number; rotation: number }> {
   if (
     !Number.isInteger(count) ||
-    count < 1 ||
+    count < 3 ||
     count > 8 ||
     !Number.isInteger(index) ||
     index < 0 ||
@@ -12,24 +12,36 @@ export function handGeometry(
   ) {
     throw new Error('手札の配置が正しくありません。');
   }
-  const angle =
-    (index - (count - 1) / 2) * Math.min((7 * Math.PI) / 180, Math.PI / 6 / (count - 1));
+  const intervals = count - 1;
+  const maximumRange = 0.5235988;
+  const step =
+    Math.fround(intervals * 0.12217305) >= maximumRange
+      ? Math.fround(maximumRange / intervals)
+      : Math.fround(0.12217305);
+  const initial =
+    Math.fround(intervals * 0.12217305) >= maximumRange
+      ? Math.fround(-0.2617994)
+      : Math.fround(Math.fround(Math.fround(intervals) * Math.fround(-0.12217305)) * 0.5);
+  const angle = Math.fround(initial + Math.fround(step * index));
   const radius = 1492.8203125;
-  const bottom = 193 + (Math.cos(angle) - 1) * radius - 114;
+  const localX = Math.fround(radius * Math.fround(Math.sin(angle)));
+  const localY = Math.fround(Math.fround(radius * Math.fround(Math.cos(angle))) - radius);
   return {
-    x: 540 + Math.sin(angle) * radius - 84,
-    y: 1920 - bottom - 228,
+    x: Math.fround(540 + localX - 84),
+    y: Math.fround(1920 - (193 + localY + 114)),
     width: 168,
     height: 228,
     rotation: (angle * 180) / Math.PI,
   };
 }
 
-export function handLayout(index: number, count: number) {
+export function handLayout(index: number, count: number, selected: boolean) {
   const rect = handGeometry(index, count);
+  const angle = (rect.rotation * Math.PI) / 180;
+  const lift = selected ? 50 : 0;
   return {
-    left: rect.x / 10.8 + '%',
-    bottom: (1920 - rect.y - rect.height) / 10.8 + 'cqw',
+    left: (rect.x + Math.sin(angle) * lift) / 10.8 + '%',
+    bottom: (1920 - rect.y - rect.height + Math.cos(angle) * lift) / 10.8 + 'cqw',
     transform: `rotate(${rect.rotation}deg)`,
   };
 }
