@@ -17,9 +17,9 @@ export function evaluateDrawSuccessInduce(
   switch (branchType) {
     case 2: {
       const numToValue = Math.fround(Math.fround(Number(branchValue)) / 10_000);
-      const factor = Math.fround(numToValue / 100);
+      const factor = numToValue / 100;
       const currentPercent = Math.fround(Math.trunc(state.stamina) / state.maximumMental);
-      return currentPercent <= factor;
+      return currentPercent !== factor;
     }
     case 4: {
       const numToValue = Math.fround(Math.fround(Number(branchValue)) / 10_000);

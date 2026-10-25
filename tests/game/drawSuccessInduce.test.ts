@@ -5,10 +5,11 @@ import { act } from '../../src/domain/game/actions';
 import { evaluateDrawSuccessInduce } from '../../src/domain/game/effects/drawSuccessInduce';
 import { game, withHand } from './support/game';
 
-it('C#のDrawSuccessInduce条件でHandCardStats.IsActiveによる分岐差を適用する', () => {
+it('ActionType901の元気条件はC#同様に不一致で成立し、IsActiveで分岐する', () => {
   const state = { ...game(), stamina: 40, maximumMental: 100, excitement: 100_000_000 };
   expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
-  expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, false, 2n, 500_000n)).toBe(false);
+  expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, false, 2n, 500_000n)).toBe(true);
+  expect(evaluateDrawSuccessInduce({ ...state, stamina: 50 }, false, 2n, 500_000n)).toBe(false);
   expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, true, 2n, 500_000n)).toBe(true);
   expect(evaluateDrawSuccessInduce(state, false, 5n, 0n)).toBe(false);
   expect(evaluateDrawSuccessInduce(state, true, 5n, 0n)).toBe(true);
