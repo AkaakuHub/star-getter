@@ -1,6 +1,7 @@
 import type { SkillCooldownEffectInput } from './skillCooldownTypes';
 import type {
   InduceSkillEffectInput,
+  EffectInduceEffect,
   UseCountInduceEffect,
   UseInduceEffect,
 } from './induceSkillEffectTypes';
@@ -77,6 +78,7 @@ export type MentalBarrier = Readonly<{
   attenuation: number;
   remainingSeconds: number | null;
   remainingSections: number | null;
+  deactivationKey?: string | null;
 }>;
 export type MentalBarrierEffect = Readonly<{
   kind: 'mental-barrier';
@@ -84,6 +86,7 @@ export type MentalBarrierEffect = Readonly<{
   enduranceType: 'ratio' | 'fixed' | 'infinite';
   endurance: number;
   attenuation: number;
+  deactivationKey?: string;
   duration:
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
     | Readonly<{ kind: 'stage' }>;
@@ -197,7 +200,12 @@ type EffectShape =
       amount: number;
       moodBonus?: MoodBonus;
     }>
-  | Readonly<{ kind: 'boost'; multiplier: number; moodBonus?: MoodBonus }>
+  | Readonly<{
+      kind: 'boost';
+      multiplier: number;
+      moodBonus?: MoodBonus;
+      deactivationKey?: string;
+    }>
   | Readonly<{
       kind: 'amplify';
       percent: number;
@@ -215,6 +223,7 @@ type EffectShape =
     }>
   | UseInduceEffect
   | UseCountInduceEffect
+  | EffectInduceEffect
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
   | Readonly<{ kind: 'ingame-mission'; groupId: number }>
   | Readonly<{

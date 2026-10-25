@@ -9,7 +9,11 @@ import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import { validateHandMaxCardEffect } from './handMaxCardTypes';
 import { validateMentalShieldEffect } from './mentalShieldTypes';
 import { validateFixedParameterExtendEffect } from './fixedParameterExtendTypes';
-import { validateUseCountInduceEffect, validateUseInduceEffect } from './useInduceTypes';
+import {
+  validateEffectInduceEffect,
+  validateUseCountInduceEffect,
+  validateUseInduceEffect,
+} from './useInduceTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -26,7 +30,8 @@ type SpecialEffect = Extract<
       | 'mental-shield'
       | 'fixed-parameter-extend'
       | 'use-induce'
-      | 'use-count-induce';
+      | 'use-count-induce'
+      | 'effect-induce';
   }
 >;
 
@@ -72,6 +77,9 @@ export function validateSpecialEffect(
     case 'use-count-induce':
       validateUseCountInduceEffect(effect, validateChild);
       break;
+    case 'effect-induce':
+      validateEffectInduceEffect(effect, validateChild);
+      break;
   }
   return true;
 }
@@ -89,6 +97,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'mental-shield' ||
     effect.kind === 'fixed-parameter-extend' ||
     effect.kind === 'use-induce' ||
-    effect.kind === 'use-count-induce'
+    effect.kind === 'use-count-induce' ||
+    effect.kind === 'effect-induce'
   );
 }

@@ -72,6 +72,8 @@ export function describeEffect(effect: Effect): string {
       return `カード使用時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
     case 'use-count-induce':
       return `カード使用回数の条件成立時、${effect.effects.map(describeEffect).join('')}${effect.limit === 0 ? '' : `最大${effect.limit}回発動する。`}`;
+    case 'effect-induce':
+      return `条件に応じて${effect.effects.map(describeEffect).join('')}を有効化する。`;
     case 'voltage-tier':
       return `熱気Lv.${effect.step}ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * effect.step}以上：${tier.map(describeEffect).join('')}`).join('')}`;
     case 'energy-limit':

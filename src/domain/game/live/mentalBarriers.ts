@@ -23,6 +23,7 @@ export function addMentalBarrier(
           ? secondsToSectionChange(state, effect.duration.value)
           : null,
     remainingSections,
+    deactivationKey: effect.deactivationKey ?? null,
   };
   const absorption = absorbSkillEffect(
     state,
@@ -148,6 +149,30 @@ export function removeExhaustedMentalBarriers(state: GameState): GameState {
       (barrier) => barrier.endurance <= 0 || barrier.currentEndurance < barrier.endurance,
     ),
   };
+}
+
+export function deactivateMentalBarriers(state: GameState, deactivationKey: string): GameState {
+  const mentalBarriers = state.mentalBarriers.filter(
+    (barrier) => barrier.deactivationKey !== deactivationKey,
+  );
+  if (mentalBarriers.length === state.mentalBarriers.length) return state;
+  const previousInterval = mentalDecreaseInterval(
+    state,
+    state.track.stage.mentalDecreaseIntervalSeconds,
+  );
+  const next = { ...state, mentalBarriers };
+  const nextInterval = mentalDecreaseInterval(
+    next,
+    state.track.stage.mentalDecreaseIntervalSeconds,
+  );
+  return previousInterval > 0 && nextInterval > 0
+    ? {
+        ...next,
+        mentalTimerSeconds: Math.fround(
+          (nextInterval / previousInterval) * next.mentalTimerSeconds,
+        ),
+      }
+    : next;
 }
 
 function activeEnduranceBarrier(state: GameState): MentalBarrier | null {

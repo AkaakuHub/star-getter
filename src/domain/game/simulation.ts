@@ -41,6 +41,7 @@ import { advanceInducedSkillEffects } from './effects/induceSkillEffect';
 import { advanceTokenDeckSplit } from './effects/tokenDeckSplit';
 import { advanceIngameMission } from './ingameMissions';
 import { createInitialEffectState } from './effects/initialState';
+import { refreshEffectInducers } from './effects/effectInduce';
 export function createGame(
   track: Track,
   deck: readonly Card[],
@@ -183,6 +184,7 @@ export function createGame(
     inducedSkillEffects: [],
     nextInducedSkillEffectId: 1,
     useInduceActivationCounts: {},
+    effectInducers: [],
     lastPerformer: null,
     lastCardName: '',
     cardUses: [],
@@ -287,12 +289,13 @@ function advanceTick(state: GameState): GameState {
   const automatic = advanceAutomaticHeart(next.automaticHeart, heartCount(next), dt);
   next = { ...next, automaticHeart: automatic.state };
   const collected = automatic.shouldCollect ? collectHearts(next) : next;
-  const mood = moodValue(collected);
-  return mood === collected.moodHistory.at(-1)?.moodValue
-    ? collected
+  const reactive = refreshEffectInducers(collected, applyEffect);
+  const mood = moodValue(reactive);
+  return mood === reactive.moodHistory.at(-1)?.moodValue
+    ? reactive
     : {
-        ...collected,
-        moodHistory: recordMoodHistory(collected.moodHistory, {
+        ...reactive,
+        moodHistory: recordMoodHistory(reactive.moodHistory, {
           timeMilliseconds: Math.trunc((tick * 1000) / rules.ticksPerSecond),
           moodValue: mood,
         }),

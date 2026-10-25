@@ -15,6 +15,23 @@ export type UseCountInduceEffect = Readonly<{
   effects: readonly import('./modelTypes').Effect[];
 }>;
 
+export type EffectInduceEffect = Readonly<{
+  kind: 'effect-induce';
+  sourceEffectId: string;
+  target: 'mental-barrier' | 'bonus-score';
+  threshold: Readonly<{ kind: 'none' | 'at-least' | 'at-most'; value: number }>;
+  effects: readonly import('./modelTypes').Effect[];
+}>;
+
+export type ActiveEffectInducer = Readonly<{
+  sourceCardId: string;
+  sourceEffectId: string;
+  target: EffectInduceEffect['target'];
+  threshold: EffectInduceEffect['threshold'];
+  effects: EffectInduceEffect['effects'];
+  active: boolean;
+}>;
+
 export type InduceSkillEffectInput = Readonly<{
   kind: 'induce-skill-effect';
   condition: InduceSkillCondition;

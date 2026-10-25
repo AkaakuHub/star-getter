@@ -39,8 +39,13 @@ import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
 import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
 import { deactivateMoodValueAdditionalBuffs } from './effects/moodValueBoost';
+import { refreshEffectInducers } from './effects/effectInduce';
 
 export function act(state: GameState, action: Action): GameState {
+  return refreshEffectInducers(actInternal(state, action), applyEffect);
+}
+
+function actInternal(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'start':
       return state.phase === 'ready' ? { ...state, phase: 'playing' } : state;

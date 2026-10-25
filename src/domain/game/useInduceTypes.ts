@@ -1,5 +1,6 @@
 import type { Effect } from './modelTypes';
 import type { UseCountInduceEffect, UseInduceEffect } from './induceSkillEffectTypes';
+import type { EffectInduceEffect } from './induceSkillEffectTypes';
 
 export function validateUseInduceEffect(
   effect: UseInduceEffect,
@@ -21,5 +22,20 @@ export function validateUseCountInduceEffect(
     !effect.effects.length
   )
     throw new Error('使用回数誘発の設定が正しくありません。');
+  for (const child of effect.effects) validateChild(child);
+}
+
+export function validateEffectInduceEffect(
+  effect: EffectInduceEffect,
+  validateChild: (effect: Effect) => void,
+): void {
+  if (
+    !effect.sourceEffectId ||
+    !['mental-barrier', 'bonus-score'].includes(effect.target) ||
+    !['none', 'at-least', 'at-most'].includes(effect.threshold.kind) ||
+    !Number.isFinite(effect.threshold.value) ||
+    !effect.effects.length
+  )
+    throw new Error('効果誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);
 }

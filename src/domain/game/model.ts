@@ -1,5 +1,5 @@
 import type { SkillCooldownEffect } from './skillCooldownTypes';
-import type { InducedSkillEffect } from './induceSkillEffectTypes';
+import type { ActiveEffectInducer, InducedSkillEffect } from './induceSkillEffectTypes';
 import type { DisableMentalDown } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
@@ -96,7 +96,11 @@ export type CardUse = Readonly<{
   handCount: number;
   cost: number;
 }>;
-export type Boost = Readonly<{ percent: number; untilTick: number }>;
+export type Boost = Readonly<{
+  percent: number;
+  untilTick: number;
+  deactivationKey?: string | null;
+}>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina' | 'attract';
   members?: readonly MemberId[];
@@ -300,6 +304,7 @@ export type GameState = Readonly<{
   handCollectionActivationCounts: Readonly<Record<string, number>>;
   handUseActivationCounts: Readonly<Record<string, number>>;
   useInduceActivationCounts: Readonly<Record<string, number>>;
+  effectInducers: readonly ActiveEffectInducer[];
   combo: number;
   lastCollectTick: number;
   lastActionTick: number;

@@ -28,7 +28,7 @@ import { resolveEffectParameterDetails } from './parameters/parameterValueChange
 import { applyParameterEffect, isParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
 import { activateHeartLimitChange, applyHeartLimitEffect } from './effects/heartLimit';
-import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
+import { dispatchEarlyEffect } from './effects/earlyEffectDispatch';
 import { applyVoltageTier } from './effects/voltageTier';
 import { applyAmplifyEffect } from './effects/amplify';
 import { applyApSpeedChange, applyApSpeedPercent } from './effects/apSpeed';
@@ -41,14 +41,12 @@ import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
 import { startIngameMission } from './ingameMissions';
 import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
-import { activateMoodChangeSkill } from './effects/moodChangeSkill';
 import { activateHeartLimitBoost } from './effects/heartLimitBoost';
 import { activateMoodValueBoost } from './effects/moodValueBoost';
-import { activateGenesisSkill } from './effects/genesisSkill';
-import { activateSpecialAppealToken } from './effects/specialAppealToken';
 import { activateHandMaxCard } from './effects/handMaxCard';
 import { activateMentalShield } from './effects/mentalShield';
 import { activateUseCountInduce, activateUseInduce } from './effects/useInduce';
+import { activateEffectInduce, refreshEffectInducers } from './effects/effectInduce';
 import {
   activateFixedParameterExtend,
   changeFixedParameterBase,
@@ -62,18 +60,27 @@ export function applyEffect(
   addValue = 0,
   effectPower = 1,
 ): GameState {
+  return refreshEffectInducers(
+    applyEffectInternal(state, effect, card, multiplier, addValue, effectPower),
+    applyEffect,
+  );
+}
+
+function applyEffectInternal(
+  state: GameState,
+  effect: Effect,
+  card: Card | undefined,
+  multiplier: number,
+  addValue: number,
+  effectPower: number,
+): GameState {
   effect = resolveEffectParameterDetails(state, card, effect);
-  if (effect.kind === 'proxy-skill-forced-activation')
-    return forceProxySkillActivation(state, effect.targetType);
-  if (effect.kind === 'proxy-skill') return registerProxySkill(state, effect, card);
-  if (effect.kind === 'mood-change-skill')
-    return activateMoodChangeSkill(state, effect, card, multiplier, addValue, effectPower);
+  const earlyEffect = dispatchEarlyEffect(state, effect, card, multiplier, addValue, effectPower);
+  if (earlyEffect) return earlyEffect;
   if (effect.kind === 'heart-limit-boost')
     return activateHeartLimitBoost(state, effect, multiplier, addValue);
   if (effect.kind === 'mood-value-boost')
     return activateMoodValueBoost(state, effect, card, multiplier, addValue);
-  if (effect.kind === 'genesis-skill') return activateGenesisSkill(state, effect, card);
-  if (effect.kind === 'special-appeal-token') return activateSpecialAppealToken(state, effect);
   if (effect.kind === 'hand-max-card') return activateHandMaxCard(state, effect);
   if (effect.kind === 'voltage-convert')
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
@@ -90,6 +97,7 @@ export function applyEffect(
   if (effect.kind === 'use-induce') return activateUseInduce(state, effect, card, applyEffect);
   if (effect.kind === 'use-count-induce')
     return activateUseCountInduce(state, effect, card, applyEffect);
+  if (effect.kind === 'effect-induce') return activateEffectInduce(state, effect, card);
   if (effect.kind === 'skill-boost') return activateAction52SkillBoost(state, effect);
   if (effect.kind === 'ap-speed')
     return applyApSpeedPercent(state, effect.percent, effect.duration);
@@ -305,6 +313,7 @@ export function applyEffect(
         state,
         Math.fround(value(Math.round((effect.multiplier - 1) * 100)) * effectPower),
         card,
+        effect.deactivationKey,
       );
     case 'amplify': {
       return applyAmplifyEffect(state, effect);
@@ -338,4 +347,5 @@ export function applyEffect(
         : state;
     }
   }
+  throw new Error('効果を実行できません。');
 }
