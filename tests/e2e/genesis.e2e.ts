@@ -17,17 +17,23 @@ const priority = [
   'library-ensemble',
 ];
 
-function activate(driver: GameDriver): void {
+function activate(driver: GameDriver): number {
+  let payment = 0;
   driver.until(
     (state) => state.bloom !== null,
     () => {
       driver.special('library-ensemble');
-      if (driver.special('horizon')) return;
+      const energy = driver.state.energy;
+      if (driver.special('horizon')) {
+        payment = energy - 20;
+        return;
+      }
       driver.useFirst(['class', 'camera', 'horizon', 'perennial']);
       driver.collect();
     },
   );
   driver.report('共鳴を先に発動');
+  return payment;
 }
 
 function prepare(driver: GameDriver): void {
@@ -74,10 +80,10 @@ function prepare(driver: GameDriver): void {
 test('開花:共鳴→追加カード→雨→除外→引き直しで専用値を育てて手動回収する', () => {
   const driver = new GameDriver('bloom');
   driver.report('開始');
-  activate(driver);
+  const paidEnergy = activate(driver);
   expect(driver.state.cardUseCounts['frost-echo'] ?? 0).toBe(0);
   expect(driver.state.cardUseCounts['rain-preparation'] ?? 0).toBe(0);
-  expect(driver.state.bloom?.rollback.energy).toBe(0);
+  expect(driver.state.bloom?.rollback.energy).toBe(paidEnergy);
   const initialGauge = driver.state.bloom?.progress ?? 0n;
   const ordinary = [driver.state.energy, driver.state.stamina, driver.state.excitement];
   const earlyBefore = driver.state.score;
