@@ -1,178 +1,17 @@
 import { expect, test } from 'vite-plus/test';
 import type { GameState } from '../../src/domain/game/model';
-import { moodValue, durationSeconds } from '../../src/domain/game/projection';
+import { durationSeconds } from '../../src/domain/game/projection';
 import { GameDriver } from './driver';
-import { heartCount } from '../../src/domain/game/hearts';
-
-const priority = [
-  'class',
-  'ensemble',
-  'library-invitation',
-  'library-ensemble',
-  'clock',
-  'library-pages',
-  'camera',
-  'story',
-  'aurora-ensemble',
-  'bookmark',
-];
-
-function isPrepared(state: GameState): boolean {
-  const hand = state.deck.filter((card) => state.hand.includes(card.id));
-  return (
-    state.deck.length >= 95 &&
-    state.hearts.heartLimit >= 500_000 &&
-    hand.some((card) => card.token === 'story') &&
-    hand.some((card) => card.token === 'bookmark' && !state.relayUsed.includes(card.id)) &&
-    moodValue(state) === 100 &&
-    heartCount(state) >= 500_000
-  );
-}
-
-function prepare(driver: GameDriver): void {
-  let normalUsed = false;
-  let extraUsed = false;
-  driver.until(isPrepared, () => {
-    if (
-      !normalUsed &&
-      (driver.state.cardUseCounts.class ?? 0) >= 1 &&
-      driver.special('library-pages')
-    )
-      normalUsed = true;
-    if (
-      normalUsed &&
-      !extraUsed &&
-      driver.state.deck.some((card) => card.token === 'clock') &&
-      driver.state.deck.some((card) => card.token === 'bookmark') &&
-      driver.special('library-ensemble')
-    )
-      extraUsed = true;
-    driver.useFirst(
-      driver.state.deck.length >= 80
-        ? [
-            'class',
-            'story',
-            'clock',
-            'ensemble',
-            'library-ensemble',
-            'library-invitation',
-            'camera',
-            'library-pages',
-            'bookmark',
-            'aurora-ensemble',
-          ]
-        : priority,
-    );
-  });
-}
-
-function hasAvailableBookmark(state: GameState): boolean {
-  return state.deck.some(
-    (card) =>
-      card.token === 'bookmark' &&
-      state.hand.includes(card.id) &&
-      !state.relayUsed.includes(card.id),
-  );
-}
-
-function restoreDeck(driver: GameDriver): void {
-  driver.useFirst([
-    'ensemble',
-    'library-invitation',
-    'library-ensemble',
-    'library-pages',
-    'clock',
-    'bookmark',
-    'story',
-    'camera',
-    'aurora-ensemble',
-  ]);
-  if (driver.state.tick % 6 === 0) driver.collect();
-}
-
-function maintainLoop(driver: GameDriver): void {
-  if (driver.state.deck.length < 95) {
-    restoreDeck(driver);
-    return;
-  }
-  if (moodValue(driver.state) < 100 || !hasAvailableBookmark(driver.state)) {
-    driver.useFirst([
-      'clock',
-      'bookmark',
-      'ensemble',
-      'library-ensemble',
-      'library-invitation',
-      'story',
-      'library-pages',
-      'camera',
-      'aurora-ensemble',
-    ]);
-  } else if (heartCount(driver.state) < 500_000) {
-    driver.useFirst([
-      'story',
-      'ensemble',
-      'library-ensemble',
-      'aurora-ensemble',
-      'clock',
-      'bookmark',
-      'library-invitation',
-      'library-pages',
-      'camera',
-    ]);
-  }
-  if (driver.state.tick % 6 === 0) driver.collect();
-}
-
-function amplifyAndWiden(driver: GameDriver): void {
-  const initialAmplification = driver.state.storyAmplification;
-  driver.until(
-    (state) => driver.collectionRedraws >= 5 && state.storyAmplification > initialAmplification,
-    () => maintainLoop(driver),
-  );
-  driver.report('回収リドローを反復し舵のドローで増幅');
-  driver.until(
-    (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 95,
-    () => {
-      if (driver.state.deck.length < 95) {
-        restoreDeck(driver);
-      } else {
-        driver.useFirst([
-          'story',
-          'clock',
-          'ensemble',
-          'library-ensemble',
-          'bookmark',
-          'library-invitation',
-          'camera',
-          'library-pages',
-          'aurora-ensemble',
-        ]);
-      }
-      if (driver.state.tick % 6 === 0) driver.collect();
-    },
-  );
-  driver.report('1000万上限へ到達');
-  expect(driver.state.hearts.heartLimit).toBe(10_000_000);
-  expect(driver.collectionRedraws).toBeGreaterThanOrEqual(5);
-  expect(driver.collectionAmplification).toBeGreaterThan(0);
-  driver.until(isPrepared, () => maintainLoop(driver));
-}
-
-function playUnplanned(driver: GameDriver): void {
-  while (driver.state.phase === 'playing') {
-    driver.special('library-pages');
-    driver.special('library-ensemble');
-    driver.useFirst(
-      driver.state.hand.map((id) => {
-        const card = driver.state.deck.find((candidate) => candidate.id === id);
-        if (!card) throw new Error('手札のカードがありません。');
-        return card.token ?? card.id;
-      }),
-    );
-    if (driver.state.tick % 6 === 0) driver.collect();
-    driver.tick();
-  }
-}
+import {
+  libraryPriority,
+  isPrepared,
+  prepare,
+  restoreDeck,
+  maintainLoop,
+  amplifyAndWiden,
+  playUnplanned,
+  runCollections,
+} from './library/strategy';
 
 test('うなばら:3種類を生成し95枚を準備して連打、巻き込み後に修復する', () => {
   const driver = new GameDriver('library');
@@ -197,7 +36,7 @@ test('うなばら:3種類を生成し95枚を準備して連打、巻き込み�
   playUnplanned(unplanned);
   unplanned.report('手札の先頭から使用可能なカードを使って60秒終了');
   const omitted = new GameDriver('library');
-  const omittedGain = omitted.finishWithCards(priority, measurementTick);
+  const omittedGain = omitted.finishWithCards(libraryPriority, measurementTick);
   omitted.report('共鳴の準備を省略して終了');
   amplifyAndWiden(driver);
   driver.until(
@@ -219,19 +58,14 @@ test('うなばら:3種類を生成し95枚を準備して連打、巻き込み�
     driver.seconds >= durationSeconds(state) - 10 && isPrepared(state);
   driver.until(readyForLateBurst, () => maintainLoop(driver));
   const lateBefore = driver.state.score;
-  const lateCards = driver.cardActions;
-  const lateUses = driver.state.stats.cardsUsed;
-  driver.burst(2, 10);
-  const lateGain = driver.state.score - lateBefore;
-  driver.report('成長後に2秒回収');
-  while (driver.state.phase === 'playing') {
-    if (driver.state.tick % 6 === 0) driver.collect();
-    driver.tick();
-  }
-  driver.report('終盤をカード無使用の手動回収で60秒終了');
-  expect(driver.cardActions).toBe(lateCards);
-  expect(driver.state.stats.cardsUsed).toBe(lateUses);
-  expect(driver.state.score - lateBefore).toBeGreaterThan(lateBefore);
+  const lateStartTick = driver.state.tick;
+  const lateRun = runCollections(driver, durationSeconds(driver.state), 10);
+  const lateGain = lateRun.gain;
+  driver.report('連鎖停止時だけカードで再始動し手動回収主体で60秒終了');
+  expect(lateRun.collections).toBeGreaterThan(lateRun.cards);
+  expect(lateRun.redraws).toBeGreaterThan(0);
+  expect(lateRun.collectionGain).toBeGreaterThan(lateRun.cardGain);
+  expect(lateRun.gain * BigInt(lateStartTick)).toBeGreaterThan(lateBefore * BigInt(lateRun.ticks));
   console.log(
     JSON.stringify({
       route: 'library',
@@ -317,23 +151,21 @@ test('うなばら:autoONはカードも手動回収も使わず間隔付きで�
   expect(driver.state.score).toBeGreaterThan(score);
 });
 
-test('うなばら:autoOFFは同じ準備から5/10/15回毎秒の回収速度で得点が変わる', () => {
-  const gains: bigint[] = [];
-  for (const speed of [5, 10, 15]) {
+test('うなばら:autoOFFは5/10/15回毎秒で回収し停止時だけカードで再始動する', () => {
+  const scores: bigint[] = [];
+  for (const speed of [5, 10, 15] as const) {
     const driver = new GameDriver('library');
     prepare(driver);
     amplifyAndWiden(driver);
     expect(driver.state.automaticHeart.enabled).toBe(false);
-    const before = driver.state.score;
-    const cards = driver.cardActions;
-    const uses = driver.state.stats.cardsUsed;
-    driver.burst(2, speed);
-    gains.push(driver.state.score - before);
-    driver.report(speed + '回毎秒でカード無使用の2秒回収');
-    expect(driver.cardActions).toBe(cards);
-    expect(driver.state.stats.cardsUsed).toBe(uses);
+    const run = runCollections(driver, durationSeconds(driver.state), speed);
+    scores.push(driver.state.score);
+    driver.report(speed + '回毎秒と停止時だけカードで60秒終了');
+    expect(run.collections).toBeGreaterThan(run.cards);
+    expect(run.redraws).toBeGreaterThan(0);
+    expect(run.collectionGain).toBeGreaterThan(run.cardGain);
   }
-  const [slow, medium, fast] = gains;
+  const [slow, medium, fast] = scores;
   if (slow === undefined || medium === undefined || fast === undefined)
     throw new Error('回収速度の比較結果がありません。');
   expect(medium).toBeGreaterThan(slow);
