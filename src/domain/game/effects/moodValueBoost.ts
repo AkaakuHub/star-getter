@@ -2,6 +2,7 @@ import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 
 type MoodValueBoostEffect = Extract<Effect, { kind: 'mood-value-boost' }>;
 
@@ -20,7 +21,7 @@ export function activateMoodValueBoost(
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          Math.fround(Math.fround(effect.bonusMoodValue) / Math.fround(10_000)),
+          Math.fround(int64ToFloat32(effect.bonusMoodValue) / Math.fround(10_000)),
         );
   if (num < 0) mood = Math.fround(-mood);
   let value = Math.fround(
@@ -48,7 +49,7 @@ export function activateMoodValueBoost(
         remainingSeconds:
           effect.duration.kind !== 'milliseconds'
             ? null
-            : Math.fround(effect.duration.value / 1000),
+            : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
         remainingSections: effect.duration.kind !== 'sections' ? null : effect.duration.value,
         deactivationKey: effect.deactivationKey ?? null,
       },
@@ -69,7 +70,7 @@ export function applyMoodValueAdditionalBuffs(
       matchesTarget(buff.target, card) &&
       (buff.paramSeriesIds === null ||
         (skillTokenSeriesIds !== null &&
-          buff.paramSeriesIds.some((id) => skillTokenSeriesIds.includes(id)))),
+          skillTokenSeriesIds.some((id) => buff.paramSeriesIds?.includes(BigInt(id))))),
   );
   if (matched.length === 0) return { state, value };
   let result = Math.fround(value);
@@ -122,8 +123,8 @@ export function expireMoodValueAdditionalBuffSections(state: GameState): GameSta
     ...state,
     moodValueAdditionalBuffs: state.moodValueAdditionalBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }

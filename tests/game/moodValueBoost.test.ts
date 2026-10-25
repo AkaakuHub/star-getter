@@ -14,8 +14,8 @@ function additiveBoost(
     calculationType: 2 as const,
     num: 10_000,
     bonusMoodTarget: 0 as const,
-    bonusMoodValue: 0,
-    duration: { kind: 'stage' as const, value: 0 },
+    bonusMoodValue: 0n,
+    duration: { kind: 'stage' as const, value: 0n },
     disabledType: 0,
     disabledCount: 0,
     target: { kind: 'all' as const },
@@ -94,7 +94,7 @@ it('Action50の対象とTokenCardSeriesパラメーターをC#の検索条件通
   expect(moodValueWithoutLimit(unmatched)).toBe(2);
   expect(unmatched.moodValueAdditionalBuffs).toHaveLength(1);
 
-  const seriesRestricted = applyEffect(initial, additiveBoost({ tokenCardSeriesIds: [1] }));
+  const seriesRestricted = applyEffect(initial, additiveBoost({ tokenCardSeriesIds: [1n] }));
   expect(moodValueWithoutLimit(applyEffect(seriesRestricted, moodChange(20_000), card))).toBe(2);
 });
 
@@ -103,14 +103,17 @@ it('Action50は時間・パート期限とDeactivator解除を適用する', () 
   const timed = applyEffect(
     initial,
     additiveBoost({
-      duration: { kind: 'milliseconds', value: 1000 },
+      duration: { kind: 'milliseconds', value: 1000n },
       deactivationKey: 'mood-boost',
       disabledType: 1,
       disabledCount: 1,
     }),
   );
   expect(advanceTo(timed, 1.1).moodValueAdditionalBuffs).toHaveLength(0);
-  const section = applyEffect(initial, additiveBoost({ duration: { kind: 'sections', value: 1 } }));
+  const section = applyEffect(
+    initial,
+    additiveBoost({ duration: { kind: 'sections', value: 1n } }),
+  );
   const nextSection = initial.track.sections[1];
   if (!nextSection) throw new Error('パートがありません。');
   expect(
@@ -155,7 +158,7 @@ it('Action50が逆符号の加算を行うとAction48のBuff符号も反転す�
     additiveBoost({
       num: -100_000,
       bonusMoodTarget: 0,
-      bonusMoodValue: 0,
+      bonusMoodValue: 0n,
     }),
   );
   const changed = applyEffect(negativeAdd, moodChange(50_000), card);
