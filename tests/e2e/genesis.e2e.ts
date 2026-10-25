@@ -42,6 +42,26 @@ function prepare(driver: GameDriver, stableCollection = true): void {
     driver.seconds < durationSeconds(driver.state) - 2 &&
     (driver.state.bloom?.progress ?? 0n) < target
   ) {
+    const progress = driver.state.bloom?.progress ?? 0n;
+    if (!stableCollection && progress >= 2_050_000_000n) {
+      const used = driver.useFirst(
+        progress >= 2_120_000_000n
+          ? ['horizon', 'sunrise', 'rain-preparation', 'frost-echo']
+          : ['frost-echo', 'horizon', 'sunrise', 'rain-preparation'],
+      );
+      if (used)
+        console.log(
+          JSON.stringify({
+            stage: '上限付近の調整',
+            seconds: driver.seconds,
+            card: used.id,
+            before: progress.toString(),
+            after: driver.state.bloom?.progress.toString(),
+          }),
+        );
+      driver.tick();
+      continue;
+    }
     const created = driver.state.deck.some((card) => card.token === 'shadow');
     const shadowUses = driver.state.cardUseCounts['shadow-1'] ?? 0;
     const next =
@@ -78,7 +98,11 @@ function prepare(driver: GameDriver, stableCollection = true): void {
     );
     if (!driver.state.specialUsed.includes('library-ensemble')) driver.special('library-ensemble');
     driver.special('horizon');
-    if (driver.state.tick % 6 === 0) driver.collect();
+    if (
+      (stableCollection || (driver.state.bloom?.progress ?? 0n) < 2_050_000_000n) &&
+      driver.state.tick % 6 === 0
+    )
+      driver.collect();
     driver.tick();
   }
 }
