@@ -37,7 +37,7 @@ export function validateCard(card: Card): void {
     ...(card.handUse?.effects ?? []),
     ...(card.modeParameterChanges?.off ?? []),
     ...(card.modeParameterChanges?.on ?? []),
-    ...(card.handPermanentParameterChanges ?? []),
+    ...(card.handPermanentEffects ?? []),
     ...(card.collectionEffects?.effects ?? []),
   ])
     validateEffect(effect);

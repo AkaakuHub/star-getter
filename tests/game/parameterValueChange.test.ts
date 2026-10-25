@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect, skillValue } from '../../src/domain/game/effects';
 import {
   applyParameterValueChange,
   initializeParameterValueFactors,
@@ -209,7 +209,18 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
     base: 20_000,
     increment: 0,
   } as const;
-  const card = { ...source, handPermanentParameterChanges: [effect] } as const;
+  const card = {
+    ...source,
+    handPermanentEffects: [
+      effect,
+      {
+        kind: 'amplify',
+        percent: 300,
+        members: [source.member],
+        moodBonus: { target: 3, perPoint: 1.5 },
+      },
+    ],
+  } as const;
   const state = {
     ...initial,
     deck: [card],
@@ -232,12 +243,23 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
   ).toBe(true);
   const active = fillHand(state);
   expect(active.activeHandPermanentCardIds).toEqual([card.id]);
+  expect(active.targetBoosts).toEqual([
+    {
+      members: [source.member],
+      percent: 300,
+      duration: 'stage',
+      deactivationKey: `hand-permanent:${card.id}`,
+    },
+  ]);
+  expect(skillValue(active, 100, { kind: 'energy', amount: 100 }, card)).toBe(400);
   expect(
     active.parameterValueFactors.find((factor) => factor.sourceEffectId === effect.sourceEffectId)
       ?.factor,
   ).toBe(2);
   const disposed = removeRandomHandCards(active, 1);
   expect(disposed.activeHandPermanentCardIds).toHaveLength(0);
+  expect(disposed.targetBoosts).toHaveLength(0);
+  expect(skillValue(disposed, 100, { kind: 'energy', amount: 100 }, card)).toBe(100);
   expect(
     disposed.parameterValueFactors.some(
       (factor) => factor.sourceEffectId === effect.sourceEffectId,

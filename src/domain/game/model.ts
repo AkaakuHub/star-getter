@@ -31,6 +31,9 @@ export type { Effect } from './modelTypes';
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
 export type MemberId = 0 | 1021 | 1022 | 1030 | 1031 | 1032 | 1033 | 1041 | 1042 | 1053;
 export type UnitId = 1 | 2 | 3;
+export type HandPermanentEffect =
+  | ParameterValueChangeEffect
+  | (Extract<Effect, { kind: 'amplify' }> & Readonly<{ members: readonly MemberId[] }>);
 
 export const costumeIds = [
   'star',
@@ -67,7 +70,7 @@ export type Card = Readonly<{
     off: readonly ParameterValueChangeEffect[];
     on: readonly ParameterValueChangeEffect[];
   }>;
-  handPermanentParameterChanges?: readonly ParameterValueChangeEffect[];
+  handPermanentEffects?: readonly HandPermanentEffect[];
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
@@ -140,6 +143,7 @@ export type TargetBoost = Readonly<{
   members: readonly MemberId[];
   percent: number;
   duration: 'stage' | 'section';
+  deactivationKey?: string;
 }>;
 export type Bloom = Readonly<{
   progress: bigint;

@@ -1,7 +1,7 @@
 import { createRangeRandom } from '../random';
 import { drawCandidate, drawWeight } from './drawLottery';
 import { consumeSearch } from './search';
-import { activateHandPermanentParameterChanges, disposeHandEffects } from './handEffects';
+import { activateHandPermanentEffects, disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
 import type { Card, GameState, HandShuffle } from '../model';
 import { initializeHandCardStats } from './skillCostChanges';
@@ -117,7 +117,7 @@ function drawUntil(state: GameState, count: number, trimOverflow: boolean): Game
       ...next,
       handEffectCardIds: [...next.handEffectCardIds.filter((id) => id !== card.id), card.id],
     };
-    if (state.drawContext !== 'initial') next = activateHandPermanentParameterChanges(next, card);
+    if (state.drawContext !== 'initial') next = activateHandPermanentEffects(next, card);
   }
   const maximum = handCapacity(next);
   if (trimOverflow && next.hand.length > maximum) {

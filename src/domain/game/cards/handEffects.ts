@@ -3,14 +3,19 @@ import {
   applyParameterValueChange,
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
+import { applyEffect } from '../effects';
 
-export function activateHandPermanentParameterChanges(state: GameState, card: Card): GameState {
-  const effects = card.handPermanentParameterChanges;
+export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
+  const effects = card.handPermanentEffects;
   if (!effects?.length || state.activeHandPermanentCardIds.includes(card.id)) return state;
-  const next = effects.reduce(
-    (next, effect) => applyParameterValueChange(next, card, effect),
-    state,
-  );
+  const deactivationKey = `hand-permanent:${card.id}`;
+  let next = state;
+  for (const effect of effects) {
+    next =
+      effect.kind === 'parameter-value-change'
+        ? applyParameterValueChange(next, card, effect)
+        : applyEffect(next, { ...effect, deactivationKey }, card);
+  }
   return {
     ...next,
     activeHandPermanentCardIds: [...state.activeHandPermanentCardIds, card.id],
@@ -40,9 +45,18 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
   for (const id of state.activeHandPermanentCardIds) {
     if (!ids.includes(id)) continue;
     const card = state.cardPool.find((item) => item.id === id);
-    const effects = card?.handPermanentParameterChanges;
+    const effects = card?.handPermanentEffects;
     if (!card || !effects) continue;
-    next = deactivateParameterValueChanges(next, card, effects);
+    next = deactivateParameterValueChanges(
+      next,
+      card,
+      effects.filter((effect) => effect.kind === 'parameter-value-change'),
+    );
+    const deactivationKey = `hand-permanent:${card.id}`;
+    next = {
+      ...next,
+      targetBoosts: next.targetBoosts.filter((boost) => boost.deactivationKey !== deactivationKey),
+    };
   }
   return {
     ...next,

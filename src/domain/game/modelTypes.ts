@@ -218,6 +218,7 @@ type EffectShape =
       moodBonus?: MoodBonus;
       members?: readonly MemberId[];
       duration?: 'section';
+      deactivationKey?: string;
     }>
   | Readonly<{ kind: 'mood'; amount: number }>
   | Readonly<{

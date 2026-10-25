@@ -25,6 +25,7 @@ import { applyHandLimit } from './effects/handLimit';
 import { applyHeartLimit } from './effects/heartLimit';
 import { forceProxySkillActivation, registerProxySkill } from './effects/proxySkill';
 import { applyVoltageTier } from './effects/voltageTier';
+import { applyAmplifyEffect } from './effects/amplify';
 export { skillValue } from './effects/skillValue';
 
 export function applyEffect(
@@ -288,29 +289,7 @@ export function applyEffect(
       };
     }
     case 'amplify': {
-      const percent =
-        effect.percent +
-        (effect.moodBonus
-          ? calculateSkillMoodCorrection(
-              effect.moodBonus.target,
-              moodValue(state),
-              effect.moodBonus.perPoint,
-            )
-          : 0);
-      if (effect.members)
-        return {
-          ...state,
-          targetBoosts: [
-            ...state.targetBoosts,
-            { members: effect.members, percent, duration: effect.duration ?? 'stage' },
-          ],
-        };
-      return {
-        ...state,
-        amplification: Math.fround(state.amplification + percent),
-        sectionAmplification:
-          state.sectionAmplification + (effect.duration === 'section' ? percent : 0),
-      };
+      return applyAmplifyEffect(state, effect);
     }
     case 'skill-cooldown': {
       const seconds = Math.fround(
