@@ -3,6 +3,7 @@ import type { MentalHeartInduceEffect, MentalHeartInducer } from '../mentalHeart
 import { createSkillHearts } from './heartCreation';
 import { applyAdditionalBuff } from './additionalBuff';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { roundToEvenFloat32 } from '../numeric';
 
 export function activateMentalHeartInduce(
   state: GameState,
@@ -57,14 +58,11 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
         next.cardPool.find((item) => item.id === inducer.sourceCardId))
       : undefined;
     const additional = applyAdditionalBuff(next, 'attract', initialCount, card);
-    const action52 = applyAction52SkillBoostForCard(
-      additional.state,
-      card,
-      floatToInt32(additional.value),
-    );
+    const action1 = floatToInt32(roundToEvenFloat32(additional.value));
+    const action52 = applyAction52SkillBoostForCard(additional.state, card, action1);
     next = createSkillHearts(
       action52.state,
-      floatToInt32(action52.value),
+      floatToInt32(roundToEvenFloat32(action52.value)),
       inducer.heartLifetimeSeconds,
       card,
     );
