@@ -14,6 +14,7 @@ export function activateSkillCooldown(
     deckUnderLimit: effect.deckUnderLimit,
     deckOverLimit: effect.deckOverLimit,
     deckCardMax: effect.deckCardMax,
+    deckCardCountAtActivation: state.deck.length,
     duration: effect.duration,
     updatesWithDeckCount: !suppressDuration,
     remainingSeconds:
@@ -38,8 +39,11 @@ export function skillCooldownSeconds(
   const value = Math.fround(
     Math.fround(Math.fround(effect.num / 10_000) * Math.fround(state.track.songTime)) / 10_000,
   );
-  if (!effect.updatesWithDeckCount || effect.deckCardMax === null) return value;
-  const diff = state.deck.length - effect.deckCardMax;
+  if (effect.deckCardMax === null) return value;
+  const deckCardCount = effect.updatesWithDeckCount
+    ? state.deck.length
+    : effect.deckCardCountAtActivation;
+  const diff = deckCardCount - effect.deckCardMax;
   const under = Math.fround(effect.deckUnderAdd / 10_000);
   const over = Math.fround(effect.deckOverAdd / 10_000);
   const add =

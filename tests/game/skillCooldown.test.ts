@@ -84,7 +84,7 @@ it('InvocationType 0x388では枚数再計算と期限を抑止し、Deactivator
     source,
   );
   expect(cardCooldownTicks({ ...active, deck: [...active.deck, ...active.deck.slice(0, 3)] })).toBe(
-    120,
+    240,
   );
   expect(advanceTo(active, 0.6).skillCooldownEffects).toHaveLength(1);
   expect(

@@ -6,6 +6,7 @@ export type SkillCooldownEffect = Readonly<{
   deckUnderLimit: number;
   deckOverLimit: number;
   deckCardMax: number | null;
+  deckCardCountAtActivation: number;
   duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
   updatesWithDeckCount: boolean;
   remainingSeconds: number | null;
