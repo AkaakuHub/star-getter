@@ -23,9 +23,7 @@ export function validateMentalShieldEffect(effect: MentalShieldEffect): void {
   if (
     !Number.isSafeInteger(effect.durability) ||
     !Number.isSafeInteger(effect.applyCount) ||
-    (effect.duration.kind !== 'stage' &&
-      (!Number.isSafeInteger(effect.duration.value) ||
-        effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0))) ||
+    (effect.duration.kind !== 'stage' && !Number.isSafeInteger(effect.duration.value)) ||
     (effect.moodBonus !== undefined &&
       (!Number.isFinite(effect.moodBonus.perPoint) ||
         ![0, 1, 2, 3].includes(effect.moodBonus.target)))

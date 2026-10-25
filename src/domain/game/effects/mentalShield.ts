@@ -12,8 +12,9 @@ export function activateMentalShield(
   addValue: number,
   effectPower: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
-    throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
+  const durability = int32(effect.durability);
+  const applyCount = int32(effect.applyCount);
+  const durationValue = effect.duration.kind === 'stage' ? 0 : int32(effect.duration.value);
   const moodCorrection = effect.moodBonus
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
@@ -21,7 +22,7 @@ export function activateMentalShield(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const rawDurability = Math.fround(Math.fround(effect.durability) / 10_000);
+  const rawDurability = Math.fround(Math.fround(durability) / 10_000);
   const rawAddValue = Math.fround(Math.fround(addValue) / 10_000);
   let value: number;
   if (effect.durabilityType === 1) {
@@ -39,18 +40,22 @@ export function activateMentalShield(
         Math.fround(multiplier),
     );
   } else {
-    value = Math.fround(Math.fround(effect.durability) * Math.fround(effectPower));
+    value = Math.fround(Math.fround(durability) * Math.fround(effectPower));
   }
   const boosted = applyAction52SkillBoostForCard(state, card, value);
   const shield: MentalShield = {
     durabilityType: effect.durabilityType,
     durability: Math.trunc(boosted.value),
-    applyCount: effect.applyCount,
+    applyCount,
     remainingSeconds:
-      effect.duration.kind === 'milliseconds' ? Math.fround(effect.duration.value / 1000) : null,
+      effect.duration.kind === 'milliseconds' ? Math.fround(durationValue / 1000) : null,
     remainingSections: effect.duration.kind === 'sections' && hasFollowingSection(state) ? 1 : null,
   };
   return { ...boosted.state, mentalShields: [...boosted.state.mentalShields, shield] };
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function advanceMentalShields(state: GameState, elapsedSeconds: number): GameState {
