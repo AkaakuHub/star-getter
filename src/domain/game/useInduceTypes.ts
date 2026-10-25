@@ -49,8 +49,8 @@ export function validateCardMoveInduceEffect(
   if (
     !effect.sourceEffectId ||
     effect.timing !== 'stage-to-graveyard' ||
-    !Number.isSafeInteger(effect.limit) ||
-    !Number.isSafeInteger(effect.requireCount)
+    !isInt64(effect.limit) ||
+    !isInt64(effect.requireCount)
   )
     throw new Error('カード移動誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);

@@ -27,8 +27,8 @@ export type CardMoveInduceEffect = Readonly<{
   kind: 'card-move-induce';
   sourceEffectId: string;
   timing: 'stage-to-graveyard';
-  limit: number;
-  requireCount: number;
+  limit: bigint;
+  requireCount: bigint;
   effects: readonly import('./modelTypes').Effect[];
 }>;
 
@@ -51,8 +51,8 @@ export type ActiveCardMoveInducer = Readonly<{
   sourceCardId: string;
   sourceEffectId: string;
   timing: CardMoveInduceEffect['timing'];
-  limit: number;
-  requireCount: number;
+  limit: bigint;
+  requireCount: bigint;
   effects: CardMoveInduceEffect['effects'];
   useCount: number;
   activatedCount: number;
