@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { ChevronLeft } from 'lucide-preact';
 import type { Card, GameState } from '../../domain/game/model';
 import { cardCost } from '../../domain/game/cards/cost';
 import { Modal } from '../components/Modal';
@@ -20,19 +21,16 @@ export function CardBrowser({
     if (!viewport || !target) return;
     const observer = new ResizeObserver(() => {
       if (viewport.clientHeight === 0) return;
-      viewport.scrollTop = target.offsetTop;
+      viewport.scrollTop +=
+        target.getBoundingClientRect().top - viewport.getBoundingClientRect().top;
       observer.disconnect();
     });
     observer.observe(viewport);
     return () => observer.disconnect();
   }, []);
   return (
-    <Modal
-      title={selected ? selected.name : 'カード確認'}
-      onClose={onClose}
-      className="card-browser"
-    >
-      <div hidden={selected !== null}>
+    <>
+      <Modal title="カード確認" onClose={onClose} className="card-browser">
         <div ref={list} className="card-browser-list">
           {cardGroups(state).map(({ board, title, cards }) => (
             <section key={board} ref={board === initialBoard ? initial : undefined}>
@@ -55,19 +53,20 @@ export function CardBrowser({
             </section>
           ))}
         </div>
-      </div>
+      </Modal>
       {selected && (
-        <>
+        <Modal title={selected.name} onClose={() => setSelected(null)} className="card-detail">
           <button
             type="button"
             className="button card-browser-back"
             onClick={() => setSelected(null)}
           >
+            <ChevronLeft size={20} aria-hidden="true" />
             一覧に戻る
           </button>
           <CardPerformance card={selected} cost={cardCost(state, selected)} />
-        </>
+        </Modal>
       )}
-    </Modal>
+    </>
   );
 }

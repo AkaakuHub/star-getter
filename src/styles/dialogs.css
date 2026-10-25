@@ -25,6 +25,18 @@
 .modal-heading h2 {
   font-size: 1.2rem;
 }
+.modal-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+}
 .result-score {
   font-size: clamp(1.5rem, 7vw, 2.7rem);
   overflow-wrap: anywhere;

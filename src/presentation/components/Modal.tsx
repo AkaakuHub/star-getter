@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { X } from 'lucide-preact';
 import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 
 export function Modal({
@@ -56,6 +57,11 @@ export function Modal({
     >
       <div className="modal-heading">
         <h2>{title}</h2>
+        {onClose && (
+          <button type="button" className="modal-close" onClick={onClose} aria-label="閉じる">
+            <X size={22} aria-hidden="true" />
+          </button>
+        )}
       </div>
       {children}
     </dialog>
