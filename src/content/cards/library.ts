@@ -12,7 +12,7 @@ export const libraryCards: readonly Card[] = [
     cost: 8,
     appeal: { smile: 4950, pure: 6050, cool: 3400 },
     beatPoint: 100,
-    useAbility: 'story-boost',
+    beforeUseAbility: 'story-boost',
     special: {
       cost: 3,
       extra: false,
@@ -45,7 +45,7 @@ export const libraryCards: readonly Card[] = [
     appeal: { smile: 5000, pure: 6100, cool: 3300 },
     beatPoint: 100,
     drawAbility: 'library',
-    useEffects: [{ kind: 'search-token', token: 'ensemble', count: 2 }],
+    beforeUseEffects: [{ kind: 'search-token', token: 'ensemble', count: 2 }],
     effects: [{ kind: 'tokens', token: 'ensemble', count: 3 }],
   },
   {

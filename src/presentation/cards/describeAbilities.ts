@@ -5,7 +5,8 @@ export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
   if (card.collectionEffects)
     text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.collectionEffects.effects.map(describeEffect).join('')}この特性は引き直すと再び使用できる。`;
-  if (card.useEffects) text += `使用後、${card.useEffects.map(describeEffect).join('')}`;
+  if (card.beforeUseEffects)
+    text += `使用時、${card.beforeUseEffects.map(describeEffect).join('')}`;
   if (card.handUse)
     text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
   if (card.collectionAbility === 'icy-kosuzu')
@@ -44,16 +45,18 @@ export function describeAbilities(card: Card): string {
         '雨音の反響・凍空の鼓動使用後だけ山札から引くことができる。引いたとき、元気を14%減らし、このパート中、エナジー回復間隔を14%延長して手札上限を1減らす。';
       break;
   }
-  switch (card.useAbility) {
+  switch (card.beforeUseAbility) {
     case 'story-boost':
       text += '使用後、編成枚数に応じて貝がらの効果をこのライブ中+100〜1001%増幅する。';
-      break;
-    case 'class':
-      text += '3回使用後、このカードを除外し、通常の共鳴を再使用可能にする。';
       break;
     case 'icy-sayaka':
       text +=
         '初回使用後、パズルを1枚追加する。累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直して熱気を140万減らす。1000段階以上ならさらに1400万減らす。';
+      break;
+  }
+  switch (card.useAbility) {
+    case 'class':
+      text += '3回使用後、このカードを除外し、通常の共鳴を再使用可能にする。';
       break;
     case 'shadow':
       text +=
@@ -86,7 +89,7 @@ export function describeAbilities(card: Card): string {
     card.token === 'story' ||
     card.token === 'clock' ||
     card.token === 'bookmark' ||
-    card.useAbility === 'story-boost'
+    card.beforeUseAbility === 'story-boost'
   )
     text += '晴れ方向の空模様では、対応する効果量が増加する。';
   return text;

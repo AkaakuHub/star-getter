@@ -26,7 +26,7 @@ export const routeTokens: readonly Card[] = [
       ],
     },
     exhausts: true,
-    useEffects: [{ kind: 'search-token', token: 'story', count: 2 }],
+    beforeUseEffects: [{ kind: 'search-token', token: 'story', count: 2 }],
     effects: [
       { kind: 'tokens', token: 'clock', count: 3 },
       { kind: 'tokens', token: 'bookmark', count: 3 },
@@ -46,7 +46,7 @@ export const routeTokens: readonly Card[] = [
     token: 'story',
     exhausts: true,
     drawAbility: 'story',
-    useEffects: [{ kind: 'search-token', token: 'bookmark', count: 1 }],
+    beforeUseEffects: [{ kind: 'search-token', token: 'bookmark', count: 1 }],
     effects: [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },
       { kind: 'heart-limit', amount: 36 },
@@ -77,7 +77,7 @@ export const routeTokens: readonly Card[] = [
     token: 'clock',
     exhausts: true,
     drawAbility: 'clock',
-    useEffects: [{ kind: 'tokens', token: 'bookmark', count: 1 }],
+    beforeUseEffects: [{ kind: 'tokens', token: 'bookmark', count: 1 }],
     effects: [
       { kind: 'hand-limit', amount: 3 },
       { kind: 'mood', amount: 80 },
@@ -96,7 +96,7 @@ export const routeTokens: readonly Card[] = [
     token: 'bookmark',
     exhausts: true,
     drawAbility: 'bookmark',
-    useEffects: [{ kind: 'tokens', token: 'story', count: 1 }],
+    beforeUseEffects: [{ kind: 'tokens', token: 'story', count: 1 }],
     effects: [
       { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
       { kind: 'search-token', token: 'clock', count: 1 },

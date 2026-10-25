@@ -53,7 +53,7 @@ export const bloomCards: readonly Card[] = [
     cost: 14,
     appeal: { smile: 3900, pure: 4000, cool: 6600 },
     beatPoint: 100,
-    useAbility: 'icy-sayaka',
+    beforeUseAbility: 'icy-sayaka',
     collectionAbility: 'icy-sayaka',
     handUse: {
       trigger: 2,

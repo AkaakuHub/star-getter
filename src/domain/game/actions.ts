@@ -1,3 +1,4 @@
+import { applyBeforeUseAbility } from './cards/beforeUse';
 import { drainModeChanges } from './effects/modeChange';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type GameState } from './model';
@@ -75,7 +76,7 @@ function activateCard(
       },
     ],
   };
-  next = retireCard(next, card);
+  next = retireCard(applyBeforeUseAbility(next, card), card);
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') {
       if (allHand) continue;

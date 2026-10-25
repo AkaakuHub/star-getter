@@ -1,34 +1,10 @@
 import type { Card, GameState } from '../model';
 import { applyEffect } from '../effects';
 import { handEffectCards } from './handEffects';
-import { moodValue } from '../projection';
 
 export function applyUseAbility(state: GameState, card: Card): GameState {
   let next = state;
   const count = state.cardUseCounts[card.id] ?? 0;
-  if (card.useAbility === 'story-boost') {
-    const size = state.deck.length;
-    const percent =
-      size >= 100
-        ? 1001
-        : size >= 80
-          ? 700
-          : size >= 60
-            ? 500
-            : size >= 40
-              ? 300
-              : size >= 20
-                ? 200
-                : 100;
-    next = {
-      ...next,
-      storyAmplification: Math.fround(
-        next.storyAmplification + percent + Math.max(0, moodValue(next)) * percent * 0.005,
-      ),
-    };
-  }
-  if (card.useAbility === 'icy-sayaka' && count === 1)
-    next = applyEffect(next, { kind: 'tokens', token: 'shadow', count: 1 }, card);
   if (card.useAbility === 'class' && count === 3)
     next = applyEffect(next, { kind: 'reset-special', normalOnly: true }, card);
   if (card.useAbility === 'shadow' && count === 14) {
@@ -55,19 +31,13 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
 }
 
 export function notifyHandSkillUse(state: GameState, used: Card): GameState {
-  const activated = (used.useEffects ?? []).reduce(
-    (next, effect) => applyEffect(next, effect, used),
-    state,
-  );
-  const listeners = handEffectCards(activated).filter(
-    (card) => card.handUse?.trigger === used.unit,
-  );
+  const listeners = handEffectCards(state).filter((card) => card.handUse?.trigger === used.unit);
   return listeners.reduce(
     (next, card) =>
       (card.handUse?.effects ?? []).reduce(
         (current, effect) => applyEffect(current, effect, card),
         next,
       ),
-    activated,
+    state,
   );
 }

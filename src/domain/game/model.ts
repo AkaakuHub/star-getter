@@ -116,7 +116,7 @@ export type Card = Readonly<{
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
-  useEffects?: readonly Effect[];
+  beforeUseEffects?: readonly Effect[];
   handUse?: Readonly<{ trigger: UnitId; effects: readonly Effect[] }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
@@ -142,7 +142,8 @@ export type Card = Readonly<{
     | 'camera'
     | 'perennial'
     | 'shadow';
-  useAbility?: 'story-boost' | 'class' | 'icy-sayaka' | 'shadow';
+  beforeUseAbility?: 'story-boost' | 'icy-sayaka';
+  useAbility?: 'class' | 'shadow';
   collectionEffects?: Readonly<{ threshold: number; effects: readonly Effect[] }>;
   collectionAbility?: 'icy-sayaka' | 'icy-kosuzu';
 }>;
