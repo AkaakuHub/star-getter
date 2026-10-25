@@ -9,7 +9,7 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
-import type { GaugeEffect, GaugeInfinity, GaugeRegeneration } from './modelTypes';
+import type { GaugeEffect, GaugeInfinity, GaugeRegeneration, MentalBarrier } from './modelTypes';
 import type {
   MoodBonus,
   ResetSpecial,
@@ -312,6 +312,7 @@ export type GameState = Readonly<{
   beatPointBuffs: readonly Readonly<{ value: number; remainingSections: number | null }>[];
   heartBoosts: readonly HeartBoost[];
   mentalShield: number;
+  mentalBarriers: readonly MentalBarrier[];
   excitement: number;
   maximumVoltageLevel: number;
   specialUsed: readonly string[];

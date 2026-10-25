@@ -1,18 +1,26 @@
 import type { GameState } from './model';
 import { voltageThreshold } from './live/voltageLevel';
 import { changeBloomResource } from './bloom';
+import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
 
 export function changeResource(
   state: GameState,
   resource: 'energy' | 'stamina' | 'excitement',
   amount: bigint,
+  source: 'skill' | 'natural' = 'skill',
 ): GameState {
   if (
     state.gaugeInfinities.some((infinity) => infinity.gauge === resourceToGauge(resource)) &&
     !(resource === 'stamina' && state.resting)
   )
     return state;
-  if (resource === 'stamina' && amount < 0n) {
+  if (resource === 'stamina' && amount < 0n && source === 'skill') {
+    const absorbed = absorbSkillMentalDamage(state, amount);
+    state = absorbed.state;
+    amount = absorbed.amount;
+    if (amount === 0n) return state;
+  }
+  if (resource === 'stamina' && amount < 0n && source === 'skill') {
     const blocked = Math.min(state.mentalShield, -Number(amount));
     state = { ...state, mentalShield: state.mentalShield - blocked };
     amount += BigInt(Math.trunc(blocked));
@@ -25,6 +33,12 @@ export function changeResource(
         ? voltageThreshold(state.maximumVoltageLevel)
         : 100;
   return { ...state, [resource]: Math.max(0, Math.min(maximum, state[resource] + Number(amount))) };
+}
+
+export function decreaseMentalNaturally(state: GameState): GameState {
+  const barrier = absorbNaturalMentalDecrease(state);
+  if (barrier.absorbed) return barrier.state;
+  return changeResource(state, 'stamina', -1n, 'natural');
 }
 
 function resourceToGauge(

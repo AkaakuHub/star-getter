@@ -74,6 +74,10 @@ export function describeEffect(effect: Effect): string {
       return `${effect.gauge === 'ap' ? 'エナジー' : effect.gauge === 'mental' ? '元気' : '熱気'}ゲージを無限にする。`;
     case 'gauge-regeneration':
       return `${effect.gauge === 'mental' ? '元気' : '熱気'}を一定間隔で回復する。`;
+    case 'mental-barrier':
+      return effect.barrier === 'endurance'
+        ? '元気の減少を耐久値まで防ぐ。'
+        : '元気の減少を緩和する。';
     case 'voltage-limit':
       return `熱気Lv.上限を${effect.amount}増加する。`;
     case 'beat-hearts':

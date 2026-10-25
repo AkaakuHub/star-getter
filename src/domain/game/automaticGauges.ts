@@ -1,7 +1,7 @@
 import type { GameState } from './model';
 import { advanceStarGatherApGauge } from './live/apGauge';
-import { changeBloomResource } from './bloom';
-import { changeResource } from './resources';
+import { changeResource, decreaseMentalNaturally } from './resources';
+import { mentalDecreaseInterval } from './live/mentalBarriers';
 import { durationSeconds } from './projection';
 
 export function advanceAutomaticGauges(state: GameState, dt: number): GameState {
@@ -59,11 +59,19 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
     );
     return { ...next, mentalTimerSeconds, stamina, resting: stamina < 60 };
   }
-  while (stage.mentalDecreaseIntervalSeconds < mentalTimerSeconds) {
-    mentalTimerSeconds = Math.fround(mentalTimerSeconds - stage.mentalDecreaseIntervalSeconds);
-    next = next.bloom
-      ? changeBloomResource(next, 'stamina', -1n)
-      : { ...next, stamina: Math.max(0, next.stamina - 1) };
+  const mentalInterval = mentalDecreaseInterval(next, stage.mentalDecreaseIntervalSeconds);
+  if (mentalInterval <= 0) {
+    if (!next.bloom) {
+      next = changeResource(next, 'stamina', -BigInt(Math.trunc(next.stamina)), 'natural');
+      if (next.stamina <= 0 && !(next.mentalProtected || next.sectionMentalProtected)) {
+        next = { ...next, resting: true };
+        mentalTimerSeconds = 0;
+      }
+    }
+  }
+  while (0 < mentalInterval && mentalInterval < mentalTimerSeconds) {
+    mentalTimerSeconds = Math.fround(mentalTimerSeconds - mentalInterval);
+    next = decreaseMentalNaturally(next);
   }
   return {
     ...next,

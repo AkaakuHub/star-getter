@@ -18,6 +18,7 @@ import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
+import { applyMentalBarrier } from './effects/mentalBarrier';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -235,6 +236,8 @@ export function applyEffect(
       return activateInfinityGauge(state, effect);
     case 'gauge-regeneration':
       return applyGaugeRegeneration(state, effect, card, multiplier);
+    case 'mental-barrier':
+      return applyMentalBarrier(state, effect, card, multiplier);
     case 'voltage-tier': {
       if (state.bloom)
         return effect.tiers.reduceRight(

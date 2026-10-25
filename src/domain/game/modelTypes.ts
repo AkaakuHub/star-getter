@@ -30,7 +30,25 @@ export type GaugeRegenerationEffect = Readonly<{
   intervalMilliseconds: number;
   duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
 }>;
-export type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect;
+export type GaugeEffect = InfinityGaugeEffect | GaugeRegenerationEffect | MentalBarrierEffect;
+export type MentalBarrier = Readonly<{
+  kind: 'endurance' | 'attenuation';
+  endurance: number;
+  currentEndurance: number;
+  attenuation: number;
+  remainingSeconds: number | null;
+  remainingSections: number | null;
+}>;
+export type MentalBarrierEffect = Readonly<{
+  kind: 'mental-barrier';
+  barrier: 'endurance' | 'attenuation';
+  enduranceType: 'ratio' | 'fixed' | 'infinite';
+  endurance: number;
+  attenuation: number;
+  duration:
+    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+    | Readonly<{ kind: 'stage' }>;
+}>;
 export type ResetSpecial = Readonly<{
   kind: 'reset-special';
   scope: 'normal' | 'extra' | 'all';

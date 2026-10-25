@@ -19,6 +19,7 @@ import {
 } from './live/heartPresentation';
 import { expireGaugeInfinities } from './resources';
 import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
+import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
 
 export function createGame(
   track: Track,
@@ -81,6 +82,7 @@ export function createGame(
     beatPointBuffs: [],
     heartBoosts: [],
     mentalShield: 0,
+    mentalBarriers: [],
     excitement: 0,
     maximumVoltageLevel: 1000,
     specialUsed: [],
@@ -156,9 +158,15 @@ export function advanceTo(state: GameState, seconds: number): GameState {
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
-  const gauges = advanceGaugeRegenerations(
-    expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
-    dt,
+  const gauges = removeExhaustedMentalBarriers(
+    expireMentalBarriers(
+      advanceGaugeRegenerations(
+        expireGaugeInfinities(advanceAutomaticGauges(state, dt), 'milliseconds', dt),
+        dt,
+      ),
+      'milliseconds',
+      dt,
+    ),
   );
   let next: GameState = advanceHearts({
     ...gauges,
@@ -186,6 +194,7 @@ function advanceTick(state: GameState): GameState {
   if (sectionAt(next) !== sectionAt(state)) {
     next = expireGaugeInfinities(next, 'sections', 1);
     next = expireGaugeRegenerations(next, 'sections');
+    next = expireMentalBarriers(next, 'sections', 1);
     next = fillHand({
       ...next,
       voltageStops: next.voltageStops.flatMap((stop) => {
