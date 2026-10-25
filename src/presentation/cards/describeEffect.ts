@@ -177,6 +177,10 @@ export function describeEffect(effect: Effect): string {
       return `自然発生${effect.amount}回分のきらめきを獲得する。`;
     case 'hearts':
       return `きらめきを${effect.amount}個獲得する。`;
+    case 'skill-hearts':
+      return effect.calculation === 'fixed'
+        ? '追加のきらめきを獲得する。'
+        : 'ビートに応じた追加のきらめきを獲得する。';
     case 'energy':
       return `エナジーを${Math.abs(effect.amount)}${effect.amount < 0 ? '減らす' : '回復する'}。開花中は回復量と効果増幅に応じて開花プログレスを増加させる。`;
     case 'stamina':

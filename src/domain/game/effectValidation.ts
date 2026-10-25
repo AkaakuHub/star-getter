@@ -13,6 +13,7 @@ import { validateGaugeRegenerationEffect } from './gaugeRegenerationTypes';
 import { validateSkillCostChangeEffect } from './skillCostChangeTypes';
 import { validateAddVoltageSkillEffect } from './addVoltageTypes';
 import { validateHeartBoostEffect } from './heartBoostTypes';
+import { validateSkillHeartsEffect } from './skillHeartTypes';
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'add-voltage-skill') return validateAddVoltageSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
@@ -278,6 +279,7 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'heart-boost') return validateHeartBoostEffect(effect);
+  if (effect.kind === 'skill-hearts') return validateSkillHeartsEffect(effect);
   if (effect.kind === 'beat-heart-value-buff') {
     validateBeatHeartValueBuff(effect);
     return;

@@ -4,6 +4,7 @@ import { recordScoreHistory } from './scoreHistory';
 import { rules, type GameState, type MemberId } from './model';
 import type { IngameMission, IngameMissionRecord } from './ingameMissionTypes';
 import type { Effect } from './modelTypes';
+import { starGatherHeartCount } from './live/heartState';
 
 export function startIngameMission(state: GameState, groupId: number): GameState {
   const group = state.track.ingameMissionGroups.find((item) => item.id === groupId);
@@ -40,7 +41,7 @@ export function missionActionEffect(
   before: GameState,
 ): GameState {
   const actionType =
-    effect.kind === 'hearts'
+    effect.kind === 'hearts' || effect.kind === 'skill-hearts'
       ? 1
       : effect.kind === 'boost'
         ? 2
@@ -72,7 +73,9 @@ export function missionActionEffect(
     actionType === 1
       ? effect.kind === 'hearts'
         ? effect.amount
-        : 0
+        : effect.kind === 'skill-hearts'
+          ? starGatherHeartCount(state.hearts) - starGatherHeartCount(before.hearts)
+          : 0
       : actionType === 2
         ? (state.boosts.at(-1)?.percent ?? 0)
         : actionType === 5

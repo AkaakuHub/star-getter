@@ -24,6 +24,7 @@ import {
 } from './effects/action52SkillBoost';
 import { addHeartBoost } from './live/heartBoosts';
 import { createHeartsFromEffect } from './effects/heartCreation';
+import { createSkillHeartsFromEffect } from './effects/skillHearts';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect, isParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
@@ -165,6 +166,8 @@ function applyEffectInternal(
         effectPower,
         effect.lifetimeSeconds,
       );
+    case 'skill-hearts':
+      return createSkillHeartsFromEffect(state, effect, card, multiplier, addValue, effectPower);
     case 'beat-hearts':
       return createHeartsFromEffect(state, value(effect.amount), card, true);
     case 'tokens':
