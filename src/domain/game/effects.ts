@@ -265,7 +265,7 @@ function applyEffectInternal(
     case 'stop-voltage-increase':
       return activateVoltageIncreaseStop(state, effect);
     case 'infinity-gauge':
-      return activateInfinityGauge(state, effect);
+      return activateInfinityGauge(state, effect, applyEffect);
     case 'gauge-regeneration':
       return applyGaugeRegeneration(
         state,

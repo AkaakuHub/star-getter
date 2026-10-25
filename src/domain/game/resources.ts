@@ -39,20 +39,13 @@ export function changeResource(
     state = conversion.state;
   }
   if (resource === 'excitement' && amount > 0n) {
-    const bonus = state.track.masteryVoltageBonus;
-    if (bonus.demand > 0) {
-      const progress = Math.fround(state.masteryVoltageProgress + Math.fround(Number(amount)));
-      if (progress >= bonus.demand) {
-        state = { ...state, masteryVoltageProgress: 0 };
-        const gained = BigInt(bonus.gain);
-        if (gained > 0n) {
-          const conversion = convertVoltageIncrease(state, gained, undefined, applyEffect);
-          state = conversion.state;
-          if (!conversion.converted) amount += gained;
-        }
-      } else {
-        state = { ...state, masteryVoltageProgress: progress };
-      }
+    const mastery = addMasteryVoltage(state, Math.fround(Number(amount)));
+    state = mastery.state;
+    if (mastery.gain > 0) {
+      const gained = BigInt(mastery.gain);
+      const conversion = convertVoltageIncrease(state, gained, undefined, applyEffect);
+      state = conversion.state;
+      if (!conversion.converted) amount += gained;
     }
   }
   if (
@@ -90,7 +83,9 @@ export function changeResource(
   if (state.bloom) {
     const changed = changeBloomResource(state, resource, amount);
     const withHandInduce =
-      resource === 'excitement' ? notifyVoltageLevelChange(state, changed, applyEffect) : changed;
+      resource === 'excitement'
+        ? notifyVoltageBaseLevelChange(state, changed, applyEffect)
+        : changed;
     const withMissionEvent =
       resource === 'excitement' && state.excitement > 0 && withHandInduce.excitement === 0
         ? registerVoltageZeroMission(withHandInduce)
@@ -107,7 +102,7 @@ export function changeResource(
         : state.maximumMental;
   const nextValue = Math.max(0, Math.min(maximum, state[resource] + Number(amount)));
   let next: GameState = { ...state, [resource]: nextValue };
-  if (resource === 'excitement') next = notifyVoltageLevelChange(state, next, applyEffect);
+  if (resource === 'excitement') next = notifyVoltageBaseLevelChange(state, next, applyEffect);
   if (resource === 'excitement' && state.excitement > 0 && nextValue === 0)
     next = registerVoltageZeroMission(next);
   if (resource === 'stamina' && nextValue !== state.stamina)
@@ -132,11 +127,23 @@ export function setVoltageValue(
   }
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
     return state;
-  const next = { ...state, excitement: target };
+  const next = notifyVoltageBaseLevelChange(state, { ...state, excitement: target }, _applyEffect);
   return state.excitement > 0 && target === 0 ? registerVoltageZeroMission(next) : next;
 }
 
-function notifyVoltageLevelChange(
+export function addMasteryVoltage(
+  state: GameState,
+  voltageUp: number,
+): Readonly<{ state: GameState; gain: number }> {
+  const bonus = state.track.masteryVoltageBonus;
+  if (voltageUp <= 0 || bonus.demand <= 0) return { state, gain: 0 };
+  const progress = Math.fround(state.masteryVoltageProgress + Math.fround(voltageUp));
+  if (progress >= bonus.demand)
+    return { state: { ...state, masteryVoltageProgress: 0 }, gain: Math.trunc(bonus.gain) };
+  return { state: { ...state, masteryVoltageProgress: progress }, gain: 0 };
+}
+
+export function notifyVoltageBaseLevelChange(
   previous: GameState,
   current: GameState,
   applyEffect?: EffectApplier,

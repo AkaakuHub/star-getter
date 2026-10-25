@@ -43,6 +43,35 @@ describe('無限ゲージ', () => {
     expect(ended.excitement).toBe(voltageThreshold(10));
   });
 
+  it('Action39は無限開始時の熱気差をMasteryへ渡し、報酬を変換する', () => {
+    const initial = game();
+    const conversion = {
+      id: 1,
+      destination: 'love' as const,
+      num: 10_000,
+      outputDuration: { kind: 'milliseconds' as const, value: 1000 },
+      disabledOnConvertCount: null,
+      conversions: 0,
+      expireOnHeartCollect: false,
+      remainingSeconds: null,
+      remainingSections: null,
+      deactivationKey: null,
+    };
+    const state = {
+      ...initial,
+      track: { ...initial.track, masteryVoltageBonus: { demand: 1, gain: 3 } },
+      voltageConversions: [conversion],
+    };
+    const active = applyEffect(state, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'stage', value: 0 },
+    });
+    expect(active.masteryVoltageProgress).toBe(0);
+    expect(active.voltageConversions[0]?.conversions).toBe(1);
+    expect(active.temporaryScoreBoosts.at(-1)?.percent).toBe(3);
+  });
+
   it('元気無限の開始と最終解除で元気タイマーを0へ戻す', () => {
     const initial = { ...game(), stamina: 42, mentalTimerSeconds: 0.4 };
     const active = applyEffect(initial, {

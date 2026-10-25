@@ -2,11 +2,37 @@ import { expect, it } from 'vite-plus/test';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
 import { moodValue } from '../../src/domain/game/projection';
+import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
 import {
   notifyHandCardBeforeUse,
   notifyHandHeartCollect,
 } from '../../src/domain/game/cards/handInduce';
 import { game, withHand } from './support/game';
+
+it('ActionType37のSetで基礎熱気レベルが上がると手札誘発を起動する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('手札誘発カードがありません。');
+  const card = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'voltage-increase' as const },
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+    },
+  };
+  const state = withHand(
+    {
+      ...initial,
+      deck: [card],
+      cardPool: [card],
+      excitement: voltageThreshold(1),
+    },
+    [card.id],
+  );
+  const changed = applyEffect(state, { kind: 'voltage-set', amount: voltageThreshold(2) });
+  expect(changed.moodOffset).toBe(1);
+  expect(changed.handUseActivationCounts[card.id]).toBe(1);
+});
 
 it('Action903は回収数を合算し、閾値ごとに子効果を上限回数まで発動する', () => {
   const initial = game();

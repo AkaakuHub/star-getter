@@ -1,10 +1,14 @@
 import { voltageThreshold } from '../live/voltageLevel';
 import type { Effect, GameState } from '../model';
 import { induceMentalHearts } from './mentalHeartInduce';
+import { convertVoltageIncrease } from './voltageConversion';
+import { induceSkillEffects, type EffectApplier } from './induceSkillEffect';
+import { addMasteryVoltage, notifyVoltageBaseLevelChange } from '../resources';
 
 export function activateInfinityGauge(
   state: GameState,
   effect: Extract<Effect, { kind: 'infinity-gauge' }>,
+  applyEffect?: EffectApplier,
 ): GameState {
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
@@ -25,7 +29,7 @@ export function activateInfinityGauge(
   const firstActivation = !state.gaugeInfinities.some(
     (infinity) => infinity.gauge === effect.gauge,
   );
-  let next = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
+  let next: GameState = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
   if (bloom) {
     const progress = BigInt.asIntN(32, bloom.progress + 500n);
     return { ...next, bloom: { ...bloom, progress: progress < 0n ? 0n : progress } };
@@ -37,7 +41,20 @@ export function activateInfinityGauge(
       { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
       next.maximumMental,
     );
-  if (effect.gauge === 'voltage')
-    next = { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
+  if (effect.gauge === 'voltage') {
+    const excitement = voltageThreshold(next.maximumVoltageLevel);
+    next = { ...next, excitement };
+    const mastery = addMasteryVoltage(next, Math.fround(excitement - state.excitement));
+    next = mastery.state;
+    let voltageUp = mastery.gain;
+    if (voltageUp > 0) {
+      const conversion = convertVoltageIncrease(next, BigInt(voltageUp), undefined, applyEffect);
+      next = conversion.state;
+      if (conversion.converted) voltageUp = 0;
+    }
+    next = notifyVoltageBaseLevelChange(state, next, applyEffect);
+    if (voltageUp > 0 && applyEffect)
+      next = induceSkillEffects(next, 'voltage', voltageUp, applyEffect);
+  }
   return next;
 }
