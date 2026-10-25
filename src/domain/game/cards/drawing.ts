@@ -2,7 +2,6 @@ import { createRangeRandom } from '../random';
 import { drawCandidate, drawWeight } from './drawLottery';
 import { disposeHandEffects } from './handEffects';
 import { applyDrawAbility } from './drawAbilities';
-import { shuffle } from '../deck';
 import type { Card, GameState, HandShuffle } from '../model';
 
 export function handCapacity(state: GameState): number {
@@ -27,22 +26,25 @@ function drawUntil(state: GameState, count: number): GameState {
   const drawnCards: Card[] = [];
 
   while (next.hand.length < count) {
-    if (!next.drawPile.length) {
-      if (!next.discard.length) break;
-      const shuffled = shuffle(next.discard, next.randomSeed);
-      next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
-    }
     const probability = (id: string) => {
       const card = next.deck.find((item) => item.id === id);
       if (!card) throw new Error('山札のカードがありません。');
       return drawWeight(card, next);
     };
-    let candidates = next.drawPile.filter((id) => probability(id) !== 0);
-    if (!candidates.length && next.discard.length) {
-      const shuffled = shuffle([...next.drawPile, ...next.discard], next.randomSeed);
-      next = { ...next, drawPile: shuffled.items, discard: [], randomSeed: shuffled.seed };
-      candidates = next.drawPile.filter((id) => probability(id) !== 0);
+    if (next.drawPile.every((id) => probability(id) === 0)) {
+      const returned = [...next.drawPile, ...next.discard];
+      if (!returned.length) break;
+      next = {
+        ...next,
+        drawPile: returned,
+        discard: [],
+        deckOutCount: next.deckOutCount + 1,
+      };
     }
+    const available = next.deck
+      .filter((card) => next.drawPile.includes(card.id))
+      .map((card) => card.id);
+    let candidates = available.filter((id) => probability(id) !== 0);
     const search = next.deckActions.searches.at(-1);
     if (search !== undefined) {
       const matches = candidates.filter((id) =>
@@ -67,7 +69,7 @@ function drawUntil(state: GameState, count: number): GameState {
           weight: probability(id),
         })),
         randomIndex,
-      ) ?? next.drawPile[randomIndex(next.drawPile.length)];
+      ) ?? available[randomIndex(available.length)];
     if (!drawn) break;
     next = {
       ...next,
@@ -107,17 +109,16 @@ function drawUntil(state: GameState, count: number): GameState {
 export function shuffleHand(state: GameState, options: HandShuffle): GameState {
   const recovered = options.recoverDiscard ? state.discard : [];
   const returned = options.destination === 'draw' ? state.hand : [];
-  const shuffled = shuffle([...state.drawPile, ...recovered, ...returned], state.randomSeed);
+  const returnedIds = [...state.drawPile, ...recovered, ...returned];
   return {
     ...state,
     hand: [],
     handEffectCardIds: state.handEffectCardIds.filter((id) => !state.hand.includes(id)),
-    drawPile: shuffled.items,
+    drawPile: state.deck.filter((card) => returnedIds.includes(card.id)).map((card) => card.id),
     discard: [
       ...(options.recoverDiscard ? [] : state.discard),
       ...(options.destination === 'discard' ? state.hand : []),
     ],
-    randomSeed: shuffled.seed,
     relayUsed: [],
     handHeartCollectCounts: {},
     drawContext: 'shuffle',

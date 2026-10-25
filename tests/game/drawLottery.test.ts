@@ -88,3 +88,20 @@ it('検索先があるときは検索外の優先カードを先に引かない'
   const drawn = fillHandToCount(state, 1);
   expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
 });
+
+it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {
+  const initial = withHand(game('library'), ['class']);
+  const state = {
+    ...initial,
+    drawContext: 'shuffle' as const,
+    drawPile: ['library-ensemble'],
+    discard: initial.deck
+      .filter((card) => !['class', 'library-ensemble'].includes(card.id))
+      .map((card) => card.id),
+  };
+  const drawn = fillHandToCount(state, 2);
+  expect(drawn.hand).toContain('aurora-ensemble');
+  expect(drawn.hand).not.toContain('library-ensemble');
+  expect(drawn.deckOutCount).toBe(state.deckOutCount + 1);
+  expect(drawn.discard).toEqual([]);
+});

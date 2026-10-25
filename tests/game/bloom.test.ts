@@ -5,7 +5,7 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { rules } from '../../src/domain/game/model';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { canUseSpecial } from '../../src/domain/game/special';
-import { game } from './support/game';
+import { game, withHand } from './support/game';
 
 function active() {
   return activateBloom(
@@ -47,7 +47,8 @@ describe('開花の専用ゲージ', () => {
 
   it('通常カードの使用では発動せず、共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
-    state = { ...state, moodOffset: -100, energy: 20, maxEnergy: 20, hand: ['horizon'] };
+    state = withHand({ ...state, moodOffset: -100, energy: 20, maxEnergy: 20 }, ['horizon']);
+    expect(act(state, { type: 'card', index: 0 }).bloom).toBeNull();
     expect(canUseSpecial(state, 'horizon')).toBe(true);
     const changed = act(state, { type: 'special', cardId: 'horizon' });
     expect(changed.bloom?.strength).toBe(3.5);

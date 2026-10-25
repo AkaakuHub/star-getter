@@ -14,6 +14,7 @@ for (const recoverDiscard of [false, true]) {
       };
       const next = shuffleHand(initial, { recoverDiscard, destination });
       expect(next.hand).toEqual([]);
+      expect(next.randomSeed).toBe(initial.randomSeed);
       expect(next.drawPile.includes('class')).toBe(destination === 'draw');
       expect(next.discard.includes('class')).toBe(destination === 'discard');
       expect(next.drawPile.includes(discarded)).toBe(recoverDiscard);

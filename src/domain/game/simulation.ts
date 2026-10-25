@@ -3,7 +3,7 @@ import { advanceAutomaticGauges } from './automaticGauges';
 import { moodAtTime, validateMoodTimeline } from './live/moodTimeline';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
 import { beatHeartCount } from './beat';
-import { validateDeck, validateCard, shuffle } from './deck';
+import { validateDeck, validateCard } from './deck';
 import { addHearts, collectHearts, advanceHearts, heartCount } from './hearts';
 import { advanceAutomaticHeart } from './live/automaticHeart';
 import { type Card, type GameState, type Track, rules } from './model';
@@ -29,13 +29,8 @@ export function createGame(
   validateTrack(track);
   for (const card of tokenCatalog) validateCard(card);
   resolveStarGatherHeartDrawCount(0, heartShowLimit);
-  const shuffled = shuffle(
-    deck.map((card) => card.id),
-    seed,
-  );
   const lead = deck[0];
   if (!lead) throw new Error('先頭のカードがありません。');
-  const ordered = [lead.id, ...shuffled.items.filter((id) => id !== lead.id)];
   const initial: GameState = {
     supportLevels: {},
     modes: createModes(deck.flatMap((card) => card.modeIds ?? [])),
@@ -47,7 +42,8 @@ export function createGame(
     cardPool: [...deck],
     hand: [lead.id],
     handEffectCardIds: [lead.id],
-    drawPile: ordered.slice(1),
+    drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
+    deckOutCount: 0,
     discard: [],
     tokenCatalog,
     nextTokenId: 1,
@@ -59,7 +55,7 @@ export function createGame(
     lastUsedSkillIcon: null,
     cardUseCounts: {},
     activation: null,
-    randomSeed: shuffled.seed,
+    randomSeed: seed,
     energy: 0,
     maxEnergy: track.stage.maxEnergy,
     apIntervalFactor: 1,
