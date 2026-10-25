@@ -51,6 +51,7 @@ export function requestTokenCard(
   const request: TokenRequest = {
     template: { kind: 'template', templateId },
     count,
+    actionType28: true,
     ...(seriesIds === undefined ? {} : { seriesIds }),
   };
   return requestToken(state, request, sourceId);

@@ -8,6 +8,7 @@ export type TokenRequest = Readonly<{
   template: TokenTemplateReference;
   count: number;
   seriesIds?: readonly number[];
+  actionType28?: true;
 }>;
 
 export type TokenCardEffect = Readonly<{

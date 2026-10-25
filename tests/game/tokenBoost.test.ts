@@ -139,6 +139,34 @@ it('ActionType28は指定したトークンカードを直接追加し、デー�
   expect(generated.drawPile.filter((id) => id.startsWith('action28-template-'))).toHaveLength(2);
 });
 
+it('ActionType28は系列条件付きActionType52補正を生成数へ適用し、使用回数を1回消費する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const template = initial.tokenCatalog.find((card) => card.token === 'story');
+  if (!source || !template) throw new Error('カードがありません。');
+  const boosted = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0 },
+      uses: 1,
+      skillTokenSeriesIds: [42],
+    },
+    source,
+  );
+  const generated = applyEffect(
+    boosted,
+    { kind: 'token-card', templateId: template.id, count: 2, seriesIds: [42] },
+    source,
+  );
+  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(
+    initial.deck.filter((card) => card.token === 'story').length + 3,
+  );
+  expect(generated.action52Buffs).toHaveLength(0);
+});
+
 it('ActionType28は同一スキル内で指定カードを増幅後に交互追加する', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
