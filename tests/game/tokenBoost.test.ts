@@ -79,3 +79,29 @@ it('追加カードの増幅は時間またはパート期限で解除する', (
     advanceTo(section, (nextSection.startBeat * 60) / initial.track.bpm + 1 / 60).tokenBoosts,
   ).toHaveLength(0);
 });
+
+it('カードの追加シリーズを対象とする増幅は生成元のシリーズで判定する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('カードがありません。');
+  const state = {
+    ...initial,
+    cardPool: initial.cardPool.map((card) =>
+      card.id === source.id ? { ...card, tokenSeriesIds: [7] } : card,
+    ),
+  };
+  const boosted = applyEffect(
+    state,
+    {
+      kind: 'token-boost',
+      calculation: 'multiply-percent',
+      num: 1_000_000,
+      target: { kind: 'card-series', seriesId: 7 },
+      uses: 1,
+    },
+    source,
+  );
+  const generated = requestTokens(boosted, 'story', 2, source.id);
+  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(4);
+  expect(generated.tokenBoosts).toHaveLength(0);
+});
