@@ -1,3 +1,4 @@
+import type { VoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
 import type { LoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
 import type {
   DeckSkillCostChangeEffect,
@@ -295,6 +296,7 @@ type EffectShape =
     }>
   | HeartBoostEffect
   | LoveUpAdditionalBuffEffect
+  | VoltageUpAdditionalBuffEffect
   | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
   | Readonly<{
       kind: 'cost-reduction';

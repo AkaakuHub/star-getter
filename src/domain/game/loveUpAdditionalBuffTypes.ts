@@ -33,13 +33,27 @@ export function validateLoveUpAdditionalBuffEffect(effect: LoveUpAdditionalBuffE
   if (
     !Number.isSafeInteger(effect.calculation) ||
     !Number.isSafeInteger(effect.num) ||
-    !Number.isFinite(effect.duration.value) ||
-    effect.duration.value < 0 ||
+    !Number.isSafeInteger(effect.duration.value) ||
     (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
+    !validTarget(effect.target) ||
+    (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
     !Number.isSafeInteger(effect.disabledType) ||
     !Number.isSafeInteger(effect.disabledCount) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
     (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )
     throw new Error('STAR追加バフの設定が正しくありません。');
+}
+
+function validTarget(target: LoveUpAdditionalBuffTarget): boolean {
+  switch (target.kind) {
+    case 'all':
+      return true;
+    case 'member':
+      return Number.isSafeInteger(target.member);
+    case 'unit':
+      return Number.isSafeInteger(target.unit) && [1, 2, 3].includes(target.unit);
+    case 'token-series':
+      return Number.isSafeInteger(target.seriesId);
+  }
 }

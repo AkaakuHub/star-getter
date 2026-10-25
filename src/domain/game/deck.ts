@@ -1,6 +1,5 @@
-import { validateLoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
-import { validateDeckSkillCostChange } from './skillCostChangeTypes';
 import { validateTokenCardEffect } from './tokenRequestTypes';
+import { validateSpecialEffect } from './effectSpecialValidation';
 import { type Card, type Effect, costumeIds, rules } from './model';
 import { validateAdditionalHeartInduceEffect } from './additionalHeartTypes';
 export function validateDeck(deck: readonly Card[]): void {
@@ -292,8 +291,7 @@ function validateEffect(effect: Effect): void {
       throw new Error('自然発生ビートポイントの設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'deck-skill-cost-change') return validateDeckSkillCostChange(effect);
-  if (effect.kind === 'love-up-additional-buff') return validateLoveUpAdditionalBuffEffect(effect);
+  if (validateSpecialEffect(effect)) return;
   if (effect.kind === 'skill-cost-change') {
     if (
       !Number.isFinite(effect.amount) ||

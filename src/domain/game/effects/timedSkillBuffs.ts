@@ -4,14 +4,20 @@ import {
   advanceLoveUpAdditionalBuffs,
   expireLoveUpAdditionalBuffSections,
 } from './loveUpAdditionalBuff';
+import {
+  advanceVoltageUpAdditionalBuffs,
+  expireVoltageUpAdditionalBuffSections,
+} from './voltageUpAdditionalBuff';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceLoveUpAdditionalBuffs(
-    advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceVoltageUpAdditionalBuffs(
+    advanceLoveUpAdditionalBuffs(advanceAction52SkillBoosts(state, elapsedSeconds), elapsedSeconds),
     elapsedSeconds,
   );
 }
 
 export function expireTimedSkillBuffSections(state: GameState): GameState {
-  return expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state));
+  return expireVoltageUpAdditionalBuffSections(
+    expireLoveUpAdditionalBuffSections(expireAction52SkillBoostSections(state)),
+  );
 }

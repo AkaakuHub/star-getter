@@ -1,3 +1,4 @@
+import type { VoltageUpAdditionalBuff } from './voltageUpAdditionalBuffTypes';
 import type { LoveUpAdditionalBuff } from './loveUpAdditionalBuffTypes';
 import type { DrawProbabilityRule } from './cards/drawProbability';
 import type { ScoreLimitSettings } from './live/scoreLimit';
@@ -275,7 +276,9 @@ export type GameState = Readonly<{
   nextVoltageConversionId: number;
   nextAction52BuffId: number;
   loveUpAdditionalBuffs: readonly LoveUpAdditionalBuff[];
+  voltageUpAdditionalBuffs: readonly VoltageUpAdditionalBuff[];
   nextLoveUpAdditionalBuffId: number;
+  nextVoltageUpAdditionalBuffId: number;
   temporaryScoreBoosts: readonly TemporaryScoreBoost[];
   gaugeInfinities: readonly GaugeInfinity[];
   gaugeRegenerations: readonly GaugeRegeneration[];

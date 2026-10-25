@@ -1,3 +1,4 @@
+import { matchingVoltageUpAdditionalBuffs } from './voltageUpAdditionalBuff';
 import type { Card, GameState, ResourceBoost } from '../model';
 
 export function applyAdditionalBuff(
@@ -10,11 +11,12 @@ export function applyAdditionalBuff(
   const matches = (boost: ResourceBoost) =>
     boost.target === target &&
     (!boost.members || (card !== undefined && boost.members.includes(card.member)));
+  const voltageBuffs = target === 'excitement' ? matchingVoltageUpAdditionalBuffs(state, card) : [];
   const percent = Math.max(
     -100,
     state.resourceBoosts.reduce(
       (sum, boost) => (matches(boost) ? Math.fround(sum + boost.percent) : sum),
-      0,
+      voltageBuffs.reduce((sum, buff) => Math.fround(sum + buff.percent), 0),
     ),
   );
   return {

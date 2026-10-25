@@ -4,6 +4,7 @@ import type { Card, Effect, GameState } from '../model';
 import { applyParameterValueChange } from './parameterValueChange';
 import { applyDeckSkillCostChange } from '../cards/deckSkillCostChange';
 import { activateLoveUpAdditionalBuff } from '../effects/loveUpAdditionalBuff';
+import { activateVoltageUpAdditionalBuff } from '../effects/voltageUpAdditionalBuff';
 
 type ParameterEffect = Extract<
   Effect,
@@ -13,7 +14,8 @@ type ParameterEffect = Extract<
       | 'skill-cost-change'
       | 'parameter-value-change'
       | 'deck-skill-cost-change'
-      | 'love-up-additional-buff';
+      | 'love-up-additional-buff'
+      | 'voltage-up-additional-buff';
   }
 >;
 
@@ -24,6 +26,7 @@ export function isParameterEffect(effect: Effect): effect is ParameterEffect {
     'parameter-value-change',
     'deck-skill-cost-change',
     'love-up-additional-buff',
+    'voltage-up-additional-buff',
   ].includes(effect.kind);
 }
 
@@ -45,5 +48,7 @@ export function applyParameterEffect(
       return applyDeckSkillCostChange(state, effect, card, multiplier, addValue);
     case 'love-up-additional-buff':
       return activateLoveUpAdditionalBuff(state, effect, card, multiplier, addValue);
+    case 'voltage-up-additional-buff':
+      return activateVoltageUpAdditionalBuff(state, effect, card, multiplier, addValue);
   }
 }
