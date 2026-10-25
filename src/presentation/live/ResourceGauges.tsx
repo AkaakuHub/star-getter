@@ -3,6 +3,7 @@ import type { GameState } from '../../domain/game/model';
 import { voltageLevel, voltageProgress } from '../../domain/game/live/voltageLevel';
 import { liveLayout } from './layout';
 import { BloomGauge } from './BloomGauge';
+import { formatNumber } from '../score/formatNumber';
 
 export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
   if (state.bloom) return <BloomGauge progress={state.bloom.progress} />;
@@ -19,7 +20,7 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         aria-valuenow={voltage}
       >
         <span>熱気</span>
-        <strong>{voltage}</strong>
+        <strong>{formatNumber(voltage)}</strong>
         <div>
           <i
             style={{ width: voltageProgress(state.excitement, state.maximumVoltageLevel) + '%' }}

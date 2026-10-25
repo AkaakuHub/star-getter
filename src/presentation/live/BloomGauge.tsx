@@ -1,6 +1,7 @@
 import { Gem } from 'lucide-preact';
 import { rules } from '../../domain/game/model';
 import { liveLayout } from './layout';
+import { formatNumber } from '../score/formatNumber';
 
 export function BloomGauge({ progress }: Readonly<{ progress: bigint }>) {
   const value = Number(progress);
@@ -11,8 +12,8 @@ export function BloomGauge({ progress }: Readonly<{ progress: bigint }>) {
       <div className="bloom-progress" style={liveLayout.bloom} role="status">
         <Gem size={15} aria-hidden="true" />
         <span>開花</span>
-        <strong>{progress.toLocaleString('ja-JP')}</strong>
-        <small>/{rules.maxBloomGauge.toLocaleString('ja-JP')}</small>
+        <strong>{formatNumber(progress)}</strong>
+        <small>/{formatNumber(rules.maxBloomGauge)}</small>
       </div>
       {[liveLayout.bloomLeft, liveLayout.bloomRight].map((position, index) => (
         <div

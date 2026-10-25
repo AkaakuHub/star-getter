@@ -5,6 +5,7 @@ import { type GameState, rules } from '../../domain/game/model';
 import { durationSeconds } from '../../domain/game/projection';
 import { formatScore, formatTime } from '../cardDescription';
 import { StarScore } from '../score/StarScore';
+import { formatNumber } from '../score/formatNumber';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { MoodGraph } from './MoodGraph';
@@ -94,9 +95,9 @@ export function LiveHud({
           fill={state.bloom ? 'none' : 'currentColor'}
           aria-hidden="true"
         />
-        <strong className="heart-count-current">{heartCount(state)}</strong>
+        <strong className="heart-count-current">{formatNumber(heartCount(state))}</strong>
         <span aria-hidden="true">/</span>
-        <span className="heart-count-limit">{state.hearts.heartLimit}</span>
+        <span className="heart-count-limit">{formatNumber(state.hearts.heartLimit)}</span>
       </button>
       <ResourceGauges state={state} />
       <MoodGraph state={state} />
