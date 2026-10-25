@@ -19,6 +19,7 @@ import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
+import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 export { skillValue } from './effects/skillValue';
@@ -82,15 +83,10 @@ export function applyEffect(
       );
       const beats = effect.kind === 'beat-hearts' ? beatHeartCount(state) : 1;
       const base = Math.ceil((value(effect.amount) * percent * beats) / 100);
-      const extra = state.heartBoosts.reduce((sum, boost) => Math.fround(sum + boost.percent), 0);
+      const boosted = consumeHeartBoosts(state, card, base);
       return addHearts(
-        {
-          ...state,
-          heartBoosts: state.heartBoosts.flatMap((boost) =>
-            boost.uses > 1 ? [{ ...boost, uses: boost.uses - 1 }] : [],
-          ),
-        },
-        Math.ceil(Math.fround(base + (base * extra) / 100)),
+        boosted.state,
+        Math.ceil(Math.fround(base + (base * boosted.percent) / 100)),
       );
     }
     case 'tokens':
@@ -202,13 +198,7 @@ export function applyEffect(
       };
     }
     case 'heart-boost':
-      return {
-        ...state,
-        heartBoosts: [
-          ...state.heartBoosts,
-          { percent: Math.ceil(value(effect.percent)), uses: effect.uses },
-        ],
-      };
+      return addHeartBoost(state, effect, card, multiplier);
     case 'voltage-limit':
       return { ...state, maximumVoltageLevel: state.maximumVoltageLevel + effect.amount };
     case 'voltage-set':

@@ -14,7 +14,10 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
       : 0;
   const raw = Math.fround(value + bonus);
   const base =
-    effect.kind === 'boost' || effect.kind === 'stamina' || effect.kind === 'excitement'
+    effect.kind === 'boost' ||
+    effect.kind === 'stamina' ||
+    effect.kind === 'excitement' ||
+    effect.kind === 'heart-boost'
       ? Math.trunc(raw)
       : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'energy'
         ? raw

@@ -20,6 +20,7 @@ import {
 import { expireGaugeInfinities } from './resources';
 import { advanceGaugeRegenerations, expireGaugeRegenerations } from './live/gaugeRegeneration';
 import { expireMentalBarriers, removeExhaustedMentalBarriers } from './live/mentalBarriers';
+import { advanceHeartBoosts, expireSectionHeartBoosts } from './live/heartBoosts';
 
 export function createGame(
   track: Track,
@@ -169,7 +170,7 @@ function advanceTick(state: GameState): GameState {
     ),
   );
   let next: GameState = advanceHearts({
-    ...gauges,
+    ...advanceHeartBoosts(gauges, dt),
     tick,
     voltageStops: state.voltageStops.flatMap((stop) => {
       if (stop.remainingSeconds === null) return [stop];
@@ -216,6 +217,7 @@ function advanceTick(state: GameState): GameState {
         const remainingSections = buff.remainingSections - 1;
         return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
       }),
+      heartBoosts: expireSectionHeartBoosts(next.heartBoosts),
       apIntervalFactor: 1,
       amplification: next.amplification - next.sectionAmplification,
       sectionAmplification: 0,

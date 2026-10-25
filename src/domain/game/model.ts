@@ -9,8 +9,13 @@ import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
 import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
-import type { GaugeEffect, GaugeInfinity, GaugeRegeneration, MentalBarrier } from './modelTypes';
 import type {
+  GaugeEffect,
+  GaugeInfinity,
+  GaugeRegeneration,
+  HeartBoostEffect,
+  HeartBoostState,
+  MentalBarrier,
   MoodBonus,
   ResetSpecial,
   SearchRequest,
@@ -104,7 +109,7 @@ export type Effect =
       moodBonus?: MoodBonus;
       duration?: Readonly<{ sections: number }>;
     }>
-  | Readonly<{ kind: 'heart-boost'; percent: number; uses: number; moodBonus?: MoodBonus }>
+  | HeartBoostEffect
   | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
   | Readonly<{
       kind: 'cost-reduction';
@@ -211,7 +216,6 @@ export type CardUse = Readonly<{
   cost: number;
 }>;
 export type Boost = Readonly<{ percent: number; untilTick: number }>;
-export type HeartBoost = Readonly<{ percent: number; uses: number }>;
 export type ResourceBoost = Readonly<{
   target: 'excitement' | 'stamina' | 'attract';
   members?: readonly MemberId[];
@@ -310,7 +314,7 @@ export type GameState = Readonly<{
   sectionMentalProtected: boolean;
   sectionBeatHeartBonus: number;
   beatPointBuffs: readonly Readonly<{ value: number; remainingSections: number | null }>[];
-  heartBoosts: readonly HeartBoost[];
+  heartBoosts: readonly HeartBoostState[];
   mentalShield: number;
   mentalBarriers: readonly MentalBarrier[];
   excitement: number;

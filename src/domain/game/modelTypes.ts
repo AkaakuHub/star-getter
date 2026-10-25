@@ -72,6 +72,26 @@ export type TokenBoostTarget =
   | Readonly<{ kind: 'member'; member: MemberId }>
   | Readonly<{ kind: 'unit'; unit: UnitId }>
   | Readonly<{ kind: 'card-series'; seriesId: number }>;
+export type HeartBoostTarget =
+  | Readonly<{ kind: 'all' }>
+  | Readonly<{ kind: 'member'; member: MemberId }>
+  | Readonly<{ kind: 'unit'; unit: UnitId }>
+  | Readonly<{ kind: 'card-series'; seriesId: number }>;
+export type HeartBoostEffect = Readonly<{
+  kind: 'heart-boost';
+  percent: number;
+  uses: number;
+  target?: HeartBoostTarget;
+  duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  moodBonus?: MoodBonus;
+}>;
+export type HeartBoostState = Readonly<{
+  percent: number;
+  uses: number;
+  target: HeartBoostTarget;
+  remainingSeconds: number | null;
+  remainingSections: number | null;
+}>;
 export type TokenBoost = Readonly<{
   calculation: 'add' | 'multiply-percent';
   value: number;

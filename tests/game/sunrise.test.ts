@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { addHearts, collectHearts } from '../../src/domain/game/hearts';
+import { advanceTo } from '../../src/domain/game/simulation';
 import { game, withHand } from './support/game';
 
 it('開花中の元気条件は成立し、雨100のときだけ対象限定の追加効果を付与する', () => {
@@ -67,4 +68,56 @@ it('きらめき獲得の次1回だけHeartUpを消費する', () => {
   state = applyEffect(state, { kind: 'hearts', amount: 10 });
   expect(state.heartBoosts).toHaveLength(0);
   expect(state.hearts.stageHearts.length).toBe(20);
+});
+
+it('きらめき増幅は対象カードだけに適用し、別対象の獲得では回数を消費しない', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  const other = initial.deck.find((card) => card.member !== source?.member);
+  if (!source || !other) throw new Error('照合用カードがありません。');
+  const clean = {
+    ...initial,
+    handEffectCardIds: [],
+    hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [] },
+  };
+  const active = applyEffect(clean, {
+    kind: 'heart-boost',
+    percent: 100,
+    uses: 1,
+    target: { kind: 'member', member: source.member },
+  });
+  const unrelated = applyEffect(active, { kind: 'hearts', amount: 10 }, other);
+  expect(unrelated.hearts.stageHearts).toHaveLength(10);
+  expect(unrelated.heartBoosts[0]?.uses).toBe(1);
+  const matched = applyEffect(unrelated, { kind: 'hearts', amount: 10 }, source);
+  expect(matched.hearts.stageHearts).toHaveLength(30);
+  expect(matched.heartBoosts).toHaveLength(0);
+});
+
+it('きらめき増幅値をC#の整数キャストと同じく0方向へ切り捨てる', () => {
+  const state = applyEffect(game(), { kind: 'heart-boost', percent: 12.9, uses: 2 });
+  expect(state.heartBoosts[0]?.percent).toBe(12);
+});
+
+it('きらめき増幅をミリ秒期限とパート期限で解除する', () => {
+  const initial = game();
+  const defaultTimed = applyEffect(initial, { kind: 'heart-boost', percent: 50, uses: 2 });
+  expect(advanceTo(defaultTimed, 0.1).heartBoosts).toHaveLength(0);
+  const timed = applyEffect(initial, {
+    kind: 'heart-boost',
+    percent: 50,
+    uses: 2,
+    duration: { kind: 'milliseconds', value: 100 },
+  });
+  expect(advanceTo(timed, 0.2).heartBoosts).toHaveLength(0);
+  const sectionTimed = applyEffect(initial, {
+    kind: 'heart-boost',
+    percent: 50,
+    uses: 2,
+    duration: { kind: 'sections', value: 1 },
+  });
+  const nextSection = initial.track.sections[1];
+  if (!nextSection) throw new Error('次のパートがありません。');
+  const nextSectionTime = (nextSection.startBeat * 60) / initial.track.bpm + 0.1;
+  expect(advanceTo(sectionTimed, nextSectionTime).heartBoosts).toHaveLength(0);
 });

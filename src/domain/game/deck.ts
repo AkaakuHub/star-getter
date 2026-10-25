@@ -116,12 +116,7 @@ function validateEffect(effect: Effect): void {
       throw new Error('熱気停止の期限が正しくありません。');
     return;
   }
-  if (
-    effect.kind === 'amplify' ||
-    effect.kind === 'resource-boost' ||
-    effect.kind === 'ap-speed' ||
-    effect.kind === 'heart-boost'
-  ) {
+  if (effect.kind === 'amplify' || effect.kind === 'resource-boost' || effect.kind === 'ap-speed') {
     if (!Number.isFinite(effect.percent)) throw new Error('増幅率が正しくありません。');
     if (
       effect.kind === 'resource-boost' &&
@@ -129,6 +124,22 @@ function validateEffect(effect: Effect): void {
       (!Number.isSafeInteger(effect.uses) || effect.uses < 1)
     )
       throw new Error('増幅回数が正しくありません。');
+    return;
+  }
+  if (effect.kind === 'heart-boost') {
+    const target = effect.target;
+    if (
+      !Number.isFinite(effect.percent) ||
+      !Number.isSafeInteger(effect.uses) ||
+      effect.uses < 1 ||
+      (target?.kind === 'member' && !Number.isSafeInteger(target.member)) ||
+      (target?.kind === 'unit' && ![1, 2, 3].includes(target.unit)) ||
+      (target?.kind === 'card-series' && !Number.isSafeInteger(target.seriesId)) ||
+      (effect.duration !== undefined &&
+        (!Number.isSafeInteger(effect.duration.value) ||
+          effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0)))
+    )
+      throw new Error('きらめき増幅の設定が正しくありません。');
     return;
   }
   if (effect.kind === 'beat-point-buff') {
