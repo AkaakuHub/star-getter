@@ -9,7 +9,6 @@ import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
 import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 import { validateMoodValueBoost } from './moodValueBoostTypes';
 import { validateGenesisSkill } from './genesisSkillTypes';
-
 export function validateEffect(effect: Effect): void {
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)

@@ -26,7 +26,10 @@ export function boostTokenRequests(
   grouped: boolean,
 ): Readonly<{ state: GameState; counts: readonly number[] }> {
   const source =
-    sourceId === null ? undefined : state.cardPool.find((card) => card.id === sourceId);
+    sourceId === null
+      ? undefined
+      : (state.cardPool.find((card) => card.id === sourceId) ??
+        state.specialAppealTokens.find((token) => token.card.id === sourceId)?.card);
   if (sourceId !== null && !source) throw new Error('追加カードを生成するカードがありません。');
   const used = new Set<number>();
   const counts = requests.map((request) => {

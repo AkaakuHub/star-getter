@@ -5,6 +5,7 @@ import type { Effect } from './model';
 import { validateDeckSkillCostChange } from './skillCostChangeTypes';
 import { validateLoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes';
 import { validateVoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
+import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -15,7 +16,8 @@ type SpecialEffect = Extract<
       | 'voltage-up-additional-buff'
       | 'recover-mental-additional-buff'
       | 'mental-barrier-additional-buff'
-      | 'disable-mental-down';
+      | 'disable-mental-down'
+      | 'special-appeal-token';
   }
 >;
 
@@ -40,6 +42,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'disable-mental-down':
       validateDisableMentalDownEffect(effect);
       break;
+    case 'special-appeal-token':
+      validateSpecialAppealTokenEffect(effect);
+      break;
   }
   return true;
 }
@@ -51,6 +56,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'voltage-up-additional-buff' ||
     effect.kind === 'recover-mental-additional-buff' ||
     effect.kind === 'mental-barrier-additional-buff' ||
-    effect.kind === 'disable-mental-down'
+    effect.kind === 'disable-mental-down' ||
+    effect.kind === 'special-appeal-token'
   );
 }

@@ -92,6 +92,8 @@ export function describeEffect(effect: Effect): string {
       return '空模様変更の効果量を増幅する。';
     case 'genesis-skill':
       return 'ジェネシスを発動する。';
+    case 'special-appeal-token':
+      return '特別アピールトークンを追加する。';
     case 'additional-heart-induce':
       return '条件に一致したアクションの使用後、追加のきらめきを生成する。';
     case 'induce-skill-effect':

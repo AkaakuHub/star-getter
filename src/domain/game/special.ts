@@ -5,11 +5,16 @@ import { spendEnergy } from './resources';
 import { flushDeckActions } from './cards/boardActions';
 import { fillHand } from './cards/drawing';
 import { resolveModeSkill } from './live/modes';
+import { startSpecialAppealTokenCooldown } from './effects/specialAppealToken';
 
 export function specialCards(state: GameState): readonly Card[] {
-  return state.deck
+  const regularCards = state.deck
     .map((card) => resolveModeSkill(card, state.modes))
     .filter((card, index) => card.special && (index === 0 || card.special.extra));
+  const tokenCards = state.specialAppealTokens.map(({ card }) =>
+    resolveModeSkill(card, state.modes),
+  );
+  return [...regularCards, ...tokenCards];
 }
 
 export function specialCost(card: Card): number {
@@ -23,11 +28,12 @@ export function isBloomSpecial(card: Card): boolean {
 
 export function canUseSpecial(state: GameState, cardId: string): boolean {
   const card = specialCards(state).find((item) => item.id === cardId);
+  const token = state.specialAppealTokens.find((item) => item.card.id === cardId);
   return Boolean(
     card?.special &&
     (state.phase === 'playing' || state.phase === 'paused') &&
     !state.resting &&
-    !state.specialUsed.includes(cardId) &&
+    (token ? token.remainingCoolTime <= 0 : !state.specialUsed.includes(cardId)) &&
     (state.bloom || state.energy >= specialCost(card)),
   );
 }
@@ -40,7 +46,11 @@ export function specialButtonCard(state: GameState): Card | undefined {
   const cards = specialCards(state);
   return (
     cards.find((card) => canUseSpecial(state, card.id)) ??
-    cards.find((card) => !state.specialUsed.includes(card.id)) ??
+    cards.find(
+      (card) =>
+        state.specialAppealTokens.some((token) => token.card.id === card.id) ||
+        !state.specialUsed.includes(card.id),
+    ) ??
     cards[0]
   );
 }
@@ -48,14 +58,18 @@ export function specialButtonCard(state: GameState): Card | undefined {
 export function useSpecial(state: GameState, cardId: string): GameState {
   if (state.phase !== 'playing' || !canUseSpecial(state, cardId)) return state;
   const card = specialCards(state).find((item) => item.id === cardId);
+  const token = state.specialAppealTokens.find((item) => item.card.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
   let next = beginTokenGeneration(spendEnergy(state, specialCost(card)), card.id);
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   next = finishTokenGeneration(next, card.id);
+  if (token) next = startSpecialAppealTokenCooldown(next, token);
   return fillHand(
     flushDeckActions({
       ...next,
-      specialUsed: [...next.specialUsed.filter((id) => id !== cardId), cardId],
+      specialUsed: token
+        ? next.specialUsed
+        : [...next.specialUsed.filter((id) => id !== cardId), cardId],
       stats: { ...next.stats, specialsUsed: next.stats.specialsUsed + 1 },
     }),
   );

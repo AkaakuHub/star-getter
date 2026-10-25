@@ -38,6 +38,7 @@ import type { ProxyAbsorption } from './proxySkillTypes';
 import type { IngameMission, IngameMissionGroup } from './ingameMissionTypes';
 import type { HeartLimitAdditionalBuff } from './heartLimitBoostTypes';
 import type { MoodValueAdditionalBuff } from './moodValueBoostTypes';
+import type { SpecialAppealToken } from './specialAppealTokenTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -270,6 +271,7 @@ export type GameState = Readonly<{
   mentalBarriers: readonly MentalBarrier[];
   excitement: number;
   maximumVoltageLevel: number;
+  specialAppealTokens: readonly SpecialAppealToken[];
   specialUsed: readonly string[];
   score: bigint;
   scoreMultiplier: bigint;

@@ -46,6 +46,7 @@ import { activateMoodChangeSkill } from './effects/moodChangeSkill';
 import { activateHeartLimitBoost } from './effects/heartLimitBoost';
 import { activateMoodValueBoost } from './effects/moodValueBoost';
 import { activateGenesisSkill } from './effects/genesisSkill';
+import { activateSpecialAppealToken } from './effects/specialAppealToken';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -66,6 +67,7 @@ export function applyEffect(
   if (effect.kind === 'mood-value-boost')
     return activateMoodValueBoost(state, effect, card, multiplier, addValue);
   if (effect.kind === 'genesis-skill') return activateGenesisSkill(state, effect, card);
+  if (effect.kind === 'special-appeal-token') return activateSpecialAppealToken(state, effect);
   if (effect.kind === 'voltage-convert')
     return activateVoltageConversion(state, effect, card, multiplier, addValue);
   if (effect.kind === 'mental-heart-induce')

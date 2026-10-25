@@ -30,18 +30,22 @@ import {
   advanceMoodValueAdditionalBuffs,
   expireMoodValueAdditionalBuffSections,
 } from './moodValueBoost';
+import { advanceSpecialAppealTokenCooldowns } from './specialAppealToken';
 
 export function advanceTimedSkillBuffs(state: GameState, elapsedSeconds: number): GameState {
-  return advanceMoodValueAdditionalBuffs(
-    advanceHeartLimitAdditionalBuffs(
-      advanceMoodChangeSkills(
-        advanceBeatHeartValueBuffs(
-          advanceDisableMentalDownEffects(
-            advanceMentalBarrierAdditionalBuffs(
-              advanceMentalRecoverAdditionalBuffs(
-                advanceVoltageUpAdditionalBuffs(
-                  advanceLoveUpAdditionalBuffs(
-                    advanceAction52SkillBoosts(state, elapsedSeconds),
+  return advanceSpecialAppealTokenCooldowns(
+    advanceMoodValueAdditionalBuffs(
+      advanceHeartLimitAdditionalBuffs(
+        advanceMoodChangeSkills(
+          advanceBeatHeartValueBuffs(
+            advanceDisableMentalDownEffects(
+              advanceMentalBarrierAdditionalBuffs(
+                advanceMentalRecoverAdditionalBuffs(
+                  advanceVoltageUpAdditionalBuffs(
+                    advanceLoveUpAdditionalBuffs(
+                      advanceAction52SkillBoosts(state, elapsedSeconds),
+                      elapsedSeconds,
+                    ),
                     elapsedSeconds,
                   ),
                   elapsedSeconds,

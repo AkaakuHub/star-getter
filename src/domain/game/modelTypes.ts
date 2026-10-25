@@ -25,6 +25,7 @@ import type { BeatHeartValueBuffEffect } from './beatHeartValueBuffTypes';
 import type { HeartLimitBoostEffect } from './heartLimitBoostTypes';
 import type { MoodValueBoostEffect } from './moodValueBoostTypes';
 import type { GenesisSkillEffect } from './genesisSkillTypes';
+import type { AddSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 export type { ProxySkillEffect } from './proxySkillTypes';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
@@ -300,6 +301,7 @@ type EffectShape =
   | HeartLimitBoostEffect
   | MoodValueBoostEffect
   | GenesisSkillEffect
+  | AddSpecialAppealTokenEffect
   | LoveUpAdditionalBuffEffect
   | VoltageUpAdditionalBuffEffect
   | MentalRecoverAdditionalBuffEffect

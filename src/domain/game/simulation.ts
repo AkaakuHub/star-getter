@@ -54,7 +54,6 @@ import {
 } from './effects/induceSkillEffect';
 import { advanceTokenDeckSplit, expireTokenDeckSplitSections } from './effects/tokenDeckSplit';
 import { advanceIngameMission } from './ingameMissions';
-
 export function createGame(
   track: Track,
   deck: readonly Card[],
@@ -164,6 +163,7 @@ export function createGame(
     mentalBarriers: [],
     excitement: 0,
     maximumVoltageLevel: 1000,
+    specialAppealTokens: [],
     specialUsed: [],
     score: 0n,
     scoreMultiplier: 1n,
@@ -209,10 +209,8 @@ export function createGame(
       bestCombo: 0,
     },
   };
-  const prepared = initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]);
-  return fillHand(prepared);
+  return fillHand(initializeHandCardStats(initializeParameterValueFactors(initial), [lead.id]));
 }
-
 export function advanceTo(state: GameState, seconds: number): GameState {
   if (!Number.isFinite(seconds) || seconds < 0) throw new Error('ゲーム時刻が正しくありません。');
   if (state.phase !== 'playing') return state;
@@ -237,7 +235,6 @@ export function advanceTo(state: GameState, seconds: number): GameState {
   }
   return next;
 }
-
 function advanceTick(state: GameState): GameState {
   const tick = state.tick + 1;
   const dt = 1 / rules.ticksPerSecond;
