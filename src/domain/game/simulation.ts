@@ -152,6 +152,7 @@ export function createGame(
     heartBoosts: [],
     mentalBarriers: [],
     excitement: 0,
+    masteryVoltageProgress: 0,
     maximumVoltageLevel: 1000,
     specialUsed: [],
     score: 0n,

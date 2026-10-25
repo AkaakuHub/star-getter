@@ -91,6 +91,7 @@ export type Track = Readonly<{
   songTime: number;
   beats: number;
   stage: StageGauges;
+  masteryVoltageBonus: Readonly<{ demand: number; gain: number }>;
   scoreLimit: ScoreLimitSettings;
   sections: readonly Section[];
   moodKeys: readonly MoodKey[];
@@ -283,6 +284,7 @@ export type GameState = Readonly<{
   mentalShields: readonly MentalShield[];
   mentalBarriers: readonly MentalBarrier[];
   excitement: number;
+  masteryVoltageProgress: number;
   maximumVoltageLevel: number;
   specialAppealTokens: readonly SpecialAppealToken[];
   handMaxCardEffects: readonly HandMaxCardEffectState[];

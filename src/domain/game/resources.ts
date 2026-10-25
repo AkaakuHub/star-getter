@@ -20,6 +20,7 @@ export function changeResource(
   applyEffect?: EffectApplier,
   induceVoltageUp = false,
 ): GameState {
+  if (resource === 'excitement') amount = BigInt.asIntN(32, amount);
   if (resource === 'energy' && amount >= 0n) {
     const absorption = absorbSkillEffect(state, 14, BigInt.asIntN(32, amount));
     if (absorption.absorbed) return absorption.state;
@@ -36,6 +37,23 @@ export function changeResource(
     const conversion = convertVoltageIncrease(state, amount, card, applyEffect);
     if (conversion.converted) return conversion.state;
     state = conversion.state;
+  }
+  if (resource === 'excitement' && amount > 0n) {
+    const bonus = state.track.masteryVoltageBonus;
+    if (bonus.demand > 0) {
+      const progress = Math.fround(state.masteryVoltageProgress + Math.fround(Number(amount)));
+      if (progress === bonus.demand) {
+        state = { ...state, masteryVoltageProgress: 0 };
+        const gained = BigInt(bonus.gain);
+        if (gained > 0n) {
+          const conversion = convertVoltageIncrease(state, gained, undefined, applyEffect);
+          state = conversion.state;
+          if (!conversion.converted) amount += gained;
+        }
+      } else {
+        state = { ...state, masteryVoltageProgress: progress };
+      }
+    }
   }
   if (
     state.gaugeInfinities.some(

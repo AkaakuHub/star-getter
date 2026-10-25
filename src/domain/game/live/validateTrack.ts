@@ -10,6 +10,10 @@ export function validateTrack(track: Track): void {
     !Number.isInteger(track.beats) ||
     track.beats < 1 ||
     track.beats > 2000 ||
+    !Number.isInteger(track.masteryVoltageBonus.demand) ||
+    track.masteryVoltageBonus.demand < 0 ||
+    !Number.isInteger(track.masteryVoltageBonus.gain) ||
+    track.masteryVoltageBonus.gain < 0 ||
     track.sections[0]?.startBeat !== 0
   )
     throw new Error('ステージの設定が正しくありません。');
