@@ -31,7 +31,7 @@ export function Stage({
         type="button"
         className="heart-field"
         aria-label={heartCount(state) + '個のきらめきを回収'}
-        disabled={state.phase !== 'playing' || heartCount(state) === 0}
+        disabled={state.phase !== 'playing'}
         onPointerDown={(event) => {
           if (event.button === 0) {
             event.preventDefault();
