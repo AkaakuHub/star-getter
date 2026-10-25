@@ -1,6 +1,5 @@
 import type { GameState } from './model';
 import { voltageLevel } from './live/voltageLevel';
-import { canActivateBloom } from './projection';
 import {
   calculateStarGatherInitialGenesisGauge,
   calculateStarGatherGenesisGaugeDelta,
@@ -9,7 +8,6 @@ import {
 const gaugeTypes = { energy: 3, stamina: 2, excitement: 1 } as const;
 
 export function activateBloom(state: GameState, strength: number): GameState {
-  if (!canActivateBloom(state)) return state;
   if (state.bloom)
     return {
       ...state,

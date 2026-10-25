@@ -3,6 +3,25 @@ import type { GameState } from '../../src/domain/game/model';
 import { act } from '../../src/domain/game/actions';
 import { canUseSpecial, specialCards } from '../../src/domain/game/special';
 import { game, withHand } from './support/game';
+import { activateBloom } from '../../src/domain/game/bloom';
+
+it('空模様0でも20APを支払って開花し、支払後のAPを保持する', () => {
+  const state = { ...game(), energy: 20, maxEnergy: 20 };
+  expect(canUseSpecial(state, 'horizon')).toBe(true);
+  const next = act(state, { type: 'special', cardId: 'horizon' });
+  expect(next.energy).toBe(0);
+  expect(next.bloom?.rollback.energy).toBe(0);
+  expect(next.specialUsed).toContain('horizon');
+});
+
+it('開花中の追加SPは通常APを固定したまま専用値で支払う', () => {
+  const state = activateBloom({ ...game(), energy: 0, stamina: 80, excitement: 655_000_001 }, 3.5);
+  expect(state.bloom?.progress).toBe(5020n);
+  expect(canUseSpecial(state, 'library-ensemble')).toBe(true);
+  const next = act(state, { type: 'special', cardId: 'library-ensemble' });
+  expect(next.energy).toBe(0);
+  expect(next.bloom?.progress).toBe(4977n);
+});
 
 it('共鳴はセンターの通常効果と基本カードの追加効果だけを選択する', () => {
   expect(specialCards(game('library')).map((card) => card.id)).toEqual([

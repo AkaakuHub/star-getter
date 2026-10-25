@@ -21,10 +21,6 @@ export function cardAt(state: GameState, index: number): Card {
   return card;
 }
 
-export function canActivateBloom(state: GameState): boolean {
-  return moodValue(state) <= -100;
-}
-
 export function moodValue(state: GameState): number {
   return Math.max(
     -100,
@@ -41,8 +37,6 @@ export function canUseCard(state: GameState, index: number): boolean {
     Number.isInteger(index) &&
     index >= 0 &&
     index < state.hand.length &&
-    (canActivateBloom(state) ||
-      !cardAt(state, index).effects.some((effect) => effect.kind === 'bloom')) &&
     !state.resting &&
     state.tick - state.lastActionTick >=
       Math.ceil(

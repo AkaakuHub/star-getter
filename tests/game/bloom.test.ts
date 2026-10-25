@@ -27,8 +27,8 @@ describe('開花の専用ゲージ', () => {
     expect(changeBloomResource(maximum, 'excitement', 1n).bloom?.progress).toBe(0n);
   });
 
-  for (const mood of [-99, 0, 100]) {
-    it(`空模様${mood}%では20エナジーあっても開花を発動できない`, () => {
+  for (const mood of [-100, -99, 0, 100]) {
+    it(`空模様${mood}%でも20エナジーで開花を発動する`, () => {
       const initial = game();
       const state = {
         ...initial,
@@ -39,13 +39,13 @@ describe('開花の専用ゲージ', () => {
           moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
         },
       };
-      expect(canUseSpecial(state, 'horizon')).toBe(false);
-      expect(act(state, { type: 'special', cardId: 'horizon' })).toBe(state);
-      expect(activateBloom(state, 1)).toBe(state);
+      expect(canUseSpecial(state, 'horizon')).toBe(true);
+      expect(act(state, { type: 'special', cardId: 'horizon' }).bloom).not.toBeNull();
+      expect(activateBloom(state, 1).bloom).not.toBeNull();
     });
   }
 
-  it('通常カードの使用では発動せず、空模様−100%の共鳴で20エナジーを払って発動する', () => {
+  it('通常カードの使用では発動せず、共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
     state = { ...state, moodOffset: -100, energy: 20, maxEnergy: 20, hand: ['horizon'] };
     expect(canUseSpecial(state, 'horizon')).toBe(true);

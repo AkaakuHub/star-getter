@@ -2,7 +2,6 @@ import type { Card, GameState } from './model';
 import { applyEffect, changeResource } from './effects';
 import { flushDeckActions } from './cards/boardActions';
 import { fillHand } from './cards/drawing';
-import { canActivateBloom } from './projection';
 
 export function specialCards(state: GameState): readonly Card[] {
   return state.deck.filter((card, index) => card.special && (index === 0 || card.special.extra));
@@ -24,8 +23,7 @@ export function canUseSpecial(state: GameState, cardId: string): boolean {
     (state.phase === 'playing' || state.phase === 'paused') &&
     !state.resting &&
     !state.specialUsed.includes(cardId) &&
-    (state.bloom || state.energy >= specialCost(card)) &&
-    (canActivateBloom(state) || !isBloomSpecial(card)),
+    (state.bloom || state.energy >= specialCost(card)),
   );
 }
 
@@ -46,7 +44,7 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   if (state.phase !== 'playing' || !canUseSpecial(state, cardId)) return state;
   const card = specialCards(state).find((item) => item.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
-  let next = state.bloom ? state : changeResource(state, 'energy', -BigInt(specialCost(card)));
+  let next = changeResource(state, 'energy', -BigInt(specialCost(card)));
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   return fillHand(
     flushDeckActions({

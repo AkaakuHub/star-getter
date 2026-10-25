@@ -27,9 +27,7 @@ export function act(state: GameState, action: Action): GameState {
 function useCard(state: GameState, index: number): GameState {
   if (!canUseCard(state, index)) return state;
   const source = cardAt(state, index);
-  const paid = state.bloom
-    ? state
-    : changeResource(state, 'energy', -BigInt(cardCost(state, source)));
+  const paid = changeResource(state, 'energy', -BigInt(cardCost(state, source)));
   const activated = {
     ...paid,
     activation: {
