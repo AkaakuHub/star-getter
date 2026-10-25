@@ -104,6 +104,27 @@ it('共鳴の再使用は種別・メンバーを絞り、追加共鳴とトー�
   expect(next.specialUsed).toEqual([normal.id, otherExtra.id, tokenSpecial.id]);
 });
 
+it('全ての共鳴を戻すときも先頭以外の通常共鳴を対象に含めない', () => {
+  const initial = game('library');
+  const normal = initial.deck.find((card) => card.id === 'library-pages');
+  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
+  const otherNormal: Card = { ...normal, id: 'normal-other-member', member: 1041, unit: 2 };
+  const deck = [...initial.deck, otherNormal];
+  const state = {
+    ...initial,
+    deck,
+    cardPool: deck,
+    specialUsed: [normal.id, extra.id, otherNormal.id],
+  };
+  const next = applyEffect(
+    state,
+    { kind: 'reset-special', scope: 'all', target: { kind: 'all' } },
+    initial.deck.find((card) => card.id === 'library-invitation'),
+  );
+  expect(next.specialUsed).toEqual([otherNormal.id]);
+});
+
 it('共鳴を使ったカード自身は再使用対象から除き、他の対象共鳴を戻す', () => {
   const initial = game('library');
   const deck = initial.deck;

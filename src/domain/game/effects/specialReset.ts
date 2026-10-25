@@ -10,8 +10,11 @@ export function applySpecialReset(
     specialUsed: state.specialUsed.filter((id) => {
       const card = state.deck.find((item) => item.id === id);
       if (!card?.special || card.token !== undefined) return true;
-      if (effect.scope === 'normal' && card.special.extra) return true;
-      if (effect.scope === 'extra' && !card.special.extra) return true;
+      const isNormalSpecial = state.deck[0]?.id === card.id;
+      const isExtraSpecial = card.special.extra === true;
+      if (effect.scope === 'normal' && !isNormalSpecial) return true;
+      if (effect.scope === 'extra' && !isExtraSpecial) return true;
+      if (effect.scope === 'all' && !isNormalSpecial && !isExtraSpecial) return true;
       const matchesTarget =
         effect.target.kind === 'all' ||
         (effect.target.kind === 'source' && card.id === sourceCard?.id) ||
