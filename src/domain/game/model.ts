@@ -1,3 +1,4 @@
+import type { GameCondition } from './conditions/model';
 import type { StarGatherHeartRuntimeState } from './live/heartTypes';
 import type { StarGatherCardAppealParameters } from './live/clientScoreInput';
 import type { StageGauges } from './live/gaugeTiming';
@@ -28,6 +29,12 @@ export type CostumeId = (typeof costumeIds)[number];
 export type TokenKind = 'ensemble' | 'story' | 'clock' | 'bookmark' | 'shadow';
 export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type Effect =
+  | Readonly<{
+      kind: 'branch';
+      condition: GameCondition;
+      whenTrue: readonly Effect[];
+      whenFalse: readonly Effect[];
+    }>
   | Readonly<{
       kind: 'hearts' | 'beat-hearts' | 'energy' | 'stamina' | 'excitement';
       amount: number;
@@ -101,6 +108,7 @@ export type Card = Readonly<{
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   modeIds?: readonly number[];
+  tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
   useEffects?: readonly Effect[];
@@ -186,6 +194,7 @@ export type PlayStats = Readonly<{
 }>;
 
 export type GameState = Readonly<{
+  supportLevels: Readonly<Record<number, number>>;
   modes: ModeState;
   modeReactions: readonly Readonly<{
     sourceId: string | null;

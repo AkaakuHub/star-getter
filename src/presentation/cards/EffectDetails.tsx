@@ -1,3 +1,4 @@
+import { describeCondition } from './describeCondition';
 import type { Effect } from '../../domain/game/model';
 import { describeEffect, effectConditions } from './describeEffect';
 import { TierDetails } from './TierDetails';
@@ -17,7 +18,18 @@ export function EffectDetails({ effects }: Readonly<{ effects: readonly Effect[]
           while (sameBeatEffect(effects[index + repetitions], effect)) repetitions++;
         return (
           <li key={index}>
-            {effect.kind === 'conditional' ? (
+            {effect.kind === 'branch' ? (
+              <section className="effect-condition">
+                <h4>{describeCondition(effect.condition)}のとき</h4>
+                <EffectDetails effects={effect.whenTrue} />
+                {effect.whenFalse.length > 0 && (
+                  <>
+                    <h4>それ以外のとき</h4>
+                    <EffectDetails effects={effect.whenFalse} />
+                  </>
+                )}
+              </section>
+            ) : effect.kind === 'conditional' ? (
               <section className="effect-condition">
                 <h4>{effectConditions[effect.condition]}のとき</h4>
                 <EffectDetails effects={effect.effects} />

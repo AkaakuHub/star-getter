@@ -1,3 +1,4 @@
+import { describeCondition } from './describeCondition';
 import { tokenNames } from '../../content/labels/tokens';
 import type { Effect } from '../../domain/game/model';
 import { targetNames } from './targetNames';
@@ -13,6 +14,8 @@ export const effectConditions = {
 
 export function describeEffect(effect: Effect): string {
   switch (effect.kind) {
+    case 'branch':
+      return `${describeCondition(effect.condition)}のとき、${effect.whenTrue.map(describeEffect).join('')}${effect.whenFalse.length ? 'それ以外のとき、' + effect.whenFalse.map(describeEffect).join('') : ''}`;
     case 'mode':
       return `モード${effect.modeId}を${effect.change === 'on' ? 'オン' : effect.change === 'off' ? 'オフ' : '反転'}にする。`;
     case 'mode-reaction':

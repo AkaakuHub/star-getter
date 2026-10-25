@@ -64,6 +64,10 @@ function validateEffect(effect: Effect): void {
     }
     return;
   }
+  if (effect.kind === 'branch') {
+    for (const child of [...effect.whenTrue, ...effect.whenFalse]) validateEffect(child);
+    return;
+  }
   if (effect.kind === 'conditional') {
     for (const child of effect.effects) validateEffect(child);
     return;

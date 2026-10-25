@@ -1,3 +1,5 @@
+import { evaluateCondition } from './conditions/evaluate';
+import { conditionContext } from './conditions/gameContext';
 import { energyMaximum } from './parameters/maximum';
 import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
@@ -43,6 +45,18 @@ export function applyEffect(
   const value = (amount: number) =>
     Math.fround(skillValue(state, amount, effect, card) * multiplier);
   switch (effect.kind) {
+    case 'branch': {
+      const context = conditionContext(state);
+      const resourceBranch =
+        effect.condition.kind === 'heat' || effect.condition.kind === 'stamina';
+      const effects =
+        context.bloomActive && resourceBranch
+          ? [...effect.whenTrue, ...effect.whenFalse]
+          : evaluateCondition(effect.condition, context)
+            ? effect.whenTrue
+            : effect.whenFalse;
+      return effects.reduce((next, child) => applyEffect(next, child, card), state);
+    }
     case 'mode':
       return changeMode(state, effect, applyEffect);
     case 'mode-reaction':
