@@ -44,7 +44,11 @@ function drawUntil(state: GameState, count: number): GameState {
     const search = next.deckActions.searches.at(-1);
     if (search !== undefined) {
       const matches = candidates.filter((id) =>
-        next.deck.some((card) => card.id === id && card.unit === search),
+        next.deck.some(
+          (card) =>
+            card.id === id &&
+            (search.kind === 'unit' ? card.unit === search.unit : card.token === search.token),
+        ),
       );
       if (matches.length) candidates = matches;
       next = {

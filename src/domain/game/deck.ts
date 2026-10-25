@@ -45,7 +45,7 @@ export function validateCard(card: Card): void {
 }
 
 function validateEffect(effect: Effect): void {
-  if (effect.kind === 'search-unit') {
+  if (effect.kind === 'search-unit' || effect.kind === 'search-token') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)
       throw new Error('検索回数が正しくありません。');
     return;

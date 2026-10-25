@@ -41,7 +41,7 @@ export const preparationCards: readonly Card[] = [
       },
     ],
     handUse: {
-      unit: 2,
+      trigger: 2,
       effects: [
         { kind: 'shuffle' },
         { kind: 'cost-reduction', amount: 9, target: { kind: 'unit', unit: 2 } },

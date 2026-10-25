@@ -6,7 +6,7 @@ export function describeAbilities(card: Card): string {
   if (card.collectionEffects)
     text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.collectionEffects.effects.map(describeEffect).join('')}この特性は引き直すと再び使用できる。`;
   if (card.handUse)
-    text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
+    text += `手札にある間、${card.handUse.trigger === 'any' ? 'アクションを使用したとき' : '対応する雨の基本カードを使用したとき'}、${card.handUse.effects.map(describeEffect).join('')}`;
   if (card.collectionAbility === 'icy-kosuzu')
     text +=
       '手札にある間に累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直し、雨音の反響・凍空の鼓動・雨の準備を次の4回優先して引く。熱気を140万減らし、1000段階以上ならさらに1400万減らす。';

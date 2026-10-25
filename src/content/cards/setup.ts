@@ -51,7 +51,7 @@ export const setupCards: readonly Card[] = [
     cost: 0,
     appeal: { smile: 5300, pure: 5300, cool: 5300 },
     beatPoint: 100,
-    allHandCost: 'sum',
+    allHandCost: { reductions: [] },
     drawRule: { priority: 'after-start' },
     useAbility: 'aurora',
     effects: [

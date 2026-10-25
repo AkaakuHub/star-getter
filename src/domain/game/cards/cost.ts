@@ -8,17 +8,8 @@ export function cardCost(state: GameState, card: Card): number {
     const other = state.deck.find((item) => item.id === id);
     return sum + (other && other.id !== card.id && !other.allHandCost ? cardCost(state, other) : 0);
   }, 0);
-  if (card.allHandCost === 'sum') return Math.max(0, total - (state.costReductions[card.id] ?? 0));
-  const reductions = [
-    [0, 5],
-    [20, 5],
-    [40, 10],
-    [60, 10],
-    [80, 20],
-    [100, 50],
-  ] as const;
-  const reduction = reductions.reduce(
-    (sum, [minimum, amount]) => sum + (state.deck.length >= minimum ? amount : 0),
+  const reduction = card.allHandCost.reductions.reduce(
+    (sum, item) => sum + (state.deck.length >= item.minimumCards ? item.amount : 0),
     0,
   );
   return Math.max(0, total - reduction - (state.costReductions[card.id] ?? 0));

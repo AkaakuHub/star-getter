@@ -33,7 +33,7 @@ it('最低値1の30万回収で1.5%の熱気回復増幅を全ステージに付
   expect(state.resourceBoosts).toHaveLength(2);
 });
 
-it('共演の30万回収は最低値1の0.1APを切り上げて回復し、同じ手札では一度だけ発動する', () => {
+it('共演の30万回収は最低値1の0.1APを最後に切り捨て、増幅後に1以上なら回復する', () => {
   const initial = game('library');
   let state = withHand(
     {
@@ -44,7 +44,28 @@ it('共演の30万回収は最低値1の0.1APを切り上げて回復し、同�
     ['library-ensemble'],
   );
   state = act(addHearts(state, 300_000), { type: 'collect' });
-  expect(state.energy).toBe(1);
+  expect(state.energy).toBe(0);
   state = act(addHearts(state, 300_000), { type: 'collect' });
-  expect(state.energy).toBe(1);
+  expect(state.energy).toBe(0);
+});
+
+it('APは小数のまま増幅して最後に切り捨て、先に1へ切り上げない', () => {
+  expect(
+    applyEffect(
+      { ...game(), energy: 0, hand: [], amplification: 100 },
+      { kind: 'energy', amount: 0.1 },
+    ).energy,
+  ).toBe(0);
+  expect(
+    applyEffect(
+      { ...game(), energy: 0, hand: [], amplification: 1100 },
+      { kind: 'energy', amount: 0.1 },
+    ).energy,
+  ).toBe(1);
+  expect(
+    applyEffect(
+      { ...game(), energy: 0, hand: [], amplification: 150 },
+      { kind: 'energy', amount: 3 },
+    ).energy,
+  ).toBe(4);
 });

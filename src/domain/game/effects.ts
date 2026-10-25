@@ -90,20 +90,26 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
             },
           };
     case 'search-unit':
+    case 'search-token': {
+      const target =
+        effect.kind === 'search-unit'
+          ? { kind: 'unit' as const, unit: effect.unit }
+          : { kind: 'token' as const, token: effect.token };
       return {
         ...state,
         deckActions: {
           ...state.deckActions,
           searches: [
             ...state.deckActions.searches,
-            ...Array.from({ length: effect.count }, () => effect.unit),
+            ...Array.from({ length: effect.count }, () => target),
           ],
         },
       };
+    }
     case 'use-hand':
       throw new Error('一斉使用はカード使用処理で実行してください。');
     case 'energy':
-      return changeResource(state, 'energy', BigInt(Math.ceil(value(effect.amount))));
+      return changeResource(state, 'energy', BigInt(Math.trunc(value(effect.amount))));
     case 'energy-limit':
       return { ...state, maxEnergy: state.maxEnergy + effect.amount };
     case 'reset-special':
@@ -245,7 +251,10 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   const base =
     effect.kind === 'boost'
       ? Math.trunc(raw)
-      : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'resource-boost'
+      : effect.kind === 'bloom' ||
+          effect.kind === 'amplify' ||
+          effect.kind === 'resource-boost' ||
+          effect.kind === 'energy'
         ? raw
         : Math.ceil(raw);
   const handBoost = state.deck.reduce(

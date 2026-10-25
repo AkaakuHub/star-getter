@@ -57,7 +57,9 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
 
 export function notifyHandSkillUse(state: GameState, used: Card): GameState {
   const listeners = state.deck.filter(
-    (card) => state.hand.includes(card.id) && card.handUse?.unit === used.unit,
+    (card) =>
+      state.hand.includes(card.id) &&
+      (card.handUse?.trigger === 'any' || card.handUse?.trigger === used.unit),
   );
   return listeners.reduce(
     (next, card) =>

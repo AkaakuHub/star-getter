@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { drawCandidate, drawWeight } from '../../src/domain/game/cards/drawLottery';
-import { fillHand } from '../../src/domain/game/cards/drawing';
+import { applyEffect } from '../../src/domain/game/effects';
+import { fillHand, fillHandToCount } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
 import { game, withHand } from './support/game';
 
@@ -65,4 +66,17 @@ it('条件一致時だけ対象を優先し、極光は開始時の優先を持�
   expect(drawWeight(source('frost-pulse'), doll)).toBe(-1);
   expect(drawWeight(source('frost-pulse'), cerise)).toBe(0);
   expect(drawWeight(source('camera'), cerise)).toBe(-1);
+});
+
+it('tokenと編成の検索を後入れ先出しにして交互の対象へ引く', () => {
+  let state = withHand(addTokens(game('library'), 'clock', 2), []);
+  state = { ...state, drawContext: 'skill', lastUsedUnit: 1 };
+  state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
+  state = applyEffect(state, { kind: 'search-unit', unit: 1, count: 1 });
+  state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
+  state = applyEffect(state, { kind: 'search-unit', unit: 1, count: 1 });
+  const drawn = fillHandToCount(state, 4);
+  const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.id === id));
+  expect(hand.map((card) => card?.token ?? card?.unit)).toEqual([1, 'clock', 1, 'clock']);
+  expect(drawn.deckActions.searches).toHaveLength(0);
 });

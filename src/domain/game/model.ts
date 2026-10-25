@@ -50,6 +50,7 @@ export type Effect =
   | Readonly<{ kind: 'hand-limit' | 'heart-limit'; amount: number }>
   | Readonly<{ kind: 'shuffle' | 'use-hand' }>
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
+  | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
@@ -89,12 +90,14 @@ export type Card = Readonly<{
   beatPoint: number;
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
-  handUse?: Readonly<{ unit: UnitId; effects: readonly Effect[] }>;
+  handUse?: Readonly<{ trigger: 'any' | UnitId; effects: readonly Effect[] }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
   special?: Readonly<{ cost: number; extra: boolean; effects: readonly Effect[] }>;
-  allHandCost?: 'sum' | 'library';
+  allHandCost?: Readonly<{
+    reductions: readonly Readonly<{ minimumCards: number; amount: number }>[];
+  }>;
   drawRule?: Readonly<{ member?: MemberId; unit?: UnitId; priority?: 'always' | 'after-start' }>;
   passive?: Readonly<{
     heartsPercent?: number;
@@ -178,7 +181,13 @@ export type GameState = Readonly<{
   nextTokenId: number;
   handLimit: number;
   drawContext: 'initial' | 'skill' | 'shuffle' | 'idle';
-  deckActions: Readonly<{ shuffles: readonly (string | null)[]; searches: readonly UnitId[] }>;
+  deckActions: Readonly<{
+    shuffles: readonly (string | null)[];
+    searches: readonly (
+      | Readonly<{ kind: 'unit'; unit: UnitId }>
+      | Readonly<{ kind: 'token'; token: TokenKind }>
+    )[];
+  }>;
   lastUsedMember: MemberId | null;
   lastUsedUnit: UnitId | null;
   cardUseCounts: Readonly<Record<string, number>>;

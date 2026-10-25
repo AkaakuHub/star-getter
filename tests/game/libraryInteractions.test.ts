@@ -77,9 +77,9 @@ it('招待状の消費減少は元の所属で判定し、同じ太陽の見た�
 
 for (const count of [79, 80]) {
   it(`共演は${count}枚の条件で追加カードを生成し、使用後も循環する`, () => {
-    let state = addTokens(game('library'), 'ensemble', 1);
+    let state = game('library');
     state = addTokens(state, 'story', count - state.deck.length);
-    const source = token(state, 'ensemble');
+    const source = card(state, 'library-ensemble');
     state = withHand(state, [source.id]);
     const used = act(state, { type: 'card', index: 0 });
     expect(used.stats.cardsUsed).toBe(1);
@@ -105,8 +105,8 @@ it('共演の一斉使用は元の手札を順に使用し、子カードの生�
   expect(used.stats.cardsUsed).toBe(3);
   expect(used.cardUses.map((use) => use.card.id)).toEqual([ensemble.id, clock.id, story.id]);
   expect(used.deck.some((item) => item.id === clock.id || item.id === story.id)).toBe(false);
-  expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(1);
-  expect(used.deck.some((item) => item.id === ensemble.id)).toBe(true);
+  expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(4);
+  expect(used.deck.some((item) => item.id === ensemble.id)).toBe(false);
 });
 
 it('100枚の状態で浮き輪を使うと、生成判定が先なので追加できず除外後99枚になる', () => {
@@ -160,9 +160,9 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
 });
 
 it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を判定してから除外する', () => {
-  let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 1);
+  let state = addTokens(game('library'), 'story', 1);
   state = addTokens(state, 'bookmark', 80 - state.deck.length);
-  const source = token(state, 'ensemble'),
+  const source = card(state, 'library-ensemble'),
     story = token(state, 'story');
   state = withHand(state, [source.id, story.id]);
   const used = act(state, { type: 'card', index: 0 });
@@ -190,3 +190,46 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   expect(used.lastUsedMember).toBe(source.member);
   expect(used.lastUsedUnit).toBe(source.unit);
 });
+
+it('帆船は先に風車と鍵を3枚ずつ生成し、巻き込む基本カードの80枚条件へ反映してから除外する', () => {
+  let state = addTokens(game('library'), 'ensemble', 1);
+  state = addTokens(state, 'story', 79 - state.deck.length);
+  const source = token(state, 'ensemble');
+  state = withHand(state, [source.id, 'library-ensemble']);
+  const used = act(state, { type: 'card', index: 0 });
+  expect(used.stats.cardsUsed).toBe(2);
+  expect(used.deck).toHaveLength(93);
+  expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(6);
+  expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(6);
+  expect(used.deck.some((item) => item.id === source.id)).toBe(false);
+  expect([...used.hand, ...used.drawPile, ...used.discard]).not.toContain(source.id);
+});
+
+for (const [count, baseReduction, tokenReduction] of [
+  [20, 20, 10],
+  [100, 60, 100],
+]) {
+  it(`総数${count}枚で基本の共演と生成された帆船の割引を別々に計算する`, () => {
+    if (count === undefined || baseReduction === undefined || tokenReduction === undefined)
+      throw new Error('割引条件がありません。');
+    let state = addTokens(game(), 'ensemble', 1);
+    state = addTokens(state, 'story', count - state.deck.length);
+    const generated = token(state, 'ensemble');
+    const others = [
+      'horizon',
+      'frost-echo',
+      'frost-pulse',
+      'rain-preparation',
+      'perennial',
+      'camera',
+      'class',
+    ];
+    state = withHand({ ...state, costReductions: {}, handLimit: 8 }, [
+      'library-ensemble',
+      ...others,
+    ]);
+    expect(cardCost(state, card(state, 'library-ensemble'))).toBe(82 - baseReduction);
+    state = withHand(state, [generated.id, ...others]);
+    expect(cardCost(state, generated)).toBe(Math.max(0, 82 - tokenReduction));
+  });
+}

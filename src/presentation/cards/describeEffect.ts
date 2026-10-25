@@ -13,18 +13,20 @@ export const effectConditions = {
 export function describeEffect(effect: Effect): string {
   switch (effect.kind) {
     case 'tokens': {
-      return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'ensemble' ? '追加されたカードは使用後に捨札へ戻る。' : effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
+      return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
     }
     case 'hand-limit':
       return `このパート中、手札上限を${effect.amount}枚増加する（最大8枚）。`;
     case 'heart-limit':
       return `このステージ中、きらめき上限を${effect.amount}個増加する。`;
+    case 'search-token':
+      return `次の${effect.count}回、「${tokenNames[effect.token]}」を優先して引く。`;
     case 'search-unit':
       return `次の${effect.count}回、対象の編成のカードを優先して引く。`;
     case 'shuffle':
       return '手札を山札・捨札と混ぜて引き直す。';
     case 'use-hand':
-      return '他の手札のアクションを一斉に使用する。必要エナジーは他の手札の合計からデッキ枚数に応じた値を引いて決まる。';
+      return '他の手札のアクションを一斉に使用する。';
     case 'mood':
       return `このパート中、空模様を${effect.amount < 0 ? '雨' : '晴れ'}方向へ${Math.abs(effect.amount)}%変化させる。`;
     case 'conditional':

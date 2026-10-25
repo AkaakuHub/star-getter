@@ -1,20 +1,7 @@
 import { tokenNames } from '../labels/tokens';
-import type { Card, Effect } from '../../domain/game/model';
+import type { Card } from '../../domain/game/model';
 
 const appeal = { smile: 1, pure: 1, cool: 1 };
-
-export const ensembleEffects: readonly Effect[] = [
-  { kind: 'use-hand' },
-  {
-    kind: 'conditional',
-    condition: 'deck80',
-    effects: [
-      { kind: 'tokens', token: 'story', count: 3 },
-      { kind: 'tokens', token: 'clock', count: 3 },
-      { kind: 'tokens', token: 'bookmark', count: 3 },
-    ],
-  },
-];
 
 export const routeTokens: readonly Card[] = [
   {
@@ -28,8 +15,23 @@ export const routeTokens: readonly Card[] = [
     beatPoint: 0,
     appeal,
     token: 'ensemble',
-    allHandCost: 'library',
-    effects: ensembleEffects,
+    allHandCost: {
+      reductions: [
+        { minimumCards: 0, amount: 5 },
+        { minimumCards: 20, amount: 5 },
+        { minimumCards: 40, amount: 10 },
+        { minimumCards: 60, amount: 10 },
+        { minimumCards: 80, amount: 20 },
+        { minimumCards: 100, amount: 50 },
+      ],
+    },
+    exhausts: true,
+    handUse: { trigger: 'any', effects: [{ kind: 'search-token', token: 'story', count: 2 }] },
+    effects: [
+      { kind: 'tokens', token: 'clock', count: 3 },
+      { kind: 'tokens', token: 'bookmark', count: 3 },
+      { kind: 'use-hand' },
+    ],
   },
   {
     id: 'story',
@@ -44,6 +46,7 @@ export const routeTokens: readonly Card[] = [
     token: 'story',
     exhausts: true,
     drawAbility: 'story',
+    handUse: { trigger: 'any', effects: [{ kind: 'search-token', token: 'bookmark', count: 1 }] },
     effects: [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },
       { kind: 'heart-limit', amount: 36 },
@@ -93,7 +96,14 @@ export const routeTokens: readonly Card[] = [
     token: 'bookmark',
     exhausts: true,
     drawAbility: 'bookmark',
-    effects: [{ kind: 'shuffle' }, { kind: 'tokens', token: 'story', count: 1 }],
+    effects: [
+      { kind: 'shuffle' },
+      { kind: 'search-token', token: 'clock', count: 1 },
+      { kind: 'search-unit', unit: 1, count: 1 },
+      { kind: 'search-token', token: 'clock', count: 1 },
+      { kind: 'search-unit', unit: 1, count: 1 },
+      { kind: 'tokens', token: 'story', count: 1 },
+    ],
   },
   {
     id: 'shadow',
