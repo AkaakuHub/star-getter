@@ -30,11 +30,11 @@ describe('スターギャザーの回収得点', () => {
   });
 
   it('60秒・各属性125の編成できらめき10個は11250となる', () => {
-    expect(collectionScore(game(), 10, false)).toBe(11250n);
+    expect(collectionScore(game(), 10, false, 10)).toBe(11250n);
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 601 }, 10, false)).toBe(22500n);
+    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(22500n);
   });
 
   it('STAR増加は加算し、開花プログレスの1.5乗を10000分率で加える', () => {
@@ -43,7 +43,7 @@ describe('スターギャザーの回収得点', () => {
       { percent: 100, untilTick: 100 },
       { percent: 100, untilTick: 100 },
     ];
-    expect(collectionScore({ ...base, boosts }, 10, false)).toBe(33750n);
+    expect(collectionScore({ ...base, boosts }, 10, false, 10)).toBe(33750n);
     expect(
       collectionScore(
         {
@@ -56,15 +56,16 @@ describe('スターギャザーの回収得点', () => {
         },
         10,
         false,
+        10,
       ),
     ).toBe(11258n);
   });
 
   it('回収回数や山場だけでは独自の得点倍率を付けない', () => {
     const base = game();
-    const expected = collectionScore(base, 10, false);
-    expect(collectionScore({ ...base, combo: 70 }, 10, false)).toBe(expected);
-    expect(collectionScore({ ...base, tick: 1200 }, 10, false)).toBe(expected);
+    const expected = collectionScore(base, 10, false, 10);
+    expect(collectionScore({ ...base, combo: 70 }, 10, false, 10)).toBe(expected);
+    expect(collectionScore({ ...base, tick: 1200 }, 10, false, 10)).toBe(expected);
   });
 
   it('カード未使用なら放置しても回収だけを繰り返しても億へ到達しない', () => {
@@ -82,12 +83,12 @@ describe('スターギャザーの回収得点', () => {
   it('1回の通常回収は本家の既定上限を適用する', () => {
     expect(calculateStarGatherAddScoreMax(100, [])).toBe(2147483647n);
     const huge = { ...game(), boosts: [{ percent: 10 ** 20, untilTick: 100 }] };
-    expect(collectionScore(huge, 100, false)).toBe(2147483647n);
+    expect(collectionScore(huge, 100, false, 100)).toBe(2147483647n);
   });
 });
 
 it('基本カードを除外しても開始時の基礎アピールを変えない', () => {
   const initial = game();
   const excluded = { ...initial, deck: initial.deck.filter((card) => card.id !== 'class') };
-  expect(collectionScore(excluded, 10, false)).toBe(collectionScore(initial, 10, false));
+  expect(collectionScore(excluded, 10, false, 10)).toBe(collectionScore(initial, 10, false, 10));
 });

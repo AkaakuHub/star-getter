@@ -1,4 +1,5 @@
 const heartRankThresholds = [100, 200, 360, 720] as const;
+const flowerRankThresholds = [100, 200, 400, 700] as const;
 const heartRankMagnifications = [1, 2, 2.5, 3, 3.5] as const;
 
 type StarGatherHeartRank = Readonly<{
@@ -19,11 +20,29 @@ export function calculateStarGatherHeartRank(
   ) {
     throw new Error('StarGather Heart rank input is invalid');
   }
-  const heartValue = collectableHeartCount * currentVoltageLevel;
-  let rank = heartRankThresholds.reduce(
-    (value, threshold) => value + Number(heartValue >= threshold),
-    0,
-  );
+  return rankFromValue(collectableHeartCount * currentVoltageLevel, heartRankThresholds, rankRange);
+}
+
+export function calculateStarGatherFlowerRank(
+  collectableHeartCount: number,
+  genesisGauge: number,
+): StarGatherHeartRank {
+  if (
+    !Number.isSafeInteger(collectableHeartCount) ||
+    collectableHeartCount < 0 ||
+    !Number.isSafeInteger(genesisGauge) ||
+    genesisGauge < 0
+  )
+    throw new Error('結晶の判定値が正しくありません。');
+  return rankFromValue(Math.sqrt(genesisGauge) * collectableHeartCount, flowerRankThresholds, null);
+}
+
+function rankFromValue(
+  heartValue: number,
+  thresholds: readonly number[],
+  rankRange: Readonly<{ minimum: number; maximum: number }> | null,
+): StarGatherHeartRank {
+  let rank = thresholds.reduce((value, threshold) => value + Number(heartValue >= threshold), 0);
   if (rankRange !== null) {
     if (
       !Number.isSafeInteger(rankRange.minimum) ||

@@ -9,15 +9,22 @@ import {
   starGatherValueToFactor,
   calculateStarGatherAddScoreMax,
 } from './live/clientScoreInput';
-import { calculateStarGatherHeartRank } from './live/heartRank';
+import { calculateStarGatherFlowerRank, calculateStarGatherHeartRank } from './live/heartRank';
 
 export function limitValue(value: bigint): bigint {
   return value > rules.maxScore ? rules.maxScore : value < 0n ? 0n : value;
 }
 
-export function collectionScore(state: GameState, count: number, missed: boolean): bigint {
+export function collectionScore(
+  state: GameState,
+  count: number,
+  missed: boolean,
+  rankHeartCount: number,
+): bigint {
   const voltage = voltageLevel(state.excitement, state.maximumVoltageLevel);
-  const rank = calculateStarGatherHeartRank(count, voltage, null);
+  const rank = state.bloom
+    ? calculateStarGatherFlowerRank(rankHeartCount, Number(state.bloom.progress))
+    : calculateStarGatherHeartRank(rankHeartCount, voltage, null);
   const base = calculateStarGatherClientScore(
     {
       cards: state.cardPool

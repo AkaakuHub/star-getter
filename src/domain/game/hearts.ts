@@ -14,9 +14,14 @@ export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
 }
 
-function awardHearts(state: GameState, count: number, missed: boolean): GameState {
+function awardHearts(
+  state: GameState,
+  count: number,
+  missed: boolean,
+  rankHeartCount: number,
+): GameState {
   if (count === 0) return state;
-  const gain = collectionScore(state, count, missed);
+  const gain = collectionScore(state, count, missed, rankHeartCount);
   const score = limitValue(state.score + gain);
   const combo = missed
     ? state.combo
@@ -51,6 +56,7 @@ export function collectHearts(state: GameState): GameState {
     { ...state, hearts: collected.state, heartRandomSeed: random.seed },
     collected.collectCount,
     false,
+    collected.collectCount,
   );
   const abilities = advanceHandCollectionAbilities(next, collected.collectCount);
   let triggered = abilities.state;
@@ -103,10 +109,16 @@ export function addHearts(state: GameState, count: number): GameState {
     { ...state, hearts: spawned.state, heartRandomSeed: random.seed },
     spawned.overflowCount,
     true,
+    starGatherHeartCount(spawned.state),
   );
 }
 
 export function advanceHearts(state: GameState): GameState {
   const advanced = advanceStarGatherHeartRuntime(state.hearts, 1 / rules.ticksPerSecond, false);
-  return awardHearts({ ...state, hearts: advanced.state }, advanced.lapsedCount, true);
+  return awardHearts(
+    { ...state, hearts: advanced.state },
+    advanced.lapsedCount,
+    true,
+    heartCount(state),
+  );
 }
