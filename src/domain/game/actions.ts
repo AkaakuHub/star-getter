@@ -230,6 +230,7 @@ function activateCard(
     next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
   }
   next = finishTokenGeneration(next, card.id);
+  next = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
   next = applyAbilityEffects(next, card, card.ability893Effects ?? [], applyEffect);
   next = applyAbilityEffects(next, card, card.ability894Effects ?? [], applyEffect);
   for (const effect of card.effects) {
@@ -244,8 +245,7 @@ function activateCard(
   }
   next = advanceProxySkillUses(applyUseAbility(next, card), card.id, usedSkillCost, applyEffect);
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
-  const completed = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
-  return { ...completed, currentSkillType: previousSkillType };
+  return { ...next, currentSkillType: previousSkillType };
 }
 
 function applyAbilityEffects(
