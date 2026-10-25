@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue } from '../projection';
+import { int64ToFloat32 } from '../numeric';
 
 type HeartLimitBoostEffect = Extract<Effect, { kind: 'heart-limit-boost' }>;
 
@@ -10,7 +11,7 @@ export function activateHeartLimitBoost(
   multiplier: number,
   addValue: number,
 ): GameState {
-  const num = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
+  const num = Math.fround(int64ToFloat32(effect.num) / Math.fround(10_000));
   if (num < 0) return state;
   const mood =
     effect.bonusMoodTarget === 0
@@ -18,7 +19,7 @@ export function activateHeartLimitBoost(
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          Math.fround(Math.fround(effect.bonusMoodValue) / Math.fround(10_000)),
+          Math.fround(int64ToFloat32(effect.bonusMoodValue) / Math.fround(10_000)),
         );
   const value = toSignedInt32(
     Math.fround(
@@ -35,7 +36,7 @@ export function activateHeartLimitBoost(
     remainingSeconds:
       suppressed || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressed || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     deactivationKey: effect.deactivationKey ?? null,
@@ -74,13 +75,13 @@ export function applyHeartLimitBoosts(
   );
   const expiredIds = new Set(
     matched.flatMap((buff) =>
-      buff.remainingUses === null || buff.remainingUses > 1 ? [] : [buff.id],
+      buff.remainingUses === null || buff.remainingUses > 1n ? [] : [buff.id],
     ),
   );
   const heartLimitAdditionalBuffs = state.heartLimitAdditionalBuffs.flatMap((buff) => {
     if (expiredIds.has(buff.id)) return [];
     if (usedIds.has(buff.id) && buff.remainingUses !== null)
-      return [{ ...buff, remainingUses: buff.remainingUses - 1 }];
+      return [{ ...buff, remainingUses: buff.remainingUses - 1n }];
     return [buff];
   });
   return { state: { ...state, heartLimitAdditionalBuffs }, value: result };
@@ -105,8 +106,8 @@ export function expireHeartLimitAdditionalBuffSections(state: GameState): GameSt
     ...state,
     heartLimitAdditionalBuffs: state.heartLimitAdditionalBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }
