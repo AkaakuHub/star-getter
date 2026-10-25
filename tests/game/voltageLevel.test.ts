@@ -31,3 +31,27 @@ it('固定値のFloat32丸め後は999段階で、自然増加の1Ptで1000段�
   const gained = applyEffect({ ...state, hand: [] }, { kind: 'excitement', amount: 1 });
   expect(voltageLevel(gained.excitement, gained.maximumVoltageLevel)).toBe(1000);
 });
+
+it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後の指定値へ直接設定する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'voltage-convert',
+      destination: 'hearts',
+      num: 10000,
+      outputDuration: { kind: 'stage', value: 0 },
+      convertDisabledType: 0,
+      displayDuration: { kind: 'stage', value: 0 },
+      disabledType: 0,
+      disabledValue: 0,
+    },
+    source,
+  );
+  const set = applyEffect(active, { kind: 'voltage-set', amount: 655_000_001 });
+  expect(set.excitement).toBe(655_000_000);
+  expect(set.voltageConversions).toHaveLength(1);
+  expect(set.hearts).toEqual(active.hearts);
+});

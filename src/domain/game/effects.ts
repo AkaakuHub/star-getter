@@ -1,5 +1,5 @@
 import { enqueueHandShuffle } from './cards/boardActions';
-import { changeResource } from './resources';
+import { changeResource, setVoltageValue } from './resources';
 import { evaluateCondition } from './conditions/evaluate';
 import { conditionContext } from './conditions/gameContext';
 import { energyMaximum } from './parameters/maximum';
@@ -268,11 +268,7 @@ export function applyEffect(
     case 'voltage-limit':
       return { ...state, maximumVoltageLevel: state.maximumVoltageLevel + effect.amount };
     case 'voltage-set':
-      return changeResource(
-        state,
-        'excitement',
-        BigInt(Math.trunc(Math.fround(effect.amount)) - Math.trunc(state.excitement)),
-      );
+      return setVoltageValue(state, effect.amount);
     case 'stop-voltage-increase':
       return activateVoltageIncreaseStop(state, effect);
     case 'infinity-gauge':

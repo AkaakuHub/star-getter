@@ -48,6 +48,17 @@ export function changeResource(
     : next;
 }
 
+export function setVoltageValue(state: GameState, amount: number): GameState {
+  const target = Math.max(0, Math.trunc(Math.fround(amount)));
+  const delta = Math.trunc(Math.fround(target - state.excitement));
+  if (state.bloom) return changeBloomResource(state, 'excitement', BigInt(delta));
+  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage')) return state;
+  return {
+    ...state,
+    excitement: target,
+  };
+}
+
 export function decreaseMentalNaturally(state: GameState): GameState {
   const barrier = absorbNaturalMentalDecrease(state);
   if (barrier.absorbed) return barrier.state;
