@@ -9,9 +9,9 @@ export function activateGenesisSkill(
   effect: GenesisSkillEffect,
   card: Card | undefined,
 ): GameState {
-  const durationValue = Number(BigInt.asIntN(32, BigInt(effect.duration.value)));
+  const durationValue = Number(BigInt.asIntN(32, effect.duration.value));
   if (effect.duration.kind !== 'stage' && durationValue < 1) return state;
-  const effectBaseNum = Number(BigInt.asIntN(32, BigInt(effect.effectBaseNum)));
+  const effectBaseNum = Number(BigInt.asIntN(32, effect.effectBaseNum));
   const value = Math.fround(Math.fround(effectBaseNum) / 10_000);
   const boosted = applyAction52SkillBoostForCard(state, card, value);
   if (effect.duration.kind !== 'stage') return boosted.state;

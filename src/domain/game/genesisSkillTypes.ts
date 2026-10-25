@@ -1,14 +1,16 @@
+import { isInt64 } from './numeric';
+
 export type GenesisSkillEffect = Readonly<{
   kind: 'genesis-skill';
-  effectBaseNum: number;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  effectBaseNum: bigint;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
 }>;
 
 export function validateGenesisSkill(effect: GenesisSkillEffect): void {
   if (
-    !Number.isSafeInteger(effect.effectBaseNum) ||
+    !isInt64(effect.effectBaseNum) ||
     !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
-    !Number.isSafeInteger(effect.duration.value)
+    !isInt64(effect.duration.value)
   )
     throw new Error('ジェネシススキルの設定が正しくありません。');
 }
