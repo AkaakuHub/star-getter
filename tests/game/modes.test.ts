@@ -39,6 +39,20 @@ describe('モード切替と切替時効果', () => {
     expect(state.maxEnergy).toBe(modeGame().maxEnergy + 1);
     expect(state.modeReactions[0]?.count).toBe(2);
   });
+  it('ActionType35のModeChangeType.Alternateは現在状態を反転する', () => {
+    const toggledOn = applyEffect(modeGame(), {
+      kind: 'mode',
+      modeId: 1,
+      change: 'alternate',
+    });
+    expect(toggledOn.modes.entries.find((entry) => entry.id === 1)?.on).toBe(true);
+    const toggledOff = applyEffect(toggledOn, {
+      kind: 'mode',
+      modeId: 1,
+      change: 'alternate',
+    });
+    expect(toggledOff.modes.entries.find((entry) => entry.id === 1)?.on).toBe(false);
+  });
   it('切替保留中は状態を変えず、解除後にFIFOで実行する', () => {
     let state = applyEffect(modeGame(), reaction);
     state = { ...state, modes: { ...state.modes, held: true } };
