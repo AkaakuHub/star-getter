@@ -2,6 +2,7 @@ import type { Card, Effect, GameState } from '../model';
 import type { ComboInduceEffect } from '../modelTypes';
 import type { ComboInduceEvent, ComboInducer } from '../comboInduceTypes';
 import { int64ToFloat32 } from '../numeric';
+import { completeDeckOutChecks } from './deckOutCheck';
 
 type ApplyComboEffect = (
   state: GameState,
@@ -79,8 +80,9 @@ export function advanceComboInducer(
       );
       const card = state.cardPool.find((item) => item.id === inducer.sourceCardId);
       for (const effect of inducer.effects) {
-        next = applyEffect(next, effect, card, inducer.multiplier, inducer.addValue, effectPower);
-        if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
+        next = completeDeckOutChecks(
+          applyEffect(next, effect, card, inducer.multiplier, inducer.addValue, effectPower),
+        );
       }
     }
     return {

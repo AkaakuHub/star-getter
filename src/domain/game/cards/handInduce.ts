@@ -1,6 +1,7 @@
 import type { Card, Effect, GameState } from '../model';
 import type { HandUseTrigger } from './cardTypes';
 import type { EffectApplier } from '../effects/induceSkillEffect';
+import { completeDeckOutChecks } from '../effects/deckOutCheck';
 
 export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectApplier): GameState {
   const withUpdatedStats = updateHandCardSkillUseStats(state, used);
@@ -155,9 +156,6 @@ function applyEffects(
   apply: EffectApplier,
 ): GameState {
   return effects.reduce((next, effect) => {
-    const activated = apply(next, effect, card);
-    return activated.deckOutCount > 0
-      ? { ...activated, deckOutCount: activated.deckOutCount - 1 }
-      : activated;
+    return completeDeckOutChecks(apply(next, effect, card));
   }, state);
 }

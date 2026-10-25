@@ -1,5 +1,6 @@
 import type { Card, Effect, GameState } from '../model';
 import type { InduceSkillCondition, InduceSkillEffectInput } from '../induceSkillEffectTypes';
+import { completeDeckOutChecks } from './deckOutCheck';
 
 export type EffectApplier = (
   state: GameState,
@@ -80,15 +81,16 @@ export function induceSkillEffects(
     for (const child of induced.effects) {
       const withParameters =
         child.actionType === 1 || child.actionType === 2 || child.actionType === 14;
-      next = applyEffect(
-        next,
-        child.effect,
-        sourceCard,
-        withParameters ? induced.multiplier : 1,
-        withParameters ? induced.addValue : 0,
-        withParameters ? effectPower : 1,
+      next = completeDeckOutChecks(
+        applyEffect(
+          next,
+          child.effect,
+          sourceCard,
+          withParameters ? induced.multiplier : 1,
+          withParameters ? induced.addValue : 0,
+          withParameters ? effectPower : 1,
+        ),
       );
-      if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
     }
   }
   return next;

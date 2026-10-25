@@ -2,6 +2,7 @@ import type { AdditionalHeartInducer, AdditionalHeartInduceEffect } from '../add
 import type { Card, Effect, GameState } from '../model';
 import { matchesAdditionalHeartCondition } from '../additionalHeartTypes';
 import { int64ToFloat32 } from '../numeric';
+import { completeDeckOutChecks } from './deckOutCheck';
 
 type ApplyEffect = (
   state: GameState,
@@ -58,15 +59,16 @@ export function induceAdditionalHearts(
     const effectPower = Math.fround(Math.fround(int64ToFloat32(product) / Math.fround(10_000)) + 1);
     const sourceCard = next.cardPool.find((item) => item.id === inducer.sourceCardId);
     if (!sourceCard) continue;
-    next = apply(
-      next,
-      inducer.heartEffect,
-      sourceCard,
-      inducer.multiplier,
-      inducer.addValue,
-      effectPower,
+    next = completeDeckOutChecks(
+      apply(
+        next,
+        inducer.heartEffect,
+        sourceCard,
+        inducer.multiplier,
+        inducer.addValue,
+        effectPower,
+      ),
     );
-    if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
   }
   return next;
 }

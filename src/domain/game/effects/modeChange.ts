@@ -5,6 +5,7 @@ import {
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
 import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
+import { completeDeckOutChecks } from './deckOutCheck';
 
 type ApplyEffect = (
   state: GameState,
@@ -93,8 +94,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
         const effectPower = scales
           ? roundToEvenFloat32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
           : 1;
-        next = apply(next, effect, source, 1, 0, effectPower);
-        if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
+        next = completeDeckOutChecks(apply(next, effect, source, 1, 0, effectPower));
       }
     }
   }

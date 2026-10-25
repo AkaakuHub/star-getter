@@ -53,6 +53,20 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   expect(reset.comboInducer?.members.map((member) => member.ap)).toEqual([3, null]);
 });
 
+it('ActionType24のCheckDeckOut通知は1つの子効果で全DeckOutを処理する', () => {
+  const { state, source, first } = setup();
+  const inducer = state.comboInducer;
+  if (!inducer) throw new Error('コンボ誘発が有効ではありません。');
+  const configured = {
+    ...state,
+    deckOutCount: 3,
+    comboInducer: { ...inducer, effects: [{ kind: 'energy' as const, amount: 1 }] },
+  };
+  const complete = notifyComboSkillPoint(notifyComboSkillPoint(configured, source, 1), first, 1);
+  const activated = advanceComboInducer(complete, 1, applyEffect);
+  expect(activated.deckOutCount).toBe(0);
+});
+
 it('ActionType24はlong積をfloat32へ直接変換する', () => {
   const { state, source, first } = setup();
   const inducer = state.comboInducer;

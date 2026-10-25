@@ -2,6 +2,7 @@ import type { Card, GameState } from '../model';
 import type { ProxySkillEffect } from '../modelTypes';
 import type { EffectApplier } from './induceSkillEffect';
 import { induceCardMoves } from './cardMoveInduce';
+import { completeDeckOutChecks } from './deckOutCheck';
 
 type ApplyProxyEffect = EffectApplier;
 
@@ -235,8 +236,7 @@ function applyProxyChild(
   addValue: number,
   apply: ApplyProxyEffect,
 ): GameState {
-  const next = apply(state, child.effect, card, multiplier, addValue);
-  return next.deckOutCount > 0 ? { ...next, deckOutCount: next.deckOutCount - 1 } : next;
+  return completeDeckOutChecks(apply(state, child.effect, card, multiplier, addValue));
 }
 
 function endProxyAbsorption(
