@@ -22,11 +22,15 @@ export type GaugeInfinity = Readonly<{
   gauge: 'ap' | 'voltage' | 'mental';
   remainingSeconds: number | null;
   remainingSections: number | null;
+  suspended: boolean;
+  deactivationKey: string | null;
 }>;
 type InfinityGaugeEffect = Readonly<{
   kind: 'infinity-gauge';
   gauge: 'ap' | 'voltage' | 'mental';
-  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  invocationType?: number;
+  deactivationKey?: string;
 }>;
 export type GaugeRegeneration = Readonly<{
   gauge: 'mental' | 'voltage';

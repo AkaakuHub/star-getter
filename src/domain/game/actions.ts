@@ -29,6 +29,7 @@ import { deactivateLoveUpAdditionalBuffs } from './effects/loveUpAdditionalBuff'
 import { deactivateMentalRecoverAdditionalBuffs } from './effects/mentalRecoverAdditionalBuff';
 import { deactivateMentalBarrierAdditionalBuffs } from './effects/mentalBarrierAdditionalBuff';
 import { deactivateDisableMentalDownEffects } from './effects/disableMentalDown';
+import { deactivateGaugeInfinities } from './resources';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -81,6 +82,8 @@ export function act(state: GameState, action: Action): GameState {
           (boost) => boost.deactivationKey !== action.deactivationKey,
         ),
       };
+    case 'deactivate-infinity-gauge':
+      return deactivateGaugeInfinities(state, action.deactivationKey);
   }
 }
 

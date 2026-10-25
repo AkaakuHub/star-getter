@@ -8,22 +8,33 @@ export function activateInfinityGauge(
 ): GameState {
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  if (state.bloom) {
-    const progress = BigInt.asIntN(32, state.bloom.progress + 500n);
-    return { ...state, bloom: { ...state.bloom, progress: progress < 0n ? 0n : progress } };
-  }
+  const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
+  const bloom = state.bloom;
+  const suspended = bloom !== null;
   const active = {
     gauge: effect.gauge,
     remainingSeconds:
-      effect.duration.kind === 'milliseconds' ? Math.fround(effect.duration.value / 1000) : null,
-    remainingSections: effect.duration.kind === 'sections' ? effect.duration.value : null,
+      !suppressDuration && effect.duration.kind === 'milliseconds'
+        ? Math.fround(effect.duration.value / 1000)
+        : null,
+    remainingSections:
+      !suppressDuration && effect.duration.kind === 'sections' ? effect.duration.value : null,
+    suspended,
+    deactivationKey: effect.deactivationKey ?? null,
   };
   const firstActivation = !state.gaugeInfinities.some(
     (infinity) => infinity.gauge === effect.gauge,
   );
-  const next = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
+  let next = { ...state, gaugeInfinities: [...state.gaugeInfinities, active] };
+  if (bloom) {
+    const progress = BigInt.asIntN(32, bloom.progress + 500n);
+    return { ...next, bloom: { ...bloom, progress: progress < 0n ? 0n : progress } };
+  }
+  if (!firstActivation) return next;
   if (effect.gauge === 'ap') return { ...next, energy: next.maxEnergy };
-  if (effect.gauge === 'mental' && firstActivation && !state.resting)
+  if (effect.gauge === 'mental' && !state.resting)
     return induceMentalHearts({ ...next, stamina: 100, mentalTimerSeconds: 0 }, 100);
-  return { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
+  if (effect.gauge === 'voltage')
+    next = { ...next, excitement: voltageThreshold(next.maximumVoltageLevel) };
+  return next;
 }

@@ -54,5 +54,10 @@ export function changeBloomResource(
 
 export function finishBloom(state: GameState): GameState {
   if (!state.bloom) return state;
-  return { ...state, ...state.bloom.rollback, bloom: null };
+  return {
+    ...state,
+    ...state.bloom.rollback,
+    gaugeInfinities: state.gaugeInfinities.map((infinity) => ({ ...infinity, suspended: false })),
+    bloom: null,
+  };
 }

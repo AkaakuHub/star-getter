@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '../../src/domain/game/actions';
+import { changeResource } from '../../src/domain/game/resources';
 import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
 import { advanceTo } from '../../src/domain/game/simulation';
-import { activateBloom } from '../../src/domain/game/bloom';
+import { activateBloom, finishBloom } from '../../src/domain/game/bloom';
 import { game } from './support/game';
 
 describe('無限ゲージ', () => {
@@ -55,7 +57,39 @@ describe('無限ゲージ', () => {
     expect(ended.mentalTimerSeconds).toBe(0);
   });
 
-  it('開花中は500のGenesisゲージを加算し、無限状態を作らない', () => {
+  it('期限抑止された効果はDeactivatorまで残り、解除時に最後のゲージ値へ戻す', () => {
+    const initial = { ...game(), excitement: 100 };
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'milliseconds', value: 500 },
+      invocationType: 0x388,
+      deactivationKey: 'voltage-infinity',
+    });
+    expect(advanceTo(active, 1).gaugeInfinities).toHaveLength(1);
+    const ended = act(active, {
+      type: 'deactivate-infinity-gauge',
+      deactivationKey: 'voltage-infinity',
+    });
+    expect(ended.gaugeInfinities).toHaveLength(0);
+    expect(ended.excitement).toBe(voltageThreshold(10));
+  });
+
+  it('Genesis中に開始した無限ゲージの時間期限を保持し、終了後に無限状態へ移す', () => {
+    const initial = activateBloom(game('bloom'), 1);
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'ap',
+      duration: { kind: 'milliseconds', value: 1000 },
+    });
+    expect(active.gaugeInfinities[0]?.suspended).toBe(true);
+    expect(active.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
+    const finished = finishBloom(active);
+    expect(finished.gaugeInfinities[0]?.suspended).toBe(false);
+    expect(changeResource(finished, 'energy', -1n).energy).toBe(finished.energy);
+  });
+
+  it('開花中は500のGenesisゲージを加算し、期限付き無限状態を保留する', () => {
     const initial = activateBloom(game('bloom'), 1);
     const next = applyEffect(initial, {
       kind: 'infinity-gauge',
@@ -63,6 +97,6 @@ describe('無限ゲージ', () => {
       duration: { kind: 'milliseconds', value: 500 },
     });
     expect(next.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
-    expect(next.gaugeInfinities).toHaveLength(0);
+    expect(next.gaugeInfinities[0]?.suspended).toBe(true);
   });
 });

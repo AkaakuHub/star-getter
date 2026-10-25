@@ -288,7 +288,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-mental-recover-additional-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-barrier-additional-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-down'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-token-boost'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-infinity-gauge'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

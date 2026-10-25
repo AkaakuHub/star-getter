@@ -63,6 +63,16 @@ export function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
+  if (effect.kind === 'infinity-gauge') {
+    if (
+      (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
+      !Number.isSafeInteger(effect.duration.value) ||
+      (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('無限ゲージの設定が正しくありません。');
+    return;
+  }
   if (effect.kind === 'token-card') return validateTokenCardEffect(effect);
   if (effect.kind === 'token-boost') {
     if (

@@ -19,7 +19,9 @@ export function changeResource(
     state = conversion.state;
   }
   if (
-    state.gaugeInfinities.some((infinity) => infinity.gauge === resourceToGauge(resource)) &&
+    state.gaugeInfinities.some(
+      (infinity) => infinity.gauge === resourceToGauge(resource) && !infinity.suspended,
+    ) &&
     !(resource === 'stamina' && state.resting)
   )
     return state;
@@ -52,7 +54,8 @@ export function setVoltageValue(state: GameState, amount: number): GameState {
   const target = Math.max(0, Math.trunc(Math.fround(amount)));
   const delta = Math.trunc(Math.fround(target - state.excitement));
   if (state.bloom) return changeBloomResource(state, 'excitement', BigInt(delta));
-  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage')) return state;
+  if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
+    return state;
   return {
     ...state,
     excitement: target,
@@ -123,6 +126,24 @@ export function expireGaugeInfinities(
         excitement: voltageThreshold(Math.min(10, next.maximumVoltageLevel)),
       };
     }
+  }
+  return next;
+}
+
+export function deactivateGaugeInfinities(state: GameState, deactivationKey: string): GameState {
+  const removed = state.gaugeInfinities.filter(
+    (infinity) => infinity.deactivationKey === deactivationKey,
+  );
+  const active = state.gaugeInfinities.filter(
+    (infinity) => infinity.deactivationKey !== deactivationKey,
+  );
+  let next: GameState = { ...state, gaugeInfinities: active };
+  for (const gauge of new Set(removed.map((infinity) => infinity.gauge))) {
+    if (active.some((infinity) => infinity.gauge === gauge)) continue;
+    if (gauge === 'mental')
+      next = induceMentalHearts({ ...next, stamina: 100, mentalTimerSeconds: 0 }, 100);
+    if (gauge === 'voltage')
+      next = { ...next, excitement: voltageThreshold(Math.min(10, next.maximumVoltageLevel)) };
   }
   return next;
 }
