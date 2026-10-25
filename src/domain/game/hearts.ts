@@ -118,10 +118,9 @@ export function addHearts(state: GameState, count: number): GameState {
 
 export function advanceHearts(state: GameState): GameState {
   const advanced = advanceStarGatherHeartRuntime(state.hearts, 1 / rules.ticksPerSecond, false);
-  return awardHearts(
+  const rankHeartCount = heartCount(state);
+  return advanced.lapsedBatches.reduce(
+    (next, count) => awardHearts(next, count, true, rankHeartCount),
     { ...state, hearts: advanced.state },
-    advanced.lapsedCount,
-    true,
-    heartCount(state),
   );
 }

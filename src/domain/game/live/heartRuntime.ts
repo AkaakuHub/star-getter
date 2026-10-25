@@ -15,7 +15,7 @@ export function advanceStarGatherHeartRuntime(
   if (!Number.isFinite(deltaTimeSeconds) || deltaTimeSeconds < 0) {
     throw new Error('StarGather Heart delta time is invalid');
   }
-  let expiredStageCount = 0;
+  const expiredBatches: number[] = [];
   const stageHearts = state.stageHearts.flatMap((heart) => {
     if (heart.phase === 'collect') {
       const collectElapsedSeconds = Math.fround(
@@ -29,7 +29,7 @@ export function advanceStarGatherHeartRuntime(
       Math.fround(heart.lifeTimeSeconds) - Math.fround(deltaTimeSeconds),
     );
     if (heart.phase === 'flash' && lifeTimeSeconds < 0) {
-      expiredStageCount += 1;
+      expiredBatches.push(1);
       return [];
     }
     const spawnElapsedSeconds = Math.fround(
@@ -53,18 +53,16 @@ export function advanceStarGatherHeartRuntime(
       },
     ];
   });
-  let expiredHiddenCount = 0;
   const hiddenHeartBatches = state.hiddenHeartBatches.flatMap((batch) => {
     const lifeTimeSeconds = Math.fround(
       Math.fround(batch.lifeTimeSeconds) - Math.fround(deltaTimeSeconds),
     );
     if (lifeTimeSeconds < 0) {
-      expiredHiddenCount += batch.count;
+      expiredBatches.push(batch.count);
       return [];
     }
     return [{ ...batch, lifeTimeSeconds }];
   });
-  const expiredCount = expiredStageCount + expiredHiddenCount;
   const collectionSoundDelays = state.collectionSoundDelays
     .map((delay) => delay - deltaTimeSeconds)
     .filter((delay) => delay > Number.EPSILON);
@@ -79,8 +77,8 @@ export function advanceStarGatherHeartRuntime(
         state.collectionSoundDelays.length -
         collectionSoundDelays.length,
     },
-    lapsedCount: autoPlay ? 0 : expiredCount,
-    autoCollectCount: autoPlay ? expiredCount : 0,
+    lapsedBatches: autoPlay ? [] : expiredBatches,
+    autoCollectCount: autoPlay ? expiredBatches.reduce((sum, count) => sum + count, 0) : 0,
   };
 }
 

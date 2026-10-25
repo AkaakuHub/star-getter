@@ -41,7 +41,7 @@ export type StarGatherHeartSpawnResult = Readonly<{
 
 export type StarGatherHeartAdvanceResult = Readonly<{
   state: StarGatherHeartRuntimeState;
-  lapsedCount: number;
+  lapsedBatches: readonly number[];
   autoCollectCount: number;
 }>;
 

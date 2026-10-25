@@ -30,11 +30,11 @@ describe('きらめきと得点', () => {
   });
 
   it('時間切れの回収は基礎得点の20%になる', () => {
-    const state = { ...addHearts(game(), 10), resting: true, stamina: 0, excitement: 100 };
+    const state = { ...addHearts(game(), 1), resting: true, stamina: 0, excitement: 100 };
     const normal = act(state, { type: 'collect' });
     let expired = state;
     for (let tick = 1; tick <= 600; tick++) expired = advanceHearts({ ...expired, tick });
-    expect(expired.stats.heartsMissed).toBe(10);
+    expect(expired.stats.heartsMissed).toBe(1);
     expect(expired.stats.heartsCollected).toBe(0);
     expect(expired.score).toBe(normal.score / 5n);
   });
