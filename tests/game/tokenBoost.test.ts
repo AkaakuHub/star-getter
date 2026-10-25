@@ -229,3 +229,34 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
     act(active, { type: 'deactivate-token-boost', deactivationKey: 'token-boost' }).tokenBoosts,
   ).toHaveLength(0);
 });
+
+it('ActionType38は詳細値をint32へ変換してからNumToValueを適用する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.id === 'library-pages');
+  if (!source) throw new Error('発動元カードがありません。');
+  const wrapped = applyEffect(
+    initial,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: 2_147_483_648,
+      target: { kind: 'all' },
+    },
+    source,
+  );
+  expect(wrapped.tokenBoosts).toHaveLength(0);
+
+  const float32Value = applyEffect(
+    initial,
+    {
+      kind: 'token-boost',
+      calculation: 'add',
+      num: 16_777_217,
+      target: { kind: 'all' },
+    },
+    source,
+  );
+  expect(float32Value.tokenBoosts[0]?.value).toBe(
+    Math.fround(Math.fround(Math.fround(16_777_216) / Math.fround(10_000))),
+  );
+});

@@ -226,7 +226,6 @@ type EffectShape =
       kind: 'token-boost';
       calculation: TokenBoost['calculation'];
       num: number;
-      addValue?: number;
       target: TokenBoostTarget;
       seriesIds?: readonly number[];
       uses?: number;

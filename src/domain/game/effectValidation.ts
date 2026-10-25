@@ -124,7 +124,6 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'token-boost') {
     if (
       !Number.isSafeInteger(effect.num) ||
-      (effect.addValue !== undefined && !Number.isFinite(effect.addValue)) ||
       (effect.uses !== undefined && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
       (effect.duration !== undefined &&
         (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)) ||
