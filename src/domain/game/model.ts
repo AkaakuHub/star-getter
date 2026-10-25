@@ -1,3 +1,4 @@
+import type { DisableMentalDown } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuff } from './mentalRecoverAdditionalBuffTypes';
 import type { VoltageUpAdditionalBuff } from './voltageUpAdditionalBuffTypes';
@@ -292,6 +293,8 @@ export type GameState = Readonly<{
   stamina: number;
   resting: boolean;
   mentalProtected: boolean;
+  disableMentalDownEffects: readonly DisableMentalDown[];
+  nextDisableMentalDownId: number;
   sectionMentalProtected: boolean;
   sectionBeatHeartBonus: number;
   beatPointBuffs: readonly Readonly<{ value: number; remainingSections: number | null }>[];
@@ -342,7 +345,8 @@ export type Action =
   | Readonly<{ type: 'deactivate-additional-heart'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-love-up-additional-buff'; deactivationKey: string }>
   | Readonly<{ type: 'deactivate-mental-recover-additional-buff'; deactivationKey: string }>
-  | Readonly<{ type: 'deactivate-mental-barrier-additional-buff'; deactivationKey: string }>;
+  | Readonly<{ type: 'deactivate-mental-barrier-additional-buff'; deactivationKey: string }>
+  | Readonly<{ type: 'deactivate-mental-down'; deactivationKey: string }>;
 
 export const rules = {
   ticksPerSecond: 60,

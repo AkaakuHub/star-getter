@@ -48,7 +48,12 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
   if (next.bloom && (next.mentalProtected || next.sectionMentalProtected)) return next;
   let mentalTimerSeconds = Math.fround(Math.fround(next.mentalTimerSeconds) + Math.fround(dt));
   const resting =
-    !(next.mentalProtected || next.sectionMentalProtected) && (next.resting || next.stamina <= 0);
+    !(
+      next.mentalProtected ||
+      next.sectionMentalProtected ||
+      next.disableMentalDownEffects.length > 0
+    ) &&
+    (next.resting || next.stamina <= 0);
   if (resting) {
     const recoveryTime = Math.fround(
       Math.trunc(Math.fround(Math.fround((durationSeconds(next) * 1000) / 120000) * 6000)) / 1000,
@@ -66,7 +71,14 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
   if (mentalInterval <= 0) {
     if (!next.bloom) {
       next = changeResource(next, 'stamina', -BigInt(Math.trunc(next.stamina)), 'natural');
-      if (next.stamina <= 0 && !(next.mentalProtected || next.sectionMentalProtected)) {
+      if (
+        next.stamina <= 0 &&
+        !(
+          next.mentalProtected ||
+          next.sectionMentalProtected ||
+          next.disableMentalDownEffects.length > 0
+        )
+      ) {
         next = { ...next, resting: true };
         mentalTimerSeconds = 0;
       }
@@ -79,6 +91,11 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
   return {
     ...next,
     mentalTimerSeconds,
-    resting: !(next.mentalProtected || next.sectionMentalProtected) && next.stamina <= 0,
+    resting:
+      !(
+        next.mentalProtected ||
+        next.sectionMentalProtected ||
+        next.disableMentalDownEffects.length > 0
+      ) && next.stamina <= 0,
   };
 }

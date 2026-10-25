@@ -94,6 +94,9 @@ export function describeEffect(effect: Effect): string {
       return '対象カードの次回消費エナジーを変化させる。';
     case 'parameter-value-change':
       return '指定されたカード効果の詳細値を変化させる。';
+    case 'disable-mental-down':
+      return '元気が0になった後の休憩を防ぐ。';
+
     case 'protect-mental':
       return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、元気が0でも休憩に入らない。`;
     case 'beat-count':

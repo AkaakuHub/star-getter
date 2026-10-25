@@ -1,3 +1,4 @@
+import type { DisableMentalDownEffect } from './disableMentalDownTypes';
 import type { MentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import type { MentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
 import type { VoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
@@ -287,6 +288,7 @@ type EffectShape =
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
   | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
+  | DisableMentalDownEffect
   | Readonly<{ kind: 'beat-count'; amount: number }>
   | Readonly<{
       kind: 'beat-point-buff';

@@ -27,6 +27,7 @@ import {
 import { deactivateLoveUpAdditionalBuffs } from './effects/loveUpAdditionalBuff';
 import { deactivateMentalRecoverAdditionalBuffs } from './effects/mentalRecoverAdditionalBuff';
 import { deactivateMentalBarrierAdditionalBuffs } from './effects/mentalBarrierAdditionalBuff';
+import { deactivateDisableMentalDownEffects } from './effects/disableMentalDown';
 
 export function act(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -70,6 +71,8 @@ export function act(state: GameState, action: Action): GameState {
       return deactivateMentalRecoverAdditionalBuffs(state, action.deactivationKey);
     case 'deactivate-mental-barrier-additional-buff':
       return deactivateMentalBarrierAdditionalBuffs(state, action.deactivationKey);
+    case 'deactivate-mental-down':
+      return deactivateDisableMentalDownEffects(state, action.deactivationKey);
   }
 }
 

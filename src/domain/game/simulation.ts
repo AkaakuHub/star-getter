@@ -139,6 +139,8 @@ export function createGame(
     stamina: 100,
     resting: false,
     mentalProtected: false,
+    disableMentalDownEffects: [],
+    nextDisableMentalDownId: 1,
     sectionMentalProtected: false,
     sectionBeatHeartBonus: 0,
     beatPointBuffs: [],

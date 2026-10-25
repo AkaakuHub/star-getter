@@ -7,6 +7,7 @@ import { activateLoveUpAdditionalBuff } from '../effects/loveUpAdditionalBuff';
 import { activateVoltageUpAdditionalBuff } from '../effects/voltageUpAdditionalBuff';
 import { activateMentalRecoverAdditionalBuff } from '../effects/mentalRecoverAdditionalBuff';
 import { activateMentalBarrierAdditionalBuff } from '../effects/mentalBarrierAdditionalBuff';
+import { activateDisableMentalDown } from '../effects/disableMentalDown';
 
 type ParameterEffect = Extract<
   Effect,
@@ -19,7 +20,8 @@ type ParameterEffect = Extract<
       | 'love-up-additional-buff'
       | 'voltage-up-additional-buff'
       | 'recover-mental-additional-buff'
-      | 'mental-barrier-additional-buff';
+      | 'mental-barrier-additional-buff'
+      | 'disable-mental-down';
   }
 >;
 
@@ -33,6 +35,7 @@ export function isParameterEffect(effect: Effect): effect is ParameterEffect {
     'voltage-up-additional-buff',
     'recover-mental-additional-buff',
     'mental-barrier-additional-buff',
+    'disable-mental-down',
   ].includes(effect.kind);
 }
 
@@ -60,5 +63,7 @@ export function applyParameterEffect(
       return activateMentalRecoverAdditionalBuff(state, effect, card, multiplier, addValue);
     case 'mental-barrier-additional-buff':
       return activateMentalBarrierAdditionalBuff(state, effect, card, multiplier, addValue);
+    case 'disable-mental-down':
+      return activateDisableMentalDown(state, effect);
   }
 }

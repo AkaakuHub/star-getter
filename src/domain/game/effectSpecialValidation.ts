@@ -1,3 +1,4 @@
+import { validateDisableMentalDownEffect } from './disableMentalDownTypes';
 import { validateMentalBarrierAdditionalBuffEffect } from './mentalBarrierAdditionalBuffTypes';
 import { validateMentalRecoverAdditionalBuffEffect } from './mentalRecoverAdditionalBuffTypes';
 import type { Effect } from './model';
@@ -13,7 +14,8 @@ type SpecialEffect = Extract<
       | 'love-up-additional-buff'
       | 'voltage-up-additional-buff'
       | 'recover-mental-additional-buff'
-      | 'mental-barrier-additional-buff';
+      | 'mental-barrier-additional-buff'
+      | 'disable-mental-down';
   }
 >;
 
@@ -35,6 +37,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'mental-barrier-additional-buff':
       validateMentalBarrierAdditionalBuffEffect(effect);
       break;
+    case 'disable-mental-down':
+      validateDisableMentalDownEffect(effect);
+      break;
   }
   return true;
 }
@@ -45,6 +50,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'love-up-additional-buff' ||
     effect.kind === 'voltage-up-additional-buff' ||
     effect.kind === 'recover-mental-additional-buff' ||
-    effect.kind === 'mental-barrier-additional-buff'
+    effect.kind === 'mental-barrier-additional-buff' ||
+    effect.kind === 'disable-mental-down'
   );
 }
