@@ -135,7 +135,7 @@ describe('カード使用可能時の自動停止', () => {
     expect(frames.pending).toBe(1);
   });
 
-  it('使用後は0.35秒以上待ち、残りの手札が使用可能になったら再び停止する', async () => {
+  it('使用後はクールタイム中のAP変化では停止せず、次のAP変化で再び停止する', async () => {
     const { controller, clock, frames } = session();
     await controller.toggleWaitMode();
     const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
@@ -150,6 +150,9 @@ describe('カード使用可能時の自動停止', () => {
     clock.seconds = cardCooldownTicks(controller.state) / rules.ticksPerSecond;
     frames.run(clock.seconds * 1000);
     expect(controller.state.hand.some((_, slot) => canUseCard(controller.state, slot))).toBe(true);
+    expect(controller.waiting).toBe(false);
+    clock.seconds = 1.2;
+    frames.run(1200);
     expect(controller.waiting).toBe(true);
     expect(frames.pending).toBe(0);
   });
@@ -224,5 +227,35 @@ describe('カード使用可能時の自動停止', () => {
     expect(controller.waiting).toBe(true);
     expect(clock.paused).toBe(true);
     expect(frames.pending).toBe(0);
+  });
+});
+
+describe('カード待ちの解除操作', () => {
+  it('共鳴の使用でも待ちを解除する', async () => {
+    const { controller, clock, frames } = session(20);
+    await controller.toggleWaitMode();
+    expect(controller.waiting).toBe(true);
+    controller.command({ type: 'special', cardId: 'library-pages' });
+    expect(controller.state.stats.specialsUsed).toBe(1);
+    expect(controller.waiting).toBe(false);
+    await vi.waitFor(() => expect(clock.paused).toBe(false));
+    expect(frames.pending).toBe(1);
+  });
+  it('回収処理だけでは解除せず、待ち解除操作で時計を再開する', async () => {
+    const { controller, clock, frames } = session();
+    clock.seconds = 1;
+    frames.run(1000);
+    controller.toggleAutomaticHearts();
+    await controller.toggleWaitMode();
+    const before = controller.state.stats.heartsCollected;
+    controller.command({ type: 'collect' });
+    expect(controller.state.stats.heartsCollected).toBeGreaterThan(before);
+    expect(controller.waiting).toBe(true);
+    controller.cancelWait();
+    await vi.waitFor(() => expect(clock.paused).toBe(false));
+    expect(controller.waiting).toBe(false);
+    clock.seconds = 1.5;
+    frames.run(1500);
+    expect(controller.waiting).toBe(false);
   });
 });

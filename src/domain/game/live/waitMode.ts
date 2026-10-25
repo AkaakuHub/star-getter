@@ -1,15 +1,24 @@
 export type WaitModeState = Readonly<{
   kind: 'disabled' | 'initial' | 'reserved' | 'force-reserved' | 'waiting';
   remainingCoolTimeSeconds: number;
+  previousAvailableCards: number;
+  previousSkillPoint: number;
 }>;
 
-const waitModeCoolTimeSeconds = 0.35;
-const waitModeCoolTimeAtStartSeconds = 0.05;
-
-export function releaseWaitMode(): WaitModeState {
+export function createWaitMode(): WaitModeState {
   return {
-    kind: 'reserved',
-    remainingCoolTimeSeconds: waitModeCoolTimeSeconds,
+    kind: 'disabled',
+    remainingCoolTimeSeconds: 0,
+    previousAvailableCards: 0,
+    previousSkillPoint: 0,
+  };
+}
+
+export function releaseWaitMode(state: WaitModeState, skillUsed: boolean): WaitModeState {
+  return {
+    ...state,
+    kind: skillUsed ? 'force-reserved' : 'initial',
+    remainingCoolTimeSeconds: 0.35,
   };
 }
 
@@ -17,44 +26,52 @@ export function advanceWaitMode(
   state: WaitModeState,
   input: Readonly<{
     enabled: boolean;
-    hasAvailableSkill: boolean;
+    availableCards: number;
+    skillPoint: number;
+    ableUseSkill: boolean;
+    mentalDown: boolean;
     deltaTimeSeconds: number;
   }>,
 ): WaitModeState {
   if (!Number.isFinite(input.deltaTimeSeconds) || input.deltaTimeSeconds < 0) {
     throw new Error('自動停止の経過時間が正しくありません。');
   }
-  if (!input.enabled) {
-    return { kind: 'disabled', remainingCoolTimeSeconds: 0 };
-  }
-  if (state.kind === 'disabled') {
-    return {
-      kind: 'force-reserved',
-      remainingCoolTimeSeconds: 0,
-    };
-  }
+  if (!input.enabled) return createWaitMode();
   if (state.kind === 'waiting') return state;
-  if (state.kind === 'force-reserved') {
-    return input.hasAvailableSkill
-      ? { kind: 'waiting', remainingCoolTimeSeconds: 0 }
-      : {
-          kind: 'initial',
-          remainingCoolTimeSeconds: waitModeCoolTimeAtStartSeconds,
-        };
-  }
   const remainingCoolTimeSeconds = Math.max(
     0,
     state.remainingCoolTimeSeconds - input.deltaTimeSeconds,
   );
-  if (state.kind === 'initial') {
-    return remainingCoolTimeSeconds > 0
-      ? { kind: 'initial', remainingCoolTimeSeconds }
-      : releaseWaitMode();
+  const next: WaitModeState = {
+    ...state,
+    remainingCoolTimeSeconds,
+    previousSkillPoint: input.skillPoint,
+  };
+  if (state.kind !== 'reserved' && state.previousSkillPoint === input.skillPoint) return next;
+  if (
+    remainingCoolTimeSeconds <= 0 &&
+    input.ableUseSkill &&
+    !input.mentalDown &&
+    (state.kind === 'force-reserved' || state.previousAvailableCards !== input.availableCards)
+  ) {
+    return {
+      ...next,
+      previousAvailableCards: input.availableCards,
+      kind:
+        input.availableCards !== 0
+          ? 'waiting'
+          : state.kind === 'force-reserved'
+            ? 'force-reserved'
+            : 'reserved',
+    };
   }
-  if (!input.hasAvailableSkill) {
-    return { kind: 'reserved', remainingCoolTimeSeconds };
-  }
-  return remainingCoolTimeSeconds > 0
-    ? { kind: 'reserved', remainingCoolTimeSeconds }
-    : { kind: 'waiting', remainingCoolTimeSeconds: 0 };
+  return {
+    ...next,
+    kind:
+      state.kind === 'force-reserved'
+        ? 'force-reserved'
+        : input.mentalDown
+          ? 'initial'
+          : 'reserved',
+  };
 }

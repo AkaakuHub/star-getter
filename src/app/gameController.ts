@@ -1,8 +1,13 @@
 import { act } from '../domain/game/actions';
 import { type Action, type Card, type GameState, rules } from '../domain/game/model';
-import { canUseCard, cardAt } from '../domain/game/projection';
+import { canUseCard, cardAt, cardCooldownTicks, sectionAt } from '../domain/game/projection';
 import { resolveStarGatherHeartDrawCount } from '../domain/game/live/heartPresentation';
-import { advanceWaitMode, releaseWaitMode, type WaitModeState } from '../domain/game/live/waitMode';
+import {
+  advanceWaitMode,
+  createWaitMode,
+  releaseWaitMode,
+  type WaitModeState,
+} from '../domain/game/live/waitMode';
 import { advanceTo } from '../domain/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 import type { GameAudio } from './gameAudio';
@@ -22,7 +27,7 @@ export class GameController {
   private selection: string | null = null;
   private waitPause: Promise<void> | null = null;
   private waitEnabled = false;
-  private waitState: WaitModeState = { kind: 'disabled', remainingCoolTimeSeconds: 0 };
+  private waitState: WaitModeState = createWaitMode();
 
   get waitModeEnabled(): boolean {
     return this.waitEnabled;
@@ -41,10 +46,10 @@ export class GameController {
     this.waitEnabled = !this.waitEnabled;
     if (!this.waitEnabled) {
       const wasWaiting = this.waiting;
-      this.waitState = { kind: 'disabled', remainingCoolTimeSeconds: 0 };
+      this.waitState = createWaitMode();
       if (wasWaiting) await this.resumeFromWait();
     } else {
-      this.waitState = { kind: 'force-reserved', remainingCoolTimeSeconds: 0 };
+      this.waitState = { ...this.waitState, kind: 'force-reserved', remainingCoolTimeSeconds: 0 };
       this.synchronizeWaitMode(0);
       await this.waitPause;
     }
@@ -56,9 +61,15 @@ export class GameController {
     if (this.currentState.phase !== 'playing' || this.waiting) return;
     this.waitState = advanceWaitMode(this.waitState, {
       enabled: this.waitEnabled,
-      hasAvailableSkill: this.currentState.hand.some((_, index) =>
-        canUseCard(this.currentState, index),
+      availableCards: this.currentState.hand.reduce(
+        (mask, _, index) => (canUseCard(this.currentState, index) ? mask | (1 << index) : mask),
+        0,
       ),
+      skillPoint: Math.trunc(this.currentState.energy),
+      ableUseSkill:
+        this.currentState.tick - this.currentState.lastActionTick >=
+        cardCooldownTicks(this.currentState),
+      mentalDown: this.currentState.resting,
       deltaTimeSeconds,
     });
     if (!this.waiting) return;
@@ -151,14 +162,26 @@ export class GameController {
     if (this.disposed || this.busy || this.currentState.phase !== 'playing') return;
     this.advance();
     const previousUses = this.currentState.stats.cardsUsed;
+    const previousSpecials = this.currentState.stats.specialsUsed;
     this.applyState(act(this.currentState, action));
-    if (this.waiting && this.currentState.stats.cardsUsed > previousUses) {
-      this.waitState = releaseWaitMode();
+    if (
+      this.waiting &&
+      (this.currentState.stats.cardsUsed > previousUses ||
+        this.currentState.stats.specialsUsed > previousSpecials)
+    ) {
+      this.waitState = releaseWaitMode(this.waitState, true);
       void this.resumeFromWait();
     }
     if (this.selection !== null && !this.currentState.hand.includes(this.selection))
       this.selection = null;
     this.notify();
+  }
+
+  cancelWait(): void {
+    if (this.disposed || this.busy || !this.waiting || this.currentState.phase !== 'playing')
+      return;
+    this.waitState = releaseWaitMode(this.waitState, false);
+    void this.resumeFromWait();
   }
 
   async togglePause(): Promise<void> {
@@ -246,6 +269,14 @@ export class GameController {
 
   private applyState(next: GameState): void {
     const previous = this.currentState.hearts;
+    if (
+      !this.waiting &&
+      this.waitEnabled &&
+      (next.hand.length !== this.currentState.hand.length ||
+        next.hand.some((id, index) => id !== this.currentState.hand[index]) ||
+        sectionAt(next) !== sectionAt(this.currentState))
+    )
+      this.waitState = { ...this.waitState, kind: 'force-reserved' };
     this.currentState = next;
     try {
       for (let index = previous.generationCount; index < next.hearts.generationCount; index++)
