@@ -1,3 +1,4 @@
+import { drainModeChanges } from './effects/modeChange';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type GameState } from './model';
 import { applyEffect, changeResource } from './effects';
@@ -75,11 +76,13 @@ function activateCard(
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') {
       if (allHand) continue;
+      next = { ...next, modes: { ...next.modes, held: true } };
       const children = [...next.hand];
       for (const id of children) {
         const child = next.deck.find((item) => item.id === id);
         if (child) next = activateCard(next, child, initialHand, true);
       }
+      next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
     } else {
       next = applyEffect(next, effect, card);
     }

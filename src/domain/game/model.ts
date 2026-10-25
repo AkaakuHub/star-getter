@@ -4,6 +4,7 @@ import type { StageGauges } from './live/gaugeTiming';
 import type { AutomaticHeartState } from './live/automaticHeart';
 import type { ScoreSample } from './scoreHistory';
 import type { MoodSample } from './moodHistory';
+import type { ModeChange, ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
 
 export type PerformerId = 'nova' | 'lumen' | 'tetra';
@@ -79,6 +80,14 @@ export type Effect =
       members?: readonly MemberId[];
       moodBonus?: MoodBonus;
     }>
+  | Readonly<{ kind: 'mode'; modeId: number; change: ModeChange['change'] }>
+  | Readonly<{
+      kind: 'mode-reaction';
+      modeId: number;
+      thresholds: readonly number[];
+      effects: readonly Effect[];
+      buffNum: number;
+    }>
   | Readonly<{ kind: 'collect' }>;
 
 export type Card = Readonly<{
@@ -91,6 +100,7 @@ export type Card = Readonly<{
   cost: number;
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
+  modeIds?: readonly number[];
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
   useEffects?: readonly Effect[];
@@ -176,6 +186,15 @@ export type PlayStats = Readonly<{
 }>;
 
 export type GameState = Readonly<{
+  modes: ModeState;
+  modeReactions: readonly Readonly<{
+    sourceId: string | null;
+    modeId: number;
+    thresholds: readonly number[];
+    effects: readonly Effect[];
+    buffNum: number;
+    count: number;
+  }>[];
   phase: 'ready' | 'playing' | 'paused' | 'finished';
   tick: number;
   track: Track;

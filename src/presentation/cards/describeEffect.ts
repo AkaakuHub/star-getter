@@ -13,6 +13,11 @@ export const effectConditions = {
 
 export function describeEffect(effect: Effect): string {
   switch (effect.kind) {
+    case 'mode':
+      return `モード${effect.modeId}を${effect.change === 'on' ? 'オン' : effect.change === 'off' ? 'オフ' : '反転'}にする。`;
+    case 'mode-reaction':
+      return `モード${effect.modeId}がオンになるたびに回数を数え、${effect.thresholds.join('・')}回ごとに効果を発動する。`;
+
     case 'tokens': {
       return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
     }

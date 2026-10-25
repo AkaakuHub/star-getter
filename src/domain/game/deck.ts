@@ -51,6 +51,19 @@ function validateEffect(effect: Effect): void {
       throw new Error('検索回数が正しくありません。');
     return;
   }
+  if (effect.kind === 'mode' || effect.kind === 'mode-reaction') {
+    if (!Number.isSafeInteger(effect.modeId) || effect.modeId < (effect.kind === 'mode' ? 0 : 1))
+      throw new Error('モードIDが正しくありません。');
+    if (effect.kind === 'mode-reaction') {
+      if (
+        !Number.isFinite(effect.buffNum) ||
+        effect.thresholds.some((count) => !Number.isSafeInteger(count) || count < 1)
+      )
+        throw new Error('モード切替の発動条件が正しくありません。');
+      for (const child of effect.effects) validateEffect(child);
+    }
+    return;
+  }
   if (effect.kind === 'conditional') {
     for (const child of effect.effects) validateEffect(child);
     return;

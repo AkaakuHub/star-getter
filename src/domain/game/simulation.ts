@@ -1,3 +1,4 @@
+import { createModes } from './live/modes';
 import { advanceAutomaticGauges } from './automaticGauges';
 import { moodAtTime, validateMoodTimeline } from './live/moodTimeline';
 import { calculateStarGatherBaseSkillCooldownSeconds } from './live/skillCooldown';
@@ -36,6 +37,8 @@ export function createGame(
   if (!lead) throw new Error('先頭のカードがありません。');
   const ordered = [lead.id, ...shuffled.items.filter((id) => id !== lead.id)];
   const initial: GameState = {
+    modes: createModes(deck.flatMap((card) => card.modeIds ?? [])),
+    modeReactions: [],
     phase: 'ready',
     tick: 0,
     track,

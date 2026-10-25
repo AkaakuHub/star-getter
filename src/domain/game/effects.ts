@@ -1,3 +1,4 @@
+import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
 import { calculateSkillMoodCorrection } from './live/skillMood';
 import { durationSeconds, moodValue, sectionAt } from './projection';
@@ -32,9 +33,19 @@ export function changeResource(
   return { ...state, [resource]: Math.max(0, Math.min(maximum, state[resource] + Number(amount))) };
 }
 
-export function applyEffect(state: GameState, effect: Effect, card?: Card): GameState {
-  const value = (amount: number) => skillValue(state, amount, effect, card);
+export function applyEffect(
+  state: GameState,
+  effect: Effect,
+  card?: Card,
+  multiplier = 1,
+): GameState {
+  const value = (amount: number) =>
+    Math.fround(skillValue(state, amount, effect, card) * multiplier);
   switch (effect.kind) {
+    case 'mode':
+      return changeMode(state, effect, applyEffect);
+    case 'mode-reaction':
+      return addModeReaction(state, effect, card);
     case 'conditional':
       return (
         effect.condition === 'happy100'
