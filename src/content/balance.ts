@@ -7,6 +7,6 @@ export const stageTiming = {
 } as const;
 
 export const scoreMultipliers: Readonly<Record<RouteId, bigint>> = {
-  library: 1n,
+  library: 2n,
   bloom: 1n,
 };
