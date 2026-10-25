@@ -60,6 +60,18 @@ it('Action47の正値にAction52を適用し、負値には適用しない', () 
   expect(beatHeartCount(negative)).toBe(beatHeartCount(initial) - 100);
 });
 
+it('Action47の詳細値をC#のint32とfloat32へ変換する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const wrapped = applyEffect(
+    initial,
+    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 2_147_483_648 },
+    source,
+  );
+  expect(wrapped.beatHeartValueBuffs[0]?.value).toBe(-214_748.359375);
+});
+
 it('Action47は指定パートで解除される', () => {
   const initial = game('library');
   const source = initial.deck[0];

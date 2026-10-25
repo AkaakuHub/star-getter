@@ -21,8 +21,11 @@ export function activateBeatHeartValueBuff(
         Math.fround(effect.moodBonus.perPoint / 10_000),
       )
     : 0;
+  const num = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.amount))));
+  const numValue = Math.fround(Math.fround(num) / Math.fround(10_000));
   let value = Math.fround(
-    Math.fround(correction + Math.fround(effect.amount / 10_000) + addValue) * multiplier,
+    Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+      Math.fround(multiplier),
   );
   let next = state;
   if (value > 0) {
