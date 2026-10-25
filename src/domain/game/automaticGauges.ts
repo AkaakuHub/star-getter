@@ -1,7 +1,7 @@
 import type { GameState } from './model';
 import { advanceStarGatherApGauge } from './live/apGauge';
 import { changeBloomResource } from './bloom';
-import { changeResource } from './effects';
+import { changeResource } from './resources';
 import { durationSeconds } from './projection';
 
 export function advanceAutomaticGauges(state: GameState, dt: number): GameState {

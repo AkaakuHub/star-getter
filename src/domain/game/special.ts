@@ -1,5 +1,6 @@
 import type { Card, GameState } from './model';
-import { applyEffect, changeResource } from './effects';
+import { applyEffect } from './effects';
+import { spendEnergy } from './resources';
 import { flushDeckActions } from './cards/boardActions';
 import { fillHand } from './cards/drawing';
 
@@ -44,7 +45,7 @@ export function useSpecial(state: GameState, cardId: string): GameState {
   if (state.phase !== 'playing' || !canUseSpecial(state, cardId)) return state;
   const card = specialCards(state).find((item) => item.id === cardId);
   if (!card?.special) throw new Error('共鳴のカードがありません。');
-  let next = changeResource(state, 'energy', -BigInt(specialCost(card)));
+  let next = spendEnergy(state, specialCost(card));
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
   return fillHand(
     flushDeckActions({

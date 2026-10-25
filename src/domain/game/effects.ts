@@ -1,3 +1,4 @@
+import { changeResource } from './resources';
 import { evaluateCondition } from './conditions/evaluate';
 import { conditionContext } from './conditions/gameContext';
 import { energyMaximum } from './parameters/maximum';
@@ -5,9 +6,9 @@ import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
 import { calculateSkillMoodCorrection } from './live/skillMood';
 import { durationSeconds, moodValue, sectionAt } from './projection';
-import { voltageLevel, voltageThreshold } from './live/voltageLevel';
+import { voltageLevel } from './live/voltageLevel';
 import { beatHeartCount } from './beat';
-import { activateBloom, changeBloomResource } from './bloom';
+import { activateBloom } from './bloom';
 import { addHearts, collectHearts } from './hearts';
 import { type Card, type Effect, type GameState, rules } from './model';
 import { applyCostReduction } from './cards/cost';
@@ -15,26 +16,6 @@ import { addTokens } from './cards/tokens';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
 import { applyStarGatherSkillBoost } from './live/skillBoost';
-
-export function changeResource(
-  state: GameState,
-  resource: 'energy' | 'stamina' | 'excitement',
-  amount: bigint,
-): GameState {
-  if (resource === 'stamina' && amount < 0n) {
-    const blocked = Math.min(state.mentalShield, -Number(amount));
-    state = { ...state, mentalShield: state.mentalShield - blocked };
-    amount += BigInt(Math.trunc(blocked));
-  }
-  if (state.bloom) return changeBloomResource(state, resource, amount);
-  const maximum =
-    resource === 'energy'
-      ? state.maxEnergy
-      : resource === 'excitement'
-        ? voltageThreshold(state.maximumVoltageLevel)
-        : 100;
-  return { ...state, [resource]: Math.max(0, Math.min(maximum, state[resource] + Number(amount))) };
-}
 
 export function applyEffect(
   state: GameState,

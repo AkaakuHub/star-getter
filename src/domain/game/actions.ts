@@ -1,7 +1,8 @@
 import { drainModeChanges } from './effects/modeChange';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type GameState } from './model';
-import { applyEffect, changeResource } from './effects';
+import { applyEffect } from './effects';
+import { spendEnergy } from './resources';
 import { canUseCard, cardAt } from './projection';
 import { cardCost } from './cards/cost';
 import { finishCardActivation } from './cards/cardZones';
@@ -28,7 +29,7 @@ export function act(state: GameState, action: Action): GameState {
 function useCard(state: GameState, index: number): GameState {
   if (!canUseCard(state, index)) return state;
   const source = cardAt(state, index);
-  const paid = changeResource(state, 'energy', -BigInt(cardCost(state, source)));
+  const paid = spendEnergy(state, cardCost(state, source));
   const activated = {
     ...paid,
     activation: {
