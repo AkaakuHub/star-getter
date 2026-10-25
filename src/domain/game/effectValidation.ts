@@ -16,7 +16,7 @@ export function validateEffect(effect: Effect): void {
       throw new Error('モードIDが正しくありません。');
     if (effect.kind === 'mode-reaction') {
       if (
-        !Number.isFinite(effect.buffNum) ||
+        !Number.isSafeInteger(effect.buffNum) ||
         effect.thresholds.some((count) => !Number.isSafeInteger(count) || count < 1)
       )
         throw new Error('モード切替の発動条件が正しくありません。');

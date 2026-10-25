@@ -10,6 +10,8 @@ type ApplyEffect = (
   effect: Effect,
   card?: Card,
   multiplier?: number,
+  addValue?: number,
+  effectPower?: number,
 ) => GameState;
 
 export function drainModeChanges(state: GameState, apply: ApplyEffect): GameState {
@@ -84,10 +86,12 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
           effect.kind === 'boost' ||
           effect.kind === 'stamina' ||
           effect.kind === 'excitement';
-        const multiplier = scales
-          ? Math.trunc(Math.fround(Math.fround(reaction.buffNum * count) / 10000))
+        const product = BigInt.asIntN(64, BigInt(reaction.buffNum) * BigInt(count));
+        const effectPower = scales
+          ? Math.trunc(Math.fround(Math.fround(Number(product)) / Math.fround(10_000)))
           : 1;
-        next = apply(next, effect, source, multiplier);
+        next = apply(next, effect, source, 1, 0, effectPower);
+        if (next.deckOutCount > 0) next = { ...next, deckOutCount: next.deckOutCount - 1 };
       }
     }
   }
@@ -113,7 +117,11 @@ export function addModeReaction(
   effect: Extract<Effect, { kind: 'mode-reaction' }>,
   card?: Card,
 ): GameState {
-  if (!state.modes.entries.some((entry) => entry.id === effect.modeId)) return state;
+  if (
+    !state.modes.entries.some((entry) => entry.id === effect.modeId) ||
+    effect.effects.length === 0
+  )
+    return state;
   return {
     ...state,
     modes: {

@@ -105,6 +105,46 @@ describe('モード切替と切替時効果', () => {
     expect(state.excitement).toBe(30);
     expect(state.modes.queue).toHaveLength(0);
   });
+  it('ActionType45のNumToValueを効果加算後にEffectPowerとして適用する', () => {
+    const initial = { ...modeGame(), moodOffset: 1 };
+    let state = applyEffect(initial, {
+      kind: 'mode-reaction',
+      modeId: 1,
+      thresholds: [2],
+      effects: [{ kind: 'boost', multiplier: 1.01, moodBonus: { target: 1, perPoint: 1 } }],
+      buffNum: 10_000,
+    });
+    state = applyEffect(state, on);
+    state = applyEffect(state, off);
+    state = applyEffect(state, on);
+    expect(state.boosts.at(-1)?.percent).toBe(4);
+  });
+  it('ActionType45は子効果がない場合、表示・誘発を登録しない', () => {
+    const state = modeGame();
+    expect(
+      applyEffect(state, {
+        kind: 'mode-reaction',
+        modeId: 1,
+        thresholds: [1],
+        effects: [],
+        buffNum: 10_000,
+      }),
+    ).toBe(state);
+  });
+  it('ActionType45は各子効果の後でCheckDeckOutを1回消費する', () => {
+    let state = applyEffect(
+      { ...modeGame(), deckOutCount: 2 },
+      {
+        kind: 'mode-reaction',
+        modeId: 1,
+        thresholds: [1],
+        effects: [{ kind: 'energy-limit', amount: 1 }],
+        buffNum: 0,
+      },
+    );
+    state = applyEffect(state, on);
+    expect(state.deckOutCount).toBe(1);
+  });
   it('切替時効果による別モードの切替を同じキューで処理する', () => {
     let state = applyEffect(modeGame(), {
       kind: 'mode-reaction',

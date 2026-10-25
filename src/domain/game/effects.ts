@@ -302,7 +302,11 @@ export function applyEffect(
     case 'collect':
       return collectHearts(state);
     case 'boost':
-      return applyScoreBoost(state, value(Math.round((effect.multiplier - 1) * 100)), card);
+      return applyScoreBoost(
+        state,
+        Math.fround(value(Math.round((effect.multiplier - 1) * 100)) * effectPower),
+        card,
+      );
     case 'amplify': {
       return applyAmplifyEffect(state, effect);
     }
