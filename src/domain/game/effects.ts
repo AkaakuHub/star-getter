@@ -1,3 +1,4 @@
+import { applyAdditionalBuff } from './effects/additionalBuff';
 import { calculateSkillMoodCorrection } from './live/skillMood';
 import { durationSeconds, moodValue, sectionAt } from './projection';
 import { voltageLevel, voltageThreshold } from './live/voltageLevel';
@@ -40,11 +41,13 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
           ? moodValue(state) >= 100
           : effect.condition === 'mellow100'
             ? moodValue(state) <= -100
-            : effect.condition === 'deck80'
-              ? state.deck.length >= 80
-              : effect.condition === 'first-section'
-                ? sectionAt(state) === state.track.sections[0]
-                : sectionAt(state) === state.track.sections.at(-1)
+            : effect.condition === 'mental0'
+              ? state.bloom !== null || Math.trunc(state.stamina) === 0
+              : effect.condition === 'deck80'
+                ? state.deck.length >= 80
+                : effect.condition === 'first-section'
+                  ? sectionAt(state) === state.track.sections[0]
+                  : sectionAt(state) === state.track.sections.at(-1)
       )
         ? effect.effects.reduce((next, item) => applyEffect(next, item, card), state)
         : state;
@@ -65,7 +68,17 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
         100,
       );
       const beats = effect.kind === 'beat-hearts' ? beatHeartCount(state) : 1;
-      return addHearts(state, Math.ceil((value(effect.amount) * percent * beats) / 100));
+      const base = Math.ceil((value(effect.amount) * percent * beats) / 100);
+      const extra = state.heartBoosts.reduce((sum, boost) => Math.fround(sum + boost.percent), 0);
+      return addHearts(
+        {
+          ...state,
+          heartBoosts: state.heartBoosts.flatMap((boost) =>
+            boost.uses > 1 ? [{ ...boost, uses: boost.uses - 1 }] : [],
+          ),
+        },
+        Math.ceil(Math.fround(base + (base * extra) / 100)),
+      );
     }
     case 'tokens':
       return addTokens(state, effect.token, effect.count);
@@ -128,7 +141,19 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     case 'cost-reduction':
       return applyCostReduction(state, effect);
     case 'protect-mental':
-      return { ...state, mentalProtected: true, resting: false };
+      return effect.duration === 'section'
+        ? { ...state, sectionMentalProtected: true, resting: false }
+        : { ...state, mentalProtected: true, resting: false };
+    case 'beat-count':
+      return { ...state, sectionBeatHeartBonus: state.sectionBeatHeartBonus + effect.amount };
+    case 'heart-boost':
+      return {
+        ...state,
+        heartBoosts: [
+          ...state.heartBoosts,
+          { percent: Math.ceil(value(effect.percent)), uses: effect.uses },
+        ],
+      };
     case 'voltage-limit':
       return { ...state, maximumVoltageLevel: state.maximumVoltageLevel + effect.amount };
     case 'voltage-set':
@@ -162,37 +187,29 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
     }
     case 'stamina':
     case 'excitement': {
-      const matching = state.resourceBoosts.filter((boost) => boost.target === effect.kind);
-      const percent = matching.reduce((sum, boost) => Math.fround(sum + boost.percent), 100);
-      const next = changeResource(
-        state,
-        effect.kind,
-        BigInt(Math.ceil(Math.fround((value(effect.amount) * percent) / 100))),
-      );
-      return {
-        ...next,
-        resourceBoosts: state.resourceBoosts.flatMap((boost) =>
-          boost.target !== effect.kind
-            ? [boost]
-            : boost.uses === null || boost.uses > 1
-              ? [{ ...boost, uses: boost.uses === null ? null : boost.uses - 1 }]
-              : [],
-        ),
-      };
+      const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);
+      return changeResource(boosted.state, effect.kind, BigInt(Math.ceil(boosted.value)));
     }
     case 'collect':
       return collectHearts(state);
-    case 'boost':
+    case 'boost': {
+      const boosted = applyAdditionalBuff(
+        state,
+        'attract',
+        value(Math.round((effect.multiplier - 1) * 100)),
+        card,
+      );
       return {
-        ...state,
+        ...boosted.state,
         boosts: [
           ...state.boosts,
           {
-            percent: Math.trunc(value(Math.round((effect.multiplier - 1) * 100))),
+            percent: Math.trunc(boosted.value),
             untilTick: Math.round(durationSeconds(state) * rules.ticksPerSecond),
           },
         ],
       };
+    }
     case 'amplify': {
       const percent =
         effect.percent +
@@ -231,7 +248,12 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
             ...state,
             resourceBoosts: [
               ...state.resourceBoosts,
-              { target: effect.target, percent: value(effect.percent), uses: effect.uses },
+              {
+                target: effect.target,
+                percent: Math.ceil(value(effect.percent)),
+                uses: effect.uses,
+                ...(effect.members ? { members: effect.members } : {}),
+              },
             ],
           }
         : state;
@@ -252,10 +274,7 @@ export function skillValue(state: GameState, value: number, effect: Effect, card
   const base =
     effect.kind === 'boost'
       ? Math.trunc(raw)
-      : effect.kind === 'bloom' ||
-          effect.kind === 'amplify' ||
-          effect.kind === 'resource-boost' ||
-          effect.kind === 'energy'
+      : effect.kind === 'bloom' || effect.kind === 'amplify' || effect.kind === 'energy'
         ? raw
         : Math.ceil(raw);
   const handBoost = state.deck.reduce(

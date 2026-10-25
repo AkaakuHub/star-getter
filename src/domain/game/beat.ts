@@ -7,7 +7,7 @@ const goodMood = { nova: 1, lumen: 3, tetra: 2 } as const;
 export function beatHeartCount(state: GameState): number {
   return calculateStarGatherBeatHeart(
     {
-      cards: state.deck
+      cards: state.cardPool
         .filter((card) => !card.token)
         .map((card) => ({
           beatPoint: card.beatPoint,
@@ -17,6 +17,9 @@ export function beatHeartCount(state: GameState): number {
       moodValue: moodValue(state),
       heartAppearRatio: 1,
     },
-    { applyBeatPointBuff: (value) => value, applyBeatHeartBuff: null },
+    {
+      applyBeatPointBuff: (value) => value,
+      applyBeatHeartBuff: (value) => value + state.sectionBeatHeartBonus,
+    },
   ).createCount;
 }

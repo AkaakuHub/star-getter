@@ -43,7 +43,7 @@ export type Effect =
   | Readonly<{ kind: 'mood'; amount: number }>
   | Readonly<{
       kind: 'conditional';
-      condition: 'happy100' | 'mellow100' | 'deck80' | 'first-section' | 'last-section';
+      condition: 'happy100' | 'mellow100' | 'mental0' | 'deck80' | 'first-section' | 'last-section';
       effects: readonly Effect[];
     }>
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number }>
@@ -57,7 +57,9 @@ export type Effect =
   | Readonly<{ kind: 'reset-special'; unit?: UnitId; normalOnly?: true }>
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
-  | Readonly<{ kind: 'protect-mental' }>
+  | Readonly<{ kind: 'protect-mental'; duration?: 'section' }>
+  | Readonly<{ kind: 'beat-count'; amount: number }>
+  | Readonly<{ kind: 'heart-boost'; percent: number; uses: number; moodBonus?: MoodBonus }>
   | Readonly<{ kind: 'mental-shield'; amount: number; moodBonus?: MoodBonus }>
   | Readonly<{
       kind: 'cost-reduction';
@@ -69,10 +71,11 @@ export type Effect =
   | Readonly<{ kind: 'voltage-set'; amount: number }>
   | Readonly<{
       kind: 'resource-boost';
-      target: 'excitement' | 'stamina';
+      target: 'excitement' | 'stamina' | 'attract';
       percent: number;
       uses: number | null;
       condition: 'voltage20' | 'mental100' | 'always';
+      members?: readonly MemberId[];
       moodBonus?: MoodBonus;
     }>
   | Readonly<{ kind: 'collect' }>;
@@ -144,8 +147,10 @@ export type CardUse = Readonly<{
   cost: number;
 }>;
 export type Boost = Readonly<{ percent: number; untilTick: number }>;
+export type HeartBoost = Readonly<{ percent: number; uses: number }>;
 export type ResourceBoost = Readonly<{
-  target: 'excitement' | 'stamina';
+  target: 'excitement' | 'stamina' | 'attract';
+  members?: readonly MemberId[];
   percent: number;
   uses: number | null;
 }>;
@@ -212,6 +217,9 @@ export type GameState = Readonly<{
   stamina: number;
   resting: boolean;
   mentalProtected: boolean;
+  sectionMentalProtected: boolean;
+  sectionBeatHeartBonus: number;
+  heartBoosts: readonly HeartBoost[];
   mentalShield: number;
   excitement: number;
   maximumVoltageLevel: number;

@@ -5,7 +5,7 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { fillHand, shuffleHand } from '../../src/domain/game/cards/drawing';
 import { game, withHand } from './support/game';
 
-it('最低値1の30万回収で1.5%の熱気回復増幅を全ステージに付与し、回数で消費しない', () => {
+it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付与し、回数で消費しない', () => {
   const initial = game();
   let state = withHand(
     {
@@ -21,7 +21,7 @@ it('最低値1の30万回収で1.5%の熱気回復増幅を全ステージに付
   state = act(addHearts(state, 299_999), { type: 'collect' });
   expect(state.resourceBoosts).toHaveLength(0);
   state = act(addHearts(state, 1), { type: 'collect' });
-  expect(state.resourceBoosts).toEqual([{ target: 'excitement', percent: 1.5, uses: null }]);
+  expect(state.resourceBoosts).toEqual([{ target: 'excitement', percent: 2, uses: null }]);
   state = applyEffect(state, { kind: 'excitement', amount: 100 });
   expect(state.excitement).toBe(102);
   expect(state.resourceBoosts[0]?.uses).toBeNull();

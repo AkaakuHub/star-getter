@@ -12,7 +12,7 @@ function game(): GameState {
   const state = act(createGame(track, routes.bloom.deck, 456, 100, routes.bloom.tokens), {
     type: 'start',
   });
-  return { ...state, relayUsed: [...state.hand] };
+  return { ...state, relayUsed: [...state.hand], hearts: { ...state.hearts, stageHearts: [], hiddenHeartBatches: [] } };
 }
 
 describe('きらめきと得点', () => {

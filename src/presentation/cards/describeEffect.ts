@@ -4,6 +4,7 @@ import { targetNames } from './targetNames';
 
 export const effectConditions = {
   happy100: '空模様が+100%（晴れ）',
+  mental0: '元気が0%（開花中も成立）',
   mellow100: '空模様が−100%（雨）',
   deck80: '編成が80枚以上',
   'first-section': '最初のパート',
@@ -44,7 +45,11 @@ export function describeEffect(effect: Effect): string {
     case 'cost-reduction':
       return `対象カードの消費エナジーを${effect.amount}減少させる。`;
     case 'protect-mental':
-      return 'このステージ中、元気が0でも休憩に入らない。';
+      return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、元気が0でも休憩に入らない。`;
+    case 'beat-count':
+      return `このパート中、自然発生するきらめきを${effect.amount}個増加する。`;
+    case 'heart-boost':
+      return `次の${effect.uses}回のきらめき獲得効果を${effect.percent}%増幅する。`;
     case 'voltage-set':
       return `熱気を${effect.amount.toLocaleString('ja-JP')}にする。`;
     case 'voltage-limit':
@@ -66,7 +71,7 @@ export function describeEffect(effect: Effect): string {
     case 'bloom':
       return 'このステージ中、開花を発動し、きらめきを結晶に変化させる。エナジー・熱気・元気の増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のSTARが増加する。発動時のゲージを保持し、開花中はエナジー残量に関係なくアクションを使用できる。使用時のエナジー消費もプログレスへ変換する。';
     case 'resource-boost':
-      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'excitement' ? '熱気ゲイン' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
+      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'excitement' ? '熱気ゲイン' : effect.target === 'attract' ? 'STAR増加' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
     case 'collect':
       return '出現中のきらめきを全て回収する。';
   }

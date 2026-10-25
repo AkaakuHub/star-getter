@@ -74,7 +74,12 @@ function validateEffect(effect: Effect): void {
       throw new Error('追加カードの枚数が正しくありません。');
     return;
   }
-  if (effect.kind === 'amplify' || effect.kind === 'resource-boost' || effect.kind === 'ap-speed') {
+  if (
+    effect.kind === 'amplify' ||
+    effect.kind === 'resource-boost' ||
+    effect.kind === 'ap-speed' ||
+    effect.kind === 'heart-boost'
+  ) {
     if (!Number.isFinite(effect.percent)) throw new Error('増幅率が正しくありません。');
     if (
       effect.kind === 'resource-boost' &&

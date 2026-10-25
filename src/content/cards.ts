@@ -7,6 +7,7 @@ export const defaultDeckIds = [
   'frost-echo',
   'frost-pulse',
   'rain-preparation',
+  'sunrise',
   'aurora-ensemble',
   'perennial',
   'camera',

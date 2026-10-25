@@ -143,7 +143,8 @@ it('手札中の対象増幅と熱気回復増幅を掛け合わせ、同じ見�
 });
 
 it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず除外する', () => {
-  let state = addTokens(game(), 'shadow', 1);
+  const initial = game();
+  let state = addTokens({ ...initial, deck: initial.deck.map((card) => card.id === 'horizon' ? { ...card, drawAbility: undefined } : card) }, 'shadow', 1);
   const source = token(state, 'shadow');
   for (let count = 1; count <= 14; count++) {
     state = withHand({ ...state, tick: count * 20, energy: 20, maxEnergy: 20, resting: false }, [

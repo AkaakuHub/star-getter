@@ -39,9 +39,10 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       1n,
     );
   }
-  if (next.bloom && next.mentalProtected) return next;
+  if (next.bloom && (next.mentalProtected || next.sectionMentalProtected)) return next;
   let mentalTimerSeconds = Math.fround(Math.fround(next.mentalTimerSeconds) + Math.fround(dt));
-  const resting = !next.mentalProtected && (next.resting || next.stamina <= 0);
+  const resting =
+    !(next.mentalProtected || next.sectionMentalProtected) && (next.resting || next.stamina <= 0);
   if (resting) {
     const recoveryTime = Math.fround(
       Math.trunc(Math.fround(Math.fround((durationSeconds(next) * 1000) / 120000) * 6000)) / 1000,
@@ -58,5 +59,9 @@ export function advanceAutomaticGauges(state: GameState, dt: number): GameState 
       ? changeBloomResource(next, 'stamina', -1n)
       : { ...next, stamina: Math.max(0, next.stamina - 1) };
   }
-  return { ...next, mentalTimerSeconds, resting: !next.mentalProtected && next.stamina <= 0 };
+  return {
+    ...next,
+    mentalTimerSeconds,
+    resting: !(next.mentalProtected || next.sectionMentalProtected) && next.stamina <= 0,
+  };
 }
