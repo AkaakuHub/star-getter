@@ -69,11 +69,11 @@ export function induceSkillEffects(
     const under = diff < 0;
     const clampedDiff = Math.min(
       Math.abs(diff),
-      under ? induced.deckUnderLimit : induced.deckOverLimit,
+      int32(under ? induced.deckUnderLimit : induced.deckOverLimit),
     );
     const add = under ? induced.deckUnderAdd : induced.deckOverAdd;
-    const targetValue = Math.fround(Math.fround(induced.num * value) / 10_000);
-    const addFactor = Math.fround(add / 10_000);
+    const targetValue = numToValue(Math.fround(Math.fround(induced.num) * Math.fround(value)));
+    const addFactor = numToValue(add);
     const effectPower = Math.fround(
       targetValue * Math.fround(Math.fround(addFactor * clampedDiff) + 1),
     );
@@ -92,6 +92,14 @@ export function induceSkillEffects(
     }
   }
   return next;
+}
+
+function numToValue(value: number): number {
+  return Math.fround(Math.fround(value) / Math.fround(10_000));
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function advanceInducedSkillEffects(state: GameState, elapsedSeconds: number): GameState {

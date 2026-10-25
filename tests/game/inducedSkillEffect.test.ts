@@ -77,6 +77,19 @@ it('ActionType41はバリア登録が成立したときに耐久値を通知す�
   expect(next.moodOffset).toBe(5);
 });
 
+it('ActionType41はdeck補正上限をC#同様にint32へ変換する', () => {
+  const initial = game();
+  const active = applyEffect(initial, {
+    ...effect,
+    deckCardMax: initial.deck.length + 1,
+    deckUnderAdd: 10_000,
+    deckUnderLimit: 4_294_967_296,
+    effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
+  });
+  const next = changeResource(active, 'stamina', 1n, 'skill', undefined, applyEffect);
+  expect(next.moodOffset).toBe(1);
+});
+
 it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', () => {
   const initial = game();
   const source = initial.deck[0];
