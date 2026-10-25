@@ -86,3 +86,26 @@ it('ActionType31の追加率にActionType52を適用する', () => {
   expect(additional.voltageUpAdditionalBuffs[0]?.percent).toBe(75);
   expect(additional.action52Buffs).toHaveLength(0);
 });
+
+it('ActionType31は正負の小数追加率をC#のMathf.Roundで登録する', () => {
+  const initial = game();
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('発動元カードがありません。');
+  const percentages = [6_000, -6_000].map((num) => {
+    const changed = applyEffect(
+      initial,
+      {
+        kind: 'voltage-up-additional-buff',
+        calculation: 1,
+        num,
+        target: { kind: 'all' },
+        duration: { kind: 'stage', value: 0 },
+        disabledType: 0,
+        disabledCount: 0,
+      },
+      source,
+    );
+    return changed.voltageUpAdditionalBuffs[0]?.percent;
+  });
+  expect(percentages).toEqual([1, -1]);
+});
