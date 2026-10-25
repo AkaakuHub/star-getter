@@ -82,6 +82,18 @@ describe('無限ゲージ', () => {
     expect(generated).toBe(150);
   });
 
+  it('Action23の詳細値をC#のint32へ変換する', () => {
+    const active = applyEffect(game(), {
+      kind: 'mental-heart-induce',
+      num: 2_147_483_648,
+      heartDuration: { kind: 'stage', value: 0 },
+      duration: { kind: 'milliseconds', value: 5_000 },
+      disabledType: 0,
+      disabledValue: 0,
+    });
+    expect(active.mentalHeartInducers[0]?.precomputedNum).toBe(-2_147_483_648);
+  });
+
   it('期限抑止された効果はDeactivatorまで残り、解除時に最後のゲージ値へ戻す', () => {
     const initial = { ...game(), excitement: 100 };
     const active = applyEffect(initial, {

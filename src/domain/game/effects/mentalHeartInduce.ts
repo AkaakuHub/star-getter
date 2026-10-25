@@ -13,8 +13,10 @@ export function activateMentalHeartInduce(
 ): GameState {
   if (effect.duration.kind === 'sections' && effect.duration.value === 0)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  const raw = Math.fround(Math.fround(effect.num + addValue) * multiplier);
-  const precomputedNum = int32(raw);
+  const raw = Math.fround(
+    Math.fround(Math.fround(int32(effect.num)) + Math.fround(addValue)) * Math.fround(multiplier),
+  );
+  const precomputedNum = floatToInt32(raw);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const inducer: MentalHeartInducer = {
     id: state.nextMentalHeartInducerId,
@@ -48,8 +50,8 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
     if (!inducer) continue;
     const product = int32(BigInt(inducer.precomputedNum) * BigInt(currentMental));
     const scaled = Math.fround(product / 10_000);
-    const rounded = Math.ceil(Math.fround(scaled * 10)) / 10;
-    const initialCount = int32(rounded);
+    const rounded = Math.fround(Math.ceil(Math.fround(scaled * 10)) / 10);
+    const initialCount = floatToInt32(rounded);
     const card = inducer.sourceCardId
       ? (next.deck.find((item) => item.id === inducer.sourceCardId) ??
         next.cardPool.find((item) => item.id === inducer.sourceCardId))
@@ -58,11 +60,11 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
     const action52 = applyAction52SkillBoostForCard(
       additional.state,
       card,
-      int32(additional.value),
+      floatToInt32(additional.value),
     );
     next = createSkillHearts(
       action52.state,
-      int32(action52.value),
+      floatToInt32(action52.value),
       inducer.heartLifetimeSeconds,
       card,
     );
@@ -114,4 +116,10 @@ export function deactivateMentalHeartInducers(
 
 function int32(value: number | bigint): number {
   return Number(BigInt.asIntN(32, typeof value === 'bigint' ? value : BigInt(Math.trunc(value))));
+}
+
+function floatToInt32(value: number): number {
+  return !Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647
+    ? -2_147_483_648
+    : Math.trunc(value);
 }
