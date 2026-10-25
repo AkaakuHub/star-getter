@@ -35,6 +35,7 @@ export type Card = Readonly<{
   unit: UnitId | null;
   mainEffect?: number;
   cost: number;
+  skillType?: number;
   style?: number;
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;

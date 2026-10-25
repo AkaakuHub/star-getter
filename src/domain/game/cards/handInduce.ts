@@ -3,7 +3,7 @@ import type { HandUseTrigger } from './cardTypes';
 import type { EffectApplier } from '../effects/induceSkillEffect';
 
 export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectApplier): GameState {
-  return activateHandInducers(state, apply, (trigger, source) => {
+  return activateHandInducers(state, apply, (trigger) => {
     switch (trigger.kind) {
       case 'member':
         return int32(trigger.member) === used.member;
@@ -14,7 +14,7 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
       case 'heart-quantity-count':
         return false;
       case 'same-card':
-        return source.id === used.id;
+        return false;
       case 'any-skill':
         return true;
       case 'voltage-increase':
@@ -22,6 +22,19 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
         return false;
     }
   });
+}
+
+export function notifyHandCardBeforeUse(
+  state: GameState,
+  used: Card,
+  apply: EffectApplier,
+): GameState {
+  return activateHandInducers(
+    state,
+    apply,
+    (trigger, source) =>
+      trigger.kind === 'same-card' && source.id === used.id && used.skillType === 2,
+  );
 }
 
 export function notifyHandHeartCollect(

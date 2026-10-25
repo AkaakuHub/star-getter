@@ -1,6 +1,6 @@
 import type { Card, GameState } from '../model';
 import { applyEffect } from '../effects';
-export { notifyHandSkillUse } from './handInduce';
+export { notifyHandCardBeforeUse, notifyHandSkillUse } from './handInduce';
 
 export function applyUseAbility(state: GameState, card: Card): GameState {
   let next = state;

@@ -10,7 +10,7 @@ import { canUseCard, cardAt } from './projection';
 import { cardCost } from './cards/cost';
 import { finishCardActivation } from './cards/cardZones';
 import { useSpecial } from './special';
-import { applyUseAbility, notifyHandSkillUse } from './cards/useAbilities';
+import { applyUseAbility, notifyHandCardBeforeUse, notifyHandSkillUse } from './cards/useAbilities';
 import { advanceProxySkillUses } from './effects/proxySkill';
 import { deactivateHandLimitEffects } from './effects/handLimit';
 import { deactivateHandMaxCardEffects } from './effects/handMaxCard';
@@ -210,6 +210,7 @@ function activateCard(
       },
     ],
   };
+  next = notifyHandCardBeforeUse(next, card, applyEffect);
   next = beginTokenGeneration(retireCard(applyBeforeUseAbility(next, card), card), card.id);
   next = notifyComboSkillPoint(next, card, usedSkillCost);
   for (const effect of card.effects) {

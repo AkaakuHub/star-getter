@@ -1,7 +1,12 @@
 import { expect, it } from 'vite-plus/test';
+import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
-import { notifyHandHeartCollect } from '../../src/domain/game/cards/handInduce';
-import { game } from './support/game';
+import { moodValue } from '../../src/domain/game/projection';
+import {
+  notifyHandCardBeforeUse,
+  notifyHandHeartCollect,
+} from '../../src/domain/game/cards/handInduce';
+import { game, withHand } from './support/game';
 
 it('Action903は回収数を合算し、閾値ごとに子効果を上限回数まで発動する', () => {
   const initial = game();
@@ -77,4 +82,65 @@ it('Action903の回収閾値と発動上限をC#のint32へ変換する', () => 
   const second = notifyHandHeartCollect(first, 1, applyEffect);
   expect(second.moodOffset).toBe(2);
   expect(second.handUseActivationCounts[source.id]).toBe(2);
+});
+
+it('Action903のUSEは発動前に発動元かつSkillType2の使用だけ反映する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'same-card' as const },
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+    },
+  };
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
+    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
+    handEffectCardIds: [source.id],
+  };
+  const skillTypeOne = notifyHandCardBeforeUse(state, { ...handCard, skillType: 1 }, applyEffect);
+  expect(skillTypeOne.handUseActivationCounts[source.id]).toBeUndefined();
+  const skillTypeTwo = notifyHandCardBeforeUse(state, { ...handCard, skillType: 2 }, applyEffect);
+  expect(skillTypeTwo.moodOffset).toBe(
+    applyEffect(state, { kind: 'mood', amount: 1 }, handCard).moodOffset,
+  );
+  expect(skillTypeTwo.handUseActivationCounts[source.id]).toBe(1);
+});
+
+it('Action903のUSE子効果はSkillType2の本体効果より先に適用する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const branchMood = moodValue(initial) + 1;
+  const card = {
+    ...source,
+    skillType: 2,
+    effects: [
+      {
+        kind: 'branch' as const,
+        condition: { kind: 'mood-at-least' as const, value: branchMood },
+        whenTrue: [{ kind: 'energy' as const, amount: 1 }],
+        whenFalse: [],
+      },
+    ],
+    handUse: {
+      trigger: { kind: 'same-card' as const },
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+    },
+  };
+  const state = withHand(
+    {
+      ...initial,
+      deck: [card],
+      cardPool: [card],
+      energy: initial.maxEnergy,
+      lastActionTick: -1_000_000,
+    },
+    [card.id],
+  );
+  const next = act(state, { type: 'card', index: 0 });
+  expect(next.energy).toBe(initial.maxEnergy - card.cost + 1);
 });

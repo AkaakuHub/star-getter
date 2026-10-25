@@ -5,7 +5,10 @@ import { advanceTo } from '../../src/domain/game/simulation';
 import { activateBloom } from '../../src/domain/game/bloom';
 import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
 import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
-import { notifyHandSkillUse } from '../../src/domain/game/cards/useAbilities';
+import {
+  notifyHandCardBeforeUse,
+  notifyHandSkillUse,
+} from '../../src/domain/game/cards/useAbilities';
 import { flushDeckActions } from '../../src/domain/game/cards/boardActions';
 import { fillHand } from '../../src/domain/game/cards/drawing';
 import { addTokens } from '../../src/domain/game/cards/tokens';
@@ -92,9 +95,10 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
     const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
     const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
     const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
-    const currentUsed = trigger.kind === 'same-card' ? handCard : used;
-    const first = notifyHandSkillUse(state, currentUsed, applyEffect);
-    const second = notifyHandSkillUse(first, currentUsed, applyEffect);
+    const currentUsed = trigger.kind === 'same-card' ? { ...handCard, skillType: 2 } : used;
+    const notify = trigger.kind === 'same-card' ? notifyHandCardBeforeUse : notifyHandSkillUse;
+    const first = notify(state, currentUsed, applyEffect);
+    const second = notify(first, currentUsed, applyEffect);
     expect(first.energy).toBe(1);
     expect(second.energy).toBe(1);
     expect(second.handUseActivationCounts[source.id]).toBe(1);
