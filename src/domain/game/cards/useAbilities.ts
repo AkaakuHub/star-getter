@@ -26,8 +26,6 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
       ),
     };
   }
-  if (card.useAbility === 'aurora')
-    next = applyEffect(next, { kind: 'set-energy', amount: 0 }, card);
   if (card.useAbility === 'icy-sayaka' && count === 1)
     next = applyEffect(next, { kind: 'tokens', token: 'shadow', count: 1 }, card);
   if (card.useAbility === 'class' && count === 3)
@@ -56,10 +54,12 @@ export function applyUseAbility(state: GameState, card: Card): GameState {
 }
 
 export function notifyHandSkillUse(state: GameState, used: Card): GameState {
-  const listeners = state.deck.filter(
-    (card) =>
-      state.hand.includes(card.id) &&
-      (card.handUse?.trigger === 'any' || card.handUse?.trigger === used.unit),
+  const activated = (used.useEffects ?? []).reduce(
+    (next, effect) => applyEffect(next, effect, used),
+    state,
+  );
+  const listeners = activated.deck.filter(
+    (card) => activated.hand.includes(card.id) && card.handUse?.trigger === used.unit,
   );
   return listeners.reduce(
     (next, card) =>
@@ -67,6 +67,6 @@ export function notifyHandSkillUse(state: GameState, used: Card): GameState {
         (current, effect) => applyEffect(current, effect, card),
         next,
       ),
-    state,
+    activated,
   );
 }

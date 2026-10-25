@@ -55,7 +55,6 @@ export type Effect =
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
   | Readonly<{ kind: 'reset-special'; unit?: UnitId; normalOnly?: true }>
-  | Readonly<{ kind: 'set-energy'; amount: number }>
   | Readonly<{ kind: 'voltage-limit'; amount: number }>
   | Readonly<{ kind: 'voltage-tier'; step: 100 | 200; tiers: readonly (readonly Effect[])[] }>
   | Readonly<{ kind: 'protect-mental' }>
@@ -90,7 +89,8 @@ export type Card = Readonly<{
   beatPoint: number;
   effects: readonly Effect[];
   drawEffects?: readonly Effect[];
-  handUse?: Readonly<{ trigger: 'any' | UnitId; effects: readonly Effect[] }>;
+  useEffects?: readonly Effect[];
+  handUse?: Readonly<{ trigger: UnitId; effects: readonly Effect[] }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;
@@ -114,7 +114,7 @@ export type Card = Readonly<{
     | 'camera'
     | 'perennial'
     | 'shadow';
-  useAbility?: 'story-boost' | 'aurora' | 'class' | 'icy-sayaka' | 'shadow';
+  useAbility?: 'story-boost' | 'class' | 'icy-sayaka' | 'shadow';
   collectionEffects?: Readonly<{ threshold: number; effects: readonly Effect[] }>;
   collectionAbility?: 'icy-sayaka' | 'icy-kosuzu';
 }>;

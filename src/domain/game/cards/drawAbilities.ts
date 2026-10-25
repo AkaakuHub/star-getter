@@ -71,7 +71,7 @@ function applyNamedDrawAbility(state: GameState, card: Card): GameState {
       costReductions: state.deck.reduce(
         (costs, item) => {
           if (item.unit === 1 || (item.token && item.token !== 'shadow'))
-            costs[item.id] = (costs[item.id] ?? 0) + amount;
+            costs[item.id] = (costs[item.id] ?? 0) + amount * (item.token === 'bookmark' ? 2 : 1);
           return costs;
         },
         { ...state.costReductions },

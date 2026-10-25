@@ -39,8 +39,6 @@ export function describeEffect(effect: Effect): string {
       return '対応する共鳴を再使用できるようにする。';
     case 'ap-speed':
       return `${effect.duration === 'stage' ? 'このステージ' : 'このパート'}中、エナジー回復速度を${effect.percent > 0 ? '+' : ''}${effect.percent}%変化させる。`;
-    case 'set-energy':
-      return `エナジーを${effect.amount}にする。`;
     case 'mental-shield':
       return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
     case 'cost-reduction':
@@ -56,7 +54,7 @@ export function describeEffect(effect: Effect): string {
     case 'hearts':
       return `きらめきを${effect.amount}個獲得する。`;
     case 'energy':
-      return `エナジーを${effect.amount}回復する。開花中は回復量と効果増幅に応じて開花プログレスを増加させる。`;
+      return `エナジーを${Math.abs(effect.amount)}${effect.amount < 0 ? '減らす' : '回復する'}。開花中は回復量と効果増幅に応じて開花プログレスを増加させる。`;
     case 'stamina':
       return `元気を${effect.amount}%回復する。開花中は回復効果を開花プログレスへ変換する。`;
     case 'excitement':

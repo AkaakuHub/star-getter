@@ -123,10 +123,6 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
           );
         }),
       };
-    case 'set-energy':
-      return state.bloom
-        ? changeBloomResource(state, 'energy', BigInt(effect.amount - state.energy))
-        : { ...state, energy: Math.min(state.maxEnergy, effect.amount) };
     case 'mental-shield':
       return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
     case 'cost-reduction':

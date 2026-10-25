@@ -53,7 +53,7 @@ export const setupCards: readonly Card[] = [
     beatPoint: 100,
     allHandCost: { reductions: [] },
     drawRule: { priority: 'after-start' },
-    useAbility: 'aurora',
+    useEffects: [{ kind: 'energy', amount: -99 }],
     effects: [
       { kind: 'use-hand' },
       ...Array.from({ length: 9 }, () => ({ kind: 'beat-hearts', amount: 25 }) as const),

@@ -45,7 +45,7 @@ export const libraryCards: readonly Card[] = [
     appeal: { smile: 5000, pure: 6100, cool: 3300 },
     beatPoint: 100,
     drawAbility: 'library',
-    handUse: { trigger: 'any', effects: [{ kind: 'search-token', token: 'ensemble', count: 2 }] },
+    useEffects: [{ kind: 'search-token', token: 'ensemble', count: 2 }],
     effects: [{ kind: 'tokens', token: 'ensemble', count: 3 }],
   },
   {

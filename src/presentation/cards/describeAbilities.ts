@@ -5,8 +5,9 @@ export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
   if (card.collectionEffects)
     text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.collectionEffects.effects.map(describeEffect).join('')}この特性は引き直すと再び使用できる。`;
+  if (card.useEffects) text += `使用後、${card.useEffects.map(describeEffect).join('')}`;
   if (card.handUse)
-    text += `手札にある間、${card.handUse.trigger === 'any' ? 'アクションを使用したとき' : '対応する雨の基本カードを使用したとき'}、${card.handUse.effects.map(describeEffect).join('')}`;
+    text += `手札にある間、対応する雨の基本カードを使用したとき、${card.handUse.effects.map(describeEffect).join('')}`;
   if (card.collectionAbility === 'icy-kosuzu')
     text +=
       '手札にある間に累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直し、雨音の反響・凍空の鼓動・雨の準備を次の4回優先して引く。熱気を140万減らし、1000段階以上ならさらに1400万減らす。';
@@ -46,9 +47,6 @@ export function describeAbilities(card: Card): string {
   switch (card.useAbility) {
     case 'story-boost':
       text += '使用後、編成枚数に応じて貝がらの効果をこのライブ中+100〜1001%増幅する。';
-      break;
-    case 'aurora':
-      text += '使用後、エナジーを0にする。';
       break;
     case 'class':
       text += '3回使用後、このカードを除外し、通常の共鳴を再使用可能にする。';

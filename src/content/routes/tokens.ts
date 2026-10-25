@@ -26,7 +26,7 @@ export const routeTokens: readonly Card[] = [
       ],
     },
     exhausts: true,
-    handUse: { trigger: 'any', effects: [{ kind: 'search-token', token: 'story', count: 2 }] },
+    useEffects: [{ kind: 'search-token', token: 'story', count: 2 }],
     effects: [
       { kind: 'tokens', token: 'clock', count: 3 },
       { kind: 'tokens', token: 'bookmark', count: 3 },
@@ -46,7 +46,7 @@ export const routeTokens: readonly Card[] = [
     token: 'story',
     exhausts: true,
     drawAbility: 'story',
-    handUse: { trigger: 'any', effects: [{ kind: 'search-token', token: 'bookmark', count: 1 }] },
+    useEffects: [{ kind: 'search-token', token: 'bookmark', count: 1 }],
     effects: [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },
       { kind: 'heart-limit', amount: 36 },
@@ -77,10 +77,10 @@ export const routeTokens: readonly Card[] = [
     token: 'clock',
     exhausts: true,
     drawAbility: 'clock',
+    useEffects: [{ kind: 'tokens', token: 'bookmark', count: 1 }],
     effects: [
       { kind: 'hand-limit', amount: 3 },
       { kind: 'mood', amount: 80 },
-      { kind: 'tokens', token: 'bookmark', count: 1 },
     ],
   },
   {
@@ -96,13 +96,13 @@ export const routeTokens: readonly Card[] = [
     token: 'bookmark',
     exhausts: true,
     drawAbility: 'bookmark',
+    useEffects: [{ kind: 'tokens', token: 'story', count: 1 }],
     effects: [
       { kind: 'shuffle' },
       { kind: 'search-token', token: 'clock', count: 1 },
       { kind: 'search-unit', unit: 1, count: 1 },
       { kind: 'search-token', token: 'clock', count: 1 },
       { kind: 'search-unit', unit: 1, count: 1 },
-      { kind: 'tokens', token: 'story', count: 1 },
     ],
   },
   {
@@ -119,6 +119,6 @@ export const routeTokens: readonly Card[] = [
     drawRule: { unit: 2, priority: 'always' },
     drawAbility: 'shadow',
     useAbility: 'shadow',
-    effects: [{ kind: 'shuffle' }, { kind: 'set-energy', amount: 0 }],
+    effects: [{ kind: 'shuffle' }, { kind: 'energy', amount: -99 }],
   },
 ];

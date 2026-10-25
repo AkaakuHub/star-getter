@@ -33,6 +33,7 @@ export function validateCard(card: Card): void {
   for (const effect of [
     ...card.effects,
     ...(card.drawEffects ?? []),
+    ...(card.useEffects ?? []),
     ...(card.handUse?.effects ?? []),
     ...(card.collectionEffects?.effects ?? []),
   ])
