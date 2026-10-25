@@ -1,4 +1,5 @@
 import { skillValue } from './skillValue';
+import { applyAction52SkillBoost } from './action52SkillBoost';
 import { startGaugeRegeneration } from '../live/gaugeRegeneration';
 import type { GaugeRegenerationEffect } from '../modelTypes';
 import type { Card, GameState } from '../model';
@@ -10,10 +11,11 @@ export function applyGaugeRegeneration(
   multiplier: number,
 ): GameState {
   const base = Math.fround(skillValue(state, effect.amount, effect, card) * multiplier);
+  const boosted = card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
   return startGaugeRegeneration(
-    state,
+    boosted.state,
     effect.gauge,
-    base,
+    boosted.value,
     effect.intervalType,
     effect.intervalMilliseconds,
     effect.duration,

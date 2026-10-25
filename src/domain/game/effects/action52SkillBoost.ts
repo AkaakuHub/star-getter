@@ -76,6 +76,14 @@ export function applyAction52SkillBoost(
   return { state: { ...state, action52Buffs }, value: adjusted };
 }
 
+export function applyAction52SkillBoostForCard(
+  state: GameState,
+  card: Card | undefined,
+  value: number,
+): Readonly<{ state: GameState; value: number }> {
+  return card ? applyAction52SkillBoost(state, card, value) : { state, value };
+}
+
 export function advanceAction52SkillBoosts(state: GameState, elapsedSeconds: number): GameState {
   return {
     ...state,

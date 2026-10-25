@@ -2,6 +2,7 @@ import type { Card, Effect, GameState } from '../model';
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { skillValue } from './skillValue';
+import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { isProxyTargetReached } from './proxySkill';
 
 type ApSpeedChange = Extract<Effect, { kind: 'ap-speed-change' }>;
@@ -43,6 +44,7 @@ export function applyApSpeedChange(
   let calculation: 'add' | 'multiply';
   let value: number;
   let absorbedAmount: number;
+  let currentState = state;
   if (effect.calculationType === 2) {
     let rate = Math.fround(
       Math.fround(multiplier) *
@@ -52,7 +54,10 @@ export function applyApSpeedChange(
         ),
     );
     if (rate > 0 && card) {
-      rate = Math.trunc(skillValue(state, rate, { kind: 'energy', amount: rate }, card));
+      const legacyBoosted = skillValue(currentState, rate, { kind: 'energy', amount: rate }, card);
+      const boosted = applyAction52SkillBoostForCard(currentState, card, legacyBoosted);
+      currentState = boosted.state;
+      rate = Math.trunc(boosted.value);
     }
     value = Math.fround(1 - Math.fround(rate / 10_000));
     absorbedAmount = Math.trunc((1 - value) * 100);
@@ -65,8 +70,8 @@ export function applyApSpeedChange(
   }
   if ((calculation === 'multiply' && value === 1) || (calculation === 'add' && value === 0))
     return state;
-  const absorption = absorbedAmount > 0 ? absorbApSpeed(state, absorbedAmount) : null;
-  if (absorption?.absorbed) return { ...state, proxyAbsorptions: absorption.absorptions };
+  const absorption = absorbedAmount > 0 ? absorbApSpeed(currentState, absorbedAmount) : null;
+  if (absorption?.absorbed) return { ...currentState, proxyAbsorptions: absorption.absorptions };
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const entry: GameState['apTimeEffects'][number] = {
     calculation,
@@ -79,7 +84,11 @@ export function applyApSpeedChange(
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     deactivationKey: effect.deactivationKey ?? null,
   };
-  return updateApTimeEffects(state, [...state.apTimeEffects, entry], absorption?.absorptions);
+  return updateApTimeEffects(
+    currentState,
+    [...currentState.apTimeEffects, entry],
+    absorption?.absorptions,
+  );
 }
 
 export function applyApSpeedPercent(

@@ -1,6 +1,7 @@
 import type { Card, Effect, GameState } from '../model';
 import type { HeartBoostState } from '../modelTypes';
 import { skillValue } from '../effects/skillValue';
+import { applyAction52SkillBoost } from '../effects/action52SkillBoost';
 
 export function addHeartBoost(
   state: GameState,
@@ -8,14 +9,16 @@ export function addHeartBoost(
   card: Card | undefined,
   multiplier: number,
 ): GameState {
+  const base = Math.fround(skillValue(state, effect.percent, effect, card) * multiplier);
+  const boosted = card
+    ? applyAction52SkillBoost(state, card, Math.trunc(base))
+    : { state, value: base };
   return {
-    ...state,
+    ...boosted.state,
     heartBoosts: [
-      ...state.heartBoosts,
+      ...boosted.state.heartBoosts,
       {
-        percent: Math.trunc(
-          Math.fround(skillValue(state, effect.percent, effect, card) * multiplier),
-        ),
+        percent: Math.trunc(boosted.value),
         uses: effect.uses,
         target: effect.target ?? { kind: 'all' },
         remainingSeconds:

@@ -87,6 +87,26 @@ it('Action52の対象外カードでは回数期限を消費しない', () => {
   expect(conversion.voltageConversions[0]?.num).toBe(10000);
 });
 
+it('Action14のAP回復にもActionType52を適用して使用回数を消費する', () => {
+  const initial = cleanGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0 },
+      uses: 1,
+    },
+    source,
+  );
+  const recovered = applyEffect(active, { kind: 'energy', amount: 10 }, source);
+  expect(recovered.energy).toBe(15);
+  expect(recovered.action52Buffs).toHaveLength(0);
+});
+
 it('Action52は時間・パート期限、InvocationType抑止、外部解除を処理する', () => {
   const initial = cleanGame();
   const source = initial.deck[0];

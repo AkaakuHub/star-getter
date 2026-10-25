@@ -5,21 +5,25 @@ import { conditionContext } from './conditions/gameContext';
 import { energyMaximum } from './parameters/maximum';
 import { addModeReaction, changeMode } from './effects/modeChange';
 import { applyAdditionalBuff } from './effects/additionalBuff';
+import { applyScoreBoost } from './effects/scoreBoost';
 import { calculateSkillMoodCorrection } from './live/skillMood';
-import { durationSeconds, moodValue, sectionAt } from './projection';
+import { moodValue, sectionAt } from './projection';
 import { voltageLevel } from './live/voltageLevel';
-import { beatHeartCount } from './beat';
 import { activateBloom } from './bloom';
-import { addHearts, collectHearts } from './hearts';
-import { type Card, type Effect, type GameState, rules } from './model';
+import { collectHearts } from './hearts';
+import { type Card, type Effect, type GameState } from './model';
 import { requestTokens } from './cards/tokens';
 import { skillValue } from './effects/skillValue';
 import { applySpecialReset } from './effects/specialReset';
 import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
-import { activateAction52SkillBoost } from './effects/action52SkillBoost';
-import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
+import {
+  activateAction52SkillBoost,
+  applyAction52SkillBoostForCard,
+} from './effects/action52SkillBoost';
+import { addHeartBoost } from './live/heartBoosts';
+import { createHeartsFromEffect } from './effects/heartCreation';
 import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect } from './parameters/applyParameterEffect';
 import { applyHandLimit } from './effects/handLimit';
@@ -85,30 +89,18 @@ export function applyEffect(
             state,
           )
         : state;
-    case 'mood':
-      return { ...state, moodOffset: state.moodOffset + Math.ceil(value(effect.amount)) };
-    case 'hearts':
-    case 'beat-hearts': {
-      const percent = state.deck.reduce(
-        (sum, card) =>
-          sum +
-          (state.handEffectCardIds.includes(card.id) && card.passive
-            ? skillValue(state, card.passive.heartsPercent ?? 0, {
-                kind: 'amplify',
-                percent: card.passive.heartsPercent ?? 0,
-                ...(card.passive.moodBonus ? { moodBonus: card.passive.moodBonus } : {}),
-              })
-            : 0),
-        100,
-      );
-      const beats = effect.kind === 'beat-hearts' ? beatHeartCount(state) : 1;
-      const base = Math.ceil((value(effect.amount) * percent * beats) / 100);
-      const boosted = consumeHeartBoosts(state, card, base);
-      return addHearts(
-        boosted.state,
-        Math.ceil(Math.fround(base + (base * boosted.percent) / 100)),
-      );
+    case 'mood': {
+      const base = value(effect.amount);
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
+      return {
+        ...boosted.state,
+        moodOffset: boosted.state.moodOffset + Math.ceil(boosted.value),
+      };
     }
+    case 'hearts':
+      return createHeartsFromEffect(state, value(effect.amount), card, false);
+    case 'beat-hearts':
+      return createHeartsFromEffect(state, value(effect.amount), card, true);
     case 'tokens':
       return requestTokens(state, effect.token, effect.count, card?.id ?? null, effect.seriesIds);
     case 'token-boost': {
@@ -138,8 +130,11 @@ export function applyEffect(
     }
     case 'hand-limit':
       return applyHandLimit(state, effect, card, multiplier, addValue);
-    case 'heart-limit':
-      return applyHeartLimit(state, value(effect.amount));
+    case 'heart-limit': {
+      const base = value(effect.amount);
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
+      return applyHeartLimit(boosted.state, Math.trunc(boosted.value));
+    }
     case 'shuffle':
       return enqueueHandShuffle(state, effect, card?.id ?? null);
     case 'search-unit':
@@ -179,8 +174,11 @@ export function applyEffect(
         skillUseDestinations: { ...state.skillUseDestinations, [card.id]: effect.destination },
       };
     }
-    case 'energy':
-      return changeResource(state, 'energy', BigInt(Math.trunc(value(effect.amount))));
+    case 'energy': {
+      const base = value(effect.amount);
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
+      return changeResource(boosted.state, 'energy', BigInt(Math.trunc(boosted.value)));
+    }
     case 'energy-limit':
       return {
         ...state,
@@ -188,8 +186,14 @@ export function applyEffect(
       };
     case 'reset-special':
       return applySpecialReset(state, effect, card);
-    case 'mental-shield':
-      return { ...state, mentalShield: state.mentalShield + Math.ceil(value(effect.amount)) };
+    case 'mental-shield': {
+      const base = value(effect.amount);
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
+      return {
+        ...boosted.state,
+        mentalShield: boosted.state.mentalShield + Math.trunc(boosted.value),
+      };
+    }
     case 'cost-reduction':
     case 'skill-cost-change':
     case 'parameter-value-change':
@@ -198,8 +202,13 @@ export function applyEffect(
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }
         : { ...state, mentalProtected: true, resting: false };
-    case 'beat-count':
-      return { ...state, sectionBeatHeartBonus: state.sectionBeatHeartBonus + effect.amount };
+    case 'beat-count': {
+      const boosted = applyAction52SkillBoostForCard(state, card, value(effect.amount));
+      return {
+        ...boosted.state,
+        sectionBeatHeartBonus: boosted.state.sectionBeatHeartBonus + Math.trunc(boosted.value),
+      };
+    }
     case 'beat-point-buff': {
       const mood = effect.moodBonus
         ? calculateSkillMoodCorrection(
@@ -214,14 +223,18 @@ export function applyEffect(
             (effect.multiplier ?? multiplier),
         ),
       );
-      const value = Math.trunc(
+      const base = Math.trunc(
         skillValue(state, amount, { kind: 'amplify', percent: amount }, card),
       );
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
       return {
-        ...state,
+        ...boosted.state,
         beatPointBuffs: [
-          ...state.beatPointBuffs,
-          { value, remainingSections: effect.duration?.sections ?? null },
+          ...boosted.state.beatPointBuffs,
+          {
+            value: Math.trunc(boosted.value),
+            remainingSections: effect.duration?.sections ?? null,
+          },
         ],
       };
     }
@@ -272,34 +285,23 @@ export function applyEffect(
     case 'stamina':
     case 'excitement': {
       const boosted = applyAdditionalBuff(state, effect.kind, value(effect.amount), card);
-      return changeResource(
+      const action52 = applyAction52SkillBoostForCard(
         boosted.state,
+        card,
+        Math.trunc(boosted.value),
+      );
+      return changeResource(
+        action52.state,
         effect.kind,
-        BigInt(Math.trunc(boosted.value)),
+        BigInt(Math.trunc(action52.value)),
         'skill',
         card,
       );
     }
     case 'collect':
       return collectHearts(state);
-    case 'boost': {
-      const boosted = applyAdditionalBuff(
-        state,
-        'attract',
-        value(Math.round((effect.multiplier - 1) * 100)),
-        card,
-      );
-      return {
-        ...boosted.state,
-        boosts: [
-          ...state.boosts,
-          {
-            percent: Math.trunc(boosted.value),
-            untilTick: Math.round(durationSeconds(state) * rules.ticksPerSecond),
-          },
-        ],
-      };
-    }
+    case 'boost':
+      return applyScoreBoost(state, value(Math.round((effect.multiplier - 1) * 100)), card);
     case 'amplify': {
       return applyAmplifyEffect(state, effect);
     }
@@ -315,8 +317,11 @@ export function applyEffect(
             : Math.min(state.skillCooldownSeconds, seconds),
       };
     }
-    case 'bloom':
-      return activateBloom(state, value(effect.strength));
+    case 'bloom': {
+      const base = value(effect.strength);
+      const boosted = applyAction52SkillBoostForCard(state, card, base);
+      return activateBloom(boosted.state, boosted.value);
+    }
     case 'resource-boost': {
       const eligible =
         effect.condition === 'always' ||
