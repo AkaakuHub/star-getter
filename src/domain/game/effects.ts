@@ -48,6 +48,7 @@ import { activateMoodValueBoost } from './effects/moodValueBoost';
 import { activateGenesisSkill } from './effects/genesisSkill';
 import { activateSpecialAppealToken } from './effects/specialAppealToken';
 import { activateHandMaxCard } from './effects/handMaxCard';
+import { activateMentalShield } from './effects/mentalShield';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -219,14 +220,8 @@ export function applyEffect(
       };
     case 'reset-special':
       return applySpecialReset(state, effect, card);
-    case 'mental-shield': {
-      const base = Math.fround(value(effect.amount) * effectPower);
-      const boosted = applyAction52SkillBoostForCard(state, card, base);
-      return {
-        ...boosted.state,
-        mentalShield: boosted.state.mentalShield + Math.trunc(boosted.value),
-      };
-    }
+    case 'mental-shield':
+      return activateMentalShield(state, effect, card, multiplier, addValue, effectPower);
     case 'protect-mental':
       return effect.duration === 'section'
         ? { ...state, sectionMentalProtected: true, resting: false }

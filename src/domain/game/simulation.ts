@@ -158,7 +158,7 @@ export function createGame(
     sectionBeatHeartBonus: 0,
     beatHeartValueBuffs: [],
     heartBoosts: [],
-    mentalShield: 0,
+    mentalShields: [],
     mentalBarriers: [],
     excitement: 0,
     maximumVoltageLevel: 1000,

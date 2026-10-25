@@ -26,7 +26,7 @@ it('自然な空模様に雨100%はなく、準備カードの使用で最初の
     expect(sectionAt(state)).toBe(state.track.sections[0]);
   }
   expect(state.cardUseCounts['rain-preparation']).toBe(2);
-  expect(state.mentalShield).toBeGreaterThan(0);
+  expect(state.mentalShields).toHaveLength(2);
 });
 
 it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍空には適用しない', () => {
@@ -64,19 +64,25 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
   expect(reacted.deckActions.shuffles).toHaveLength(1);
 });
 
-it('シールドは負の回復効果を防ぎ、自然減少は防がない', () => {
+it('シールドは自然減少とスキル由来の元気減少を防ぐ', () => {
   const initial = { ...game(), hand: [], handEffectCardIds: [], stamina: 100, targetBoosts: [] };
-  const shield = applyEffect(initial, { kind: 'mental-shield', amount: 10 });
+  const shield = applyEffect(initial, {
+    kind: 'mental-shield',
+    durabilityType: 2,
+    durability: 100_000,
+    duration: { kind: 'stage' },
+    applyCount: 0,
+  });
   const damaged = applyEffect(shield, { kind: 'stamina', amount: -14 });
   expect(damaged.stamina).toBe(96);
-  expect(damaged.mentalShield).toBe(0);
+  expect(damaged.mentalShields).toHaveLength(0);
   const natural = advanceAutomaticGauges({ ...shield, mentalTimerSeconds: 0 }, 1.2);
-  expect(natural.stamina).toBe(99);
-  expect(natural.mentalShield).toBe(10);
+  expect(natural.stamina).toBe(100);
+  expect(natural.mentalShields[0]?.durability).toBe(9);
   const active = activateBloom({ ...shield, moodOffset: -150 }, 1);
   const converted = applyEffect(active, { kind: 'stamina', amount: -14 });
   expect(converted.stamina).toBe(100);
-  expect(converted.mentalShield).toBe(0);
+  expect(converted.mentalShields).toHaveLength(0);
   expect(converted.bloom?.progress).toBe((active.bloom?.progress ?? 0n) - 4n);
 });
 

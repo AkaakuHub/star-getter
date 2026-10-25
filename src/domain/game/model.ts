@@ -40,6 +40,7 @@ import type { HeartLimitAdditionalBuff } from './heartLimitBoostTypes';
 import type { MoodValueAdditionalBuff } from './moodValueBoostTypes';
 import type { SpecialAppealToken } from './specialAppealTokenTypes';
 import type { HandMaxCardEffectState } from './handMaxCardTypes';
+import type { MentalShield } from './mentalShieldTypes';
 
 export type { SearchRequest } from './modelTypes';
 export type { SearchTarget, TokenBoost } from './modelTypes';
@@ -268,7 +269,7 @@ export type GameState = Readonly<{
     deactivationKey: string | null;
   }>[];
   heartBoosts: readonly HeartBoostState[];
-  mentalShield: number;
+  mentalShields: readonly MentalShield[];
   mentalBarriers: readonly MentalBarrier[];
   excitement: number;
   maximumVoltageLevel: number;

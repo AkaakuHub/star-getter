@@ -101,7 +101,7 @@ export function describeEffect(effect: Effect): string {
     case 'induce-skill-effect':
       return '熱気・元気回復・元気バリアに応じて効果を発動する。';
     case 'mental-shield':
-      return `このステージ中、最大元気の${effect.amount}%ぶんの直接ダメージを防ぐ。`;
+      return '元気シールドを付与する。';
     case 'cost-reduction':
       return `対象カードの消費エナジーを${effect.amount}減少させる。`;
     case 'skill-cost-change':

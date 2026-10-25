@@ -1,6 +1,7 @@
 import type { GameState } from './model';
 import { voltageThreshold } from './live/voltageLevel';
 import { changeBloomResource } from './bloom';
+import { breakMentalShields } from './effects/mentalShield';
 import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
 import type { Card } from './model';
 import { convertVoltageIncrease } from './effects/voltageConversion';
@@ -39,7 +40,7 @@ export function changeResource(
     state.gaugeInfinities.some(
       (infinity) => infinity.gauge === resourceToGauge(resource) && !infinity.suspended,
     ) &&
-    !(resource === 'stamina' && state.resting)
+    !(resource === 'stamina' && (state.resting || amount < 0n))
   ) {
     if (!applyEffect || amount < 0n) return state;
     if (resource === 'stamina' && source === 'skill')
@@ -48,16 +49,24 @@ export function changeResource(
       return induceSkillEffects(state, 'voltage', Number(amount), applyEffect);
     return state;
   }
-  if (resource === 'stamina' && amount < 0n && source === 'skill') {
+  if (resource === 'stamina' && amount < 0n && source === 'skill' && !state.bloom) {
     const absorbed = absorbSkillMentalDamage(state, amount);
     state = absorbed.state;
     amount = absorbed.amount;
     if (amount === 0n) return state;
   }
-  if (resource === 'stamina' && amount < 0n && source === 'skill') {
-    const blocked = Math.min(state.mentalShield, -Number(amount));
-    state = { ...state, mentalShield: state.mentalShield - blocked };
-    amount += BigInt(Math.trunc(blocked));
+  if (resource === 'stamina' && amount < 0n) {
+    const shielded = breakMentalShields(state, Number(-amount));
+    state = shielded.state;
+    amount = -BigInt(Math.trunc(shielded.remainingDamage));
+    if (amount === 0n) return state;
+    if (
+      state.gaugeInfinities.some(
+        (infinity) => infinity.gauge === 'mental' && !infinity.suspended,
+      ) &&
+      !state.resting
+    )
+      return state.bloom ? changeBloomResource(state, 'stamina', amount) : state;
   }
   if (state.bloom) {
     const changed = changeBloomResource(state, resource, amount);

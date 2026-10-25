@@ -7,6 +7,7 @@ import { validateLoveUpAdditionalBuffEffect } from './loveUpAdditionalBuffTypes'
 import { validateVoltageUpAdditionalBuffEffect } from './voltageUpAdditionalBuffTypes';
 import { validateSpecialAppealTokenEffect } from './specialAppealTokenTypes';
 import { validateHandMaxCardEffect } from './handMaxCardTypes';
+import { validateMentalShieldEffect } from './mentalShieldTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -19,7 +20,8 @@ type SpecialEffect = Extract<
       | 'mental-barrier-additional-buff'
       | 'disable-mental-down'
       | 'special-appeal-token'
-      | 'hand-max-card';
+      | 'hand-max-card'
+      | 'mental-shield';
   }
 >;
 
@@ -50,6 +52,9 @@ export function validateSpecialEffect(effect: Effect): boolean {
     case 'hand-max-card':
       validateHandMaxCardEffect(effect);
       break;
+    case 'mental-shield':
+      validateMentalShieldEffect(effect);
+      break;
   }
   return true;
 }
@@ -63,6 +68,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'mental-barrier-additional-buff' ||
     effect.kind === 'disable-mental-down' ||
     effect.kind === 'special-appeal-token' ||
-    effect.kind === 'hand-max-card'
+    effect.kind === 'hand-max-card' ||
+    effect.kind === 'mental-shield'
   );
 }

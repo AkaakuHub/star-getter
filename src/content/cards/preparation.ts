@@ -17,7 +17,13 @@ export const preparationCards: readonly Card[] = [
     collectionAbility: 'icy-kosuzu',
     effects: [
       { kind: 'mood', amount: -50 },
-      { kind: 'mental-shield', amount: 140, moodBonus: { target: 3, perPoint: 0.7 } },
+      {
+        kind: 'mental-shield',
+        durabilityType: 2,
+        durability: 1_400_000,
+        duration: { kind: 'stage' },
+        applyCount: 0,
+      },
       { kind: 'ap-speed', percent: 14, duration: 'section' },
       { kind: 'hand-limit', amount: 1, duration: { kind: 'sections', value: 1 } },
     ],
