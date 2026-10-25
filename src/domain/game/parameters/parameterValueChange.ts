@@ -79,6 +79,7 @@ export function initializeParameterValueFactors(
     const effects = [
       ...card.effects,
       ...(card.ability893Effects ?? []),
+      ...(card.ability894Effects ?? []),
       ...(card.drawEffects ?? []),
       ...(card.beforeUseEffects ?? []),
       ...(card.handUse?.effects ?? []),

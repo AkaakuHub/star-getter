@@ -206,16 +206,16 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   expect(used.lastUsedUnit).toBe(source.unit);
 });
 
-it('ヨットの生成は使用終了時に確定し、巻き込んだ船出の合図の80枚条件へ予約分を数えない', () => {
+it('ActionType42の子カードは親スキルの追加カード確定後に80枚条件を判定する', () => {
   let state = addTokens(game('library'), 'ensemble', 1);
   state = addTokens(state, 'story', 79 - state.deck.length);
   const source = token(state, 'ensemble');
   state = withHand({ ...state, energy: 1 }, [source.id, 'library-ensemble']);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
-  expect(used.deck).toHaveLength(84);
-  expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(3);
-  expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(3);
+  expect(used.deck).toHaveLength(93);
+  expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(6);
+  expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(6);
   expect(used.tokenGroups).toEqual([]);
   expect(used.deck.some((item) => item.id === source.id)).toBe(false);
   expect([...used.hand, ...used.drawPile, ...used.discard]).not.toContain(source.id);

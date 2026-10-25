@@ -3,7 +3,7 @@ import { applyBeforeUseAbility } from './cards/beforeUse';
 import { drainModeChanges } from './effects/modeChange';
 import { resolveModeSkill } from './live/modes';
 import { collectHearts } from './hearts';
-import { type Action, type Card, type GameState } from './model';
+import { type Action, type Card, type Effect, type GameState } from './model';
 import { applyEffect } from './effects';
 import { spendEnergy } from './resources';
 import { canUseCard, cardAt } from './projection';
@@ -45,6 +45,7 @@ import { deactivateGaugeRegenerations } from './live/gaugeRegeneration';
 import { deactivateSearchRequests } from './cards/search';
 import { deactivateHeartBoosts } from './live/heartBoosts';
 import { deactivateSkillCostChanges } from './cards/skillCostChanges';
+import type { EffectApplier } from './effects/induceSkillEffect';
 
 export function act(state: GameState, action: Action): GameState {
   return refreshEffectInducers(actInternal(state, action), applyEffect);
@@ -228,9 +229,9 @@ function activateCard(
     const beforeEffect = next;
     next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
   }
-  for (const effect of card.ability893Effects ?? []) {
-    next = applyEffect(next, effect, card);
-  }
+  next = finishTokenGeneration(next, card.id);
+  next = applyAbilityEffects(next, card, card.ability893Effects ?? [], applyEffect);
+  next = applyAbilityEffects(next, card, card.ability894Effects ?? [], applyEffect);
   for (const effect of card.effects) {
     if (effect.kind !== 'use-hand' || allHand) continue;
     next = { ...next, modes: { ...next.modes, held: true } };
@@ -241,15 +242,22 @@ function activateCard(
     }
     next = drainModeChanges({ ...next, modes: { ...next.modes, held: false } }, applyEffect);
   }
-  next = advanceProxySkillUses(
-    applyUseAbility(finishTokenGeneration(next, card.id), card),
-    card.id,
-    usedSkillCost,
-    applyEffect,
-  );
+  next = advanceProxySkillUses(applyUseAbility(next, card), card.id, usedSkillCost, applyEffect);
   next = induceAdditionalHearts(next, card, usedSkillCost, applyEffect);
   const completed = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
   return { ...completed, currentSkillType: previousSkillType };
+}
+
+function applyAbilityEffects(
+  state: GameState,
+  card: Card,
+  effects: readonly Effect[],
+  applyEffect: EffectApplier,
+): GameState {
+  if (effects.length === 0) return state;
+  let next = beginTokenGeneration(state, card.id);
+  for (const effect of effects) next = applyEffect(next, effect, card);
+  return finishTokenGeneration(next, card.id);
 }
 
 function retireCard(state: GameState, card: Card): GameState {
