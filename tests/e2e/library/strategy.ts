@@ -17,7 +17,7 @@ export const libraryPriority = [
   'bookmark',
 ];
 
-export function isPrepared(state: GameState): boolean {
+function isPrepared(state: GameState): boolean {
   const hand = state.deck.filter((card) => state.hand.includes(card.id));
   return (
     state.deck.length >= 95 &&
@@ -47,21 +47,37 @@ export function prepare(driver: GameDriver): void {
       driver.special('library-ensemble')
     )
       extraUsed = true;
+    const dresses = driver.state.deck.filter(
+      (card) => card.token === 'ensemble' && driver.state.hand.includes(card.id),
+    ).length;
     driver.useFirst(
-      driver.state.deck.length >= 80
-        ? [
-            'class',
-            'story',
-            'clock',
-            'ensemble',
-            'library-ensemble',
-            'library-invitation',
-            'camera',
-            'library-pages',
-            'bookmark',
-            'aurora-ensemble',
-          ]
-        : libraryPriority,
+      dresses >= 2
+        ? ['ensemble']
+        : driver.state.deck.length < 95
+          ? [
+              'class',
+              'library-invitation',
+              'library-ensemble',
+              'library-pages',
+              'story',
+              'bookmark',
+              'camera',
+              'ensemble',
+              'clock',
+              'aurora-ensemble',
+            ]
+          : [
+              'class',
+              'story',
+              'bookmark',
+              'library-invitation',
+              'ensemble',
+              'library-ensemble',
+              'clock',
+              'camera',
+              'library-pages',
+              'aurora-ensemble',
+            ],
     );
   });
 }
@@ -75,7 +91,7 @@ function hasAvailableBookmark(state: GameState): boolean {
   );
 }
 
-export function restoreDeck(driver: GameDriver): void {
+function restoreDeck(driver: GameDriver): void {
   driver.useFirst([
     'ensemble',
     'library-invitation',
@@ -90,7 +106,7 @@ export function restoreDeck(driver: GameDriver): void {
   if (driver.state.tick % 6 === 0) driver.collect();
 }
 
-export function maintainLoop(driver: GameDriver): void {
+function maintainLoop(driver: GameDriver): void {
   if (driver.state.deck.length < 95) {
     restoreDeck(driver);
     return;
@@ -158,6 +174,20 @@ export function amplifyAndWiden(driver: GameDriver): void {
   driver.until(isPrepared, () => maintainLoop(driver));
 }
 
+export function armAutomaticCollection(driver: GameDriver): void {
+  driver.until(
+    (state) =>
+      isPrepared(state) &&
+      state.deck.some(
+        (card) =>
+          card.token === 'story' &&
+          state.hand.includes(card.id) &&
+          !state.relayUsed.includes(card.id),
+      ),
+    () => maintainLoop(driver),
+  );
+}
+
 export function playUnplanned(driver: GameDriver): void {
   while (driver.state.phase === 'playing') {
     driver.special('library-pages');
@@ -182,6 +212,8 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
   const start = driver.state.tick;
   const until = Math.round(stopSeconds * rules.ticksPerSecond);
   const interval = rules.ticksPerSecond / speed;
+  let deckRepairs = 0;
+  let minimumDeck = driver.state.deck.length;
   let collectionGain = 0n;
   let cardGain = 0n;
   let streak = 0;
@@ -190,8 +222,9 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
     if ((driver.state.tick - start) % interval === 0) {
       if (heartCount(driver.state) === 0) {
         const cardBefore = driver.state.score;
+        const deckBefore = driver.state.deck.length;
         const used =
-          driver.state.deck.length < 95
+          driver.state.deck.length <= 96
             ? driver.useFirst([
                 'ensemble',
                 'library-invitation',
@@ -228,6 +261,13 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
                       'aurora-ensemble',
                     ],
               );
+        if (
+          deckBefore <= 96 &&
+          driver.state.deck.length > deckBefore &&
+          driver.state.deck.length >= 95
+        )
+          deckRepairs++;
+        minimumDeck = Math.min(minimumDeck, driver.state.deck.length);
         cardGain += driver.state.score - cardBefore;
         if (used) streak = 0;
       } else {
@@ -243,6 +283,8 @@ export function runCollections(driver: GameDriver, stopSeconds: number, speed: 5
   const gain = driver.state.score - before;
   const result = {
     gain,
+    deckRepairs,
+    minimumDeck,
     collectionGain,
     cardGain,
     ticks: driver.state.tick - start,
