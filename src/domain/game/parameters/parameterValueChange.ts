@@ -102,7 +102,7 @@ function collectNestedEffects(effect: Effect): readonly Effect[] {
   return [effect, ...nested.flatMap(collectNestedEffects)];
 }
 
-export function resolveParameterDetailValue(
+function resolveParameterDetailValue(
   state: GameState,
   card: Card | undefined,
   effect: Readonly<{
@@ -135,7 +135,7 @@ export function resolveParameterDetailValue(
   return adjusted / detail.unitsPerValue;
 }
 
-export function resolveParameterDetailInteger(
+function resolveParameterDetailInteger(
   state: GameState,
   card: Card | undefined,
   effect: Readonly<{
@@ -165,6 +165,30 @@ export function resolveParameterDetailInteger(
           Math.min(2147483647, Number.isNaN(multiplied) ? 0 : Math.ceil(multiplied)),
         );
   return BigInt(adjusted);
+}
+
+export function resolveEffectParameterDetails(
+  state: GameState,
+  card: Card | undefined,
+  effect: Effect,
+): Effect {
+  if (!effect.parameterDetails) return effect;
+  const resolved = { ...effect };
+  for (const [key] of Object.entries(effect.parameterDetails)) {
+    const value = Object.getOwnPropertyDescriptor(effect, key)?.value;
+    if (typeof value === 'number') {
+      Object.defineProperty(resolved, key, {
+        value: resolveParameterDetailValue(state, card, effect, key, value),
+      });
+      continue;
+    }
+    if (typeof value === 'bigint') {
+      Object.defineProperty(resolved, key, {
+        value: resolveParameterDetailInteger(state, card, effect, key, value),
+      });
+    }
+  }
+  return resolved;
 }
 
 function parameterKey(id: bigint): bigint {

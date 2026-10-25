@@ -112,3 +112,33 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
   );
   expect(result.energy).toBe(7);
 });
+
+it('amount以外の詳細値も効果実行前に補正する', () => {
+  const initial = game();
+  const card = initial.deck.find((item) => item.id === 'class');
+  if (!card) throw new Error('検証用カードがありません。');
+  const changed = applyParameterValueChange(initial, card, {
+    kind: 'parameter-value-change',
+    sourceEffectId: 'change-param',
+    targetDetailId: 202141300101n,
+    calculation: 'add',
+    base: 10_000,
+    increment: 2_500,
+  });
+  const result = applyEffect(
+    changed,
+    {
+      kind: 'amplify',
+      percent: 10,
+      parameterDetails: {
+        percent: {
+          id: 202141300101n,
+          value: 40_000n,
+          unitsPerValue: 1_000,
+        },
+      },
+    },
+    card,
+  );
+  expect(result.amplification).toBe(150);
+});

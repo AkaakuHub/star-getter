@@ -19,7 +19,7 @@ import { activateInfinityGauge } from './effects/infinityGauge';
 import { applyGaugeRegeneration } from './effects/gaugeRegeneration';
 import { applyMentalBarrier } from './effects/mentalBarrier';
 import { addHeartBoost, consumeHeartBoosts } from './live/heartBoosts';
-import { resolveParameterDetailValue } from './parameters/parameterValueChange';
+import { resolveEffectParameterDetails } from './parameters/parameterValueChange';
 import { applyParameterEffect } from './parameters/applyParameterEffect';
 
 import { changeStarGatherHeartLimit } from './live/heartLimit';
@@ -31,10 +31,9 @@ export function applyEffect(
   card?: Card,
   multiplier = 1,
 ): GameState {
-  const parameterValue = (key: string, fallback: number) =>
-    resolveParameterDetailValue(state, card, effect, key, fallback);
+  effect = resolveEffectParameterDetails(state, card, effect);
   const value = (amount: number) =>
-    Math.fround(skillValue(state, parameterValue('amount', amount), effect, card) * multiplier);
+    Math.fround(skillValue(state, amount, effect, card) * multiplier);
   switch (effect.kind) {
     case 'branch': {
       const context = conditionContext(state);
