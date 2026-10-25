@@ -169,7 +169,7 @@ function useCard(state: GameState, index: number): GameState {
       pendingHandStatsDeactivationKeys: [],
     },
   };
-  return finishCardActivation(activateCard(activated, source, state.hand, false), applyEffect);
+  return finishCardActivation(activateCard(activated, source, state.hand, false));
 }
 
 function activateCard(

@@ -1,13 +1,9 @@
-import type { Card, Effect, GameState } from '../model';
+import type { Card, GameState } from '../model';
 import type { ProxySkillEffect } from '../modelTypes';
+import type { EffectApplier } from './induceSkillEffect';
+import { induceCardMoves } from './cardMoveInduce';
 
-type ApplyProxyEffect = (
-  state: GameState,
-  effect: Effect,
-  card: Card,
-  multiplier: number,
-  addValue: number,
-) => GameState;
+type ApplyProxyEffect = EffectApplier;
 
 export function registerProxySkill(
   state: GameState,
@@ -58,7 +54,7 @@ export function advanceProxySkillPeriods(
     if (absorption.periodType !== 1) continue;
     const remainingPeriod = Math.fround(absorption.remainingPeriod - Math.fround(elapsedSeconds));
     if (remainingPeriod <= 0 && absorption.induceTiming === 3)
-      next = endProxyAbsorption(next, absorption);
+      next = endProxyAbsorption(next, absorption, apply);
     else if (remainingPeriod <= 0) next = finishProxyAbsorption(next, absorption, apply);
     else next = updateProxyAbsorptionPeriod(next, absorption, remainingPeriod);
   }
@@ -74,9 +70,9 @@ export function advanceProxySkillSections(state: GameState, apply: ApplyProxyEff
     if (absorption.periodType !== 2) continue;
     const remainingPeriod = absorption.remainingPeriod - 1;
     if (remainingPeriod <= 0 && absorption.induceTiming === 1)
-      next = endProxyAbsorption(next, absorption);
+      next = endProxyAbsorption(next, absorption, apply);
     else if (remainingPeriod <= 0 && absorption.induceTiming === 3)
-      next = endProxyAbsorption(next, absorption);
+      next = endProxyAbsorption(next, absorption, apply);
     else if (remainingPeriod <= 0) next = finishProxyAbsorption(next, absorption, apply);
     else next = updateProxyAbsorptionPeriod(next, absorption, remainingPeriod);
   }
@@ -99,7 +95,7 @@ export function advanceProxySkillUses(
     const decrement = absorption.periodType === 4 ? 1 : skillCost;
     const remainingPeriod = absorption.remainingPeriod - decrement;
     if (remainingPeriod <= 0 && absorption.induceTiming === 3)
-      next = endProxyAbsorption(next, absorption);
+      next = endProxyAbsorption(next, absorption, apply);
     else if (remainingPeriod <= 0) next = finishProxyAbsorption(next, absorption, apply);
     else next = updateProxyAbsorptionPeriod(next, absorption, remainingPeriod);
   }
@@ -196,7 +192,8 @@ function finishProxyAbsorption(
   const allTargetsReached = absorption.effects.every((effect) =>
     isProxyTargetReached(absorption, effect),
   );
-  if (checkTargets && !allTargetsReached) return releaseFailedProxyAbsorption(state, absorption);
+  if (checkTargets && !allTargetsReached)
+    return releaseFailedProxyAbsorption(state, absorption, apply);
   const card = state.cardPool.find((item) => item.id === absorption.sourceId);
   if (!card) return removeProxyAbsorption(state, absorption);
   let next = updateProxyAbsorption(state, absorption, { ...absorption, isAbsorbEnd: true });
@@ -251,12 +248,14 @@ function applyProxyChild(
 function endProxyAbsorption(
   state: GameState,
   absorption: GameState['proxyAbsorptions'][number],
+  apply: ApplyProxyEffect,
 ): GameState {
   const checkTargets = absorption.induceTiming === 1 || absorption.induceCondition === 2;
   const allTargetsReached = absorption.effects.every((effect) =>
     isProxyTargetReached(absorption, effect),
   );
-  if (checkTargets && !allTargetsReached) return releaseFailedProxyAbsorption(state, absorption);
+  if (checkTargets && !allTargetsReached)
+    return releaseFailedProxyAbsorption(state, absorption, apply);
   return updateProxyAbsorption(state, absorption, { ...absorption, isAbsorbEnd: true });
 }
 
@@ -298,9 +297,12 @@ function removeProxyAbsorption(
 function releaseFailedProxyAbsorption(
   state: GameState,
   absorption: GameState['proxyAbsorptions'][number],
+  apply: ApplyProxyEffect,
 ): GameState {
-  const next = removeProxyAbsorption(state, absorption);
+  let next = removeProxyAbsorption(state, absorption);
   if (!state.proxyCards.includes(absorption.sourceId)) return next;
+  if (next.proxyCards.includes(absorption.sourceId))
+    next = induceCardMoves(next, new Set([absorption.sourceId]), apply);
   return {
     ...next,
     proxyCards: next.proxyCards.filter((id) => id !== absorption.sourceId),

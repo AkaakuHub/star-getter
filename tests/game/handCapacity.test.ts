@@ -246,7 +246,7 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
     },
   };
   const changed = applyEffect(activated, { kind: 'hand-limit', amount: -1 }, source);
-  const finished = finishCardActivation(changed, applyEffect);
+  const finished = finishCardActivation(changed);
   expect(finished.hand).toHaveLength(3);
   expect(finished.discard).toHaveLength(2);
   expect(finished.discard).toContain(source.id);
@@ -271,7 +271,7 @@ it('手札目標数より多い状態では使用元カードを補充しない'
       handCountChanges: {},
     },
   };
-  const finished = finishCardActivation(activated, applyEffect);
+  const finished = finishCardActivation(activated);
   expect(finished.hand).toHaveLength(6);
   expect(finished.discard).toContain(source.id);
 });

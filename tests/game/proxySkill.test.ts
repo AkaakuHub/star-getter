@@ -141,7 +141,7 @@ it('Proxy威力タイプ2は吸収量を加算してから倍率を適用する'
     absorbed,
     0.2,
     (state, _effect, _card, multiplier, addValue) => {
-      applications.push({ multiplier, addValue });
+      applications.push({ multiplier: multiplier ?? 1, addValue: addValue ?? 0 });
       return state;
     },
   );
@@ -185,7 +185,7 @@ it('Proxy威力タイプ3は吸収量と目標量の比を倍率にする', () =
     partiallyAbsorbed,
     0.2,
     (state, _effect, _card, multiplier, addValue) => {
-      applications.push({ multiplier, addValue });
+      applications.push({ multiplier: multiplier ?? 1, addValue: addValue ?? 0 });
       return state;
     },
   );
@@ -313,7 +313,7 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
       handCountChanges: {},
     },
   };
-  const finished = finishCardActivation(activated, applyEffect);
+  const finished = finishCardActivation(activated);
   expect(finished.proxyCards).toEqual([source.id, child.id]);
   expect(finished.drawPile).not.toContain(child.id);
   expect(finished.discard).not.toContain(source.id);

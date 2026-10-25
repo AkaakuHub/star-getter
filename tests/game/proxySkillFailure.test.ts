@@ -15,7 +15,18 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
   const active = applyEffect(
-    initial,
+    applyEffect(
+      initial,
+      {
+        kind: 'card-move-induce',
+        sourceEffectId: 'proxy-card-graveyard',
+        timing: 'stage-to-graveyard',
+        limit: 1,
+        requireCount: 1,
+        effects: [{ kind: 'boost', multiplier: 1.2 }],
+      },
+      source,
+    ),
     {
       kind: 'proxy-skill',
       absorbLimit: 1,
@@ -36,9 +47,69 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
     drawPile: active.drawPile.filter((id) => id !== source.id),
     discard: active.discard.filter((id) => id !== source.id),
     proxyCards: [...active.proxyCards, source.id],
+    skillUseDestinations: Object.fromEntries(
+      Object.entries(active.skillUseDestinations).filter(([id]) => id !== source.id),
+    ),
   };
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
   expect(expired.proxyAbsorptions).toHaveLength(0);
   expect(expired.proxyCards).not.toContain(source.id);
   expect(expired.discard).toContain(source.id);
+  expect(expired.boosts).toHaveLength(inProxy.boosts.length + 1);
+  expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
+  expect(expired.cardMoveInducers[0]?.activatedCount).toBe(1);
+});
+
+it('ActionType908は墓地行き時にC#のint32 LimitNumで上限を判定する', () => {
+  const track = tracks[0];
+  if (!track) throw new Error('楽曲がありません。');
+  const initial = act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {
+    type: 'start',
+  });
+  const source = initial.deck[0];
+  if (!source) throw new Error('Proxy発動元カードがありません。');
+  const withInducer = applyEffect(
+    initial,
+    {
+      kind: 'card-move-induce',
+      sourceEffectId: 'proxy-card-limit-wrap',
+      timing: 'stage-to-graveyard',
+      limit: 2_147_483_648,
+      requireCount: 0,
+      effects: [{ kind: 'boost', multiplier: 1.2 }],
+    },
+    source,
+  );
+  const active = applyEffect(
+    withInducer,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 1,
+      periodParam: 100,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 20, targetAmount: 1 }],
+      effects: [],
+    },
+    source,
+  );
+  const inProxy = {
+    ...active,
+    hand: active.hand.filter((id) => id !== source.id),
+    drawPile: active.drawPile.filter((id) => id !== source.id),
+    discard: active.discard.filter((id) => id !== source.id),
+    proxyCards: [...active.proxyCards, source.id],
+    skillUseDestinations: Object.fromEntries(
+      Object.entries(active.skillUseDestinations).filter(([id]) => id !== source.id),
+    ),
+  };
+
+  const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
+
+  expect(expired.boosts).toHaveLength(inProxy.boosts.length);
+  expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
+  expect(expired.cardMoveInducers[0]?.activatedCount).toBe(0);
 });

@@ -91,7 +91,7 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
     card,
   );
   expect(active.voltageUpAdditionalBuffs).toHaveLength(1);
-  expect(finishCardActivation(active, applyEffect).voltageUpAdditionalBuffs).toHaveLength(0);
+  expect(finishCardActivation(active).voltageUpAdditionalBuffs).toHaveLength(0);
 });
 
 it('disabledType省略時はbranchType3を継続扱いにする', () => {

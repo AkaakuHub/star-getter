@@ -2,11 +2,9 @@ import type { GameState } from '../model';
 import { disposeHandEffects } from './handEffects';
 import { flushDeckActions } from './boardActions';
 import { fillHand, handCapacity, removeRandomHandCards } from './drawing';
-import type { EffectApplier } from '../effects/induceSkillEffect';
-import { induceCardMoves } from '../effects/cardMoveInduce';
 import { deactivateInducedEffects } from '../effects/effectInduce';
 
-export function finishCardActivation(state: GameState, apply: EffectApplier): GameState {
+export function finishCardActivation(state: GameState): GameState {
   const activation = state.activation;
   if (!activation) throw new Error('カードの使用処理がありません。');
   const source = state.deck.find((card) => card.id === activation.sourceId);
@@ -94,7 +92,7 @@ export function finishCardActivation(state: GameState, apply: EffectApplier): Ga
     ),
     activation: null,
   };
-  return induceCardMoves(completed, proxyIds, apply);
+  return completed;
 }
 
 function excludeCards(state: GameState, ids: readonly string[]): GameState {
