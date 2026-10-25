@@ -2,9 +2,11 @@ import type { Card } from '../../domain/game/model';
 import { describeCardTraits } from '../cardDescription';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { EffectDetails } from './EffectDetails';
+import { unitCardNames } from './targetNames';
 
 export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
-  const traits = describeCardTraits(card);
+  const { drawEffects, handUse, ...traitsCard } = card;
+  const traits = describeCardTraits(traitsCard);
   return (
     <div className="card-performance">
       <div className={'card-performance-art color-' + card.performer}>
@@ -33,6 +35,19 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <h3>アクション</h3>
           <EffectDetails effects={card.effects} />
         </section>
+        {drawEffects && (
+          <section>
+            <h3>引いたとき</h3>
+            <EffectDetails effects={drawEffects} />
+          </section>
+        )}
+        {handUse && (
+          <section>
+            <h3>手札にある間</h3>
+            <p>{unitCardNames(handUse.unit)}を使用したとき</p>
+            <EffectDetails effects={handUse.effects} />
+          </section>
+        )}
         {traits.length > 0 && (
           <section>
             <h3>特性</h3>

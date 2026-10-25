@@ -12,7 +12,7 @@ export function TierDetails({ effect }: Readonly<{ effect: TierEffect }>) {
   const conditions = first.filter((item) => item.kind === 'conditional');
   return (
     <div className="tier-details">
-      {normal[0]?.length ? <TierTable tiers={normal} mood={0} step={200} /> : null}
+      {normal[0]?.length ? <TierTable tiers={normal} mood={0} step={effect.step} /> : null}
       {conditions.map((condition) => (
         <section key={condition.condition}>
           <h4>{effectConditions[condition.condition]}のとき</h4>
@@ -31,7 +31,7 @@ export function TierDetails({ effect }: Readonly<{ effect: TierEffect }>) {
                   ? 100
                   : 0
             }
-            step={200}
+            step={effect.step}
           />
         </section>
       ))}

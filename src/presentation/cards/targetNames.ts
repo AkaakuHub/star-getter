@@ -6,3 +6,10 @@ export function targetNames(members: readonly number[]): string {
     .map((card) => card.name)
     .join('・');
 }
+
+export function unitCardNames(unit: number): string {
+  return baseCards
+    .filter((card) => card.unit === unit)
+    .map((card) => card.name)
+    .join('・');
+}
