@@ -91,7 +91,11 @@ function applyNamedDrawAbility(state: GameState, card: Card): GameState {
               : count >= 20
                 ? 40
                 : 20;
-    return applyEffect(state, { kind: 'beat-hearts', amount }, card);
+    return applyEffect(
+      state,
+      { kind: 'beat-hearts', amount, moodBonus: { target: 1, perPoint: amount * 0.005 } },
+      card,
+    );
   }
   if (card.drawAbility === 'bookmark') {
     const amount =
