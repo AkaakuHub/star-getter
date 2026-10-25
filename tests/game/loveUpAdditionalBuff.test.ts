@@ -4,8 +4,9 @@ import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
 import { applyScoreBoost } from '../../src/domain/game/effects/scoreBoost';
 import { game } from './support/game';
+import { addHearts, collectHearts } from '../../src/domain/game/hearts';
 
-it('ActionType30は対象カードのSTAR増加を指定率で増幅し、使用回数を消費する', () => {
+it('ActionType30は対象カードのSTAR増加を指定率で増幅し、回収時に解除する', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   const target = initial.deck.find((card) => card.id === 'rain-preparation');
@@ -33,10 +34,11 @@ it('ActionType30は対象カードのSTAR増加を指定率で増幅し、使用
   );
   const used = applyScoreBoost(buffed, 100, target);
   expect(used.boosts[0]?.percent).toBe(150);
-  expect(used.loveUpAdditionalBuffs).toHaveLength(0);
+  expect(used.loveUpAdditionalBuffs).toHaveLength(1);
   const unmatched = applyScoreBoost(buffed, 100, source);
   expect(unmatched.boosts[0]?.percent).toBe(100);
   expect(unmatched.loveUpAdditionalBuffs).toHaveLength(1);
+  expect(collectHearts(addHearts(used, 1)).loveUpAdditionalBuffs).toHaveLength(0);
 });
 
 it('ActionType30は期限・InvocationType抑止・Deactivator解除を処理する', () => {

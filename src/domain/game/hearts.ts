@@ -12,6 +12,7 @@ import { voltageLevel } from './live/voltageLevel';
 import { expireConvertedScoreBoostsOnHeartCollect } from './effects/voltageConversion';
 import { absorbSkillEffect } from './effects/proxySkill';
 import { registerMissionHeartCollect } from './ingameMissions';
+import { removeLoveUpAdditionalBuffsOnHeartCollect } from './effects/loveUpAdditionalBuff';
 
 export function heartCount(state: GameState): number {
   return starGatherHeartCount(state.hearts);
@@ -62,6 +63,7 @@ export function collectHearts(state: GameState): GameState {
     collected.collectCount,
   );
   next = registerMissionHeartCollect(next, collected.collectCount);
+  next = removeLoveUpAdditionalBuffsOnHeartCollect(next);
   const abilities = advanceHandCollectionAbilities(next, collected.collectCount);
   let triggered = abilities.state;
   for (const card of abilities.activated) {
