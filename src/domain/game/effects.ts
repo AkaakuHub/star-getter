@@ -235,14 +235,18 @@ export function applyEffect(state: GameState, effect: Effect, card?: Card): Game
           state.sectionAmplification + (effect.duration === 'section' ? percent : 0),
       };
     }
-    case 'skill-cooldown':
+    case 'skill-cooldown': {
+      const seconds = Math.fround(
+        Math.fround(Math.fround(effect.ratio / 10000) * Math.fround(state.track.songTime)) / 10000,
+      );
       return {
         ...state,
         skillCooldownSeconds:
           state.skillCooldownSeconds === null
-            ? effect.seconds
-            : Math.min(state.skillCooldownSeconds, effect.seconds),
+            ? seconds
+            : Math.min(state.skillCooldownSeconds, seconds),
       };
+    }
     case 'bloom':
       return activateBloom(state, value(effect.strength));
     case 'resource-boost': {

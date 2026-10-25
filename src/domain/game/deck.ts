@@ -90,7 +90,7 @@ function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'skill-cooldown') {
-    if (!Number.isFinite(effect.seconds) || effect.seconds < 0)
+    if (!Number.isFinite(effect.ratio) || effect.ratio < 0)
       throw new Error('アクション間隔が正しくありません。');
     return;
   }

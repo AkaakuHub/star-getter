@@ -52,7 +52,7 @@ export type Effect =
   | Readonly<{ kind: 'search-unit'; unit: UnitId; count: number }>
   | Readonly<{ kind: 'search-token'; token: TokenKind; count: number }>
   | Readonly<{ kind: 'bloom'; strength: number }>
-  | Readonly<{ kind: 'skill-cooldown'; seconds: number }>
+  | Readonly<{ kind: 'skill-cooldown'; ratio: number }>
   | Readonly<{ kind: 'energy-limit'; amount: number }>
   | Readonly<{ kind: 'ap-speed'; percent: number; duration: 'stage' | 'section' }>
   | Readonly<{ kind: 'reset-special'; unit?: UnitId; normalOnly?: true }>
@@ -133,6 +133,7 @@ export type Track = Readonly<{
   id: string;
   name: string;
   bpm: number;
+  songTime: number;
   beats: number;
   stage: StageGauges;
   sections: readonly Section[];

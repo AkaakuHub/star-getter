@@ -32,7 +32,7 @@ export const bloomCards: readonly Card[] = [
         { kind: 'bloom', strength: 3.5 },
         {
           kind: 'skill-cooldown',
-          seconds: Math.fround(Math.fround(Math.fround(6666 / 10000) * Math.fround(11605)) / 10000),
+          ratio: 6666,
         },
       ],
     },
