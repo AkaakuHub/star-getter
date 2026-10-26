@@ -73,7 +73,7 @@ it('乗算変更はC#のSkillグループ倍率式で基礎上限へ適用する
   expect(expireHeartLimitBuffSections(changed).hearts.heartLimit).toBe(5000);
 });
 
-it('ActionType25は追加バフ対象外の負数をそのまま上限変更へ渡す', () => {
+it('ActionType25は追加バフ後が正数でない場合にfloat.MinValueを上限へ渡す', () => {
   const state = game();
   const card = state.deck[0];
   if (!card) throw new Error('きらめき上限変更の発動元カードがありません。');
@@ -91,8 +91,8 @@ it('ActionType25は追加バフ対象外の負数をそのまま上限変更へ�
     1,
     -2,
   );
-  expect(changed.heartLimitBuffs[0]?.value).toBe(-1);
-  expect(changed.hearts.heartLimit).toBe(99);
+  expect(changed.heartLimitBuffs[0]?.value).toBe(Math.fround(-3.4028234663852886e38));
+  expect(changed.hearts.heartLimit).toBe(0);
 });
 
 it('パート期限と外部解除で上限変更を解除し、直接上限変更は基礎値に加える', () => {
