@@ -9,8 +9,11 @@ import type { ActionType14Record } from './actionType14Record';
 import type { ActionType17Record } from './actionType17Record';
 import type { ActionType18Record } from './actionType18Record';
 import type { ActionType901Record } from './actionType901Record';
+import type { ActionType902Record } from './actionType902Record';
 import type { ActionType19Record } from './actionType19Record';
 import type { MoodActionRecord } from './moodActionRecord';
+import type { HandUseTrigger } from './handUseTrigger';
+export type { HandUseTrigger } from './handUseTrigger';
 
 type ActionTypeDetail = Readonly<{
   id: bigint;
@@ -220,14 +223,6 @@ export type ActionType41Record = Readonly<{
   deactivationKey?: string;
 }>;
 
-export type HandUseTrigger =
-  | Readonly<{ kind: 'member'; member: bigint }>
-  | Readonly<{ kind: 'skill-icon'; icon: bigint }>
-  | Readonly<{ kind: 'unit'; unit: bigint }>
-  | Readonly<{ kind: 'heart-quantity-count'; count: bigint }>
-  | Readonly<{ kind: 'voltage-increase' | 'section-change' }>
-  | Readonly<{ kind: 'same-card' | 'any-skill' }>;
-
 export type ModeSkillVariant = Readonly<{
   cost: number;
   effects: readonly Effect[];
@@ -283,6 +278,7 @@ export type Card = Readonly<{
     | ActionType17Record
     | ActionType18Record
     | ActionType901Record
+    | ActionType902Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
