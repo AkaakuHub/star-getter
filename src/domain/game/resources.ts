@@ -220,25 +220,28 @@ export function expireGaugeInfinities(
 ): GameState {
   const before = state.gaugeInfinities;
   const ended = new Set<'ap' | 'voltage' | 'mental'>();
-  const active = before.flatMap((infinity) => {
+  const active: GameState['gaugeInfinities'][number][] = [];
+  for (const infinity of before) {
+    if (duration === 'milliseconds') {
+      const remaining =
+        infinity.remainingSeconds === null
+          ? null
+          : Math.fround(infinity.remainingSeconds - Math.fround(elapsed));
+      if (remaining !== null && remaining <= 0) {
+        ended.add(infinity.gauge);
+        continue;
+      }
+      active.push(remaining === null ? infinity : { ...infinity, remainingSeconds: remaining });
+      continue;
+    }
     const remaining =
-      duration === 'milliseconds'
-        ? infinity.remainingSeconds === null
-          ? null
-          : Math.fround(infinity.remainingSeconds - Math.fround(elapsed))
-        : infinity.remainingSections === null
-          ? null
-          : infinity.remainingSections - elapsed;
+      infinity.remainingSections === null ? null : infinity.remainingSections - BigInt(elapsed);
     if (remaining !== null && remaining <= 0) {
       ended.add(infinity.gauge);
-      return [];
+      continue;
     }
-    if (duration === 'milliseconds' && remaining !== null)
-      return [{ ...infinity, remainingSeconds: remaining }];
-    if (duration === 'sections' && remaining !== null)
-      return [{ ...infinity, remainingSections: remaining }];
-    return [infinity];
-  });
+    active.push(remaining === null ? infinity : { ...infinity, remainingSections: remaining });
+  }
   let next: GameState = { ...state, gaugeInfinities: active };
   for (const gauge of ended) {
     if (active.some((infinity) => infinity.gauge === gauge)) continue;

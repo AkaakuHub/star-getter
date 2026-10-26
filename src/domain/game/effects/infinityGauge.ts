@@ -10,7 +10,7 @@ export function activateInfinityGauge(
   effect: Extract<Effect, { kind: 'infinity-gauge' }>,
   applyEffect?: EffectApplier,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const bloom = state.bloom;

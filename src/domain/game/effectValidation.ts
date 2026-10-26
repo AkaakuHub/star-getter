@@ -137,8 +137,8 @@ export function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'infinity-gauge') {
     if (
-      (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
-      !Number.isSafeInteger(effect.duration.value) ||
+      (effect.duration.kind === 'sections' && effect.duration.value === 0n) ||
+      (effect.duration.kind !== 'sections' && !Number.isSafeInteger(effect.duration.value)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

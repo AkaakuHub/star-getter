@@ -44,14 +44,17 @@ export type MoodBonus = Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
 export type GaugeInfinity = Readonly<{
   gauge: 'ap' | 'voltage' | 'mental';
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   suspended: boolean;
   deactivationKey: string | null;
 }>;
 type InfinityGaugeEffect = Readonly<{
   kind: 'infinity-gauge';
   gauge: 'ap' | 'voltage' | 'mental';
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration:
+    | Readonly<{ kind: 'milliseconds'; value: number }>
+    | Readonly<{ kind: 'sections'; value: bigint }>
+    | Readonly<{ kind: 'stage'; value: number }>;
   invocationType?: number;
   deactivationKey?: string;
 }>;
