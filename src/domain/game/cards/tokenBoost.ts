@@ -15,7 +15,7 @@ function matches(boost: TokenBoost, source: Card | undefined, request: TokenRequ
     targetMatches &&
     (boost.seriesIds === undefined ||
       (request.seriesIds !== undefined &&
-        request.seriesIds.some((id) => boost.seriesIds?.includes(id))))
+        request.seriesIds.some((id) => boost.seriesIds?.includes(BigInt(id)))))
   );
 }
 
@@ -62,8 +62,8 @@ export function boostTokenRequests(
       ...state,
       tokenBoosts: state.tokenBoosts.flatMap((boost, index) => {
         if (!used.has(index) || boost.remainingUses === null) return [boost];
-        return boost.remainingUses > 1
-          ? [{ ...boost, remainingUses: boost.remainingUses - 1 }]
+        return boost.remainingUses > 1n
+          ? [{ ...boost, remainingUses: boost.remainingUses - 1n }]
           : [];
       }),
     },

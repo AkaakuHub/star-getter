@@ -46,8 +46,8 @@ export function advanceSectionChange(state: GameState, applyEffect: EffectApplie
     ...next,
     tokenBoosts: next.tokenBoosts.flatMap((boost) => {
       if (boost.remainingSections === null) return [boost];
-      const remainingSections = boost.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...boost, remainingSections }] : [];
+      const remainingSections = boost.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...boost, remainingSections }] : [];
     }),
     skillScoreUps: next.skillScoreUps.flatMap((boost) => {
       if (boost.remainingSections === null) return [boost];

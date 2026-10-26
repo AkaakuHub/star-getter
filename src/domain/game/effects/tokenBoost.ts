@@ -9,7 +9,9 @@ export function activateTokenBoost(
   multiplier: number,
   addValue: number,
 ): GameState {
-  const num = BigInt.asIntN(32, BigInt(effect.num));
+  if (effect.duration?.kind === 'sections' && effect.duration.value === 0n)
+    throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
+  const num = BigInt.asIntN(32, effect.num);
   const numValue = Math.fround(int64ToFloat32(num) / Math.fround(10_000));
   const base = Math.fround(
     Math.fround(Math.fround(numValue + Math.fround(addValue)) * Math.fround(multiplier)),
@@ -31,7 +33,7 @@ export function activateTokenBoost(
         remainingSeconds:
           suppressDuration || effect.duration?.kind !== 'milliseconds'
             ? null
-            : Math.fround(effect.duration.value / 1000),
+            : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
         remainingSections:
           suppressDuration || effect.duration?.kind !== 'sections' ? null : effect.duration.value,
         deactivationKey: effect.deactivationKey ?? null,

@@ -20,10 +20,10 @@ it('追加カードの増幅は元指定枚数を超えて配分せず、同一�
     {
       kind: 'token-boost',
       calculation: 'multiply-percent',
-      num: 1_000_000,
+      num: 1_000_000n,
       target: { kind: 'member', member: source.member },
-      seriesIds: [42],
-      uses: 1,
+      seriesIds: [42n],
+      uses: 1n,
     },
     source,
   );
@@ -45,17 +45,17 @@ it('追加カードの増幅は対象カードと生成効果のシリーズ指�
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 20_000,
+      num: 20_000n,
       target: { kind: 'member', member: source.member },
-      seriesIds: [42],
-      uses: 2,
+      seriesIds: [42n],
+      uses: 2n,
     },
     source,
   );
   const unmatched = requestTokens(boosted, 'story', 1, source.id, [11]);
-  expect(unmatched.tokenBoosts[0]?.remainingUses).toBe(2);
+  expect(unmatched.tokenBoosts[0]?.remainingUses).toBe(2n);
   const matched = requestTokens(unmatched, 'story', 1, source.id, [42]);
-  expect(matched.tokenBoosts[0]?.remainingUses).toBe(1);
+  expect(matched.tokenBoosts[0]?.remainingUses).toBe(1n);
   expect(matched.deck.filter((card) => card.token === 'story')).toHaveLength(4);
 });
 
@@ -68,7 +68,7 @@ it('ActionType38は負の計算値をバフとして登録しない', () => {
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: -10_000,
+      num: -10_000n,
       target: { kind: 'member', member: source.member },
     },
     source,
@@ -87,9 +87,9 @@ it('追加カードの増幅は時間またはパート期限で解除する', (
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 10_000,
+      num: 10_000n,
       target: { kind: 'all' },
-      duration: { kind: 'milliseconds', value: 500 },
+      duration: { kind: 'milliseconds', value: 500n },
     },
     source,
   );
@@ -99,9 +99,9 @@ it('追加カードの増幅は時間またはパート期限で解除する', (
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 10_000,
+      num: 10_000n,
       target: { kind: 'all' },
-      duration: { kind: 'sections', value: 1 },
+      duration: { kind: 'sections', value: 1n },
     },
     source,
   );
@@ -127,9 +127,9 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
     {
       kind: 'token-boost',
       calculation: 'multiply-percent',
-      num: 1_000_000,
+      num: 1_000_000n,
       target: { kind: 'card-series', seriesId: 7 },
-      uses: 1,
+      uses: 1n,
     },
     source,
   );
@@ -203,10 +203,10 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 10_000,
+      num: 10_000n,
       target: { kind: 'member', member: source.member },
-      seriesIds: [42],
-      uses: 1,
+      seriesIds: [42n],
+      uses: 1n,
     },
     source,
   );
@@ -256,9 +256,9 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
   const effect = {
     kind: 'token-boost',
     calculation: 'add',
-    num: 500_000,
+    num: 500_000n,
     target: { kind: 'all' },
-    duration: { kind: 'milliseconds', value: 500 },
+    duration: { kind: 'milliseconds', value: 500n },
     invocationType: 0x388,
     deactivationKey: 'token-boost',
   } as const;
@@ -280,8 +280,8 @@ it('ActionType38は詳細値をint32へ変換し、0以下なら登録しない'
     calculation: 'add',
     target: { kind: 'all' },
   } as const;
-  const wrapped = applyEffect(initial, { ...effect, num: 2_147_483_648 }, source);
-  const zero = applyEffect(initial, { ...effect, num: 0 }, source);
+  const wrapped = applyEffect(initial, { ...effect, num: 2_147_483_648n }, source);
+  const zero = applyEffect(initial, { ...effect, num: 0n }, source);
   expect(wrapped.tokenBoosts).toHaveLength(0);
   expect(zero.tokenBoosts).toHaveLength(0);
 });
@@ -295,7 +295,7 @@ it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適�
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 2_147_483_648,
+      num: 2_147_483_648n,
       target: { kind: 'all' },
     },
     source,
@@ -307,7 +307,7 @@ it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適�
     {
       kind: 'token-boost',
       calculation: 'add',
-      num: 16_777_217,
+      num: 16_777_217n,
       target: { kind: 'all' },
     },
     source,

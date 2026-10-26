@@ -155,10 +155,10 @@ export type TokenBoost = Readonly<{
   calculation: 'add' | 'multiply-percent';
   value: number;
   target: TokenBoostTarget;
-  seriesIds?: readonly number[];
-  remainingUses: number | null;
+  seriesIds?: readonly bigint[];
+  remainingUses: bigint | null;
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   deactivationKey: string | null;
 }>;
 type EffectShape =
@@ -215,11 +215,11 @@ type EffectShape =
   | Readonly<{
       kind: 'token-boost';
       calculation: TokenBoost['calculation'];
-      num: number;
+      num: bigint;
       target: TokenBoostTarget;
-      seriesIds?: readonly number[];
-      uses?: number;
-      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+      seriesIds?: readonly bigint[];
+      uses?: bigint;
+      duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>;
       invocationType?: number;
       deactivationKey?: string;
     }>
