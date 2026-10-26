@@ -146,6 +146,7 @@ export type GameState = Readonly<{
   tokenDeckSplit: TokenDeckSplit | null;
   ingameMission: IngameMission | null;
   deckOutCount: number;
+  afterMentalDownEvents: number;
   discard: readonly string[];
   tokenCatalog: readonly Card[];
   nextTokenId: number;

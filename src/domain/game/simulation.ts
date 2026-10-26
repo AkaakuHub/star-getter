@@ -88,6 +88,7 @@ export function createGame(
     tokenDeckSplit: null,
     ingameMission: null,
     deckOutCount: 0,
+    afterMentalDownEvents: 0,
     discard: [],
     tokenCatalog: resolvedTokenCatalog,
     nextTokenId: 1,

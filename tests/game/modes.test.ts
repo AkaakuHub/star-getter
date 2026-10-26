@@ -200,7 +200,7 @@ describe('モード切替と切替時効果', () => {
       }),
     ).toBe(state);
   });
-  it('ActionType45はCheckDeckOut通知で溜まったDeckOut数を全て処理する', () => {
+  it('ActionType45は子EffectごとにCheckDeckOutを1回通知する', () => {
     let state = applyEffect(
       { ...modeGame(), deckOutCount: 2 },
       {
@@ -212,7 +212,8 @@ describe('モード切替と切替時効果', () => {
       },
     );
     state = applyEffect(state, on);
-    expect(state.deckOutCount).toBe(0);
+    expect(state.deckOutCount).toBe(1);
+    expect(state.afterMentalDownEvents).toBe(1);
   });
   it('切替時効果による別モードの切替を同じキューで処理する', () => {
     let state = applyEffect(modeGame(), {
