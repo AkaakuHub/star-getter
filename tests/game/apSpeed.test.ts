@@ -75,7 +75,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     hasAbsorbLimit: false,
     isAbsoluteAdd: false,
     periodType: 3 as const,
-    remainingPeriod: 0,
+    remainingPeriod: 0n,
     isAbsorbEnd: false,
     induceTiming: 1 as const,
     induceCondition: 1 as const,

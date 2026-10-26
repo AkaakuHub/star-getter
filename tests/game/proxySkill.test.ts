@@ -31,7 +31,7 @@ it('Proxyに吸収された手札数加算を目標数へ反映せず、期限�
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 3000,
+      periodParam: 3000n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
@@ -57,7 +57,7 @@ it('時間期限のProxy吸収を期限後に解除する', () => {
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 100,
+      periodParam: 100n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
@@ -81,7 +81,7 @@ it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発�
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 100,
+      periodParam: 100n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
@@ -112,7 +112,7 @@ it('Proxy威力タイプ2は吸収量を加算してから倍率を適用する'
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 100,
+      periodParam: 100n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 2,
@@ -156,7 +156,7 @@ it('Proxy威力タイプ3は吸収量と目標量の比を倍率にする', () =
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 100,
+      periodParam: 100n,
       induceTiming: 2,
       induceCondition: 1,
       inducePowerType: 3,
@@ -199,7 +199,7 @@ it('Proxy誘発タイミング3はAPKのIsAbsorbEnd判定に従う', () => {
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 100,
+      periodParam: 100n,
       induceTiming: 3,
       induceCondition: 1,
       inducePowerType: 1,
@@ -227,7 +227,7 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
       kind: 'proxy-skill',
       absorbLimit: 1,
       periodType: 1,
-      periodParam: 3000,
+      periodParam: 3000n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
@@ -243,7 +243,7 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
       kind: 'proxy-skill',
       absorbLimit: 0,
       periodType: 1,
-      periodParam: 3000,
+      periodParam: 3000n,
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
@@ -291,7 +291,7 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
     kind: 'proxy-skill',
     absorbLimit: 1,
     periodType: 1 as const,
-    periodParam: 3000,
+    periodParam: 3000n,
     induceTiming: 1,
     induceCondition: 1,
     inducePowerType: 1,
@@ -332,7 +332,7 @@ it('スキル使用回数と消費APを使うProxy期限を個別に進める', 
   const periodEffect = {
     kind: 'proxy-skill' as const,
     absorbLimit: 1,
-    periodParam: 3,
+    periodParam: 3n,
     induceTiming: 1 as const,
     induceCondition: 1 as const,
     inducePowerType: 1 as const,
@@ -343,9 +343,9 @@ it('スキル使用回数と消費APを使うProxy期限を個別に進める', 
   const uses = applyEffect(initial, { ...periodEffect, periodType: 4 as const }, source);
   const costs = applyEffect(uses, { ...periodEffect, periodType: 5 as const }, source);
   const afterUse = advanceProxySkillUses(costs, 'other-card', 2, applyEffect);
-  expect(afterUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([2, 1]);
+  expect(afterUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([2n, 1n]);
   const afterSecondUse = advanceProxySkillUses(afterUse, 'other-card', 2, applyEffect);
-  expect(afterSecondUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([1]);
+  expect(afterSecondUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([1n]);
   expect(
     advanceProxySkillUses(afterSecondUse, 'other-card', 2, applyEffect).proxyAbsorptions,
   ).toHaveLength(0);

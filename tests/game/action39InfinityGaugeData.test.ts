@@ -34,3 +34,13 @@ it('ActionType39の既定値とFullEnd期限を反映する', () => {
   });
   expect(fullEnd).toMatchObject({ duration: { kind: 'stage', value: 0 } });
 });
+
+it('ActionType39のミリ秒longをfloat32へ直接変換する', () => {
+  const longValue = (1n << 54n) + (1n << 30n) + 1n;
+  expect(
+    createInfinityGaugeEffect({
+      skillEffectId: 39n,
+      details: [{ id: 1n, detailType: 'INFINITY_GAUGE_DISPLAY_TIME', value: longValue }],
+    }),
+  ).toMatchObject({ duration: { kind: 'milliseconds', value: 2 ** 54 + 2 ** 31 } });
+});

@@ -3,6 +3,7 @@ import type { ProxySkillEffect } from '../modelTypes';
 import type { EffectApplier } from './induceSkillEffect';
 import { induceCardMoves } from './cardMoveInduce';
 import { completeDeckOutChecks } from './deckOutCheck';
+import { int64ToFloat32 } from '../numeric';
 
 type ApplyProxyEffect = EffectApplier;
 
@@ -12,16 +13,12 @@ export function registerProxySkill(
   card: Card | undefined,
 ): GameState {
   if (!card) return state;
-  if (effect.periodType === 3 ? effect.induceTiming !== 1 : effect.periodParam < 1) return state;
-  const periodParam = Math.trunc(effect.periodParam);
-  if (periodParam < 1 && effect.periodType !== 3) return state;
-  const absorption = {
+  if (effect.periodType === 3 ? effect.induceTiming !== 1 : effect.periodParam < 1n) return state;
+  const common = {
     id: state.nextProxyAbsorptionId,
     sourceId: card.id,
     hasAbsorbLimit: (effect.absorbLimit & 1) === 1,
     isAbsoluteAdd: (effect.absorbLimit & 2) === 2,
-    periodType: effect.periodType,
-    remainingPeriod: effect.periodType === 1 ? Math.fround(periodParam / 1000) : periodParam,
     isAbsorbEnd: false,
     induceTiming: effect.induceTiming,
     induceCondition: effect.induceCondition,
@@ -33,7 +30,19 @@ export function registerProxySkill(
       targetAmount: BigInt(signedInt32(target.targetAmount)),
       totalAmount: 0n,
     })),
-  } satisfies GameState['proxyAbsorptions'][number];
+  };
+  const absorption: GameState['proxyAbsorptions'][number] =
+    effect.periodType === 1
+      ? {
+          ...common,
+          periodType: 1,
+          remainingPeriod: Math.fround(int64ToFloat32(effect.periodParam) / Math.fround(1000)),
+        }
+      : {
+          ...common,
+          periodType: effect.periodType,
+          remainingPeriod: effect.periodParam,
+        };
   return {
     ...state,
     proxyAbsorptions: [...state.proxyAbsorptions, absorption],
@@ -69,12 +78,12 @@ export function advanceProxySkillSections(state: GameState, apply: ApplyProxyEff
     if (!absorption) continue;
     if (absorption.isAbsorbEnd) continue;
     if (absorption.periodType !== 2) continue;
-    const remainingPeriod = absorption.remainingPeriod - 1;
-    if (remainingPeriod <= 0 && absorption.induceTiming === 1)
+    const remainingPeriod = absorption.remainingPeriod - 1n;
+    if (remainingPeriod <= 0n && absorption.induceTiming === 1)
       next = endProxyAbsorption(next, absorption, apply);
-    else if (remainingPeriod <= 0 && absorption.induceTiming === 3)
+    else if (remainingPeriod <= 0n && absorption.induceTiming === 3)
       next = endProxyAbsorption(next, absorption, apply);
-    else if (remainingPeriod <= 0) next = finishProxyAbsorption(next, absorption, apply);
+    else if (remainingPeriod <= 0n) next = finishProxyAbsorption(next, absorption, apply);
     else next = updateProxyAbsorptionPeriod(next, absorption, remainingPeriod);
   }
   return next;
@@ -93,11 +102,11 @@ export function advanceProxySkillUses(
     if (absorption.isAbsorbEnd) continue;
     if (absorption.sourceId === usedSourceId) continue;
     if (absorption.periodType !== 4 && absorption.periodType !== 5) continue;
-    const decrement = absorption.periodType === 4 ? 1 : skillCost;
+    const decrement = BigInt(absorption.periodType === 4 ? 1 : Math.trunc(skillCost));
     const remainingPeriod = absorption.remainingPeriod - decrement;
-    if (remainingPeriod <= 0 && absorption.induceTiming === 3)
+    if (remainingPeriod <= 0n && absorption.induceTiming === 3)
       next = endProxyAbsorption(next, absorption, apply);
-    else if (remainingPeriod <= 0) next = finishProxyAbsorption(next, absorption, apply);
+    else if (remainingPeriod <= 0n) next = finishProxyAbsorption(next, absorption, apply);
     else next = updateProxyAbsorptionPeriod(next, absorption, remainingPeriod);
   }
   return next;
@@ -195,8 +204,8 @@ function finishProxyAbsorption(
   if (absorption.inducePowerType === 3) {
     let multiplier = 1;
     for (const effect of absorption.effects) {
-      const total = Math.fround(Number(effect.totalAmount));
-      const target = Math.fround(Number(effect.targetAmount));
+      const total = int64ToFloat32(effect.totalAmount);
+      const target = int64ToFloat32(effect.targetAmount);
       if (total === 0 || target === 0) continue;
       multiplier = Math.fround(multiplier * Math.fround(total / target));
     }
@@ -209,14 +218,7 @@ function finishProxyAbsorption(
     next = absorption.inducedEffects.reduce((current, child) => {
       const match = absorption.effects.find((item) => item.actionType === child.actionType);
       return match
-        ? applyProxyChild(
-            current,
-            child,
-            card,
-            power,
-            Math.fround(Number(match.totalAmount)),
-            apply,
-          )
+        ? applyProxyChild(current, child, card, power, int64ToFloat32(match.totalAmount), apply)
         : applyProxyChild(current, child, card, 1, 0, apply);
     }, next);
   } else {
@@ -254,8 +256,13 @@ function endProxyAbsorption(
 function updateProxyAbsorptionPeriod(
   state: GameState,
   current: GameState['proxyAbsorptions'][number],
-  remainingPeriod: number,
+  remainingPeriod: number | bigint,
 ): GameState {
+  if (current.periodType === 1) {
+    if (typeof remainingPeriod !== 'number') throw new Error('Proxyの期限値が正しくありません。');
+    return updateProxyAbsorption(state, current, { ...current, remainingPeriod });
+  }
+  if (typeof remainingPeriod !== 'bigint') throw new Error('Proxyの期限値が正しくありません。');
   return updateProxyAbsorption(state, current, { ...current, remainingPeriod });
 }
 

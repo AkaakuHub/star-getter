@@ -48,7 +48,7 @@ describe('元気バリア', () => {
         kind: 'proxy-skill',
         absorbLimit: 1,
         periodType: 1,
-        periodParam: 3000,
+        periodParam: 3000n,
         induceTiming: 1,
         induceCondition: 1,
         inducePowerType: 1,

@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
+import { createSkillCostChangeEffect } from '../../src/domain/game/actionTypeEffects/skillCostChange';
 
 it('ActionType17の条件付きコスト変更詳細を手札効果へ接続する', () => {
   const track = tracks[0];
@@ -45,4 +46,15 @@ it('ActionType17の条件付きコスト変更詳細を手札効果へ接続す�
       deactivationKey: 'ability:cost',
     },
   );
+});
+
+it('ActionType17のlong値をfloat32へ直接変換してからNumToValueを適用する', () => {
+  const longValue = (1n << 54n) + (1n << 30n) + 1n;
+  const effect = createSkillCostChangeEffect({
+    details: [
+      { id: 1n, detailType: 'CHANGE_AP_NUM', value: longValue },
+      { id: 2n, detailType: 'CHANGE_AP_CONDITION_TYPE', value: 1n },
+    ],
+  });
+  expect(effect).toMatchObject({ amount: Math.fround((2 ** 54 + 2 ** 31) / 10_000) });
 });

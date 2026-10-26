@@ -127,8 +127,8 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'proxy-skill') {
     if (
       !Number.isSafeInteger(effect.absorbLimit) ||
-      !Number.isSafeInteger(effect.periodParam) ||
-      (effect.periodType !== 3 && effect.periodParam < 1) ||
+      !isInt64(effect.periodParam) ||
+      (effect.periodType !== 3 && effect.periodParam < 1n) ||
       (effect.periodType === 3 && effect.induceTiming !== 1) ||
       !Number.isFinite(effect.inducePowerParam) ||
       effect.targets.some(

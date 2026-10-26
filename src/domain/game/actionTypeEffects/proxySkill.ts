@@ -1,6 +1,6 @@
 import type { ProxySkillEffect } from '../proxySkillTypes';
 import type { Effect } from '../model';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
@@ -54,11 +54,11 @@ export function createProxySkillEffect(input: Input): Effect {
     kind: 'proxy-skill',
     absorbLimit: int32(value(input.details, detailTypes.absorbLimit, 1n)),
     periodType: periodType as ProxySkillEffect['periodType'],
-    periodParam: Number(value(input.details, detailTypes.periodParam, 0n)),
+    periodParam: value(input.details, detailTypes.periodParam, 0n),
     induceTiming: induceTiming as ProxySkillEffect['induceTiming'],
     induceCondition: induceCondition as ProxySkillEffect['induceCondition'],
     inducePowerType: inducePowerType as ProxySkillEffect['inducePowerType'],
-    inducePowerParam: Math.fround(Number(value(input.details, detailTypes.inducePowerParam, 0n))),
+    inducePowerParam: int64ToFloat32(value(input.details, detailTypes.inducePowerParam, 0n)),
     targets,
     effects: input.effects,
   };

@@ -1,5 +1,5 @@
 import type { Effect } from '../modelTypes';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
@@ -35,7 +35,7 @@ function find(details: readonly Detail[], detailType: string): Detail | undefine
 }
 
 function numToValue(value: bigint): number {
-  return Math.fround(Math.fround(Number(value)) / 10_000);
+  return Math.fround(int64ToFloat32(value) / 10_000);
 }
 
 function int32(value: bigint): number {

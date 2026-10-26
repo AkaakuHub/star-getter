@@ -1,12 +1,10 @@
 import type { Effect } from './modelTypes';
 
-export type ProxyAbsorption = Readonly<{
+type ProxyAbsorptionBase = Readonly<{
   id: number;
   sourceId: string;
   hasAbsorbLimit: boolean;
   isAbsoluteAdd: boolean;
-  periodType: 1 | 2 | 3 | 4 | 5;
-  remainingPeriod: number;
   isAbsorbEnd: boolean;
   induceTiming: 1 | 2 | 3;
   induceCondition: 1 | 2;
@@ -20,11 +18,15 @@ export type ProxyAbsorption = Readonly<{
   }>[];
 }>;
 
+export type ProxyAbsorption =
+  | (ProxyAbsorptionBase & Readonly<{ periodType: 1; remainingPeriod: number }>)
+  | (ProxyAbsorptionBase & Readonly<{ periodType: 2 | 3 | 4 | 5; remainingPeriod: bigint }>);
+
 export type ProxySkillEffect = Readonly<{
   kind: 'proxy-skill';
   absorbLimit: number;
   periodType: 1 | 2 | 3 | 4 | 5;
-  periodParam: number;
+  periodParam: bigint;
   induceTiming: 1 | 2 | 3;
   induceCondition: 1 | 2;
   inducePowerType: 1 | 2 | 3;

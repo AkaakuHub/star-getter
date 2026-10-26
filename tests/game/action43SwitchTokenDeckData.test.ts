@@ -28,3 +28,13 @@ it('ActionType43は系列指定なしを全系列として表し、期限の既�
     duration: { kind: 'milliseconds', value: 0 },
   });
 });
+
+it('ActionType43のミリ秒longをfloat32へ直接変換する', () => {
+  const longValue = (1n << 54n) + (1n << 30n) + 1n;
+  expect(
+    createSwitchTokenDeckEffect({
+      skillEffectId: 43n,
+      details: [{ id: 1n, detailType: 'SWITCH_TOKEN_CARD_DECK_DISPLAY_TIME', value: longValue }],
+    }),
+  ).toMatchObject({ duration: { kind: 'milliseconds', value: 2 ** 54 + 2 ** 31 } });
+});

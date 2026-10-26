@@ -42,3 +42,20 @@ it('ActionType40の既定期限はミリ秒0で、FullEndをステージ期限�
     }),
   ).toMatchObject({ duration: { kind: 'stage', value: 0 } });
 });
+
+it('ActionType40のlongをfloat32へ直接変換する', () => {
+  const longValue = (1n << 54n) + (1n << 30n) + 1n;
+  expect(
+    createSkillCooldownEffect({
+      skillEffectId: 40n,
+      deckCardMax: 30,
+      details: [
+        { id: 1n, detailType: 'SKILL_COOL_TIME_NUM', value: longValue },
+        { id: 2n, detailType: 'SKILL_COOL_TIME_DISPLAY_TIME', value: longValue },
+      ],
+    }),
+  ).toMatchObject({
+    num: 2 ** 54 + 2 ** 31,
+    duration: { kind: 'milliseconds', value: 2 ** 54 + 2 ** 31 },
+  });
+});

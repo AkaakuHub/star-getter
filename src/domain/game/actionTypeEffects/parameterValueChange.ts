@@ -1,6 +1,6 @@
 import type { Effect, ParameterValueChangeEffect } from '../modelTypes';
 import type { MemberId } from '../model';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{ skillEffectId: bigint; details: readonly Detail[] }>;
@@ -10,12 +10,8 @@ export function createParameterValueChangeEffect(input: Input): Effect {
   const calculationType = int32(find(input.details, 'CHANGE_PARAM_VALUE_CALC_TYPE')?.value ?? 1n);
   const targetDetailId = find(input.details, 'CHANGE_PARAM_VALUE_ACTION_ID')?.value ?? 0n;
   if (!isInt64(targetDetailId)) throw new Error('変更対象の詳細値IDが正しくありません。');
-  const base = Math.fround(
-    Number(find(input.details, 'CHANGE_PARAM_VALUE_BASE_NUM')?.value ?? 10_000n),
-  );
-  const increment = Math.fround(
-    Number(find(input.details, 'CHANGE_PARAM_VALUE_ADD_NUM')?.value ?? 0n),
-  );
+  const base = int64ToFloat32(find(input.details, 'CHANGE_PARAM_VALUE_BASE_NUM')?.value ?? 10_000n);
+  const increment = int64ToFloat32(find(input.details, 'CHANGE_PARAM_VALUE_ADD_NUM')?.value ?? 0n);
   const calculation = calculationFor(calculationType);
   const params = input.details.filter(
     (detail) => detail.detailType === 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID',
@@ -25,7 +21,7 @@ export function createParameterValueChangeEffect(input: Input): Effect {
       ? params.map((detail) => {
           if (!isInt64(detail.id) || !isInt64(detail.value))
             throw new Error('詳細値が正しくありません。');
-          return Math.fround(Number(detail.value));
+          return int64ToFloat32(detail.value);
         })
       : undefined;
   const members =

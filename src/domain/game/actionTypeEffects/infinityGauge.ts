@@ -1,5 +1,5 @@
 import type { Effect } from '../model';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
@@ -25,7 +25,7 @@ export function createInfinityGaugeEffect(input: Input): Effect {
   const displayTime = detail(input.details, detailTypes.displayTime)?.value ?? 0n;
   const duration =
     displayTimeType === 1
-      ? { kind: 'milliseconds' as const, value: Math.fround(Number(displayTime)) }
+      ? { kind: 'milliseconds' as const, value: int64ToFloat32(displayTime) }
       : displayTimeType === 2
         ? { kind: 'sections' as const, value: displayTime }
         : displayTimeType === 3
