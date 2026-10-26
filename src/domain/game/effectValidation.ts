@@ -152,10 +152,10 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'token-card') return validateTokenCardEffect(effect);
   if (effect.kind === 'token-boost') {
     if (
-      !Number.isSafeInteger(effect.num) ||
-      (effect.uses !== undefined && (!Number.isSafeInteger(effect.uses) || effect.uses < 0)) ||
+      !isInt64(effect.num) ||
+      (effect.uses !== undefined && (!isInt64(effect.uses) || effect.uses < 0n)) ||
       (effect.duration !== undefined &&
-        (!Number.isSafeInteger(effect.duration.value) || effect.duration.value < 0)) ||
+        (!isInt64(effect.duration.value) || effect.duration.value < 0n)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

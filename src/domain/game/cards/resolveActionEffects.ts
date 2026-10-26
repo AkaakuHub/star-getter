@@ -13,6 +13,8 @@ import { createMentalBarrierAdditionalBuffEffect } from '../actionTypeEffects/me
 import { createDisableMentalDownEffect } from '../actionTypeEffects/disableMentalDown';
 import { createChangeModeEffect } from '../actionTypeEffects/changeMode';
 import { createVoltageLevelEffect } from '../actionTypeEffects/voltageLevel';
+import { createTokenBoostEffect } from '../actionTypeEffects/tokenBoost';
+import { createInfinityGaugeEffect } from '../actionTypeEffects/infinityGauge';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -86,7 +88,11 @@ export function resolveActionEffects(card: Card): Card {
                               ? createDisableMentalDownEffect(actionEffect)
                               : actionEffect.actionType === 35
                                 ? createChangeModeEffect(actionEffect)
-                                : createVoltageLevelEffect(actionEffect);
+                                : actionEffect.actionType === 37
+                                  ? createVoltageLevelEffect(actionEffect)
+                                  : actionEffect.actionType === 38
+                                    ? createTokenBoostEffect(actionEffect)
+                                    : createInfinityGaugeEffect(actionEffect);
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }

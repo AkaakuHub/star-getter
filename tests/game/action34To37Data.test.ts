@@ -3,7 +3,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
 
-it('ActionType34/35/37の詳細レコードを各Effectへ接続する', () => {
+it('ActionType34/35/37/38/39の詳細レコードを各Effectへ接続する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
@@ -30,6 +30,18 @@ it('ActionType34/35/37の詳細レコードを各Effectへ接続する', () => {
               destination: 'effects' as const,
               details: [],
             },
+            {
+              actionType: 38 as const,
+              skillEffectId: 38_001n,
+              destination: 'effects' as const,
+              details: [],
+            },
+            {
+              actionType: 39 as const,
+              skillEffectId: 39_001n,
+              destination: 'effects' as const,
+              details: [],
+            },
           ],
         }
       : card,
@@ -38,4 +50,6 @@ it('ActionType34/35/37の詳細レコードを各Effectへ接続する', () => {
   expect(compiled?.effects.some((item) => item.kind === 'disable-mental-down')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'mode')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'voltage-set')).toBe(true);
+  expect(compiled?.effects.some((item) => item.kind === 'token-boost')).toBe(true);
+  expect(compiled?.effects.some((item) => item.kind === 'infinity-gauge')).toBe(true);
 });
