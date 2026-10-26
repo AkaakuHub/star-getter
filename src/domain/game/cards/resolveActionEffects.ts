@@ -3,6 +3,7 @@ import { resolveActionEffect } from './resolveActionEffect';
 import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessInduce';
 import { createOnDrawInduceRule } from '../actionTypeEffects/onDrawInduce';
 import { createHandInducer } from '../actionTypeEffects/handInduce';
+import { resolveHandPermanentEffects } from '../actionTypeEffects/handPermanent';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -34,6 +35,10 @@ export function resolveActionEffects(card: Card): Card {
     }
     if (actionEffect.actionType === 903) {
       handInducers.push(createHandInducer(actionEffect));
+      continue;
+    }
+    if (actionEffect.actionType === 904) {
+      handPermanentEffects.push(...resolveHandPermanentEffects(actionEffect));
       continue;
     }
     const effect = resolveActionEffect(actionEffect);

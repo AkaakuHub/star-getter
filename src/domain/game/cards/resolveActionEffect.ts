@@ -44,7 +44,7 @@ import type { Effect } from '../modelTypes';
 
 type RuntimeActionEffect = Exclude<
   NonNullable<Card['actionEffects']>[number],
-  { actionType: 36 | 901 | 902 | 903 }
+  { actionType: 36 | 901 | 902 | 903 | 904 }
 >;
 
 import { resolveEarlyActionEffect, type EarlyActionEffect } from './resolveEarlyActionEffect';
