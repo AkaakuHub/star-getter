@@ -243,6 +243,45 @@ export function resolveEffectParameterDetails(
       ),
     };
   }
+  if (effect.kind === 'ap-speed-change') {
+    const calculationType = int32(
+      resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'calculationType',
+        BigInt(effect.calculationType),
+      ),
+    );
+    if (calculationType !== 1 && calculationType !== 2)
+      throw new Error('AP回復速度変更の計算種別が正しくありません。');
+    return {
+      ...effect,
+      calculationType,
+      num: resolveParameterDetailInteger(state, card, effect, 'num', effect.num),
+      bonusMoodValue: resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'bonusMoodValue',
+        effect.bonusMoodValue,
+      ),
+      displayTimeType: resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'displayTimeType',
+        effect.displayTimeType,
+      ),
+      displayTime: resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'displayTime',
+        effect.displayTime,
+      ),
+    };
+  }
   const resolved = { ...effect };
   for (const [key] of Object.entries(effect.parameterDetails)) {
     const value = Object.getOwnPropertyDescriptor(effect, key)?.value;

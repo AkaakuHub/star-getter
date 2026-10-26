@@ -96,7 +96,7 @@ export function missionActionEffect(
                     : effect.kind === 'hand-limit'
                       ? state.handLimit - before.handLimit
                       : effect.kind === 'ap-speed-change'
-                        ? effect.num
+                        ? 0
                         : effect.kind === 'heart-limit-change'
                           ? heartLimitValueWithoutLimit(state) - heartLimitValueWithoutLimit(before)
                           : 0;

@@ -4,6 +4,7 @@ import { moodValue } from '../projection';
 import { skillValue } from './skillValue';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { isProxyTargetReached } from './proxySkill';
+import { int64ToFloat32 } from '../numeric';
 
 type ApSpeedChange = Extract<Effect, { kind: 'ap-speed-change' }>;
 
@@ -31,15 +32,16 @@ export function applyApSpeedChange(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.displayTimeType === 2n && effect.displayTime === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
+  const displayTimeType = int32(effect.displayTimeType);
   const correction =
     effect.bonusMoodTarget === 0
       ? 0
       : calculateSkillMoodCorrection(
           effect.bonusMoodTarget,
           moodValue(state),
-          Math.fround(effect.bonusMoodValue / 10_000),
+          Math.fround(int64ToFloat32(effect.bonusMoodValue) / 10_000),
         );
   let calculation: 'add' | 'multiply';
   let value: number;
@@ -48,7 +50,7 @@ export function applyApSpeedChange(
   let rate = Math.fround(
     Math.fround(multiplier) *
       Math.fround(
-        Math.fround(Math.fround(addValue * 100) + (10_000 - Math.trunc(effect.num))) -
+        Math.fround(Math.fround(addValue * 100) + int32(10_000 - int32(effect.num))) -
           Math.fround(correction * 10_000),
       ),
   );
@@ -57,17 +59,20 @@ export function applyApSpeedChange(
       const legacyBoosted = skillValue(currentState, rate, { kind: 'energy', amount: rate }, card);
       const boosted = applyAction52SkillBoostForCard(currentState, card, legacyBoosted);
       currentState = boosted.state;
-      rate = Math.trunc(boosted.value);
+      rate = int32(boosted.value);
     } else {
       currentState = applyAction52SkillBoostForCard(currentState, card, rate).state;
     }
   }
   if (effect.calculationType === 2) {
-    value = Math.fround(1 - Math.fround(rate / 10_000));
+    value = Math.fround(Math.fround(10_000 - rate) / 10_000);
     absorbedAmount = Math.trunc((1 - value) * 100);
     calculation = 'multiply';
   } else {
-    value = Math.fround(Math.fround(correction + effect.num + addValue) * multiplier);
+    value = Math.fround(
+      Math.fround(Math.fround(correction + int64ToFloat32(effect.num)) + Math.fround(addValue)) *
+        Math.fround(multiplier),
+    );
     const currentInterval = apIncreaseIntervalSeconds(state);
     absorbedAmount = Math.trunc((-value / currentInterval) * 100);
     calculation = 'add';
@@ -81,11 +86,10 @@ export function applyApSpeedChange(
     calculation,
     value,
     remainingSeconds:
-      suppressDuration || effect.duration.kind !== 'milliseconds'
+      suppressDuration || displayTimeType !== 1
         ? null
-        : Math.fround(effect.duration.value / 1000),
-    remainingSections:
-      suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
+        : Math.fround(int64ToFloat32(effect.displayTime) / 1000),
+    remainingSections: suppressDuration || displayTimeType !== 2 ? null : effect.displayTime,
     deactivationKey: effect.deactivationKey ?? null,
   };
   return updateApTimeEffects(
@@ -104,7 +108,7 @@ export function applyApSpeedPercent(
     calculation: 'multiply',
     value: Math.fround(1 - Math.fround(percent / 100)),
     remainingSeconds: null,
-    remainingSections: duration === 'section' ? 1 : null,
+    remainingSections: duration === 'section' ? 1n : null,
     deactivationKey: null,
   };
   return updateApTimeEffects(state, [...state.apTimeEffects, entry]);
@@ -122,10 +126,15 @@ export function advanceApSpeedEffects(state: GameState, elapsedSeconds: number):
 export function expireApSpeedSections(state: GameState): GameState {
   const effects = state.apTimeEffects.flatMap((effect) => {
     if (effect.remainingSections === null) return [effect];
-    const remainingSections = effect.remainingSections - 1;
-    return remainingSections > 0 ? [{ ...effect, remainingSections }] : [];
+    const remainingSections = effect.remainingSections - 1n;
+    return remainingSections > 0n ? [{ ...effect, remainingSections }] : [];
   });
   return updateApTimeEffects(state, effects);
+}
+
+function int32(value: bigint | number): number {
+  const integer = typeof value === 'bigint' ? value : BigInt(Math.trunc(value));
+  return Number(BigInt.asIntN(32, integer));
 }
 
 export function deactivateApSpeedEffects(state: GameState, deactivationKey: string): GameState {

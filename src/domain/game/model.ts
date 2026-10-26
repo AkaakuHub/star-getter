@@ -225,7 +225,7 @@ export type GameState = Readonly<{
     calculation: 'add' | 'multiply';
     value: number;
     remainingSeconds: number | null;
-    remainingSections: number | null;
+    remainingSections: bigint | null;
     deactivationKey: string | null;
   }>[];
   voltageConversions: readonly VoltageConversion[];

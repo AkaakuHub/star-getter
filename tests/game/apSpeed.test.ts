@@ -8,10 +8,11 @@ import { game } from './support/game';
 const speedEffect = {
   kind: 'ap-speed-change',
   calculationType: 2,
-  num: 7000,
+  num: 7000n,
   bonusMoodTarget: 0,
-  bonusMoodValue: 0,
-  duration: { kind: 'stage' },
+  bonusMoodValue: 0n,
+  displayTimeType: 3n,
+  displayTime: 0n,
 } as const;
 
 it('Action21の乗算はC#のnum換算でAP回復時間へ適用し、deactivatorで元に戻す', () => {
@@ -55,12 +56,11 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     {
       ...speedEffect,
       calculationType: 1,
-      num: -0.25,
-      duration: { kind: 'stage' },
+      num: -25n,
     },
     source,
   );
-  expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(1, 5);
+  expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(0.2, 5);
 
   const boosted = applyEffect(
     { ...initial, targetBoosts: [{ members: [source.member], percent: 100, duration: 'stage' }] },
@@ -112,17 +112,18 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
     },
     source,
   );
-  const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 0.25 }, source);
+  const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 2500n }, source);
   expect(changed.action52Buffs).toHaveLength(0);
-  expect(changed.apTimeEffects.at(-1)?.value).toBe(0.25);
+  expect(changed.apTimeEffects.at(-1)?.value).toBe(2500);
 });
 
 it('Action21のパート期限とミリ秒期限を解除する', () => {
   const initial = game();
   const sectionEffect = applyEffect(initial, {
     ...speedEffect,
-    num: 11000,
-    duration: { kind: 'sections', value: 1 },
+    num: 11000n,
+    displayTimeType: 2n,
+    displayTime: 1n,
   });
   const nextSection = initial.track.sections[1];
   if (!nextSection) throw new Error('次のパートがありません。');
@@ -136,8 +137,9 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
 
   const persistent = applyEffect(initial, {
     ...speedEffect,
-    num: 11000,
-    duration: { kind: 'sections', value: 1 },
+    num: 11000n,
+    displayTimeType: 2n,
+    displayTime: 1n,
     invocationType: 0x388,
     deactivationKey: 'persistent',
   });
@@ -151,8 +153,9 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
 
   const timed = applyEffect(initial, {
     ...speedEffect,
-    num: 11000,
-    duration: { kind: 'milliseconds', value: 250 },
+    num: 11000n,
+    displayTimeType: 1n,
+    displayTime: 250n,
   });
   expect(timed.apTimeEffects).toHaveLength(1);
   expect(advanceTo(timed, 0.3).apTimeEffects).toHaveLength(0);

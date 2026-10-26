@@ -265,12 +265,11 @@ type EffectShape =
   | Readonly<{
       kind: 'ap-speed-change';
       calculationType: 1 | 2;
-      num: number;
+      num: bigint;
       bonusMoodTarget: 0 | 1 | 2 | 3;
-      bonusMoodValue: number;
-      duration:
-        | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
-        | Readonly<{ kind: 'stage' }>;
+      bonusMoodValue: bigint;
+      displayTimeType: bigint;
+      displayTime: bigint;
       invocationType?: number;
       deactivationKey?: string;
     }>
