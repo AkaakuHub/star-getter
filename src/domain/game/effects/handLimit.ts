@@ -13,7 +13,6 @@ export function applyHandLimit(
   multiplier: number,
   addValue = 0,
 ): GameState {
-  if (effect.calculationType !== 1) throw new Error('手札枚数変更の計算種別が正しくありません。');
   const baseAmount = effect.amount;
   if (effect.displayTimeType === 2 && effect.displayTime === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
@@ -24,8 +23,9 @@ export function applyHandLimit(
   const action52 = applyAction52SkillBoostForCard(state, card, skillBoosted);
   const amount = int32(action52.value);
   const currentState = action52.state;
-  const absorption = amount >= 0 ? absorbHandLimit(currentState, amount) : null;
-  const appliedAmount = absorption?.absorbed ? 0 : amount;
+  const absorption =
+    effect.calculationType === 1 && amount >= 0 ? absorbHandLimit(currentState, amount) : null;
+  const appliedAmount = effect.calculationType !== 1 || absorption?.absorbed ? 0 : amount;
   const activation = currentState.activation;
   const handLimitEffects =
     amount === 0
