@@ -5,6 +5,17 @@ import { TokenArtwork } from './TokenArtwork';
 
 export function CardArtwork({ card }: Readonly<{ card: Card }>) {
   if (card.token) return <TokenArtwork kind={card.token} />;
+  if (card.tokenCard)
+    return (
+      <span
+        className="token-card-art"
+        data-mood={card.mood}
+        data-style={card.style}
+        aria-hidden="true"
+      />
+    );
+  if (card.costume === null || card.performer === null)
+    throw new Error('カードの表示データがありません。');
   const palette = costumePalettes[card.costume];
   return (
     <span

@@ -1,9 +1,12 @@
-import { type GameState, type TokenKind, rules } from '../model';
+import { type Card, type GameState, type TokenKind, rules } from '../model';
 import type { TokenRequest, TokenTemplateReference } from '../tokenRequestTypes';
 import { boostTokenRequests } from './tokenBoost';
 import { initializeParameterValueFactors } from '../parameters/parameterValueChange';
 import { int64ToFloat32 } from '../numeric';
 import { registerMissionAction } from '../ingameMissions';
+import { validateCard } from '../deck';
+import type { TokenCardEffect } from '../tokenRequestTypes';
+import type { ModeAbilityVariant, ModeSkillVariant } from './cardTypes';
 
 export function addTokens(state: GameState, kind: TokenKind, count: number): GameState {
   return addTokenCards(state, { kind: 'token-kind', token: kind }, count, true);
@@ -31,42 +34,21 @@ export function requestTokens(
 
 export function applyTokenCardEffect(
   state: GameState,
-  effect: import('../tokenRequestTypes').TokenCardEffect,
+  effect: TokenCardEffect,
   sourceId: string | null,
 ): GameState {
-  return requestTokenCard(state, effect.templateId, effect.count, sourceId, effect.seriesIds);
-}
-
-export function requestTokenCard(
-  state: GameState,
-  templateId: string,
-  count: number | bigint,
-  sourceId: string | null,
-  seriesIds?: readonly number[] | readonly bigint[],
-): GameState {
-  const template = state.tokenCatalog.find((card) => card.id === templateId);
-  if (!template) return state;
   const grouped = state.tokenGroups.some((group) => group.sourceId === sourceId);
-  const requestCount =
-    typeof count === 'bigint'
-      ? grouped
-        ? Number(BigInt.asIntN(32, count))
-        : int64ToFloat32(count)
-      : count;
-  if (
-    !Number.isFinite(requestCount) ||
-    requestCount < 1 ||
-    (typeof count === 'number' && !Number.isSafeInteger(count))
-  )
-    return state;
-  const request: TokenRequest = {
-    template: { kind: 'template', templateId },
-    count: requestCount,
-    ...(seriesIds === undefined
-      ? {}
-      : { seriesIds: seriesIds.map((id) => (typeof id === 'bigint' ? id : BigInt(id))) }),
-  };
-  return requestToken(state, request, sourceId);
+  const count = grouped ? Number(BigInt.asIntN(32, effect.count)) : int64ToFloat32(effect.count);
+  if (!Number.isFinite(count) || count < 1) return state;
+  return requestToken(
+    state,
+    {
+      template: { kind: 'action-token-card', effect },
+      count,
+      ...(effect.seriesIds === undefined ? {} : { seriesIds: effect.seriesIds }),
+    },
+    sourceId,
+  );
 }
 
 export function finishTokenGeneration(
@@ -81,15 +63,14 @@ export function finishTokenGeneration(
   let actionType28Count = 0;
   const pending = group.requests.map((request, index) => ({
     template: request.template,
-    seriesIds: request.seriesIds,
-    isActionType28: request.template.kind === 'template',
+    isActionType28: request.template.kind === 'action-token-card',
     count: boosted.counts[index] ?? 0,
   }));
   while (next.deck.length < rules.maxDeckSize) {
     let added = false;
     for (const request of pending) {
       if (request.count < 1 || next.deck.length >= rules.maxDeckSize) continue;
-      next = addTokenCards(next, request.template, 1, false, request.seriesIds);
+      next = addTokenCards(next, request.template, 1, false);
       request.count--;
       if (request.isActionType28) actionType28Count++;
       if (next.deck.length < rules.maxDeckSize) added = true;
@@ -113,13 +94,7 @@ function requestToken(state: GameState, request: TokenRequest, sourceId: string 
     };
   }
   const boosted = boostTokenRequests(state, [request], sourceId, false);
-  return addTokenCards(
-    boosted.state,
-    request.template,
-    boosted.counts[0] ?? 0,
-    true,
-    request.seriesIds,
-  );
+  return addTokenCards(boosted.state, request.template, boosted.counts[0] ?? 0, true);
 }
 
 function addTokenCards(
@@ -127,26 +102,31 @@ function addTokenCards(
   templateReference: TokenTemplateReference,
   count: number,
   throwIfMissing: boolean,
-  seriesIds?: readonly bigint[],
 ): GameState {
   const template =
     templateReference.kind === 'token-kind'
       ? state.tokenCatalog.find((card) => card.token === templateReference.token)
-      : state.tokenCatalog.find((card) => card.id === templateReference.templateId);
-  if (!template) {
+      : null;
+  if (!template && templateReference.kind !== 'action-token-card') {
     if (throwIfMissing) throw new Error('追加カードの定義がありません。');
     return state;
   }
   const addable = Math.max(0, rules.maxDeckSize - state.deck.length);
-  const generated = Array.from(
+  const generated: Card[] = Array.from(
     { length: Math.min(Math.max(0, Math.trunc(count)), addable) },
     (_, index) => {
-      const card = { ...template, id: `${template.id}-${state.nextTokenId + index}` };
-      return templateReference.kind === 'template'
-        ? { ...card, tokenSeriesIds: (seriesIds ?? []).map(int32) }
-        : card;
+      const generatedId = state.nextTokenId + index;
+      if (templateReference.kind === 'action-token-card')
+        return createActionTokenCard(
+          templateReference.effect,
+          tokenCardId(templateReference.effect.resourceId, generatedId),
+          templateReference.effect.seriesIds,
+        );
+      if (!template) throw new Error('追加カードの定義がありません。');
+      return { ...template, id: `${template.id}-${generatedId}` };
     },
   );
+  for (const card of generated) validateCard(card);
   const split = state.tokenDeckSplit;
   const splitMatches = (card: (typeof generated)[number]) =>
     split?.seriesIds !== null &&
@@ -184,6 +164,63 @@ function addTokenCards(
     },
     generated,
   );
+}
+
+function createActionTokenCard(
+  effect: TokenCardEffect,
+  id: string,
+  seriesIds?: readonly bigint[],
+): Card {
+  if (!effect.skill) throw new Error('追加カードのSkill系列Masterがありません。');
+  const skill = skillVariant(effect.skill.variant);
+  const ability =
+    effect.ability === null || effect.ability === undefined
+      ? null
+      : abilityVariant(effect.ability.variant);
+  return {
+    id,
+    name: '',
+    costume: null,
+    performer: null,
+    member: 0,
+    unit: null,
+    mainEffect: effect.skill.mainEffect,
+    cost: skill.cost,
+    style: effect.style,
+    mood: effect.mood,
+    appeal: { smile: 0, pure: 0, cool: 0 },
+    beatPoint: 0,
+    tokenCardAbilitySeriesId: ability === null ? null : BigInt(effect.ability?.seriesId ?? 0),
+    ...(seriesIds === undefined ? {} : { tokenSeriesIds: seriesIds.map(int32) }),
+    effects: skill.effects,
+    ...(skill.special === null ? {} : { special: skill.special }),
+    ...(ability === null
+      ? {}
+      : {
+          ability893Effects: ability.ability893Effects,
+          ability894Effects: ability.ability894Effects,
+        }),
+    tokenCard: true as const,
+    skillIcon: effect.skill.skillIcon,
+  };
+}
+
+function tokenCardId(resourceId: number, sequence: number): string {
+  if (!Number.isSafeInteger(resourceId))
+    throw new Error('TokenCard ResourceIDが正しくありません。');
+  const sign = resourceId < 0 ? 'negative' : 'positive';
+  return `token-card-${sign}-${Math.abs(resourceId)}-${sequence}`;
+}
+
+function skillVariant(variant: ModeSkillVariant | ModeAbilityVariant): ModeSkillVariant {
+  if (!('cost' in variant)) throw new Error('追加カードのSkill variantが正しくありません。');
+  return variant;
+}
+
+function abilityVariant(variant: ModeSkillVariant | ModeAbilityVariant): ModeAbilityVariant {
+  if (!('modeEffects' in variant))
+    throw new Error('追加カードのAbility variantが正しくありません。');
+  return variant;
 }
 
 function int32(value: bigint): number {

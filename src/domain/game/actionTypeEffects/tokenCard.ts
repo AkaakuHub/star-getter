@@ -52,7 +52,7 @@ export function createTokenCardEffect(input: Input): TokenCardEffect {
   });
   return {
     kind: 'token-card',
-    templateId: String(resourceId),
+    resourceId,
     count,
     style,
     mood,

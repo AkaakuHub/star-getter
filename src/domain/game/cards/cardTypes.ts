@@ -23,6 +23,13 @@ import type { MoodActionRecord } from './moodActionRecord';
 export type { HandUseTrigger } from './handUseTrigger';
 import type { HandInducer } from './handInducer';
 import type { ActionTypeDetail } from './actionTypeDetail';
+import type { ModeAbilityVariant, ModeSkillVariant } from './cardSkillVariants';
+export type {
+  CardSkillVariantMaster,
+  ModeAbilityVariant,
+  ModeSkillVariant,
+  TokenCardSkillMasterData,
+} from './cardSkillVariants';
 
 export type ActionType1Record = Readonly<{
   actionType: 1;
@@ -183,15 +190,6 @@ export type ActionType36Record = Readonly<{
   }>;
 }>;
 
-export type CardSkillVariantMaster = Readonly<{
-  skillType: number;
-  seriesId: number;
-  skillLevel: number;
-  specialAppealSkillLevel: number;
-  skillSkillLevel: number;
-  variant: ModeSkillVariant | ModeAbilityVariant;
-}>;
-
 export type ActionType29Record = Readonly<{
   actionType: 29;
   skillEffectId: bigint;
@@ -220,29 +218,18 @@ export type ActionType41Record = Readonly<{
   deactivationKey?: string;
 }>;
 
-export type ModeSkillVariant = Readonly<{
-  cost: number;
-  effects: readonly Effect[];
-  skillIcon: number | null;
-  special: Readonly<{ cost: number; extra: boolean; effects: readonly Effect[] }> | null;
-}>;
-
-export type ModeAbilityVariant = Readonly<{
-  modeEffects: readonly Effect[];
-  ability893Effects: readonly Effect[];
-  ability894Effects: readonly Effect[];
-}>;
-
 export type Card = Readonly<{
   id: string;
   name: string;
-  costume: CostumeId;
-  performer: PerformerId;
+  costume: CostumeId | null;
+  performer: PerformerId | null;
   member: MemberId;
   unit: UnitId | null;
   mainEffect?: number;
   cost: number;
   style?: number;
+  mood?: number;
+  tokenCard?: true;
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
   tokenCardAbilitySeriesId?: bigint | null;

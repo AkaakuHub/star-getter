@@ -2,7 +2,6 @@ import { expect, it } from 'vite-plus/test';
 import {
   beginTokenGeneration,
   finishTokenGeneration,
-  requestTokenCard,
   requestTokens,
 } from '../../src/domain/game/cards/tokens';
 import { boostTokenRequests } from '../../src/domain/game/cards/tokenBoost';
@@ -10,6 +9,7 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { act } from '../../src/domain/game/actions';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { game } from './support/game';
+import { tokenCardEffect } from './support/tokenCardEffect';
 
 it('追加カードの増幅は元指定枚数を超えて配分せず、同一スキル中は使用回数を一度だけ消費する', () => {
   const initial = game('library');
@@ -138,47 +138,34 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
   expect(generated.tokenBoosts).toHaveLength(0);
 });
 
-it('ActionType28は指定したトークンカードを直接追加し、データ項目を保つ', () => {
+it('ActionType28はMasterからTokenCardを生成し、系列情報を保持する', () => {
   const initial = game('library');
-  const template = initial.tokenCatalog.find((card) => card.token === 'story');
-  if (!template) throw new Error('トークンカードがありません。');
-  const customized = {
-    ...initial,
-    tokenCatalog: initial.tokenCatalog.map((card) =>
-      card.id === template.id ? { ...card, id: 'action28-template', style: 2 as const } : card,
-    ),
-  };
-  const generated = applyEffect(
-    customized,
-    action28TokenEffect('action28-template', 2n, [42n], 2),
-    undefined,
-  );
-  const added = generated.deck.filter((card) => card.id.startsWith('action28-template-'));
+  const generated = applyEffect(initial, tokenCardEffect(481, 2n, [42n], 2), undefined);
+  const added = generated.deck.filter((card) => card.id.startsWith('token-card-positive-481-'));
   expect(added).toHaveLength(2);
   expect(added.every((card) => card.style === 2)).toBe(true);
-  expect(generated.drawPile.filter((id) => id.startsWith('action28-template-'))).toHaveLength(2);
+  expect(added.every((card) => card.tokenCard && card.performer === null)).toBe(true);
 });
 
 it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成ではint32化する', () => {
   const initial = game('library');
   const source = initial.deck[0];
-  const template = initial.tokenCatalog.find((card) => card.token === 'story');
-  if (!source || !template) throw new Error('カードがありません。');
+  if (!source) throw new Error('カードがありません。');
   const state = {
     ...initial,
     deck: [source],
     cardPool: [source],
     drawPile: [source.id],
     hand: [],
-    tokenCatalog: [template],
+    tokenCatalog: [],
     tokenGroups: [],
   };
   const count = (1n << 32n) + 1n;
-  const ordinary = requestTokenCard(state, template.id, count, source.id);
+  const ordinary = applyEffect(state, tokenCardEffect(481, count), source);
   expect(ordinary.deck).toHaveLength(1);
 
   const grouped = finishTokenGeneration(
-    requestTokenCard(beginTokenGeneration(state, source.id), template.id, count, source.id),
+    applyEffect(beginTokenGeneration(state, source.id), tokenCardEffect(481, count), source),
     source.id,
   ).state;
   expect(grouped.deck).toHaveLength(2);
@@ -187,8 +174,7 @@ it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成で�
 it('ActionType28はActionType52を消費せず、生成数を変えない', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
-  const template = initial.tokenCatalog.find((card) => card.token === 'story');
-  if (!source || !template) throw new Error('カードがありません。');
+  if (!source) throw new Error('発動元カードがありません。');
   const boosted = applyEffect(
     initial,
     {
@@ -201,50 +187,17 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
     },
     source,
   );
-  const generated = applyEffect(boosted, action28TokenEffect(template.id, 2n, [42n]), source);
-  expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(
-    initial.deck.filter((card) => card.token === 'story').length + 2,
-  );
+  const generated = applyEffect(boosted, tokenCardEffect(481, 2n, [42n]), source);
+  expect(generated.deck.filter((card) => card.tokenCard)).toHaveLength(2);
   expect(generated.action52Buffs).toHaveLength(1);
 });
-
-function action28TokenEffect(
-  templateId: string,
-  count: bigint,
-  seriesIds: readonly bigint[],
-  style = 1,
-) {
-  return {
-    kind: 'token-card' as const,
-    templateId,
-    count,
-    style,
-    mood: 1,
-    skillSeriesId: 0,
-    skillLevel: 1,
-    abilitySeriesId: 0,
-    abilityLevel: 1 as const,
-    sourceSkillType: 2,
-    sourceSkillLevel: 1,
-    sourceSpecialAppealSkillLevel: 0,
-    sourceSkillSkillLevel: 1,
-    seriesIds,
-  };
-}
 
 it('ActionType28は同一スキル内で指定カードを増幅後に交互追加する', () => {
   const initial = game('library');
   const source = initial.deck.find((card) => card.id === 'library-pages');
-  const template = initial.tokenCatalog.find((card) => card.token === 'story');
-  if (!source || !template) throw new Error('カードがありません。');
-  const customized = {
-    ...initial,
-    tokenCatalog: initial.tokenCatalog.map((card) =>
-      card.id === template.id ? { ...card, id: 'action28-template' } : card,
-    ),
-  };
+  if (!source) throw new Error('発動元カードがありません。');
   const boosted = applyEffect(
-    customized,
+    initial,
     {
       kind: 'token-boost',
       calculation: 'add',
@@ -256,9 +209,11 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
     source,
   );
   let state = beginTokenGeneration(boosted, source.id);
-  state = requestTokenCard(state, 'action28-template', 2, source.id, [42]);
+  state = applyEffect(state, tokenCardEffect(481, 2n, [42n]), source);
   state = finishTokenGeneration(state, source.id).state;
-  expect(state.deck.filter((card) => card.id.startsWith('action28-template-'))).toHaveLength(2);
+  expect(state.deck.filter((card) => card.id.startsWith('token-card-positive-481-'))).toHaveLength(
+    2,
+  );
   expect(state.tokenBoosts).toHaveLength(0);
 });
 

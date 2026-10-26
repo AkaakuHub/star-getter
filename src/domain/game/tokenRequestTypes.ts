@@ -1,8 +1,9 @@
 import type { TokenKind } from './model';
+import type { TokenCardSkillMasterData } from './cards/cardTypes';
 
 export type TokenTemplateReference =
   | Readonly<{ kind: 'token-kind'; token: TokenKind }>
-  | Readonly<{ kind: 'template'; templateId: string }>;
+  | Readonly<{ kind: 'action-token-card'; effect: TokenCardEffect }>;
 
 export type TokenRequest = Readonly<{
   template: TokenTemplateReference;
@@ -12,7 +13,7 @@ export type TokenRequest = Readonly<{
 
 export type TokenCardEffect = Readonly<{
   kind: 'token-card';
-  templateId: string;
+  resourceId: number;
   count: bigint;
   style: number;
   mood: number;
@@ -24,13 +25,15 @@ export type TokenCardEffect = Readonly<{
   sourceSkillLevel: number;
   sourceSpecialAppealSkillLevel: number;
   sourceSkillSkillLevel: number;
+  skill?: TokenCardSkillMasterData;
+  ability?: TokenCardSkillMasterData | null;
   seriesIds?: readonly bigint[];
   parameterDetails?: Readonly<Record<string, { id: bigint; value: bigint; unitsPerValue: number }>>;
 }>;
 
 export function validateTokenCardEffect(effect: TokenCardEffect): undefined {
   if (
-    !effect.templateId ||
+    !isInt32(effect.resourceId) ||
     ![
       effect.style,
       effect.mood,
@@ -41,7 +44,17 @@ export function validateTokenCardEffect(effect: TokenCardEffect): undefined {
       effect.sourceSkillLevel,
       effect.sourceSpecialAppealSkillLevel,
       effect.sourceSkillSkillLevel,
-    ].every(Number.isSafeInteger) ||
+    ].every(isInt32) ||
+    !effect.skill ||
+    effect.skill.seriesId !== effect.skillSeriesId ||
+    !isInt32(effect.skill.mainEffect) ||
+    !isInt32(effect.skill.skillIcon) ||
+    effect.ability === undefined ||
+    (effect.abilitySeriesId === 0
+      ? effect.ability !== null
+      : effect.ability === null || effect.ability.seriesId !== effect.abilitySeriesId) ||
+    (effect.ability !== null &&
+      (!isInt32(effect.ability.mainEffect) || !isInt32(effect.ability.skillIcon))) ||
     effect.count < -(1n << 63n) ||
     effect.count >= 1n << 63n ||
     effect.seriesIds?.some((id) => id < -(1n << 63n) || id >= 1n << 63n) ||
@@ -56,4 +69,8 @@ export function validateTokenCardEffect(effect: TokenCardEffect): undefined {
   )
     throw new Error('追加カードデータの設定が正しくありません。');
   return undefined;
+}
+
+function isInt32(value: number): boolean {
+  return Number.isInteger(value) && value >= -2_147_483_648 && value <= 2_147_483_647;
 }

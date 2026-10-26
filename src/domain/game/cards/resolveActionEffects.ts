@@ -1,9 +1,11 @@
+import type { Card } from './cardTypes';
 import type {
-  Card,
   CardSkillVariantMaster,
   ModeAbilityVariant,
   ModeSkillVariant,
-} from './cardTypes';
+  TokenCardSkillMasterData,
+} from './cardSkillVariants';
+import type { Effect } from '../modelTypes';
 import { resolveActionEffect } from './resolveActionEffect';
 import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessInduce';
 import { createOnDrawInduceRule } from '../actionTypeEffects/onDrawInduce';
@@ -59,16 +61,16 @@ export function resolveActionEffects(
       if (actionEffect.skillType === 3) {
         modeAbilityChanges = {
           modeId,
-          off: modeAbilityVariant(off),
-          on: modeAbilityVariant(on),
+          off: modeAbilityVariant(off.variant),
+          on: modeAbilityVariant(on.variant),
         };
       } else {
         if (actionEffect.skillType !== 1 && actionEffect.skillType !== 2)
           throw new Error('モード切替スキル種別が正しくありません。');
         modeSkillChanges = {
           modeId,
-          off: modeSkillVariant(off),
-          on: modeSkillVariant(on),
+          off: modeSkillVariant(off.variant),
+          on: modeSkillVariant(on.variant),
         };
       }
       continue;
@@ -89,7 +91,11 @@ export function resolveActionEffects(
       handPermanentEffects.push(...resolveHandPermanentEffects(actionEffect));
       continue;
     }
-    const effect = resolveActionEffect(actionEffect);
+    const resolvedEffect = resolveActionEffect(actionEffect);
+    const effect =
+      actionEffect.actionType === 28 && resolvedEffect?.kind === 'token-card'
+        ? resolveTokenCardSkillData(resolvedEffect, cardSkillVariants)
+        : resolvedEffect;
     if (effect === null) continue;
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
@@ -109,6 +115,43 @@ export function resolveActionEffects(
   };
 }
 
+function resolveTokenCardSkillData(
+  effect: Extract<Effect, { kind: 'token-card' }>,
+  masters: readonly CardSkillVariantMaster[],
+): Extract<Effect, { kind: 'token-card' }> {
+  const skillMaster = resolveCardSkillVariant(
+    masters,
+    effect.skillSeriesId,
+    2,
+    effect.skillLevel,
+    0,
+    effect.skillLevel,
+  );
+  const ability =
+    effect.abilitySeriesId === 0
+      ? null
+      : resolveCardSkillVariant(
+          masters,
+          effect.abilitySeriesId,
+          3,
+          effect.abilityLevel,
+          0,
+          effect.skillLevel,
+        );
+  const skill = tokenCardSkillData(skillMaster);
+  const abilityData = ability === null ? null : tokenCardSkillData(ability);
+  return { ...effect, skill, ability: abilityData };
+}
+
+function tokenCardSkillData(master: CardSkillVariantMaster): TokenCardSkillMasterData {
+  return {
+    seriesId: master.seriesId,
+    mainEffect: master.seriesMainEffect,
+    skillIcon: master.seriesSkillIcon,
+    variant: master.variant,
+  };
+}
+
 function resolveCardSkillVariant(
   masters: readonly CardSkillVariantMaster[],
   seriesId: number,
@@ -116,7 +159,7 @@ function resolveCardSkillVariant(
   skillLevel: number,
   specialAppealSkillLevel: number,
   skillSkillLevel: number,
-): ModeSkillVariant | ModeAbilityVariant {
+): CardSkillVariantMaster {
   const matches = masters.filter(
     (master) =>
       master.seriesId === seriesId &&
@@ -128,7 +171,7 @@ function resolveCardSkillVariant(
   if (matches.length !== 1) throw new Error('モード切替スキル系列Masterを一意に解決できません。');
   const match = matches[0];
   if (!match) throw new Error('モード切替スキル系列Masterがありません。');
-  return match.variant;
+  return match;
 }
 
 function modeSkillVariant(variant: ModeSkillVariant | ModeAbilityVariant): ModeSkillVariant {

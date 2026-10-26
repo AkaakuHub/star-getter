@@ -10,6 +10,7 @@ import {
   startIngameMission,
 } from '../../src/domain/game/ingameMissions';
 import { game } from './support/game';
+import { tokenCardEffect } from './support/tokenCardEffect';
 
 const records = [
   {
@@ -134,8 +135,7 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   const initial = game('library');
   const sourceId = initial.hand[0];
   const source = initial.deck.find((card) => card.id === sourceId);
-  const template = initial.tokenCatalog.find((card) => card.token === 'story');
-  if (!source || !template) throw new Error('ActionType28の検証カードがありません。');
+  if (!source) throw new Error('ActionType28の検証カードがありません。');
   const record = {
     missionType: 2 as const,
     probability: 1,
@@ -149,23 +149,7 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   };
   const card = {
     ...source,
-    effects: [
-      {
-        kind: 'token-card' as const,
-        templateId: template.id,
-        count: 2n,
-        style: 1,
-        mood: 1,
-        skillSeriesId: 0,
-        skillLevel: 1,
-        abilitySeriesId: 0,
-        abilityLevel: 1 as const,
-        sourceSkillType: 2,
-        sourceSkillLevel: 1,
-        sourceSpecialAppealSkillLevel: 0,
-        sourceSkillSkillLevel: 1,
-      },
-    ],
+    effects: [tokenCardEffect(481, 2n)],
   };
   const deck = initial.deck.map((item) => (item.id === source.id ? card : item));
   const state = {

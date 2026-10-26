@@ -11,6 +11,8 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillLevel: 1,
     specialAppealSkillLevel: 1,
     skillSkillLevel: 1,
+    seriesMainEffect: 0,
+    seriesSkillIcon: 20,
     variant: { cost: 2, effects: [], skillIcon: 20, special: null },
   },
   {
@@ -19,6 +21,8 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillLevel: 1,
     specialAppealSkillLevel: 1,
     skillSkillLevel: 1,
+    seriesMainEffect: 0,
+    seriesSkillIcon: 21,
     variant: { cost: 3, effects: [], skillIcon: 21, special: null },
   },
   {
@@ -27,6 +31,8 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillLevel: 1,
     specialAppealSkillLevel: 1,
     skillSkillLevel: 1,
+    seriesMainEffect: 0,
+    seriesSkillIcon: 22,
     variant: {
       modeEffects: [],
       ability893Effects: [{ kind: 'voltage-set', amount: 1 }],
@@ -39,6 +45,8 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillLevel: 1,
     specialAppealSkillLevel: 1,
     skillSkillLevel: 1,
+    seriesMainEffect: 0,
+    seriesSkillIcon: 23,
     variant: {
       modeEffects: [],
       ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
@@ -160,6 +168,8 @@ it('ActionType36は系列IDに一致するMaster variantがない場合に失敗
         skillLevel: 1,
         specialAppealSkillLevel: 1,
         skillSkillLevel: 1,
+        seriesMainEffect: 0,
+        seriesSkillIcon: 20,
         variant: { cost: 2, effects: [], skillIcon: 20, special: null },
       },
     ]),

@@ -53,7 +53,8 @@ export function boostTokenRequests(
     );
     value = Math.fround((Math.max(-100, percent) * value) / 100 + value);
     if (!Number.isFinite(value)) return 0;
-    const count = request.template.kind === 'template' ? toInt32(value) : Math.trunc(value);
+    const count =
+      request.template.kind === 'action-token-card' ? toInt32(value) : Math.trunc(value);
     return Math.max(0, grouped ? Math.min(request.count, count) : count);
   });
   return {

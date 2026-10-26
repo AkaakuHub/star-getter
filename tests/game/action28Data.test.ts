@@ -1,7 +1,36 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
+import type { CardSkillVariantMaster } from '../../src/domain/game/cards/cardTypes';
 import { createGame } from '../../src/domain/game/simulation';
+import { applyEffect } from '../../src/domain/game/effects';
+
+const cardSkillVariants: readonly CardSkillVariantMaster[] = [
+  {
+    skillType: 2,
+    seriesId: 42,
+    skillLevel: 4,
+    specialAppealSkillLevel: 0,
+    skillSkillLevel: 4,
+    seriesMainEffect: 1,
+    seriesSkillIcon: 5,
+    variant: { cost: 3, effects: [{ kind: 'energy', amount: 2 }], skillIcon: 5, special: null },
+  },
+  {
+    skillType: 3,
+    seriesId: 43,
+    skillLevel: 1,
+    specialAppealSkillLevel: 0,
+    skillSkillLevel: 4,
+    seriesMainEffect: 2,
+    seriesSkillIcon: 6,
+    variant: {
+      modeEffects: [],
+      ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
+      ability894Effects: [],
+    },
+  },
+];
 
 it('ActionType28は指定されたTokenCardテンプレートからEffectを生成する', () => {
   const track = tracks[0];
@@ -36,16 +65,24 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
                   value: 43n,
                 },
                 { id: 28_001_7n, detailType: 'TOKEN_CARD_ABILITY_LEVEL_REFERENCE', value: 2n },
+                {
+                  id: 28_001_8n,
+                  detailType: 'TOKEN_CARD_SERIES_ID',
+                  value: 0n,
+                  paramValues: [(1n << 32n) + 42n],
+                },
               ],
             },
           ],
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
-  expect(compiled?.effects.find((item) => item.kind === 'token-card')).toMatchObject({
+  const state = createGame(track, deck, 7, undefined, [], cardSkillVariants);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'token-card');
+  expect(effect).toMatchObject({
     kind: 'token-card',
-    templateId: '481',
+    resourceId: 481,
     count: 2n,
     style: 2,
     mood: 3,
@@ -57,5 +94,43 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
     sourceSkillLevel: 2,
     sourceSpecialAppealSkillLevel: 3,
     sourceSkillSkillLevel: 4,
+    skill: {
+      seriesId: 42,
+      mainEffect: 1,
+      skillIcon: 5,
+      variant: { cost: 3, effects: [{ kind: 'energy', amount: 2 }], skillIcon: 5, special: null },
+    },
+    ability: {
+      seriesId: 43,
+      mainEffect: 2,
+      skillIcon: 6,
+      variant: {
+        modeEffects: [],
+        ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
+        ability894Effects: [],
+      },
+    },
   });
+  if (!compiled || !effect) throw new Error('TokenCard effectが解決されていません。');
+  const generated = applyEffect(state, effect, compiled);
+  const tokenCard = generated.deck.find((card) => card.tokenCard);
+  expect(tokenCard).toMatchObject({
+    name: '',
+    costume: null,
+    performer: null,
+    member: 0,
+    unit: null,
+    cost: 3,
+    style: 2,
+    mood: 3,
+    appeal: { smile: 0, pure: 0, cool: 0 },
+    beatPoint: 0,
+    mainEffect: 1,
+    skillIcon: 5,
+    tokenCardAbilitySeriesId: 43n,
+    tokenSeriesIds: [42],
+    effects: [{ kind: 'energy', amount: 2 }],
+    ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
+  });
+  expect(state.tokenCatalog).toHaveLength(0);
 });

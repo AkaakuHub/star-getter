@@ -1,12 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { createTokenCardEffect } from '../../src/domain/game/actionTypeEffects/tokenCard';
-import {
-  beginTokenGeneration,
-  finishTokenGeneration,
-  requestTokenCard,
-} from '../../src/domain/game/cards/tokens';
 import { game } from './support/game';
+import { tokenCardEffect } from './support/tokenCardEffect';
 
 it('ActionType28はカードテンプレートとlong枚数・series IDを接続する', () => {
   expect(
@@ -29,7 +25,7 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
     }),
   ).toEqual({
     kind: 'token-card',
-    templateId: '-2147483648',
+    resourceId: -2_147_483_648,
     count: 4_294_967_298n,
     style: 1,
     mood: 1,
@@ -60,7 +56,7 @@ it('ActionType28は枚数とResourceIDの既定値を使う', () => {
     }),
   ).toEqual({
     kind: 'token-card',
-    templateId: '0',
+    resourceId: 0,
     count: 1n,
     style: 1,
     mood: 1,
@@ -109,32 +105,24 @@ it('ActionType28はC# int32 castとAbility参照レベルを適用する', () =>
   });
 });
 
-it('ActionType28はAbilityがないTokenCardCardDataを追加する', () => {
+it('ActionType28はAbility系列が0のTokenCardDataを追加する', () => {
   const initial = game();
-  const template = initial.tokenCatalog[0];
   const source = initial.deck[0];
-  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
-  const state = {
-    ...initial,
-    tokenCatalog: [
-      { ...template, id: 'token-without-skill-series', tokenCardAbilitySeriesId: null },
-    ],
-  };
-
-  const result = requestTokenCard(state, 'token-without-skill-series', 1, source.id);
+  if (!source) throw new Error('発動元カードがありません。');
+  const result = applyEffect(initial, tokenCardEffect(481, 1n), source);
+  const generated = result.deck.find((card) => card.tokenCard);
+  expect(generated?.tokenCardAbilitySeriesId).toBeNull();
   expect(result.deck).toHaveLength(initial.deck.length + 1);
   expect(result.nextTokenId).toBe(initial.nextTokenId + 1);
 });
 
 it('ActionType28はseries detailのlong値で補正対象を照合し、生成カードにはint32値を設定する', () => {
   const initial = game();
-  const template = initial.tokenCatalog[0];
   const source = initial.deck[0];
-  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
+  if (!source) throw new Error('発動元カードがありません。');
   const seriesId = (1n << 32n) + 42n;
   const state = {
     ...initial,
-    tokenCatalog: [{ ...template, id: 'action28-series-template', tokenSeriesIds: [9] }],
     tokenBoosts: [
       {
         calculation: 'add' as const,
@@ -149,22 +137,16 @@ it('ActionType28はseries detailのlong値で補正対象を照合し、生成�
     ],
   };
 
-  const grouped = beginTokenGeneration(state, source.id);
-  const result = finishTokenGeneration(
-    requestTokenCard(grouped, 'action28-series-template', 2n, source.id, [seriesId]),
-    source.id,
-  ).state;
-  const generated = result.deck.filter((card) => card.id.startsWith('action28-series-template-'));
-  expect(generated).toHaveLength(2);
+  const result = applyEffect(state, tokenCardEffect(481, 2n, [seriesId]), source);
+  const generated = result.deck.filter((card) => card.tokenCard);
+  expect(generated).toHaveLength(3);
   expect(generated.every((card) => card.tokenSeriesIds?.join(',') === '42')).toBe(true);
 });
 
 it('ActionType28のカード枚数にActionType18の詳細値係数を適用する', () => {
   const initial = game();
-  const template = initial.tokenCatalog[0];
   const source = initial.deck[0];
-  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
-  const tokenTemplate = { ...template, id: '481', tokenCardAbilitySeriesId: null };
+  if (!source) throw new Error('発動元カードがありません。');
   const countDetailId = 12_345n;
   const effect = createTokenCardEffect({
     skillEffectId: 28n,
@@ -181,15 +163,26 @@ it('ActionType28のカード枚数にActionType18の詳細値係数を適用す�
       { id: 28_001_2n, detailType: 'TOKEN_CARD_RESOURCE_ID', value: 481n },
     ],
   });
+  const resolvedEffect = {
+    ...effect,
+    skill: {
+      seriesId: 0,
+      mainEffect: 0,
+      skillIcon: 0,
+      variant: { cost: 1, effects: [], skillIcon: 0, special: null },
+    },
+    ability: null,
+  } as const;
   const state = {
     ...initial,
-    tokenCatalog: [tokenTemplate],
+    tokenCatalog: [],
     parameterValueFactors: [
       { cardId: source.id, sourceEffectId: '18', targetDetailId: countDetailId, factor: 2 },
     ],
   };
 
-  const result = applyEffect(state, effect, source);
+  const result = applyEffect(state, resolvedEffect, source);
 
   expect(result.deck).toHaveLength(initial.deck.length + 4);
+  expect(result.deck.slice(initial.deck.length).every((card) => card.tokenCard)).toBe(true);
 });

@@ -17,13 +17,17 @@ export function validateDeck(
 export function validateCard(card: Card): void {
   if (
     !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(card.id) ||
-    !card.name.trim() ||
-    !costumeIds.includes(card.costume) ||
+    (!card.tokenCard && !card.name.trim()) ||
+    (card.costume !== null && !costumeIds.includes(card.costume)) ||
+    (!card.tokenCard && (card.costume === null || card.performer === null)) ||
     !Number.isInteger(card.cost) ||
     card.cost < 0 ||
     (card.mainEffect !== undefined && !Number.isSafeInteger(card.mainEffect)) ||
-    Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
-    (card.effects.length === 0 &&
+    Object.values(card.appeal).some(
+      (value) => !Number.isSafeInteger(value) || (card.tokenCard ? value < 0 : value <= 0),
+    ) ||
+    (!card.tokenCard &&
+      card.effects.length === 0 &&
       !card.handPermanentEffects?.length &&
       !card.modeSkillChanges &&
       !card.modeAbilityChanges) ||
