@@ -52,6 +52,23 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
   expect(changeResource({ ...latest, excitement: 10 }, 'excitement', -10n).excitement).toBe(0);
 });
 
+it('Action22は熟練度ボーナスの熱気も変換する', () => {
+  const base = unboostedGame();
+  const initial = {
+    ...base,
+    track: {
+      ...base.track,
+      masteryVoltageBonus: { demand: 1, gain: 10 },
+    },
+  };
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(initial, conversion, source);
+  const converted = changeResource(active, 'excitement', 1n, 'natural', source);
+  expect(heartCount(converted)).toBe(10);
+  expect(converted.excitement).toBe(initial.excitement + 1);
+});
+
 it('Action22の詳細値をC#のint32へ変換する', () => {
   const source = game().deck[0];
   if (!source) throw new Error('発動元カードがありません。');
