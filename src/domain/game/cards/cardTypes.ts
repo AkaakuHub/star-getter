@@ -12,6 +12,13 @@ type ActionTypeDetail = Readonly<{
   targetMood?: number;
 }>;
 
+export type ActionType1Record = Readonly<{
+  actionType: 1;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  destination: 'effects' | 'handPermanentEffects';
+}>;
+
 export type ActionType20Record = Readonly<{
   actionType: 20;
   skillEffectId: bigint;
@@ -225,6 +232,7 @@ export type Card = Readonly<{
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   actionEffects?: readonly (
+    | ActionType1Record
     | ActionType20Record
     | ActionType21Record
     | ActionType22Record
