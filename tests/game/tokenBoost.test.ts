@@ -175,7 +175,7 @@ it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成で�
   };
   const count = (1n << 32n) + 1n;
   const ordinary = requestTokenCard(state, template.id, count, source.id);
-  expect(ordinary.deck).toHaveLength(100);
+  expect(ordinary.deck).toHaveLength(1);
 
   const grouped = finishTokenGeneration(
     requestTokenCard(beginTokenGeneration(state, source.id), template.id, count, source.id),

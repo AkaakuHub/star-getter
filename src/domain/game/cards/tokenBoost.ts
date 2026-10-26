@@ -52,9 +52,9 @@ export function boostTokenRequests(
       0,
     );
     value = Math.fround((Math.max(-100, percent) * value) / 100 + value);
-    return Number.isFinite(value)
-      ? Math.max(0, grouped ? Math.min(request.count, Math.trunc(value)) : Math.trunc(value))
-      : 0;
+    if (!Number.isFinite(value)) return 0;
+    const count = request.template.kind === 'template' ? toInt32(value) : Math.trunc(value);
+    return Math.max(0, grouped ? Math.min(request.count, count) : count);
   });
   return {
     counts,
@@ -68,4 +68,10 @@ export function boostTokenRequests(
       }),
     },
   };
+}
+
+function toInt32(value: number): number {
+  if (!Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647)
+    return -2_147_483_648;
+  return Math.trunc(value);
 }
