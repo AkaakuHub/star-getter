@@ -30,7 +30,7 @@ export function addHeartBoost(
       ...boosted.state.heartBoosts,
       {
         percent: int32(boosted.value),
-        uses: effect.uses,
+        uses: effect.uses === null ? null : BigInt(effect.uses),
         target: effect.target ?? { kind: 'all' },
         remainingSeconds: suppressDuration
           ? null
@@ -73,7 +73,7 @@ export function consumeHeartBoosts(
       heartBoosts: state.heartBoosts.flatMap((boost) => {
         if (!matchingSet.has(boost)) return [boost];
         if (boost.uses === null) return [boost];
-        return boost.uses > 1 ? [{ ...boost, uses: boost.uses - 1 }] : [];
+        return boost.uses > 1n ? [{ ...boost, uses: boost.uses - 1n }] : [];
       }),
     },
     percent: matching.reduce((total, boost) => Math.fround(total + boost.percent), 0),

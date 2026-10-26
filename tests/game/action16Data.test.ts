@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
+import { createHeartUpEffect } from '../../src/domain/game/actionTypeEffects/heartUp';
 
 it('ActionType16の対象・回数・期限詳細をきらめき増幅Effectへ接続する', () => {
   const track = tracks[0];
@@ -33,8 +34,20 @@ it('ActionType16の対象・回数・期限詳細をきらめき増幅Effectへ�
   expect(compiled?.effects.find((item) => item.kind === 'heart-boost')).toMatchObject({
     kind: 'heart-boost',
     percent: 2.5,
-    uses: 2,
+    uses: 2n,
     target: { kind: 'member', member: 1031 },
     duration: { kind: 'stage' },
   });
+});
+
+it('ActionType16の使用回数longをbigintのまま保持する', () => {
+  const uses = (1n << 53n) + 1n;
+  const effect = createHeartUpEffect({
+    skillEffectId: 16n,
+    details: [
+      { id: 1n, detailType: 'HEART_UP_DISABLED_TYPE', value: 1n },
+      { id: 2n, detailType: 'HEART_UP_DISABLED', value: uses },
+    ],
+  });
+  expect(effect).toMatchObject({ uses });
 });

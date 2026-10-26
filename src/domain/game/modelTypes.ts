@@ -101,7 +101,7 @@ export type HeartBoostTarget =
 type HeartBoostEffect = Readonly<{
   kind: 'heart-boost';
   percent: number;
-  uses: number | null;
+  uses: number | bigint | null;
   target?: HeartBoostTarget;
   duration?:
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
@@ -112,7 +112,7 @@ type HeartBoostEffect = Readonly<{
 }>;
 export type HeartBoostState = Readonly<{
   percent: number;
-  uses: number | null;
+  uses: bigint | null;
   target: HeartBoostTarget;
   remainingSeconds: number | null;
   remainingSections: number | null;

@@ -42,9 +42,7 @@ export function createHeartUpEffect(input: Input): Effect {
     int32(detail(input.details, 'HEART_UP_TARGET_ID')?.value ?? 0n),
   );
   const disabledType = int32(detail(input.details, 'HEART_UP_DISABLED_TYPE')?.value ?? 0n);
-  const disabledCountValue = detail(input.details, 'HEART_UP_DISABLED')?.value ?? 0n;
-  const disabledCount = Number(disabledCountValue);
-  if (!Number.isSafeInteger(disabledCount)) throw new Error('きらめき増幅の使用回数が範囲外です。');
+  const disabledCount = detail(input.details, 'HEART_UP_DISABLED')?.value ?? 0n;
   return {
     kind: 'heart-boost',
     percent: Math.fround(

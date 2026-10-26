@@ -90,10 +90,19 @@ it('きらめき増幅は対象カードだけに適用し、別対象の獲得�
   });
   const unrelated = applyEffect(active, { kind: 'hearts', amount: 10 }, other);
   expect(unrelated.hearts.stageHearts).toHaveLength(10);
-  expect(unrelated.heartBoosts[0]?.uses).toBe(1);
+  expect(unrelated.heartBoosts[0]?.uses).toBe(1n);
   const matched = applyEffect(unrelated, { kind: 'hearts', amount: 10 }, source);
   expect(matched.hearts.stageHearts).toHaveLength(30);
   expect(matched.heartBoosts).toHaveLength(0);
+});
+
+it('longのきらめき増幅使用回数をbigintで1回ずつ減らす', () => {
+  const initial = game();
+  const uses = (1n << 53n) + 1n;
+  const active = applyEffect(initial, { kind: 'heart-boost', percent: 100, uses });
+  const consumed = applyEffect(active, { kind: 'hearts', amount: 1 });
+  expect(active.heartBoosts[0]?.uses).toBe(uses);
+  expect(consumed.heartBoosts[0]?.uses).toBe(uses - 1n);
 });
 
 it('きらめき増幅値をC#の整数キャストと同じく0方向へ切り捨てる', () => {

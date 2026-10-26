@@ -1,10 +1,14 @@
 import type { Effect } from './modelTypes';
+import { isInt64 } from './numeric';
 
 export function validateHeartBoostEffect(effect: Extract<Effect, { kind: 'heart-boost' }>): void {
   const target = effect.target;
   if (
     !Number.isFinite(effect.percent) ||
-    (effect.uses !== null && (!Number.isSafeInteger(effect.uses) || effect.uses < 1)) ||
+    (effect.uses !== null &&
+      (typeof effect.uses === 'bigint'
+        ? !isInt64(effect.uses)
+        : !Number.isSafeInteger(effect.uses) || effect.uses < 1)) ||
     (target?.kind === 'member' && !Number.isSafeInteger(target.member)) ||
     (target?.kind === 'unit' && ![1, 2, 3].includes(target.unit)) ||
     (target?.kind === 'card-series' && !Number.isSafeInteger(target.seriesId)) ||
