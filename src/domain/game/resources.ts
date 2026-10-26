@@ -1,6 +1,6 @@
 import type { GameState } from './model';
 import { voltageLevel, voltageThreshold } from './live/voltageLevel';
-import { changeBloomResource } from './bloom';
+import { changeBloomGauge, changeBloomResource } from './bloom';
 import { breakMentalShields } from './effects/mentalShield';
 import { absorbNaturalMentalDecrease, absorbSkillMentalDamage } from './live/mentalBarriers';
 import type { Card } from './model';
@@ -251,10 +251,10 @@ export function expireGaugeInfinities(
         next.maximumMental,
       );
     if (gauge === 'voltage') {
-      next = {
-        ...next,
-        excitement: voltageThreshold(Math.min(10, next.maximumVoltageLevel)),
-      };
+      const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
+      next = next.bloom
+        ? changeBloomGauge(next, Math.fround(target - next.excitement))
+        : setVoltageValue(next, target);
     }
   }
   return next;
@@ -275,8 +275,12 @@ export function deactivateGaugeInfinities(state: GameState, deactivationKey: str
         { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
         next.maximumMental,
       );
-    if (gauge === 'voltage')
-      next = { ...next, excitement: voltageThreshold(Math.min(10, next.maximumVoltageLevel)) };
+    if (gauge === 'voltage') {
+      const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
+      next = next.bloom
+        ? changeBloomGauge(next, Math.fround(target - next.excitement))
+        : setVoltageValue(next, target);
+    }
   }
   return next;
 }

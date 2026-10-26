@@ -167,6 +167,27 @@ describe('無限ゲージ', () => {
     expect(next.gaugeInfinities[0]?.suspended).toBe(true);
   });
 
+  it('開花中の熱気無限解除は熱気を維持してGenesis進捗へ目標差を加算する', () => {
+    const initial = { ...activateBloom(game('bloom'), 1), excitement: 100 };
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'stage', value: 0 },
+      invocationType: 0x388,
+      deactivationKey: 'voltage-infinity',
+    });
+    const progress = active.bloom?.progress;
+    if (progress === undefined) throw new Error('開花が発動していません。');
+    const ended = act(active, {
+      type: 'deactivate-infinity-gauge',
+      deactivationKey: 'voltage-infinity',
+    });
+    expect(ended.excitement).toBe(active.excitement);
+    expect(ended.bloom?.progress).toBe(
+      progress + BigInt(Math.trunc(Math.fround(voltageThreshold(10) - active.excitement))),
+    );
+  });
+
   it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {
     const base = game('bloom');
     const initial = {

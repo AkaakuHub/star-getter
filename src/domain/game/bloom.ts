@@ -54,6 +54,22 @@ export function changeBloomResource(
   };
 }
 
+export function changeBloomGauge(state: GameState, effectValue: number): GameState {
+  if (!state.bloom) throw new Error('開花が発動していません。');
+  const delta = calculateStarGatherGenesisGaugeDelta({
+    actionType: 39,
+    gaugeType: 1,
+    effectValue,
+    currentGenesisEffectValue: state.bloom.strength,
+  });
+  if (delta === null) return state;
+  const progress = BigInt.asIntN(32, state.bloom.progress + BigInt(delta));
+  return {
+    ...state,
+    bloom: { ...state.bloom, progress: progress < 0n ? 0n : progress },
+  };
+}
+
 export function finishBloom(state: GameState): GameState {
   if (!state.bloom) return state;
   let next: GameState = {
