@@ -107,3 +107,14 @@ it('負のActionType20効果はActionType44ミッション数を減らさない'
   const changed = applyEffect(startIngameMission(initial, 20n), handCardCountEffect(-1, 3, 0n));
   expect(changed.ingameMission?.count).toBe(0);
 });
+
+it('子効果で発動したActionType14もActionType44へ通知する', () => {
+  const initial = missionState(14, 2);
+  const changed = applyEffect(startIngameMission(initial, 14n), {
+    kind: 'branch',
+    condition: { kind: 'heat', minimum: 0 },
+    whenTrue: [{ kind: 'energy', amount: 2 }],
+    whenFalse: [],
+  });
+  expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+});
