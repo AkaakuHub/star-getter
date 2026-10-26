@@ -2,7 +2,9 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createHeartLimitChangeEffect } from '../../src/domain/game/actionTypeEffects/heartLimitChange';
+import { resolveEffectParameterDetails } from '../../src/domain/game/parameters/parameterValueChange';
 import { createGame } from '../../src/domain/game/simulation';
+import { game } from './support/game';
 
 it('ActionType25はlongの詳細値・対象Mood・期限を保持して計算種別をint32化する', () => {
   const effect = createHeartLimitChangeEffect({
@@ -68,4 +70,33 @@ it('ActionType25の詳細レコードをcreateGameでハート上限効果へ接
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
   const effect = compiled?.effects.find((item) => item.kind === 'heart-limit-change');
   expect(effect).toEqual(createHeartLimitChangeEffect({ skillEffectId: 25_001n, details }));
+});
+
+it('ActionType25はActionType18による計算種別の詳細値補正を適用する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('検証用カードがありません。');
+  const detailId = 25_002_1n;
+  const effect = createHeartLimitChangeEffect({
+    skillEffectId: 25_002n,
+    details: [
+      {
+        id: detailId,
+        detailType: 'CHANGE_HEART_LIMIT_CALC_TYPE',
+        targetMood: 0,
+        value: 1n,
+      },
+    ],
+  });
+  const state = {
+    ...initial,
+    parameterValueFactors: [
+      { cardId: card.id, sourceEffectId: 'parameter-value', targetDetailId: detailId, factor: 2 },
+    ],
+  };
+
+  expect(resolveEffectParameterDetails(state, card, effect)).toMatchObject({
+    kind: 'heart-limit-change',
+    calculationType: 2,
+  });
 });

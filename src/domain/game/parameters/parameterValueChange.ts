@@ -283,8 +283,20 @@ export function resolveEffectParameterDetails(
     };
   }
   if (effect.kind === 'heart-limit-change') {
+    const calculationType = int32(
+      resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'calculationType',
+        BigInt(effect.calculationType),
+      ),
+    );
+    if (calculationType !== 1 && calculationType !== 2)
+      throw new Error('きらめき上限変更の計算種別が正しくありません。');
     return {
       ...effect,
+      calculationType,
       num: resolveParameterDetailInteger(state, card, effect, 'num', effect.num),
       bonusMoodValue: resolveParameterDetailInteger(
         state,
