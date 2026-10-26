@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { advanceTo } from '../../src/domain/game/simulation';
+import { applyMentalBarrierAdditionalBuff } from '../../src/domain/game/effects/mentalBarrierAdditionalBuff';
 import { game } from './support/game';
 
 it('ActionType33は対象カードの耐久値を増幅し、対象外では消費しない', () => {
@@ -20,11 +21,11 @@ it('ActionType33は対象カードの耐久値を増幅し、対象外では消�
     {
       kind: 'mental-barrier-additional-buff',
       calculation: 1,
-      num: 500_000,
+      num: 500_000n,
       target: { kind: 'member', member: target.member },
-      duration: { kind: 'stage', value: 0 },
+      duration: { kind: 'stage', value: 0n },
       disabledType: 1,
-      disabledCount: 1,
+      disabledCount: 1n,
     },
     source,
   );
@@ -51,11 +52,11 @@ it('ActionType33の期限とInvocationType 0x388の期限抑止を適用する',
   const effect = {
     kind: 'mental-barrier-additional-buff',
     calculation: 1,
-    num: 1_000_000,
+    num: 1_000_000n,
     target: { kind: 'all' },
-    duration: { kind: 'milliseconds', value: 500 },
+    duration: { kind: 'milliseconds', value: 500n },
     disabledType: 0,
-    disabledCount: 0,
+    disabledCount: 0n,
   } as const;
   expect(
     advanceTo(applyEffect(initial, effect, source), 0.6).mentalBarrierAdditionalBuffs,
@@ -76,15 +77,42 @@ it('ActionType33は負数と小数の追加率をC#のintキャストで0方向�
       {
         kind: 'mental-barrier-additional-buff',
         calculation: 1,
-        num,
+        num: BigInt(num),
         target: { kind: 'all' },
-        duration: { kind: 'stage', value: 0 },
+        duration: { kind: 'stage', value: 0n },
         disabledType: 0,
-        disabledCount: 0,
+        disabledCount: 0n,
       },
       source,
     );
     return changed.mentalBarrierAdditionalBuffs[0]?.percent;
   });
   expect(percentages).toEqual([0, 0, 0, 1]);
+});
+
+it('ActionType33はC# longの期限と使用回数をfloat32・int64範囲で保持する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const longValue = 9_007_199_254_740_993n;
+  const armed = applyEffect(
+    initial,
+    {
+      kind: 'mental-barrier-additional-buff',
+      calculation: 1,
+      num: 10_000n,
+      moodBonus: { target: 1, perPoint: 1, perPointLong: longValue },
+      target: { kind: 'all' },
+      duration: { kind: 'sections', value: longValue },
+      disabledType: 1,
+      disabledCount: longValue,
+    },
+    source,
+  );
+  const buff = armed.mentalBarrierAdditionalBuffs[0];
+  expect(buff?.remainingSections).toBe(longValue);
+  expect(buff?.remainingUses).toBe(longValue);
+  const consumed = applyMentalBarrierAdditionalBuff(armed, source, 10);
+  expect(consumed.state.mentalBarrierAdditionalBuffs[0]?.remainingUses).toBe(longValue - 1n);
+  expect(consumed.state.mentalBarrierAdditionalBuffs[0]?.remainingSections).toBe(longValue);
 });

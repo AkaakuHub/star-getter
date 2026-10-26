@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   MentalBarrierAdditionalBuffEffect,
@@ -14,17 +15,19 @@ export function activateMentalBarrierAdditionalBuff(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   if (effect.calculation !== 1) return state;
   const correction = effect.moodBonus
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
         moodValue(state),
-        effect.moodBonus.perPoint,
+        effect.moodBonus.perPointLong === undefined
+          ? effect.moodBonus.perPoint
+          : int64ToFloat32(effect.moodBonus.perPointLong),
       )
     : 0;
-  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
+  const numValue = Math.fround(int64ToFloat32(effect.num) / Math.fround(10_000));
   const value = toInt32(
     Math.fround(
       Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
@@ -44,10 +47,10 @@ export function activateMentalBarrierAdditionalBuff(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / Math.fround(1000)),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
-    remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
+    remainingUses: effect.disabledType === 1 ? BigInt.asIntN(64, effect.disabledCount) : null,
     deactivationKey: effect.deactivationKey ?? null,
   };
   return {
@@ -85,8 +88,8 @@ export function expireMentalBarrierAdditionalBuffSections(state: GameState): Gam
     ...state,
     mentalBarrierAdditionalBuffs: state.mentalBarrierAdditionalBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }
@@ -121,8 +124,8 @@ export function applyMentalBarrierAdditionalBuff(
       mentalBarrierAdditionalBuffs: state.mentalBarrierAdditionalBuffs.flatMap((buff) => {
         if (!matching.some((item) => item.id === buff.id) || buff.remainingUses === null)
           return [buff];
-        const remainingUses = buff.remainingUses - 1;
-        return remainingUses > 0 ? [{ ...buff, remainingUses }] : [];
+        const remainingUses = buff.remainingUses - 1n;
+        return remainingUses > 0n ? [{ ...buff, remainingUses }] : [];
       }),
     },
   };
