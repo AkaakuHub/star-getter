@@ -106,9 +106,10 @@ export function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'token-deck-split') {
     if (
-      (effect.seriesIds !== null && effect.seriesIds.some((id) => !Number.isSafeInteger(id))) ||
-      !Number.isSafeInteger(effect.duration.value) ||
-      effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0) ||
+      (effect.seriesIds !== null && effect.seriesIds.some((id) => !isInt64(id))) ||
+      (effect.duration.kind === 'sections'
+        ? effect.duration.value < 1n
+        : !Number.isSafeInteger(effect.duration.value)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

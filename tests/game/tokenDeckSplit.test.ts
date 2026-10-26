@@ -21,7 +21,7 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
   const state = withHand({ ...base, deck }, [base.hand[0] ?? '', selectedId]);
   const split = applyEffect(state, {
     kind: 'token-deck-split',
-    seriesIds: [42],
+    seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
     deactivationKey: 'test-split',
   });
@@ -64,7 +64,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
   );
   const split = applyEffect(state, {
     kind: 'token-deck-split',
-    seriesIds: [42],
+    seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
   });
   expect([
@@ -86,7 +86,7 @@ it('ActionType43の系列IDをC#のint32へ変換してから照合する', () =
   };
   const split = applyEffect(state, {
     kind: 'token-deck-split',
-    seriesIds: [4_294_967_338],
+    seriesIds: [4_294_967_338n],
     duration: { kind: 'stage', value: 0 },
   });
   expect(split.tokenDeckSplit?.seriesIds).toEqual([42]);
@@ -106,7 +106,7 @@ it('期限切れでメインデッキへ戻す', () => {
   const state = withHand({ ...base, deck }, [base.hand[0] ?? '']);
   const split = applyEffect(state, {
     kind: 'token-deck-split',
-    seriesIds: [42],
+    seriesIds: [42n],
     duration: { kind: 'milliseconds', value: 1 },
   });
   expect(advanceTo(split, 0.1).tokenDeckSplit).toBeNull();

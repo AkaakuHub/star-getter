@@ -10,6 +10,6 @@ export type TokenDeckSplit = Readonly<{
   sub: TokenDeckZones;
   active: 'main' | 'sub';
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   deactivationKey: string | null;
 }>;

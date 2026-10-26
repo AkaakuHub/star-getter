@@ -210,8 +210,11 @@ type EffectShape =
   | Readonly<{ kind: 'ingame-mission'; groupId: number }>
   | Readonly<{
       kind: 'token-deck-split';
-      seriesIds: readonly number[] | null;
-      duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+      seriesIds: readonly bigint[] | null;
+      duration:
+        | Readonly<{ kind: 'milliseconds'; value: number }>
+        | Readonly<{ kind: 'sections'; value: bigint }>
+        | Readonly<{ kind: 'stage'; value: number }>;
       invocationType?: number;
       deactivationKey?: string;
     }>

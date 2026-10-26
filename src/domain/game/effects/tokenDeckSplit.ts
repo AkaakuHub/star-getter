@@ -21,9 +21,9 @@ export function activateTokenDeckSplit(
   effect: Extract<import('../modelTypes').Effect, { kind: 'token-deck-split' }>,
 ): GameState {
   if (state.tokenDeckSplit) return state;
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('表示パート数が0です。');
-  const seriesIds = effect.seriesIds?.map((id) => id | 0) ?? null;
+  const seriesIds = effect.seriesIds?.map((id) => Number(BigInt.asIntN(32, id))) ?? null;
   const selected = new Set(
     state.deck.filter((card) => isSeriesCard(card, seriesIds)).map((card) => card.id),
   );
@@ -46,7 +46,7 @@ export function activateTokenDeckSplit(
     active: 'main',
     remainingSeconds:
       !suppressExpiration && effect.duration.kind === 'milliseconds'
-        ? effect.duration.value / 1000
+        ? Math.fround(Math.fround(effect.duration.value) / Math.fround(1000))
         : null,
     remainingSections:
       !suppressExpiration && effect.duration.kind === 'sections' ? effect.duration.value : null,
@@ -149,8 +149,8 @@ export function advanceTokenDeckSplit(state: GameState, seconds: number): GameSt
 export function expireTokenDeckSplitSections(state: GameState): GameState {
   const split = state.tokenDeckSplit;
   if (!split || split.remainingSections === null) return state;
-  const remainingSections = split.remainingSections - 1;
-  return remainingSections <= 0
+  const remainingSections = split.remainingSections - 1n;
+  return remainingSections <= 0n
     ? mergeTokenDeck(state)
     : { ...state, tokenDeckSplit: { ...split, remainingSections } };
 }
