@@ -3,6 +3,7 @@ import type { StarGatherCardAppealParameters } from '../live/clientScoreInput';
 import type { PerformerId, MemberId, UnitId, CostumeId, TokenKind } from '../model';
 import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
+import type { SpecialAppealTokenCardSet } from '../specialAppealTokenTypes';
 
 type ActionTypeDetail = Readonly<{
   id: bigint;
@@ -99,6 +100,18 @@ export type ActionType46Record = Readonly<{
   absorbActionTypes: readonly bigint[];
   absorbAmounts: readonly bigint[];
   childEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
+  destination: 'effects' | 'handPermanentEffects';
+}>;
+
+export type ActionType53Record = Readonly<{
+  actionType: 53;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  musicGenerationsId: number;
+  sourceSkillLevel: number;
+  sourceSpecialAppealSkillLevel: number;
+  memberOrder: readonly MemberId[];
+  tokenCardSets: readonly SpecialAppealTokenCardSet[];
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
@@ -217,6 +230,7 @@ export type Card = Readonly<{
     | MoodActionRecord<44>
     | ActionType45Record
     | ActionType46Record
+    | ActionType53Record
     | MoodActionRecord<47>
     | MoodActionRecord<48>
     | MoodActionRecord<49>
