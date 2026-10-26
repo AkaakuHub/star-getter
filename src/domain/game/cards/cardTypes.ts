@@ -44,6 +44,15 @@ export type ActionType5Record = Readonly<{
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
+export type ActionType6Record = Readonly<{
+  actionType: 6;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  destination: 'effects' | 'handPermanentEffects';
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
 export type ActionType20Record = Readonly<{
   actionType: 20;
   skillEffectId: bigint;
@@ -261,6 +270,7 @@ export type Card = Readonly<{
     | ActionType2Record
     | ActionType3Record
     | ActionType5Record
+    | ActionType6Record
     | ActionType20Record
     | ActionType21Record
     | ActionType22Record
