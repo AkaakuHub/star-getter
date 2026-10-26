@@ -29,6 +29,9 @@ export function createTokenCardEffect(input: Input): TokenCardEffect {
     kind: 'token-card',
     templateId: String(resourceId),
     count,
+    ...(countDetail
+      ? { parameterDetails: { count: { id: countDetail.id, value: count, unitsPerValue: 1 } } }
+      : {}),
     ...(seriesIds && seriesIds.length > 0 ? { seriesIds } : {}),
   };
 }

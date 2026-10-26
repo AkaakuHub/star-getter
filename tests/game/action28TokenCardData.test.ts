@@ -1,4 +1,5 @@
 import { expect, it } from 'vite-plus/test';
+import { applyEffect } from '../../src/domain/game/effects';
 import { createTokenCardEffect } from '../../src/domain/game/actionTypeEffects/tokenCard';
 import {
   beginTokenGeneration,
@@ -26,6 +27,9 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
     kind: 'token-card',
     templateId: '-2147483648',
     count: 4_294_967_298n,
+    parameterDetails: {
+      count: { id: 1n, value: 4_294_967_298n, unitsPerValue: 1 },
+    },
     seriesIds: [(1n << 53n) + 1n],
   });
 });
@@ -86,4 +90,35 @@ it('ActionType28はseries detailのlong値で補正対象を照合し、生成�
   const generated = result.deck.filter((card) => card.id.startsWith('action28-series-template-'));
   expect(generated).toHaveLength(2);
   expect(generated.every((card) => card.tokenSeriesIds?.join(',') === '42')).toBe(true);
+});
+
+it('ActionType28のカード枚数にActionType18の詳細値係数を適用する', () => {
+  const initial = game();
+  const template = initial.tokenCatalog[0];
+  const source = initial.deck[0];
+  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
+  const tokenTemplate = { ...template, id: '481', tokenCardAbilitySeriesId: null };
+  const countDetailId = 12_345n;
+  const effect = createTokenCardEffect({
+    skillEffectId: 28n,
+    details: [
+      {
+        id: countDetailId,
+        detailType: 'TOKEN_CARD_CARD_COUNT',
+        value: 2n,
+      },
+      { id: 28_001_2n, detailType: 'TOKEN_CARD_RESOURCE_ID', value: 481n },
+    ],
+  });
+  const state = {
+    ...initial,
+    tokenCatalog: [tokenTemplate],
+    parameterValueFactors: [
+      { cardId: source.id, sourceEffectId: '18', targetDetailId: countDetailId, factor: 2 },
+    ],
+  };
+
+  const result = applyEffect(state, effect, source);
+
+  expect(result.deck).toHaveLength(initial.deck.length + 4);
 });
