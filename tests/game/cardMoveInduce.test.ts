@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { induceCardMoves } from '../../src/domain/game/effects/cardMoveInduce';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { game } from './support/game';
 
@@ -30,10 +31,11 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
     {
       kind: 'card-move-induce',
       sourceEffectId: 'proxy-graveyard',
+      targetEffectId: 700n,
       timing: 'stage-to-graveyard',
       limit: 1n,
       requireCount: 2n,
-      effects: [{ kind: 'boost', multiplier: 1.2 }],
+      effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 700n }],
     },
     source,
   );
@@ -60,7 +62,6 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
   const secondMove = moveProxyCard(firstMove);
   expect(secondMove.boosts).toHaveLength(0);
   expect(secondMove.cardMoveInducers[0]?.useCount).toBe(0);
-  expect(secondMove.cardMoveInducers[0]?.activatedCount).toBe(0);
   const thirdMove = moveProxyCard(secondMove);
   expect(thirdMove.boosts).toHaveLength(0);
   expect(thirdMove.cardMoveInducers[0]?.useCount).toBe(0);
@@ -75,10 +76,11 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
     {
       kind: 'card-move-induce',
       sourceEffectId: 'proxy-graveyard-only',
+      targetEffectId: 701n,
       timing: 'stage-to-graveyard',
       limit: 0n,
       requireCount: 0n,
-      effects: [{ kind: 'boost', multiplier: 1.2 }],
+      effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 701n }],
     },
     source,
   );
@@ -110,10 +112,11 @@ it('Proxy領域へ入る時はint32化したLimitNumを使う誘発も発火し�
     {
       kind: 'card-move-induce',
       sourceEffectId: 'proxy-limit-wrap',
+      targetEffectId: 702n,
       timing: 'stage-to-graveyard',
       limit: 2_147_483_648n,
       requireCount: 0n,
-      effects: [{ kind: 'boost', multiplier: 1.2 }],
+      effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 702n }],
     },
     source,
   );
@@ -131,14 +134,47 @@ it('Proxy領域へ入る時はint32化したRequireNumを使う誘発も発火�
     {
       kind: 'card-move-induce',
       sourceEffectId: 'proxy-require-wrap',
+      targetEffectId: 703n,
       timing: 'stage-to-graveyard',
       limit: 0n,
       requireCount: 4_294_967_297n,
-      effects: [{ kind: 'boost', multiplier: 1.2 }],
+      effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 703n }],
     },
     source,
   );
   const moved = moveProxyCard(armed, source.id);
   expect(moved.boosts).toHaveLength(0);
   expect(moved.cardMoveInducers[0]?.useCount).toBe(0);
+});
+
+it('ActionType908の上限は通常実行済みの子効果回数も含める', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('テスト用カードがありません。');
+  const child = { kind: 'boost' as const, multiplier: 1.2, skillEffectId: 706n };
+  const usedNormally = applyEffect({ ...initial, boosts: [] }, child, source);
+  const armed = applyEffect(
+    usedNormally,
+    {
+      kind: 'card-move-induce',
+      sourceEffectId: 'proxy-graveyard-shared-count',
+      targetEffectId: 706n,
+      timing: 'stage-to-graveyard',
+      limit: 1n,
+      requireCount: 0n,
+      effects: [child],
+    },
+    source,
+  );
+  const inProxy = {
+    ...armed,
+    proxyCards: [source.id],
+    skillUseDestinations: {},
+  };
+
+  const moved = induceCardMoves(inProxy, new Set([source.id]), applyEffect);
+
+  expect(moved.boosts).toEqual(inProxy.boosts);
+  expect(moved.cardMoveInducers[0]?.useCount).toBe(1);
+  expect(moved.skillEffectActivationCounts[`${source.id}:706`]).toBe(1);
 });

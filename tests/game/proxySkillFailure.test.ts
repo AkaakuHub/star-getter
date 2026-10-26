@@ -20,10 +20,11 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
       {
         kind: 'card-move-induce',
         sourceEffectId: 'proxy-card-graveyard',
+        targetEffectId: 704n,
         timing: 'stage-to-graveyard',
         limit: 1n,
         requireCount: 1n,
-        effects: [{ kind: 'boost', multiplier: 1.2 }],
+        effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 704n }],
       },
       source,
     ),
@@ -57,7 +58,6 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
   expect(expired.discard).toContain(source.id);
   expect(expired.boosts).toHaveLength(inProxy.boosts.length + 1);
   expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
-  expect(expired.cardMoveInducers[0]?.activatedCount).toBe(1);
 });
 
 it('ActionType908は墓地行き時にC#のint32 LimitNumで上限を判定する', () => {
@@ -73,10 +73,11 @@ it('ActionType908は墓地行き時にC#のint32 LimitNumで上限を判定す�
     {
       kind: 'card-move-induce',
       sourceEffectId: 'proxy-card-limit-wrap',
+      targetEffectId: 705n,
       timing: 'stage-to-graveyard',
       limit: 2_147_483_648n,
       requireCount: 0n,
-      effects: [{ kind: 'boost', multiplier: 1.2 }],
+      effects: [{ kind: 'boost', multiplier: 1.2, skillEffectId: 705n }],
     },
     source,
   );
@@ -111,5 +112,4 @@ it('ActionType908は墓地行き時にC#のint32 LimitNumで上限を判定す�
 
   expect(expired.boosts).toHaveLength(inProxy.boosts.length);
   expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
-  expect(expired.cardMoveInducers[0]?.activatedCount).toBe(0);
 });

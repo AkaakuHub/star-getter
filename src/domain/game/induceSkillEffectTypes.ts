@@ -29,6 +29,7 @@ export type EffectInduceEffect = Readonly<{
 export type CardMoveInduceEffect = Readonly<{
   kind: 'card-move-induce';
   sourceEffectId: string;
+  targetEffectId: bigint | null;
   timing: 'stage-to-graveyard';
   limit: bigint;
   requireCount: bigint;
@@ -54,12 +55,12 @@ export type ActiveEffectInducer = Readonly<{
 export type ActiveCardMoveInducer = Readonly<{
   sourceCardId: string;
   sourceEffectId: string;
+  targetEffectId: bigint | null;
   timing: CardMoveInduceEffect['timing'];
   limit: bigint;
   requireCount: bigint;
   effects: CardMoveInduceEffect['effects'];
   useCount: number;
-  activatedCount: number;
 }>;
 
 export type InduceSkillEffectInput = Readonly<{

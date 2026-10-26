@@ -18,12 +18,12 @@ export function activateCardMoveInduce(
       {
         sourceCardId: card.id,
         sourceEffectId,
+        targetEffectId: effect.targetEffectId,
         timing: effect.timing,
         limit: effect.limit,
         requireCount: effect.requireCount,
         effects: effect.effects,
         useCount: 0,
-        activatedCount: 0,
       },
     ],
   };
@@ -48,17 +48,22 @@ export function induceCardMoves(
     const useCount = int32(inducer.useCount + 1);
     next = updateInducer(next, sourceEffectId, { ...inducer, useCount });
     const limit = int32(inducer.limit);
-    const activatedCount = int32(inducer.activatedCount);
+    const activatedCount =
+      inducer.targetEffectId === null
+        ? 0
+        : int32(
+            next.skillEffectActivationCounts[`${inducer.sourceCardId}:${inducer.targetEffectId}`] ??
+              0,
+          );
     const requireCount = int32(inducer.requireCount);
     if (limit !== 0 && limit <= activatedCount) continue;
     if (requireCount !== 0 && useCount % requireCount !== 0) continue;
-    if (inducer.effects.length === 0) continue;
+    if (inducer.targetEffectId === null || inducer.effects.length === 0) continue;
     const card = next.cardPool.find((item) => item.id === inducer.sourceCardId);
     if (!card) throw new Error('カード移動誘発の発動元カードがありません。');
     next = updateInducer(next, sourceEffectId, {
       ...inducer,
       useCount,
-      activatedCount: int32(activatedCount + 1),
     });
     for (const effect of inducer.effects) next = apply(next, effect, card);
   }
