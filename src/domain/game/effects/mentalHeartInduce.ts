@@ -50,7 +50,7 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
     const inducer = next.mentalHeartInducers.find((item) => item.id === original.id);
     if (!inducer) continue;
     const product = int32(BigInt(inducer.precomputedNum) * BigInt(currentMental));
-    const scaled = Math.fround(product / 10_000);
+    const scaled = Math.fround(Math.fround(product) / Math.fround(10_000));
     const rounded = Math.fround(Math.ceil(Math.fround(scaled * 10)) / 10);
     const initialCount = floatToInt32(rounded);
     const card = inducer.sourceCardId
