@@ -12,7 +12,7 @@ export type AdditionalHeartInduceEffect = Readonly<{
   condition: AdditionalHeartInduceCondition;
   apPower: bigint;
   heartEffect: Extract<Effect, { kind: 'hearts' }>;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -26,7 +26,7 @@ export type AdditionalHeartInducer = Readonly<{
   addValue: number;
   multiplier: number;
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   deactivationKey: string | null;
 }>;
 
@@ -39,7 +39,7 @@ export function validateAdditionalHeartInduceEffect(effect: AdditionalHeartInduc
       !Number.isSafeInteger(effect.condition.actionType)) ||
     (effect.condition.kind === 'unit' && ![1, 2, 3].includes(effect.condition.unit)) ||
     !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
-    !Number.isSafeInteger(effect.duration.value) ||
+    !isInt64(effect.duration.value) ||
     (effect.heartEffect.lifetimeSeconds !== undefined &&
       !Number.isFinite(effect.heartEffect.lifetimeSeconds)) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||

@@ -21,7 +21,7 @@ it('一致したスキル使用APからEffectPowerを求め、登録したAction
       condition: { kind: 'all' },
       apPower: 10_000n,
       heartEffect: { kind: 'hearts', amount: 1, lifetimeSeconds: 2 },
-      duration: { kind: 'stage', value: 0 },
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -59,7 +59,7 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
               condition: { kind: 'member', member: source.member },
               apPower: 10_000n,
               heartEffect: { kind: 'hearts', amount: 1 },
-              duration: { kind: 'stage', value: 0 },
+              duration: { kind: 'stage', value: 0n },
               deactivationKey: 'extra-heart',
             },
           ] as const)
@@ -97,7 +97,7 @@ it('ActionType27はlong積をfloat32へ直接変換する', () => {
       condition: { kind: 'all' },
       apPower: 0n,
       heartEffect: { kind: 'hearts', amount: 1 },
-      duration: { kind: 'stage', value: 0 },
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -135,7 +135,7 @@ it('Action27の0ミリ秒期限は誘発を登録しない', () => {
       condition: { kind: 'all' },
       apPower: 10_000n,
       heartEffect: { kind: 'hearts', amount: 1 },
-      duration: { kind: 'milliseconds', value: 0 },
+      duration: { kind: 'milliseconds', value: 0n },
     },
     source,
   );

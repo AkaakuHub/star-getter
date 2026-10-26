@@ -21,7 +21,7 @@ export function activateAdditionalHeartInduce(
   addValue: number,
 ): GameState {
   if (!card) return state;
-  if (effect.duration.kind !== 'stage' && effect.duration.value === 0) return state;
+  if (effect.duration.kind !== 'stage' && effect.duration.value === 0n) return state;
   const indefinite = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   const inducer: AdditionalHeartInducer = {
     id: state.nextAdditionalHeartInducerId,
@@ -34,7 +34,7 @@ export function activateAdditionalHeartInduce(
     remainingSeconds:
       indefinite || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       indefinite || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     deactivationKey: effect.deactivationKey ?? null,
@@ -93,8 +93,8 @@ export function expireAdditionalHeartInducerSections(state: GameState): GameStat
     ...state,
     additionalHeartInducers: state.additionalHeartInducers.flatMap((inducer) => {
       if (inducer.remainingSections === null) return [inducer];
-      const remainingSections = inducer.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...inducer, remainingSections }] : [];
+      const remainingSections = inducer.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...inducer, remainingSections }] : [];
     }),
   };
 }
