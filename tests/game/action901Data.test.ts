@@ -1,9 +1,11 @@
 import { expect, it } from 'vite-plus/test';
+import { act } from '../../src/domain/game/actions';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
+import type { Card } from '../../src/domain/game/model';
 import { createGame } from '../../src/domain/game/simulation';
 
-it('ActionType901の条件分岐と子効果をドロー誘発効果へ接続する', () => {
+it('ActionType901の条件分岐と子効果をAbility893へ接続する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
@@ -28,7 +30,7 @@ it('ActionType901の条件分岐と子効果をドロー誘発効果へ接続す
       : card,
   );
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
-  expect(compiled?.drawEffects?.[0]).toEqual({
+  expect(compiled?.ability893Effects?.[0]).toEqual({
     kind: 'draw-success-induce',
     sourceEffectId: '901',
     branchType: 2n,
@@ -37,4 +39,43 @@ it('ActionType901の条件分岐と子効果をドロー誘発効果へ接続す
     whenTrue: [{ kind: 'mood', amount: 10 }],
     whenFalse: [{ kind: 'energy', amount: 1 }],
   });
+  expect(compiled?.drawEffects).toBeUndefined();
+});
+
+it('ActionType901はカード使用時にAbility893から条件付き子効果を発動する', () => {
+  const track = tracks[0];
+  if (!track) throw new Error('楽曲がありません。');
+  const card: Card = {
+    id: 'action-901',
+    name: 'ActionType901',
+    performer: 'nova',
+    member: 1021,
+    unit: 1,
+    costume: 'star',
+    cost: 0,
+    appeal: { smile: 1, pure: 1, cool: 1 },
+    beatPoint: 100,
+    effects: [{ kind: 'mood' as const, amount: 0 }],
+    actionEffects: [
+      {
+        actionType: 901 as const,
+        skillEffectId: 901n,
+        details: [
+          { id: 1n, detailType: 'DRAW_SUCCESS_INDUCE_BRANCH_TYPE', value: 1n },
+          { id: 2n, detailType: 'DRAW_SUCCESS_INDUCE_DISABLED_TYPE', value: 1n },
+        ],
+        whenTrue: [{ kind: 'mood' as const, amount: 10 }],
+        whenFalse: [],
+      },
+    ],
+  };
+  const deck = [
+    card,
+    { ...card, id: 'action-901-b', actionEffects: [] },
+    { ...card, id: 'action-901-c', actionEffects: [] },
+  ];
+  const initial = createGame(track, deck, 7);
+  const started = act(initial, { type: 'start' });
+  const used = act(started, { type: 'card', index: 0 });
+  expect(used.moodOffset - started.moodOffset).toBe(10);
 });

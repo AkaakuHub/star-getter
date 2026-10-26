@@ -10,6 +10,7 @@ export function resolveActionEffects(card: Card): Card {
   const { actionEffects, ...resolved } = card;
   let effects = [...resolved.effects];
   let handPermanentEffects = [...(resolved.handPermanentEffects ?? [])];
+  let ability893Effects = [...(resolved.ability893Effects ?? [])];
   let drawEffects = [...(resolved.drawEffects ?? [])];
   let drawRules = [...(resolved.drawRules ?? [])];
   let handInducers = [...(resolved.handInducers ?? [])];
@@ -26,7 +27,7 @@ export function resolveActionEffects(card: Card): Card {
       continue;
     }
     if (actionEffect.actionType === 901) {
-      drawEffects.push(createDrawSuccessInduceEffect(actionEffect));
+      ability893Effects.push(createDrawSuccessInduceEffect(actionEffect));
       continue;
     }
     if (actionEffect.actionType === 902) {
@@ -53,6 +54,7 @@ export function resolveActionEffects(card: Card): Card {
     ...(modeSkillChanges ? { modeSkillChanges } : {}),
     ...(modeAbilityChanges ? { modeAbilityChanges } : {}),
     ...(handPermanentEffects.length > 0 ? { handPermanentEffects } : {}),
+    ...(ability893Effects.length > 0 ? { ability893Effects } : {}),
     ...(drawEffects.length > 0 ? { drawEffects } : {}),
     ...(drawRules.length > 0 ? { drawRules } : {}),
     ...(handInducers.length > 0 ? { handInducers } : {}),
