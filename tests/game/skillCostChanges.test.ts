@@ -320,7 +320,6 @@ it('ActionType29の全範囲にはProxy中のカードも含める', () => {
   if (!target) throw new Error('対象カードがありません。');
   const proxyState = {
     ...initial,
-    deck: initial.deck.filter((card) => card.id !== target.id),
     proxyCards: [target.id],
   };
   const changed = applyEffect(proxyState, {

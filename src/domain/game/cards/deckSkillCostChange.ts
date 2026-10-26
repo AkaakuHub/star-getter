@@ -18,7 +18,8 @@ export function applyDeckSkillCostChange(
             ...state.deck,
             ...state.proxyCards.flatMap((id) => state.cardPool.filter((card) => card.id === id)),
           ];
-  const targets = candidates.filter((card) => {
+  const uniqueCandidates = [...new Map(candidates.map((card) => [card.id, card])).values()];
+  const targets = uniqueCandidates.filter((card) => {
     switch (effect.target) {
       case 'all':
         return true;
