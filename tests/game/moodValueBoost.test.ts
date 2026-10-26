@@ -80,9 +80,22 @@ it('Action50の詳細値をC#のint32へ変換してからNumToValueを計算す
   expect(wrapped.moodValueAdditionalBuffs[0]?.value).toBe(-214_748.359375);
 });
 
-it('Action50のMultiply2値はC#のMathf.Roundと同じ偶数丸めを行う', () => {
+it('Action50のMultiply2値はC#のint castと同じく0方向へ切り捨てる', () => {
   const state = applyEffect(game('library'), additiveBoost({ calculationType: 1, num: 15_000 }));
-  expect(state.moodValueAdditionalBuffs[0]?.value).toBe(2);
+  expect(state.moodValueAdditionalBuffs[0]?.value).toBe(1);
+});
+
+it('Action50はint cast後に正値を判定し、0になった値でActionType52を消費しない', () => {
+  const initial = applyEffect(game('library'), {
+    kind: 'skill-boost',
+    num: 1_000_000,
+    target: { kind: 'all' },
+    duration: { kind: 'stage', value: 0n },
+    uses: 1n,
+  });
+  const state = applyEffect(initial, additiveBoost({ calculationType: 1, num: 5_000 }));
+  expect(state.moodValueAdditionalBuffs[0]?.value).toBe(0);
+  expect(state.action52Buffs).toHaveLength(1);
 });
 
 it('Action50の対象とTokenCardSeriesパラメーターをC#の検索条件通りに扱う', () => {

@@ -2,7 +2,7 @@ import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
-import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
+import { int64ToFloat32 } from '../numeric';
 
 type MoodValueBoostEffect = Extract<Effect, { kind: 'mood-value-boost' }>;
 
@@ -27,7 +27,7 @@ export function activateMoodValueBoost(
   let value = Math.fround(
     Math.fround(Math.fround(mood + num) + Math.fround(addValue)) * Math.fround(multiplier),
   );
-  if (effect.calculationType === 1) value = roundToEvenFloat32(value);
+  if (effect.calculationType === 1) value = toSignedInt32(value);
   if (value > 0) {
     const boosted = applyAction52SkillBoostForCard(state, card, value);
     state = boosted.state;
