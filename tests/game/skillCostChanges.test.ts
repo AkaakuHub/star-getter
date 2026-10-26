@@ -313,3 +313,23 @@ it('ActionType29は山札上の対象カードだけに適用し、負数をActi
   expect(changed.onceSkillCostChanges[initial.hand[0] ?? '']).toBeUndefined();
   expect(changed.action52Buffs).toHaveLength(0);
 });
+
+it('ActionType29の全範囲にはProxy中のカードも含める', () => {
+  const initial = game();
+  const target = initial.deck[0];
+  if (!target) throw new Error('対象カードがありません。');
+  const proxyState = {
+    ...initial,
+    deck: initial.deck.filter((card) => card.id !== target.id),
+    proxyCards: [target.id],
+  };
+  const changed = applyEffect(proxyState, {
+    kind: 'deck-skill-cost-change',
+    num: 10_000,
+    targetRange: 1,
+    target: 'all',
+    targetId: 0,
+  });
+
+  expect(changed.onceSkillCostChanges[target.id]).toBe(1);
+});

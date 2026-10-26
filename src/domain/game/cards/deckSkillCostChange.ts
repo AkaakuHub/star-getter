@@ -14,7 +14,10 @@ export function applyDeckSkillCostChange(
       ? state.hand.flatMap((id) => state.deck.filter((card) => card.id === id))
       : effect.targetRange === 3
         ? state.deck.filter((card) => state.drawPile.includes(card.id))
-        : state.deck;
+        : [
+            ...state.deck,
+            ...state.proxyCards.flatMap((id) => state.cardPool.filter((card) => card.id === id)),
+          ];
   const targets = candidates.filter((card) => {
     switch (effect.target) {
       case 'all':
