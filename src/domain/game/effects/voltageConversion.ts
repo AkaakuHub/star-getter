@@ -66,10 +66,11 @@ export function convertVoltageIncrease(
   if (amount < 1n) return { state, converted: false };
   const conversion = state.voltageConversions.at(-1);
   if (!conversion) return { state, converted: false };
-  const voltage = Number(amount);
+  const voltage = BigInt.asIntN(32, amount);
   const card = sourceCard;
   let next = state;
-  const raw = Math.fround((conversion.num * voltage) / 10_000);
+  const product = BigInt.asIntN(32, BigInt(conversion.num) * voltage);
+  const raw = Math.fround(Math.fround(Number(product)) / Math.fround(10_000));
   if (conversion.destination === 'hearts') {
     const base = Math.trunc(Math.ceil(Math.fround(raw * 10)) / 10);
     const buffed = card

@@ -99,6 +99,25 @@ it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で�
   expect(converted.excitement).toBe(initial.excitement);
 });
 
+it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      ...conversion,
+      destination: 'love',
+      num: 100_000,
+      outputDuration: { kind: 'stage', value: 0 },
+      displayDuration: { kind: 'stage', value: 0 },
+    },
+    source,
+  );
+  const converted = changeResource(active, 'excitement', 100_000n, 'skill', source);
+  expect(converted.temporaryScoreBoosts[0]?.percent).toBe(141_006);
+});
+
 it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactivatorを処理する', () => {
   const initial = { ...unboostedGame(), stamina: 50 };
   const source = initial.deck[0];
