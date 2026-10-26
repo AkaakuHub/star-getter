@@ -235,3 +235,31 @@ it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEff
     duration: { kind: 'stage', value: 0n },
   });
 });
+
+it('ActionType24の詳細レコードは子EffectとともにcreateGameへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 24 as const,
+              skillEffectId: 24_001n,
+              destination: 'effects' as const,
+              details: [{ id: 24_001_1n, detailType: 'COMBO_INDUCE_AP_POWER', value: 10_000n }],
+              childEffects: [],
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  expect(compiled?.effects.find((item) => item.kind === 'combo-induce')).toMatchObject({
+    kind: 'combo-induce',
+    apPower: 10_000n,
+    effects: [],
+  });
+});

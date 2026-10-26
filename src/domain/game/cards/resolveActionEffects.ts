@@ -3,6 +3,7 @@ import { createHandCardCountEffect } from '../actionTypeEffects/handCardCount';
 import { createApSpeedChangeEffect } from '../actionTypeEffects/apSpeedChange';
 import { createVoltageConvertEffect } from '../actionTypeEffects/voltageConvert';
 import { createMentalHeartInduceEffect } from '../actionTypeEffects/mentalHeartInduce';
+import { createComboInduceEffect } from '../actionTypeEffects/comboInduce';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -23,7 +24,12 @@ export function resolveActionEffects(card: Card): Card {
             })
           : actionEffect.actionType === 22
             ? createVoltageConvertEffect(actionEffect)
-            : createMentalHeartInduceEffect(actionEffect);
+            : actionEffect.actionType === 23
+              ? createMentalHeartInduceEffect(actionEffect)
+              : createComboInduceEffect({
+                  ...actionEffect,
+                  effects: actionEffect.childEffects,
+                });
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
