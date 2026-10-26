@@ -32,6 +32,8 @@ import { createAdditionalHeartInduceEffect } from '../actionTypeEffects/addition
 import { createModeChangeInduceEffect } from '../actionTypeEffects/modeChangeInduce';
 import { createProxySkillEffect } from '../actionTypeEffects/proxySkill';
 import { createTokenCardEffect } from '../actionTypeEffects/tokenCard';
+import { createSkillCooldownEffect } from '../actionTypeEffects/skillCooldown';
+import { createInduceSkillEffect } from '../actionTypeEffects/induceSkillEffect';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -115,36 +117,31 @@ export function resolveActionEffects(card: Card): Card {
                                         ? createTokenBoostEffect(actionEffect)
                                         : actionEffect.actionType === 39
                                           ? createInfinityGaugeEffect(actionEffect)
-                                          : actionEffect.actionType === 42
-                                            ? createUseAllHandEffect(actionEffect)
-                                            : actionEffect.actionType === 43
-                                              ? createSwitchTokenDeckEffect(actionEffect)
-                                              : actionEffect.actionType === 44
-                                                ? createIngameMissionEffect(actionEffect)
-                                                : actionEffect.actionType === 45
-                                                  ? createModeChangeInduceEffect({
-                                                      ...actionEffect,
-                                                      effects: actionEffect.childEffects,
-                                                    })
-                                                  : actionEffect.actionType === 46
-                                                    ? createProxySkillEffect({
-                                                        ...actionEffect,
-                                                        effects: actionEffect.childEffects,
-                                                      })
-                                                    : actionEffect.actionType === 47
-                                                      ? createBeatHeartValueEffect({
+                                          : actionEffect.actionType === 40
+                                            ? createSkillCooldownEffect(actionEffect)
+                                            : actionEffect.actionType === 41
+                                              ? createInduceSkillEffect({
+                                                  ...actionEffect,
+                                                  effects: actionEffect.childEffects,
+                                                })
+                                              : actionEffect.actionType === 42
+                                                ? createUseAllHandEffect(actionEffect)
+                                                : actionEffect.actionType === 43
+                                                  ? createSwitchTokenDeckEffect(actionEffect)
+                                                  : actionEffect.actionType === 44
+                                                    ? createIngameMissionEffect(actionEffect)
+                                                    : actionEffect.actionType === 45
+                                                      ? createModeChangeInduceEffect({
                                                           ...actionEffect,
-                                                          details: actionEffect.details.map(
-                                                            (detail) => ({
-                                                              ...detail,
-                                                              targetMood: detail.targetMood ?? 0,
-                                                            }),
-                                                          ),
+                                                          effects: actionEffect.childEffects,
                                                         })
-                                                      : actionEffect.actionType === 48
-                                                        ? createMoodChangeEffect(actionEffect)
-                                                        : actionEffect.actionType === 49
-                                                          ? createHeartLimitBoostEffect({
+                                                      : actionEffect.actionType === 46
+                                                        ? createProxySkillEffect({
+                                                            ...actionEffect,
+                                                            effects: actionEffect.childEffects,
+                                                          })
+                                                        : actionEffect.actionType === 47
+                                                          ? createBeatHeartValueEffect({
                                                               ...actionEffect,
                                                               details: actionEffect.details.map(
                                                                 (detail) => ({
@@ -154,23 +151,21 @@ export function resolveActionEffects(card: Card): Card {
                                                                 }),
                                                               ),
                                                             })
-                                                          : actionEffect.actionType === 50
-                                                            ? createMoodValueBoostEffect({
-                                                                ...actionEffect,
-                                                                details: actionEffect.details.map(
-                                                                  (detail) => ({
-                                                                    ...detail,
-                                                                    targetMood:
-                                                                      detail.targetMood ?? 0,
-                                                                  }),
-                                                                ),
-                                                              })
-                                                            : actionEffect.actionType === 51
-                                                              ? createGenesisSkillEffect(
-                                                                  actionEffect,
-                                                                )
-                                                              : actionEffect.actionType === 52
-                                                                ? createSkillBoostEffect({
+                                                          : actionEffect.actionType === 48
+                                                            ? createMoodChangeEffect(actionEffect)
+                                                            : actionEffect.actionType === 49
+                                                              ? createHeartLimitBoostEffect({
+                                                                  ...actionEffect,
+                                                                  details: actionEffect.details.map(
+                                                                    (detail) => ({
+                                                                      ...detail,
+                                                                      targetMood:
+                                                                        detail.targetMood ?? 0,
+                                                                    }),
+                                                                  ),
+                                                                })
+                                                              : actionEffect.actionType === 50
+                                                                ? createMoodValueBoostEffect({
                                                                     ...actionEffect,
                                                                     details:
                                                                       actionEffect.details.map(
@@ -181,14 +176,12 @@ export function resolveActionEffects(card: Card): Card {
                                                                         }),
                                                                       ),
                                                                   })
-                                                                : actionEffect.actionType === 54
-                                                                  ? createHandMaxCardEffect({
-                                                                      skillEffectId:
-                                                                        actionEffect.skillEffectId,
-                                                                      details: actionEffect.details,
-                                                                    })
-                                                                  : actionEffect.actionType === 56
-                                                                    ? createMentalShieldEffect({
+                                                                : actionEffect.actionType === 51
+                                                                  ? createGenesisSkillEffect(
+                                                                      actionEffect,
+                                                                    )
+                                                                  : actionEffect.actionType === 52
+                                                                    ? createSkillBoostEffect({
                                                                         ...actionEffect,
                                                                         details:
                                                                           actionEffect.details.map(
@@ -200,13 +193,35 @@ export function resolveActionEffects(card: Card): Card {
                                                                             }),
                                                                           ),
                                                                       })
-                                                                    : actionEffect.actionType === 57
-                                                                      ? createProxyForcedActivationEffect(
-                                                                          actionEffect,
-                                                                        )
-                                                                      : createFixedParameterExtendEffect(
-                                                                          actionEffect,
-                                                                        );
+                                                                    : actionEffect.actionType === 54
+                                                                      ? createHandMaxCardEffect({
+                                                                          skillEffectId:
+                                                                            actionEffect.skillEffectId,
+                                                                          details:
+                                                                            actionEffect.details,
+                                                                        })
+                                                                      : actionEffect.actionType ===
+                                                                          56
+                                                                        ? createMentalShieldEffect({
+                                                                            ...actionEffect,
+                                                                            details:
+                                                                              actionEffect.details.map(
+                                                                                (detail) => ({
+                                                                                  ...detail,
+                                                                                  targetMood:
+                                                                                    detail.targetMood ??
+                                                                                    0,
+                                                                                }),
+                                                                              ),
+                                                                          })
+                                                                        : actionEffect.actionType ===
+                                                                            57
+                                                                          ? createProxyForcedActivationEffect(
+                                                                              actionEffect,
+                                                                            )
+                                                                          : createFixedParameterExtendEffect(
+                                                                              actionEffect,
+                                                                            );
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }

@@ -109,6 +109,27 @@ export type ActionType29Record = Readonly<{
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
+export type ActionType40Record = Readonly<{
+  actionType: 40;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  deckCardMax: number | null;
+  destination: 'effects' | 'handPermanentEffects';
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
+export type ActionType41Record = Readonly<{
+  actionType: 41;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  deckCardMax: number;
+  childEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
+  destination: 'effects' | 'handPermanentEffects';
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
 type MoodActionRecord<T extends number> = Readonly<{
   actionType: T;
   skillEffectId: bigint;
@@ -180,6 +201,8 @@ export type Card = Readonly<{
     | ActionType27Record
     | ActionType28Record
     | ActionType29Record
+    | ActionType40Record
+    | ActionType41Record
     | MoodActionRecord<30>
     | MoodActionRecord<31>
     | MoodActionRecord<32>
