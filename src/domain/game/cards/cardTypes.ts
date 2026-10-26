@@ -4,6 +4,7 @@ import type { PerformerId, MemberId, UnitId, CostumeId, TokenKind } from '../mod
 import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
 import type { SpecialAppealTokenCardSet } from '../specialAppealTokenTypes';
+import type { ActionType12Record } from './actionType12Record';
 
 type ActionTypeDetail = Readonly<{
   id: bigint;
@@ -285,6 +286,7 @@ export type Card = Readonly<{
     | ActionType7Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
+    | ActionType12Record
     | MoodActionRecord<13>
     | ActionType20Record
     | ActionType21Record
