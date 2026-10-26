@@ -1,5 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { createTokenCardEffect } from '../../src/domain/game/actionTypeEffects/tokenCard';
+import { requestTokenCard } from '../../src/domain/game/cards/tokens';
+import { game } from './support/game';
 
 it('ActionType28はカードテンプレートとlong枚数・series IDを接続する', () => {
   expect(
@@ -26,4 +28,21 @@ it('ActionType28は枚数の既定値を1にし、カードテンプレート必
   expect(() => createTokenCardEffect({ skillEffectId: 28n, templateId: '', details: [] })).toThrow(
     '追加カードのテンプレートがありません。',
   );
+});
+
+it('ActionType28はAbilityのSkillSeriesがないTokenCardCardDataを追加しない', () => {
+  const initial = game();
+  const template = initial.tokenCatalog[0];
+  const source = initial.deck[0];
+  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
+  const state = {
+    ...initial,
+    tokenCatalog: [
+      { ...template, id: 'token-without-skill-series', tokenCardAbilitySeriesId: null },
+    ],
+  };
+
+  const result = requestTokenCard(state, 'token-without-skill-series', 1, source.id);
+  expect(result.deck).toHaveLength(initial.deck.length);
+  expect(result.nextTokenId).toBe(initial.nextTokenId);
 });

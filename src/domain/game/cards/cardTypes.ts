@@ -248,6 +248,7 @@ export type Card = Readonly<{
   style?: number;
   appeal: StarGatherCardAppealParameters;
   beatPoint: number;
+  tokenCardAbilitySeriesId?: bigint | null;
   modeIds?: readonly number[];
   modeParameterChanges?: Readonly<{
     modeId: number;

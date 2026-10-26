@@ -43,7 +43,8 @@ export function requestTokenCard(
   sourceId: string | null,
   seriesIds?: readonly number[] | readonly bigint[],
 ): GameState {
-  if (!state.tokenCatalog.some((card) => card.id === templateId)) return state;
+  const template = state.tokenCatalog.find((card) => card.id === templateId);
+  if (!template || template.tokenCardAbilitySeriesId === null) return state;
   const grouped = state.tokenGroups.some((group) => group.sourceId === sourceId);
   const requestCount =
     typeof count === 'bigint'
