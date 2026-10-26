@@ -23,12 +23,25 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
                   value: 27_002n,
                 },
               ],
-              heartEffect: {
-                kind: 'skill-hearts' as const,
+              heartAction: {
                 skillEffectId: 27_002n,
-                calculation: 'fixed' as const,
-                amount: 10_000,
-                displayTime: { kind: 'full-end' as const, value: 0 },
+                details: [
+                  {
+                    id: 27_002_1n,
+                    detailType: 'HEART_CALC_TYPE',
+                    value: 2n,
+                  },
+                  {
+                    id: 27_002_2n,
+                    detailType: 'HEART_NUM_BASE',
+                    value: 10_000n,
+                  },
+                  {
+                    id: 27_002_3n,
+                    detailType: 'HEART_DISPLAY_TIME_TYPE',
+                    value: 3n,
+                  },
+                ],
               },
             },
             {
@@ -57,7 +70,15 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
       : card,
   );
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
-  expect(compiled?.effects.some((item) => item.kind === 'additional-heart-induce')).toBe(true);
+  const additionalHeart = compiled?.effects.find((item) => item.kind === 'additional-heart-induce');
+  expect(additionalHeart).toMatchObject({
+    heartEffect: {
+      kind: 'skill-hearts',
+      skillEffectId: 27_002n,
+      calculation: 'fixed',
+      amount: 10_000,
+    },
+  });
   expect(compiled?.effects.some((item) => item.kind === 'mode-reaction')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'proxy-skill')).toBe(true);
 });

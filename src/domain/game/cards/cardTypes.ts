@@ -123,7 +123,7 @@ export type ActionType27Record = Readonly<{
   actionType: 27;
   skillEffectId: bigint;
   details: readonly ActionTypeDetail[];
-  heartEffect: Extract<Effect, { kind: 'skill-hearts' }>;
+  heartAction: Readonly<{ skillEffectId: bigint; details: readonly ActionTypeDetail[] }>;
   destination: 'effects' | 'handPermanentEffects';
   invocationType?: number;
   deactivationKey?: string;
