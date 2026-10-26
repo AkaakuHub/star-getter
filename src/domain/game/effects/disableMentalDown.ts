@@ -1,5 +1,6 @@
 import type { DisableMentalDownEffect } from '../disableMentalDownTypes';
 import type { GameState } from '../model';
+import { int64ToFloat32 } from '../numeric';
 
 export function activateDisableMentalDown(
   state: GameState,
@@ -11,7 +12,7 @@ export function activateDisableMentalDown(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / Math.fround(1000)),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     deactivationKey: effect.deactivationKey ?? null,
@@ -42,8 +43,8 @@ export function expireDisableMentalDownEffectSections(state: GameState): GameSta
     ...state,
     disableMentalDownEffects: state.disableMentalDownEffects.flatMap((effect) => {
       if (effect.remainingSections === null) return [effect];
-      const remainingSections = effect.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...effect, remainingSections }] : [];
+      const remainingSections = effect.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...effect, remainingSections }] : [];
     }),
   };
 }
