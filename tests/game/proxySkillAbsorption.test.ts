@@ -3,6 +3,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
+import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { absorbSkillEffect } from '../../src/domain/game/effects/proxySkill';
 import { createGame } from '../../src/domain/game/simulation';
 
@@ -62,6 +63,40 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
   const absorbed = applyEffect(active, { kind: 'energy', amount: 3 }, source);
   expect(absorbed.energy).toBe(active.energy);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(12n);
+});
+
+it('ProxyのActionType20吸収累計をC# longと同じ64bitで折り返す', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('Proxy発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 0,
+      periodType: 1,
+      periodParam: 3000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 20, targetAmount: 1 }],
+      effects: [],
+    },
+    source,
+  );
+  const atLongMaximum = {
+    ...active,
+    proxyAbsorptions: active.proxyAbsorptions.map((absorption) => ({
+      ...absorption,
+      effects: absorption.effects.map((effect) => ({
+        ...effect,
+        totalAmount: (1n << 63n) - 1n,
+      })),
+    })),
+  };
+  const absorbed = applyEffect(atLongMaximum, handCardCountEffect(1, 3, 0n));
+  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
 });
 
 it('ActionType48の負の目標値は非絶対加算でC#と同じ下方向判定を使う', () => {
