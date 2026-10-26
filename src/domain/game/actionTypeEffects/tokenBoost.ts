@@ -1,10 +1,10 @@
 import type { Effect, MemberId, UnitId } from '../model';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import { isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
+  details: readonly ActionTypeDetail[];
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -40,18 +40,17 @@ export function createTokenBoostEffect(input: Input): Effect {
     int32(detail(input.details, detailTypes.targetType)?.value ?? 0n),
     int32(detail(input.details, detailTypes.targetId)?.value ?? 0n),
   );
-  const seriesIds = input.details
-    .filter((item) => item.detailType === detailTypes.seriesId)
-    .map((item) => {
-      checked(item);
-      return item.value;
-    });
+  const seriesDetail = detail(input.details, detailTypes.seriesId);
+  const seriesIds = seriesDetail?.paramValues?.map((value) => {
+    if (!isInt64(value)) throw new Error('詳細値が正しくありません。');
+    return value;
+  });
   return {
     kind: 'token-boost',
     calculation,
     num: detail(input.details, detailTypes.num)?.value ?? 0n,
     target,
-    ...(seriesIds.length > 0 ? { seriesIds } : {}),
+    ...(seriesIds && seriesIds.length > 0 ? { seriesIds } : {}),
     ...(disabledType === 1 ? { uses: disabledCount } : {}),
     ...(duration !== undefined ? { duration } : {}),
     ...(input.invocationType !== undefined ? { invocationType: input.invocationType } : {}),
@@ -89,13 +88,16 @@ function unitId(value: number): UnitId {
   throw new Error('追加カード数補正のユニットが正しくありません。');
 }
 
-function detail(details: readonly Detail[], detailType: string): Detail | undefined {
+function detail(
+  details: readonly ActionTypeDetail[],
+  detailType: string,
+): ActionTypeDetail | undefined {
   const item = details.find((value) => value.detailType === detailType);
   if (item) checked(item);
   return item;
 }
 
-function checked(item: Detail): void {
+function checked(item: ActionTypeDetail): void {
   if (!isInt64(item.id) || !isInt64(item.value)) throw new Error('詳細値が正しくありません。');
 }
 

@@ -18,7 +18,8 @@ it('ActionType38は詳細long値、対象、期限、回数をEffectへ変換す
       {
         id: 9n,
         detailType: 'BOOST_TOKEN_CARD_TOKEN_CARD_SERIES_ID',
-        value: 9_007_199_254_740_993n,
+        value: 0n,
+        paramValues: [9_007_199_254_740_993n],
       },
     ],
   });
