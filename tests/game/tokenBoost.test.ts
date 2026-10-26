@@ -150,7 +150,7 @@ it('ActionType28は指定したトークンカードを直接追加し、デー�
   };
   const generated = applyEffect(
     customized,
-    { kind: 'token-card', templateId: 'action28-template', count: 2, seriesIds: [42] },
+    { kind: 'token-card', templateId: 'action28-template', count: 2, seriesIds: [42n] },
     undefined,
   );
   const added = generated.deck.filter((card) => card.id.startsWith('action28-template-'));
@@ -178,7 +178,7 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
   );
   const generated = applyEffect(
     boosted,
-    { kind: 'token-card', templateId: template.id, count: 2, seriesIds: [42] },
+    { kind: 'token-card', templateId: template.id, count: 2, seriesIds: [42n] },
     source,
   );
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(

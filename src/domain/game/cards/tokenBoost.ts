@@ -15,7 +15,7 @@ function matches(boost: TokenBoost, source: Card | undefined, request: TokenRequ
     targetMatches &&
     (boost.seriesIds === undefined ||
       (request.seriesIds !== undefined &&
-        request.seriesIds.some((id) => boost.seriesIds?.includes(BigInt(id)))))
+        request.seriesIds.some((id) => boost.seriesIds?.includes(id))))
   );
 }
 

@@ -22,7 +22,7 @@ export function requestTokens(
   const request: TokenRequest = {
     template: { kind: 'token-kind', token },
     count,
-    ...(seriesIds === undefined ? {} : { seriesIds }),
+    ...(seriesIds === undefined ? {} : { seriesIds: seriesIds.map(BigInt) }),
   };
   return requestToken(state, request, sourceId);
 }
@@ -40,7 +40,7 @@ export function requestTokenCard(
   templateId: string,
   count: number,
   sourceId: string | null,
-  seriesIds?: readonly number[],
+  seriesIds?: readonly number[] | readonly bigint[],
 ): GameState {
   if (
     count < 1 ||
@@ -51,7 +51,9 @@ export function requestTokenCard(
   const request: TokenRequest = {
     template: { kind: 'template', templateId },
     count,
-    ...(seriesIds === undefined ? {} : { seriesIds }),
+    ...(seriesIds === undefined
+      ? {}
+      : { seriesIds: seriesIds.map((id) => (typeof id === 'bigint' ? id : BigInt(id))) }),
   };
   return requestToken(state, request, sourceId);
 }
