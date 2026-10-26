@@ -38,7 +38,7 @@ it('ActionType28は枚数とResourceIDの既定値を使う', () => {
   });
 });
 
-it('ActionType28はAbilityのSkillSeriesがないTokenCardCardDataを追加しない', () => {
+it('ActionType28はAbilityがないTokenCardCardDataを追加する', () => {
   const initial = game();
   const template = initial.tokenCatalog[0];
   const source = initial.deck[0];
@@ -51,8 +51,8 @@ it('ActionType28はAbilityのSkillSeriesがないTokenCardCardDataを追加し�
   };
 
   const result = requestTokenCard(state, 'token-without-skill-series', 1, source.id);
-  expect(result.deck).toHaveLength(initial.deck.length);
-  expect(result.nextTokenId).toBe(initial.nextTokenId);
+  expect(result.deck).toHaveLength(initial.deck.length + 1);
+  expect(result.nextTokenId).toBe(initial.nextTokenId + 1);
 });
 
 it('ActionType28はseries detailのlong値で補正対象を照合し、生成カードにはint32値を設定する', () => {
