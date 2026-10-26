@@ -1,11 +1,11 @@
 import type { Effect } from '../modelTypes';
 import type { MemberId } from '../model';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import { isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
+  details: readonly ActionTypeDetail[];
   effects: readonly Effect[];
   invocationType?: number;
   deactivationKey?: string;
@@ -21,8 +21,8 @@ const detailTypes = {
 
 export function createComboInduceEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
-  const memberDetails = input.details.filter((item) => item.detailType === detailTypes.members);
-  const members = memberDetails.map((item) => memberId(int32(checkedValue(item))));
+  const memberDetail = input.details.find((item) => item.detailType === detailTypes.members);
+  const members = detailParams(memberDetail).map(memberId);
   const apPower = firstDetail(input.details, detailTypes.apPower)?.value ?? 10_000n;
   const displayTimeType = int32(
     firstDetail(input.details, detailTypes.displayTimeType)?.value ?? 3n,
@@ -42,31 +42,40 @@ export function createComboInduceEffect(input: Input): Effect {
   };
 }
 
-function firstDetail(details: readonly Detail[], detailType: string): Detail | undefined {
+function firstDetail(
+  details: readonly ActionTypeDetail[],
+  detailType: string,
+): ActionTypeDetail | undefined {
   const detail = details.find((item) => item.detailType === detailType);
   if (detail) checkedValue(detail);
   return detail;
 }
 
-function checkedValue(detail: Detail): bigint {
+function checkedValue(detail: ActionTypeDetail): bigint {
   if (!isInt64(detail.id) || !isInt64(detail.value)) throw new Error('詳細値が正しくありません。');
   return detail.value;
 }
 
-function memberId(value: number): MemberId {
-  if (
-    value === 0 ||
-    value === 1021 ||
-    value === 1022 ||
-    value === 1030 ||
-    value === 1031 ||
-    value === 1032 ||
-    value === 1033 ||
-    value === 1041 ||
-    value === 1042 ||
-    value === 1053
-  )
-    return value;
+function detailParams(detail: ActionTypeDetail | undefined): readonly bigint[] {
+  if (!detail || !isInt64(detail.id) || !detail.paramValues)
+    throw new Error('コンボ誘発の対象メンバー詳細値がありません。');
+  if (detail.paramValues.some((value) => !isInt64(value)))
+    throw new Error('コンボ誘発の対象メンバー詳細値が正しくありません。');
+  return detail.paramValues;
+}
+
+function memberId(raw: bigint): MemberId {
+  if (!isInt64(raw)) throw new Error('コンボ誘発の対象メンバー詳細値が正しくありません。');
+  if (raw === 0n) return 0;
+  if (raw === 1021n) return 1021;
+  if (raw === 1022n) return 1022;
+  if (raw === 1030n) return 1030;
+  if (raw === 1031n) return 1031;
+  if (raw === 1032n) return 1032;
+  if (raw === 1033n) return 1033;
+  if (raw === 1041n) return 1041;
+  if (raw === 1042n) return 1042;
+  if (raw === 1053n) return 1053;
   throw new Error('コンボ誘発の対象メンバーが正しくありません。');
 }
 
