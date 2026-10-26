@@ -145,3 +145,35 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
   expect(active.handLimitEffects[0]?.deactivationKey).toBe(`hand-permanent:${source.id}`);
   expect(disposeHandEffects(active, [source.id]).handLimit).toBe(state.handLimit);
 });
+
+it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 21 as const,
+              skillEffectId: 21_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 21_001_1n, detailType: 'CHANGE_AP_INCREASE_SPEED_NUM', value: 100n },
+                {
+                  id: 21_001_2n,
+                  detailType: 'CHANGE_AP_INCREASE_SPEED_DISPLAY_TIME_TYPE',
+                  value: 3n,
+                },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'ap-speed-change');
+  expect(effect).toMatchObject({ kind: 'ap-speed-change', calculationType: 1, num: 100n });
+});
