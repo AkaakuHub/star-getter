@@ -2,6 +2,7 @@ import type { Card } from './cardTypes';
 import { createHandCardCountEffect } from '../actionTypeEffects/handCardCount';
 import { createApSpeedChangeEffect } from '../actionTypeEffects/apSpeedChange';
 import { createVoltageConvertEffect } from '../actionTypeEffects/voltageConvert';
+import { createMentalHeartInduceEffect } from '../actionTypeEffects/mentalHeartInduce';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -20,7 +21,9 @@ export function resolveActionEffects(card: Card): Card {
                 targetMood: detail.targetMood ?? 0,
               })),
             })
-          : createVoltageConvertEffect(actionEffect);
+          : actionEffect.actionType === 22
+            ? createVoltageConvertEffect(actionEffect)
+            : createMentalHeartInduceEffect(actionEffect);
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }

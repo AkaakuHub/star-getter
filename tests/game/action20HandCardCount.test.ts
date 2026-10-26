@@ -205,3 +205,33 @@ it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続
   const effect = compiled?.effects.find((item) => item.kind === 'voltage-convert');
   expect(effect).toMatchObject({ kind: 'voltage-convert', destination: 'hearts', num: 100 });
 });
+
+it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEffectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 23 as const,
+              skillEffectId: 23_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 23_001_1n, detailType: 'MENTAL_HEART_INDUCE_NUM', value: 100n },
+                { id: 23_001_2n, detailType: 'MENTAL_HEART_INDUCE_DISPLAY_TIME_TYPE', value: 3n },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  expect(compiled?.effects.find((item) => item.kind === 'mental-heart-induce')).toMatchObject({
+    kind: 'mental-heart-induce',
+    num: 100n,
+    duration: { kind: 'stage', value: 0n },
+  });
+});
