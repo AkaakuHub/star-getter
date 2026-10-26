@@ -33,19 +33,8 @@ import { createAdditionalHeartInduceEffect } from '../actionTypeEffects/addition
 import { createModeChangeInduceEffect } from '../actionTypeEffects/modeChangeInduce';
 import { createProxySkillEffect } from '../actionTypeEffects/proxySkill';
 import { createTokenCardEffect } from '../actionTypeEffects/tokenCard';
-import { createAddHeartEffect } from '../actionTypeEffects/addHeart';
-import { createLoveUpEffect } from '../actionTypeEffects/loveUp';
-import { createBeatPointEffect } from '../actionTypeEffects/beatPoint';
-import { createRecoverMentalEffect } from '../actionTypeEffects/recoverMental';
-import { createMentalRegenerationEffect } from '../actionTypeEffects/regenMental';
-import { createMentalBarrierEffect } from '../actionTypeEffects/mentalBarrier';
-import { createAddVoltageEffect } from '../actionTypeEffects/addVoltage';
-import { createVoltageRegenerationEffect } from '../actionTypeEffects/regenVoltage';
-import { createReshuffleEffect } from '../actionTypeEffects/reshuffle';
 import { createSkillCooldownEffect } from '../actionTypeEffects/skillCooldown';
 import { createInduceSkillEffect } from '../actionTypeEffects/induceSkillEffect';
-import { createCardSearchEffect } from '../actionTypeEffects/cardSearch';
-import { createHeartUpEffect } from '../actionTypeEffects/heartUp';
 import { assertNeverActionEffect } from './assertNeverActionEffect';
 
 import type { Card } from './cardTypes';
@@ -53,301 +42,219 @@ import type { Effect } from '../modelTypes';
 
 type RuntimeActionEffect = Exclude<NonNullable<Card['actionEffects']>[number], { actionType: 36 }>;
 
+import { resolveEarlyActionEffect, type EarlyActionEffect } from './resolveEarlyActionEffect';
+
 export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
-  return actionEffect.actionType === 1
-    ? createAddHeartEffect(actionEffect)
-    : actionEffect.actionType === 2
-      ? createLoveUpEffect(actionEffect)
-      : actionEffect.actionType === 3
-        ? createBeatPointEffect(actionEffect)
-        : actionEffect.actionType === 5
-          ? createRecoverMentalEffect(actionEffect)
-          : actionEffect.actionType === 6
-            ? createMentalRegenerationEffect(actionEffect)
-            : actionEffect.actionType === 7
-              ? createMentalBarrierEffect({
+  switch (actionEffect.actionType) {
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+    case 6:
+    case 7:
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 15:
+    case 16:
+    case 19:
+      return resolveEarlyActionEffect(actionEffect);
+    default:
+      return resolveLaterActionEffect(actionEffect);
+  }
+}
+
+type LaterActionEffect = Exclude<RuntimeActionEffect, EarlyActionEffect>;
+
+function resolveLaterActionEffect(actionEffect: LaterActionEffect): Effect {
+  return actionEffect.actionType === 20
+    ? createHandCardCountEffect(actionEffect)
+    : actionEffect.actionType === 21
+      ? createApSpeedChangeEffect({
+          ...actionEffect,
+          details: actionEffect.details.map((detail) => ({
+            ...detail,
+            targetMood: detail.targetMood ?? 0,
+          })),
+        })
+      : actionEffect.actionType === 22
+        ? createVoltageConvertEffect(actionEffect)
+        : actionEffect.actionType === 23
+          ? createMentalHeartInduceEffect(actionEffect)
+          : actionEffect.actionType === 24
+            ? createComboInduceEffect({
+                ...actionEffect,
+                effects: actionEffect.childEffects,
+              })
+            : actionEffect.actionType === 25
+              ? createHeartLimitChangeEffect({
                   ...actionEffect,
                   details: actionEffect.details.map((detail) => ({
                     ...detail,
                     targetMood: detail.targetMood ?? 0,
                   })),
                 })
-              : actionEffect.actionType === 10
-                ? createAddVoltageEffect(actionEffect)
-                : actionEffect.actionType === 11
-                  ? createVoltageRegenerationEffect(actionEffect)
-                  : actionEffect.actionType === 12
-                    ? {
-                        kind: 'branch' as const,
-                        condition: actionEffect.condition,
-                        whenTrue: actionEffect.whenTrue,
-                        whenFalse: actionEffect.whenFalse,
-                        ...(actionEffect.persistent !== undefined
-                          ? { persistent: actionEffect.persistent }
-                          : {}),
-                        ...(actionEffect.deactivationKey !== undefined
-                          ? { deactivationKey: actionEffect.deactivationKey }
-                          : {}),
-                      }
-                    : actionEffect.actionType === 13
-                      ? createReshuffleEffect(actionEffect)
-                      : actionEffect.actionType === 15
-                        ? createCardSearchEffect(actionEffect)
-                        : actionEffect.actionType === 16
-                          ? createHeartUpEffect(actionEffect)
-                          : actionEffect.actionType === 20
-                            ? createHandCardCountEffect(actionEffect)
-                            : actionEffect.actionType === 21
-                              ? createApSpeedChangeEffect({
-                                  ...actionEffect,
-                                  details: actionEffect.details.map((detail) => ({
-                                    ...detail,
-                                    targetMood: detail.targetMood ?? 0,
-                                  })),
-                                })
-                              : actionEffect.actionType === 22
-                                ? createVoltageConvertEffect(actionEffect)
-                                : actionEffect.actionType === 23
-                                  ? createMentalHeartInduceEffect(actionEffect)
-                                  : actionEffect.actionType === 24
-                                    ? createComboInduceEffect({
-                                        ...actionEffect,
-                                        effects: actionEffect.childEffects,
-                                      })
-                                    : actionEffect.actionType === 25
-                                      ? createHeartLimitChangeEffect({
-                                          ...actionEffect,
-                                          details: actionEffect.details.map((detail) => ({
-                                            ...detail,
-                                            targetMood: detail.targetMood ?? 0,
-                                          })),
-                                        })
-                                      : actionEffect.actionType === 27
-                                        ? createAdditionalHeartInduceEffect(actionEffect)
-                                        : actionEffect.actionType === 28
-                                          ? createTokenCardEffect(actionEffect)
-                                          : actionEffect.actionType === 29
-                                            ? createDeckSkillCostChangeEffect(actionEffect)
-                                            : actionEffect.actionType === 30
-                                              ? createLoveUpAdditionalBuffEffect({
-                                                  ...actionEffect,
-                                                  details: actionEffect.details.map((detail) => ({
-                                                    ...detail,
-                                                    targetMood: detail.targetMood ?? 0,
-                                                  })),
-                                                })
-                                              : actionEffect.actionType === 31
-                                                ? createVoltageUpAdditionalBuffEffect({
-                                                    ...actionEffect,
-                                                    details: actionEffect.details.map((detail) => ({
-                                                      ...detail,
-                                                      targetMood: detail.targetMood ?? 0,
-                                                    })),
-                                                  })
-                                                : actionEffect.actionType === 32
-                                                  ? createMentalRecoverAdditionalBuffEffect({
-                                                      ...actionEffect,
-                                                      details: actionEffect.details.map(
-                                                        (detail) => ({
-                                                          ...detail,
-                                                          targetMood: detail.targetMood ?? 0,
-                                                        }),
-                                                      ),
-                                                    })
-                                                  : actionEffect.actionType === 33
-                                                    ? createMentalBarrierAdditionalBuffEffect({
+              : actionEffect.actionType === 27
+                ? createAdditionalHeartInduceEffect(actionEffect)
+                : actionEffect.actionType === 28
+                  ? createTokenCardEffect(actionEffect)
+                  : actionEffect.actionType === 29
+                    ? createDeckSkillCostChangeEffect(actionEffect)
+                    : actionEffect.actionType === 30
+                      ? createLoveUpAdditionalBuffEffect({
+                          ...actionEffect,
+                          details: actionEffect.details.map((detail) => ({
+                            ...detail,
+                            targetMood: detail.targetMood ?? 0,
+                          })),
+                        })
+                      : actionEffect.actionType === 31
+                        ? createVoltageUpAdditionalBuffEffect({
+                            ...actionEffect,
+                            details: actionEffect.details.map((detail) => ({
+                              ...detail,
+                              targetMood: detail.targetMood ?? 0,
+                            })),
+                          })
+                        : actionEffect.actionType === 32
+                          ? createMentalRecoverAdditionalBuffEffect({
+                              ...actionEffect,
+                              details: actionEffect.details.map((detail) => ({
+                                ...detail,
+                                targetMood: detail.targetMood ?? 0,
+                              })),
+                            })
+                          : actionEffect.actionType === 33
+                            ? createMentalBarrierAdditionalBuffEffect({
+                                ...actionEffect,
+                                details: actionEffect.details.map((detail) => ({
+                                  ...detail,
+                                  targetMood: detail.targetMood ?? 0,
+                                })),
+                              })
+                            : actionEffect.actionType === 34
+                              ? createDisableMentalDownEffect(actionEffect)
+                              : actionEffect.actionType === 35
+                                ? createChangeModeEffect(actionEffect)
+                                : actionEffect.actionType === 37
+                                  ? createVoltageLevelEffect(actionEffect)
+                                  : actionEffect.actionType === 38
+                                    ? createTokenBoostEffect(actionEffect)
+                                    : actionEffect.actionType === 39
+                                      ? createInfinityGaugeEffect(actionEffect)
+                                      : actionEffect.actionType === 40
+                                        ? createSkillCooldownEffect(actionEffect)
+                                        : actionEffect.actionType === 41
+                                          ? createInduceSkillEffect({
+                                              ...actionEffect,
+                                              effects: actionEffect.childEffects,
+                                            })
+                                          : actionEffect.actionType === 42
+                                            ? createUseAllHandEffect(actionEffect)
+                                            : actionEffect.actionType === 43
+                                              ? createSwitchTokenDeckEffect(actionEffect)
+                                              : actionEffect.actionType === 44
+                                                ? createIngameMissionEffect(actionEffect)
+                                                : actionEffect.actionType === 53
+                                                  ? createSpecialAppealTokenEffect(actionEffect)
+                                                  : actionEffect.actionType === 45
+                                                    ? createModeChangeInduceEffect({
                                                         ...actionEffect,
-                                                        details: actionEffect.details.map(
-                                                          (detail) => ({
-                                                            ...detail,
-                                                            targetMood: detail.targetMood ?? 0,
-                                                          }),
-                                                        ),
+                                                        effects: actionEffect.childEffects,
                                                       })
-                                                    : actionEffect.actionType === 34
-                                                      ? createDisableMentalDownEffect(actionEffect)
-                                                      : actionEffect.actionType === 35
-                                                        ? createChangeModeEffect(actionEffect)
-                                                        : actionEffect.actionType === 37
-                                                          ? createVoltageLevelEffect(actionEffect)
-                                                          : actionEffect.actionType === 38
-                                                            ? createTokenBoostEffect(actionEffect)
-                                                            : actionEffect.actionType === 39
-                                                              ? createInfinityGaugeEffect(
-                                                                  actionEffect,
-                                                                )
-                                                              : actionEffect.actionType === 40
-                                                                ? createSkillCooldownEffect(
+                                                    : actionEffect.actionType === 46
+                                                      ? createProxySkillEffect({
+                                                          ...actionEffect,
+                                                          effects: actionEffect.childEffects,
+                                                        })
+                                                      : actionEffect.actionType === 47
+                                                        ? createBeatHeartValueEffect({
+                                                            ...actionEffect,
+                                                            details: actionEffect.details.map(
+                                                              (detail) => ({
+                                                                ...detail,
+                                                                targetMood: detail.targetMood ?? 0,
+                                                              }),
+                                                            ),
+                                                          })
+                                                        : actionEffect.actionType === 48
+                                                          ? createMoodChangeEffect(actionEffect)
+                                                          : actionEffect.actionType === 49
+                                                            ? createHeartLimitBoostEffect({
+                                                                ...actionEffect,
+                                                                details: actionEffect.details.map(
+                                                                  (detail) => ({
+                                                                    ...detail,
+                                                                    targetMood:
+                                                                      detail.targetMood ?? 0,
+                                                                  }),
+                                                                ),
+                                                              })
+                                                            : actionEffect.actionType === 50
+                                                              ? createMoodValueBoostEffect({
+                                                                  ...actionEffect,
+                                                                  details: actionEffect.details.map(
+                                                                    (detail) => ({
+                                                                      ...detail,
+                                                                      targetMood:
+                                                                        detail.targetMood ?? 0,
+                                                                    }),
+                                                                  ),
+                                                                })
+                                                              : actionEffect.actionType === 51
+                                                                ? createGenesisSkillEffect(
                                                                     actionEffect,
                                                                   )
-                                                                : actionEffect.actionType === 41
-                                                                  ? createInduceSkillEffect({
+                                                                : actionEffect.actionType === 52
+                                                                  ? createSkillBoostEffect({
                                                                       ...actionEffect,
-                                                                      effects:
-                                                                        actionEffect.childEffects,
+                                                                      details:
+                                                                        actionEffect.details.map(
+                                                                          (detail) => ({
+                                                                            ...detail,
+                                                                            targetMood:
+                                                                              detail.targetMood ??
+                                                                              0,
+                                                                          }),
+                                                                        ),
                                                                     })
-                                                                  : actionEffect.actionType === 42
-                                                                    ? createUseAllHandEffect(
-                                                                        actionEffect,
-                                                                      )
-                                                                    : actionEffect.actionType === 43
-                                                                      ? createSwitchTokenDeckEffect(
+                                                                  : actionEffect.actionType === 54
+                                                                    ? createHandMaxCardEffect({
+                                                                        skillEffectId:
+                                                                          actionEffect.skillEffectId,
+                                                                        details:
+                                                                          actionEffect.details,
+                                                                      })
+                                                                    : actionEffect.actionType === 55
+                                                                      ? createResetSpecialEffect(
                                                                           actionEffect,
                                                                         )
                                                                       : actionEffect.actionType ===
-                                                                          44
-                                                                        ? createIngameMissionEffect(
-                                                                            actionEffect,
-                                                                          )
+                                                                          56
+                                                                        ? createMentalShieldEffect({
+                                                                            ...actionEffect,
+                                                                            details:
+                                                                              actionEffect.details.map(
+                                                                                (detail) => ({
+                                                                                  ...detail,
+                                                                                  targetMood:
+                                                                                    detail.targetMood ??
+                                                                                    0,
+                                                                                }),
+                                                                              ),
+                                                                          })
                                                                         : actionEffect.actionType ===
-                                                                            53
-                                                                          ? createSpecialAppealTokenEffect(
+                                                                            57
+                                                                          ? createProxyForcedActivationEffect(
                                                                               actionEffect,
                                                                             )
                                                                           : actionEffect.actionType ===
-                                                                              45
-                                                                            ? createModeChangeInduceEffect(
-                                                                                {
-                                                                                  ...actionEffect,
-                                                                                  effects:
-                                                                                    actionEffect.childEffects,
-                                                                                },
+                                                                              58
+                                                                            ? createFixedParameterExtendEffect(
+                                                                                actionEffect,
                                                                               )
-                                                                            : actionEffect.actionType ===
-                                                                                46
-                                                                              ? createProxySkillEffect(
-                                                                                  {
-                                                                                    ...actionEffect,
-                                                                                    effects:
-                                                                                      actionEffect.childEffects,
-                                                                                  },
-                                                                                )
-                                                                              : actionEffect.actionType ===
-                                                                                  47
-                                                                                ? createBeatHeartValueEffect(
-                                                                                    {
-                                                                                      ...actionEffect,
-                                                                                      details:
-                                                                                        actionEffect.details.map(
-                                                                                          (
-                                                                                            detail,
-                                                                                          ) => ({
-                                                                                            ...detail,
-                                                                                            targetMood:
-                                                                                              detail.targetMood ??
-                                                                                              0,
-                                                                                          }),
-                                                                                        ),
-                                                                                    },
-                                                                                  )
-                                                                                : actionEffect.actionType ===
-                                                                                    48
-                                                                                  ? createMoodChangeEffect(
-                                                                                      actionEffect,
-                                                                                    )
-                                                                                  : actionEffect.actionType ===
-                                                                                      49
-                                                                                    ? createHeartLimitBoostEffect(
-                                                                                        {
-                                                                                          ...actionEffect,
-                                                                                          details:
-                                                                                            actionEffect.details.map(
-                                                                                              (
-                                                                                                detail,
-                                                                                              ) => ({
-                                                                                                ...detail,
-                                                                                                targetMood:
-                                                                                                  detail.targetMood ??
-                                                                                                  0,
-                                                                                              }),
-                                                                                            ),
-                                                                                        },
-                                                                                      )
-                                                                                    : actionEffect.actionType ===
-                                                                                        50
-                                                                                      ? createMoodValueBoostEffect(
-                                                                                          {
-                                                                                            ...actionEffect,
-                                                                                            details:
-                                                                                              actionEffect.details.map(
-                                                                                                (
-                                                                                                  detail,
-                                                                                                ) => ({
-                                                                                                  ...detail,
-                                                                                                  targetMood:
-                                                                                                    detail.targetMood ??
-                                                                                                    0,
-                                                                                                }),
-                                                                                              ),
-                                                                                          },
-                                                                                        )
-                                                                                      : actionEffect.actionType ===
-                                                                                          51
-                                                                                        ? createGenesisSkillEffect(
-                                                                                            actionEffect,
-                                                                                          )
-                                                                                        : actionEffect.actionType ===
-                                                                                            52
-                                                                                          ? createSkillBoostEffect(
-                                                                                              {
-                                                                                                ...actionEffect,
-                                                                                                details:
-                                                                                                  actionEffect.details.map(
-                                                                                                    (
-                                                                                                      detail,
-                                                                                                    ) => ({
-                                                                                                      ...detail,
-                                                                                                      targetMood:
-                                                                                                        detail.targetMood ??
-                                                                                                        0,
-                                                                                                    }),
-                                                                                                  ),
-                                                                                              },
-                                                                                            )
-                                                                                          : actionEffect.actionType ===
-                                                                                              54
-                                                                                            ? createHandMaxCardEffect(
-                                                                                                {
-                                                                                                  skillEffectId:
-                                                                                                    actionEffect.skillEffectId,
-                                                                                                  details:
-                                                                                                    actionEffect.details,
-                                                                                                },
-                                                                                              )
-                                                                                            : actionEffect.actionType ===
-                                                                                                55
-                                                                                              ? createResetSpecialEffect(
-                                                                                                  actionEffect,
-                                                                                                )
-                                                                                              : actionEffect.actionType ===
-                                                                                                  56
-                                                                                                ? createMentalShieldEffect(
-                                                                                                    {
-                                                                                                      ...actionEffect,
-                                                                                                      details:
-                                                                                                        actionEffect.details.map(
-                                                                                                          (
-                                                                                                            detail,
-                                                                                                          ) => ({
-                                                                                                            ...detail,
-                                                                                                            targetMood:
-                                                                                                              detail.targetMood ??
-                                                                                                              0,
-                                                                                                          }),
-                                                                                                        ),
-                                                                                                    },
-                                                                                                  )
-                                                                                                : actionEffect.actionType ===
-                                                                                                    57
-                                                                                                  ? createProxyForcedActivationEffect(
-                                                                                                      actionEffect,
-                                                                                                    )
-                                                                                                  : actionEffect.actionType ===
-                                                                                                      58
-                                                                                                    ? createFixedParameterExtendEffect(
-                                                                                                        actionEffect,
-                                                                                                      )
-                                                                                                    : assertNeverActionEffect(
-                                                                                                        actionEffect,
-                                                                                                      );
+                                                                            : assertNeverActionEffect(
+                                                                                actionEffect,
+                                                                              );
 }

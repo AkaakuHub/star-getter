@@ -5,6 +5,7 @@ import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
 import type { SpecialAppealTokenCardSet } from '../specialAppealTokenTypes';
 import type { ActionType12Record } from './actionType12Record';
+import type { ActionType19Record } from './actionType19Record';
 
 type ActionTypeDetail = Readonly<{
   id: bigint;
@@ -284,6 +285,7 @@ export type Card = Readonly<{
     | ActionType5Record
     | ActionType6Record
     | ActionType7Record
+    | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
     | ActionType12Record
