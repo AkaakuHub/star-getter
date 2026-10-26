@@ -65,6 +65,35 @@ export type ActionType25Record = Readonly<{
   deactivationKey?: string;
 }>;
 
+export type ActionType27Record = Readonly<{
+  actionType: 27;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  heartEffect: Extract<Effect, { kind: 'hearts' }>;
+  destination: 'effects' | 'handPermanentEffects';
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
+export type ActionType45Record = Readonly<{
+  actionType: 45;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  childEffects: readonly Effect[];
+  thresholds: readonly bigint[];
+  destination: 'effects' | 'handPermanentEffects';
+}>;
+
+export type ActionType46Record = Readonly<{
+  actionType: 46;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  absorbActionTypes: readonly bigint[];
+  absorbAmounts: readonly bigint[];
+  childEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
+  destination: 'effects' | 'handPermanentEffects';
+}>;
+
 export type ActionType29Record = Readonly<{
   actionType: 29;
   skillEffectId: bigint;
@@ -140,6 +169,7 @@ export type Card = Readonly<{
     | ActionType23Record
     | ActionType24Record
     | ActionType25Record
+    | ActionType27Record
     | ActionType29Record
     | MoodActionRecord<30>
     | MoodActionRecord<31>
@@ -153,6 +183,8 @@ export type Card = Readonly<{
     | MoodActionRecord<42>
     | MoodActionRecord<43>
     | MoodActionRecord<44>
+    | ActionType45Record
+    | ActionType46Record
     | MoodActionRecord<47>
     | MoodActionRecord<48>
     | MoodActionRecord<49>
