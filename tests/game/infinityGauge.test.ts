@@ -141,6 +141,59 @@ describe('無限ゲージ', () => {
     expect(ended.excitement).toBe(voltageThreshold(10));
   });
 
+  it('ActionType39の電圧解除で永続電圧分岐を切り替える', () => {
+    const base = { ...game(), excitement: voltageThreshold(20) };
+    const source = base.deck[0];
+    if (!source) throw new Error('発動元カードがありません。');
+    const branch = applyEffect(
+      base,
+      {
+        kind: 'branch',
+        persistent: true,
+        condition: { kind: 'voltage-level-at-most', level: 10 },
+        whenTrue: [
+          {
+            kind: 'skill-boost',
+            num: 200_000,
+            target: { kind: 'all' },
+            uses: null,
+            duration: { kind: 'stage', value: 0n },
+          },
+        ],
+        whenFalse: [
+          {
+            kind: 'skill-boost',
+            num: 100_000,
+            target: { kind: 'all' },
+            uses: null,
+            duration: { kind: 'stage', value: 0n },
+          },
+        ],
+      },
+      source,
+    );
+    const active = applyEffect(branch, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'stage', value: 0 },
+      invocationType: 0x388,
+      deactivationKey: 'voltage-infinity',
+    });
+    expect(active.action52Buffs.map((buff) => buff.percent)).toEqual([10]);
+    const ended = act(active, {
+      type: 'deactivate-infinity-gauge',
+      deactivationKey: 'voltage-infinity',
+    });
+    expect(ended.excitement).toBe(voltageThreshold(10));
+    expect(ended.action52Buffs.map((buff) => buff.percent)).toEqual([20]);
+    const timed = applyEffect(branch, {
+      kind: 'infinity-gauge',
+      gauge: 'voltage',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    expect(advanceTo(timed, 0.5 + 1 / 60).action52Buffs.map((buff) => buff.percent)).toEqual([20]);
+  });
+
   it('Genesis中に開始した無限ゲージの時間期限を保持し、終了後に無限状態へ移す', () => {
     const initial = activateBloom(game('bloom'), 1);
     const active = applyEffect(initial, {

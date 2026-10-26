@@ -119,7 +119,7 @@ function actInternal(state: GameState, action: Action): GameState {
     case 'deactivate-fixed-parameter-extend':
       return deactivateFixedParameterExtends(state, action.deactivationKey);
     case 'deactivate-infinity-gauge':
-      return deactivateGaugeInfinities(state, action.deactivationKey);
+      return deactivateGaugeInfinities(state, action.deactivationKey, applyEffect);
     case 'deactivate-skill-cooldown':
       return deactivateSkillCooldownEffects(state, action.deactivationKey);
     case 'deactivate-induced-skill-effect':

@@ -37,7 +37,7 @@ export function advanceSectionChange(state: GameState, applyEffect: EffectApplie
   next = expiredHandLimit.state;
   if (expiredHandLimit.handAdjustment > 0)
     next = restoreHandLimitCount(next, expiredHandLimit.handAdjustment);
-  next = expireGaugeInfinities(next, 'sections', 1);
+  next = expireGaugeInfinities(next, 'sections', 1, applyEffect);
   next = expireGaugeRegenerations(next, 'sections');
   next = expireMentalBarriers(next, 'sections', 1);
   next = expireVoltageIncreaseStopSections(next);

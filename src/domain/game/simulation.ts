@@ -250,6 +250,7 @@ function advanceTick(state: GameState): GameState {
                   advanceAutomaticGauges(state, dt, applyEffect),
                   'milliseconds',
                   dt,
+                  applyEffect,
                 ),
                 dt,
                 applyEffect,

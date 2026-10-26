@@ -10,6 +10,7 @@ import { induceSkillEffects, type EffectApplier } from './effects/induceSkillEff
 import { absorbSkillEffect } from './effects/proxySkill';
 import { registerVoltageZeroMission } from './ingameMissions';
 import { notifyHandVoltageIncrease } from './cards/handInduce';
+import { refreshBranchInducers } from './effects/branch';
 
 export function changeResource(
   state: GameState,
@@ -177,10 +178,11 @@ export function notifyVoltageBaseLevelChange(
   applyEffect?: EffectApplier,
 ): GameState {
   if (!applyEffect || previous.excitement === current.excitement) return current;
+  const branched = refreshBranchInducers(current, applyEffect);
   return notifyHandVoltageIncrease(
-    current,
+    branched,
     voltageLevel(previous.excitement, previous.maximumVoltageLevel),
-    voltageLevel(current.excitement, current.maximumVoltageLevel),
+    voltageLevel(branched.excitement, branched.maximumVoltageLevel),
     applyEffect,
   );
 }
@@ -216,6 +218,7 @@ export function expireGaugeInfinities(
   state: GameState,
   duration: 'milliseconds' | 'sections',
   elapsed: number,
+  applyEffect?: EffectApplier,
 ): GameState {
   const before = state.gaugeInfinities;
   const ended = new Set<'ap' | 'voltage' | 'mental'>();
@@ -256,13 +259,17 @@ export function expireGaugeInfinities(
       const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
       next = next.bloom
         ? changeBloomGauge(next, Math.fround(target - next.excitement))
-        : setVoltageValue(next, target);
+        : setVoltageValue(next, target, applyEffect);
     }
   }
   return next;
 }
 
-export function deactivateGaugeInfinities(state: GameState, deactivationKey: string): GameState {
+export function deactivateGaugeInfinities(
+  state: GameState,
+  deactivationKey: string,
+  applyEffect?: EffectApplier,
+): GameState {
   const removed = state.gaugeInfinities.filter(
     (infinity) => infinity.deactivationKey === deactivationKey,
   );
@@ -284,7 +291,7 @@ export function deactivateGaugeInfinities(state: GameState, deactivationKey: str
       const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
       next = next.bloom
         ? changeBloomGauge(next, Math.fround(target - next.excitement))
-        : setVoltageValue(next, target);
+        : setVoltageValue(next, target, applyEffect);
     }
   }
   return next;
