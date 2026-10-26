@@ -85,12 +85,12 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
       whenTrue: [
         {
           kind: 'voltage-up-additional-buff',
-          calculation: 1,
-          num: 500_000,
+          calculation: 1n,
+          num: 500_000n,
           target: { kind: 'all' },
-          duration: { kind: 'stage', value: 0 },
+          duration: { kind: 'stage', value: 0n },
           disabledType: 0,
-          disabledCount: 0,
+          disabledCount: 0n,
         },
       ],
       whenFalse: [],

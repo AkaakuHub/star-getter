@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   VoltageUpAdditionalBuffEffect,
@@ -14,9 +15,9 @@ export function activateVoltageUpAdditionalBuff(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  if (effect.calculation !== 1) return state;
+  if (effect.calculation !== 1n) return state;
   const correction = effect.moodBonus
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
@@ -24,7 +25,7 @@ export function activateVoltageUpAdditionalBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
+  const numValue = Math.fround(int64ToFloat32(effect.num) / Math.fround(10_000));
   const base = Math.fround(
     Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
       Math.fround(multiplier),
@@ -42,7 +43,7 @@ export function activateVoltageUpAdditionalBuff(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     deactivationKey: effect.deactivationKey ?? null,
@@ -80,8 +81,8 @@ export function expireVoltageUpAdditionalBuffSections(state: GameState): GameSta
     ...state,
     voltageUpAdditionalBuffs: state.voltageUpAdditionalBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }
