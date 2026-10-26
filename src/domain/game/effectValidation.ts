@@ -35,8 +35,11 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'mode' || effect.kind === 'mode-reaction') {
-    if (!Number.isSafeInteger(effect.modeId) || effect.modeId < (effect.kind === 'mode' ? 0 : 1))
-      throw new Error('モードIDが正しくありません。');
+    const invalidModeId =
+      effect.kind === 'mode'
+        ? !isInt64(effect.modeId) || effect.modeId < 0n
+        : !Number.isSafeInteger(effect.modeId) || effect.modeId < 1;
+    if (invalidModeId) throw new Error('モードIDが正しくありません。');
     if (effect.kind === 'mode-reaction') {
       if (
         !isInt64(effect.buffNum) ||

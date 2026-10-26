@@ -10,6 +10,9 @@ import { createLoveUpAdditionalBuffEffect } from '../actionTypeEffects/loveUpAdd
 import { createVoltageUpAdditionalBuffEffect } from '../actionTypeEffects/voltageUpAdditionalBuff';
 import { createMentalRecoverAdditionalBuffEffect } from '../actionTypeEffects/mentalRecoverAdditionalBuff';
 import { createMentalBarrierAdditionalBuffEffect } from '../actionTypeEffects/mentalBarrierAdditionalBuff';
+import { createDisableMentalDownEffect } from '../actionTypeEffects/disableMentalDown';
+import { createChangeModeEffect } from '../actionTypeEffects/changeMode';
+import { createVoltageLevelEffect } from '../actionTypeEffects/voltageLevel';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -71,13 +74,19 @@ export function resolveActionEffects(card: Card): Card {
                                 targetMood: detail.targetMood ?? 0,
                               })),
                             })
-                          : createMentalBarrierAdditionalBuffEffect({
-                              ...actionEffect,
-                              details: actionEffect.details.map((detail) => ({
-                                ...detail,
-                                targetMood: detail.targetMood ?? 0,
-                              })),
-                            });
+                          : actionEffect.actionType === 33
+                            ? createMentalBarrierAdditionalBuffEffect({
+                                ...actionEffect,
+                                details: actionEffect.details.map((detail) => ({
+                                  ...detail,
+                                  targetMood: detail.targetMood ?? 0,
+                                })),
+                              })
+                            : actionEffect.actionType === 34
+                              ? createDisableMentalDownEffect(actionEffect)
+                              : actionEffect.actionType === 35
+                                ? createChangeModeEffect(actionEffect)
+                                : createVoltageLevelEffect(actionEffect);
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
