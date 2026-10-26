@@ -172,3 +172,45 @@ it('ActionType25ミッションは上限の実変化量を加算する', () => {
 
   expect(notified.ingameMission?.count).toBe(2);
 });
+
+it('ActionType1ミッションは上限適用後に実際に追加されたきらめき数を加算する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const state = {
+    ...initial,
+    hearts: { ...initial.hearts, heartLimit: 3 },
+    track: {
+      ...initial.track,
+      ingameMissionGroups: [
+        {
+          id: 1,
+          records: [
+            {
+              missionType: 2 as const,
+              probability: 100,
+              rare: false,
+              param1: 100,
+              param2: 1,
+              addParam: 0,
+              baseScore: 0,
+              addScore: 0,
+              text: 'きらめきを$TargetValue$個生成',
+            },
+          ],
+        },
+      ],
+    },
+  };
+  const active = startIngameMission(state, 1);
+  const effect = {
+    kind: 'skill-hearts' as const,
+    calculation: 'fixed' as const,
+    amount: 100_000,
+    displayTime: { kind: 'full-end' as const, value: 0 },
+  };
+  const changed = applyEffect(active, effect, card);
+  const notified = missionActionEffect(changed, effect, active);
+
+  expect(notified.ingameMission?.count).toBe(3);
+});
