@@ -1,11 +1,11 @@
 import type { Action52BuffEffect } from '../skillBoostTypes';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import type { MemberId, UnitId } from '../model';
 import { isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; targetMood: number; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
+  details: readonly ActionTypeDetail[];
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -49,12 +49,7 @@ export function createSkillBoostEffect(input: Input): Action52BuffEffect {
     int32(details.targetType?.value ?? 0n),
     int32(details.targetId?.value ?? 0n),
   );
-  const seriesIds = input.details
-    .filter((detail) => detail.detailType === detailTypes.seriesId)
-    .map((detail) => {
-      checked(detail);
-      return detail.value;
-    });
+  const seriesIds = find(input.details, detailTypes.seriesId)?.paramValues;
   const expireType = int32(details.expireType?.value ?? 0n);
   if (expireType !== 0 && expireType !== 1)
     throw new Error('ActionType52の解除条件が正しくありません。');
@@ -72,7 +67,7 @@ export function createSkillBoostEffect(input: Input): Action52BuffEffect {
     ...(moodBonus !== undefined ? { moodBonus } : {}),
     duration,
     uses: expireType === 1 ? (details.expireValue?.value ?? 0n) : null,
-    ...(seriesIds.length > 0 ? { skillTokenSeriesIds: seriesIds } : {}),
+    ...(seriesIds && seriesIds.length > 0 ? { skillTokenSeriesIds: seriesIds } : {}),
     ...(input.invocationType !== undefined ? { invocationType: input.invocationType } : {}),
     ...(input.deactivationKey !== undefined ? { deactivationKey: input.deactivationKey } : {}),
   };
@@ -97,13 +92,13 @@ function unitId(value: number): UnitId {
   throw new Error('ActionType52のユニットが正しくありません。');
 }
 
-function find(details: readonly Detail[], type: string): Detail | undefined {
+function find(details: readonly ActionTypeDetail[], type: string): ActionTypeDetail | undefined {
   const detail = details.find((item) => item.detailType === type);
   if (detail) checked(detail);
   return detail;
 }
 
-function checked(detail: Detail): void {
+function checked(detail: ActionTypeDetail): void {
   if (!isInt64(detail.id) || !isInt64(detail.value) || !Number.isSafeInteger(detail.targetMood))
     throw new Error('詳細値が正しくありません。');
 }

@@ -1,11 +1,11 @@
 import type { MoodValueBoostEffect } from '../moodValueBoostTypes';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import type { MemberId, UnitId } from '../model';
 import { isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; targetMood: number; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
+  details: readonly ActionTypeDetail[];
   deactivationKey?: string;
 }>;
 
@@ -50,12 +50,7 @@ export function createMoodValueBoostEffect(input: Input): MoodValueBoostEffect {
     int32(details.targetType?.value ?? 0n),
     int32(details.targetId?.value ?? 0n),
   );
-  const seriesIds = input.details
-    .filter((detail) => detail.detailType === detailTypes.seriesId)
-    .map((detail) => {
-      checked(detail);
-      return detail.value;
-    });
+  const seriesIds = find(input.details, detailTypes.seriesId)?.paramValues;
   return {
     kind: 'mood-value-boost',
     calculationType,
@@ -66,7 +61,7 @@ export function createMoodValueBoostEffect(input: Input): MoodValueBoostEffect {
     disabledType: int32(details.disabledType?.value ?? 0n),
     disabledCount: int32(details.disabledCount?.value ?? 0n),
     target,
-    ...(seriesIds.length > 0 ? { tokenCardSeriesIds: seriesIds } : {}),
+    ...(seriesIds && seriesIds.length > 0 ? { tokenCardSeriesIds: seriesIds } : {}),
     ...(input.deactivationKey !== undefined ? { deactivationKey: input.deactivationKey } : {}),
   };
 }
@@ -90,13 +85,13 @@ function unitId(value: number): UnitId {
   throw new Error('空模様追加バフのユニットが正しくありません。');
 }
 
-function find(details: readonly Detail[], type: string): Detail | undefined {
+function find(details: readonly ActionTypeDetail[], type: string): ActionTypeDetail | undefined {
   const detail = details.find((item) => item.detailType === type);
   if (detail) checked(detail);
   return detail;
 }
 
-function checked(detail: Detail): void {
+function checked(detail: ActionTypeDetail): void {
   if (!isInt64(detail.id) || !isInt64(detail.value) || !Number.isSafeInteger(detail.targetMood))
     throw new Error('詳細値が正しくありません。');
 }
