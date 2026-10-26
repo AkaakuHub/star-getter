@@ -10,7 +10,7 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
     card.id === sourceId
       ? {
           ...card,
-          effects: [{ kind: 'reshuffle-skill' as const, recoveryType: 1, stashType: 1 }],
+          effects: [{ kind: 'reshuffle-skill' as const, recoveryType: 1n, stashType: 1n }],
         }
       : card,
   );

@@ -10,8 +10,8 @@ export function activateReshuffleSkill(
   return enqueueHandShuffle(
     state,
     {
-      recoverDiscard: effect.recoveryType === 1,
-      destination: effect.stashType === 1 ? 'draw' : 'discard',
+      recoverDiscard: effect.recoveryType === 1n,
+      destination: effect.stashType === 1n ? 'draw' : 'discard',
     },
     card?.id ?? null,
     true,

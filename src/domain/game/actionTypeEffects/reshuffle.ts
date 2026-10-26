@@ -8,8 +8,8 @@ export function createReshuffleEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
   return {
     kind: 'reshuffle-skill',
-    recoveryType: int32(value(input.details, 'RESHUFFLE_RECOVERY_TYPE') ?? 0n),
-    stashType: int32(value(input.details, 'RESHUFFLE_STASH_TYPE') ?? 0n),
+    recoveryType: value(input.details, 'RESHUFFLE_RECOVERY_TYPE') ?? 0n,
+    stashType: value(input.details, 'RESHUFFLE_STASH_TYPE') ?? 0n,
     skillEffectId: input.skillEffectId,
   };
 }
@@ -19,8 +19,4 @@ function value(details: readonly Detail[], type: string): bigint | undefined {
   if (detail && (!isInt64(detail.id) || !isInt64(detail.value)))
     throw new Error('詳細値が正しくありません。');
   return detail?.value;
-}
-
-function int32(value: bigint): number {
-  return Number(BigInt.asIntN(32, value));
 }
