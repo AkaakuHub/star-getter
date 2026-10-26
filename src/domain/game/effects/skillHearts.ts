@@ -2,7 +2,6 @@ import { beatHeartCount } from '../beat';
 import { addHeartsWithLifeTime } from '../hearts';
 import { moodValue } from '../projection';
 import { calculateSkillMoodCorrection } from '../live/skillMood';
-import { consumeHeartBoosts } from '../live/heartBoosts';
 import type { Card, GameState } from '../model';
 import type { Effect } from '../modelTypes';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
@@ -45,12 +44,7 @@ export function createSkillHeartsFromEffect(
     effect.calculation === 'fixed'
       ? Math.fround(value)
       : Math.fround(Math.fround(value) * Math.fround(beatHeartCount(next)));
-  const heartBoost = consumeHeartBoosts(next, card, baseCount);
-  next = heartBoost.state;
-  const requestedCount = Math.fround(
-    baseCount + Math.fround((baseCount * heartBoost.percent) / 100),
-  );
-  const count = Math.max(1, int32(requestedCount * Math.fround(effectPower)));
+  const count = Math.max(1, int32(baseCount * Math.fround(effectPower)));
   const lifetimeSeconds =
     effect.displayTime.kind === 'milliseconds'
       ? Math.fround(int32(effect.displayTime.value) / 1000)

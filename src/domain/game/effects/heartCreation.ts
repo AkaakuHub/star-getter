@@ -2,7 +2,6 @@ import { beatHeartCount } from '../beat';
 import { addHearts, addHeartsWithLifeTime } from '../hearts';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { skillValue } from './skillValue';
-import { consumeHeartBoosts } from '../live/heartBoosts';
 import { applyAdditionalBuff } from './additionalBuff';
 import type { Card, GameState } from '../model';
 
@@ -10,12 +9,9 @@ export function createSkillHearts(
   state: GameState,
   count: number,
   lifetimeSeconds: number,
-  card: Card | undefined,
 ): GameState {
   const base = Math.max(0, count);
-  const boosted = consumeHeartBoosts(state, card, base);
-  const created = Math.max(1, Math.trunc(Math.fround(base + (base * boosted.percent) / 100)));
-  return addHeartsWithLifeTime(boosted.state, created, lifetimeSeconds);
+  return addHeartsWithLifeTime(state, Math.max(1, Math.trunc(base)), lifetimeSeconds);
 }
 
 export function createHeartsFromEffect(
@@ -43,14 +39,8 @@ export function createHeartsFromEffect(
   const additional = applyAdditionalBuff(state, 'attract', base, card);
   const action52 = applyAction52SkillBoostForCard(additional.state, card, additional.value);
   const heartBase = Math.trunc(action52.value);
-  const boosted = consumeHeartBoosts(action52.state, card, heartBase);
-  const count = Math.max(
-    1,
-    Math.trunc(
-      Math.fround(Math.fround(heartBase + (heartBase * boosted.percent) / 100) * effectPower),
-    ),
-  );
+  const count = Math.max(1, Math.trunc(Math.fround(heartBase * effectPower)));
   return lifetimeSeconds === undefined
-    ? addHearts(boosted.state, count)
-    : addHeartsWithLifeTime(boosted.state, count, lifetimeSeconds);
+    ? addHearts(action52.state, count)
+    : addHeartsWithLifeTime(action52.state, count, lifetimeSeconds);
 }

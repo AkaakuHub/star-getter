@@ -64,7 +64,6 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
       action52.state,
       floatToInt32(action52.value),
       inducer.heartLifetimeSeconds,
-      card,
     );
     const updated = { ...inducer, induces: inducer.induces + 1 };
     next = {

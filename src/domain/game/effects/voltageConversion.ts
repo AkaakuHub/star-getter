@@ -81,7 +81,6 @@ export function convertVoltageIncrease(
       conversion.outputDuration.kind === 'milliseconds'
         ? Math.fround(conversion.outputDuration.value / 1000)
         : 9_999,
-      card,
     );
   } else if (conversion.destination === 'love') {
     const base = Math.trunc(raw);

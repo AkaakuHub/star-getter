@@ -122,6 +122,47 @@ it('Action14のAP回復にもActionType52を適用して使用回数を消費す
   expect(recovered.action52Buffs).toHaveLength(0);
 });
 
+it('ActionType16のハート追加バフをActionType52より先に適用する', () => {
+  const initial = cleanGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const heartBoost = applyEffect(
+    initial,
+    {
+      kind: 'heart-boost',
+      percent: 33,
+      uses: 1,
+      target: { kind: 'member', member: source.member },
+      duration: { kind: 'stage' },
+    },
+    source,
+  );
+  const skillBoost = applyEffect(
+    heartBoost,
+    {
+      kind: 'skill-boost',
+      num: 400_000,
+      target: { kind: 'member', member: source.member },
+      duration: { kind: 'stage', value: 0n },
+      uses: null,
+    },
+    source,
+  );
+  const created = applyEffect(
+    skillBoost,
+    {
+      kind: 'skill-hearts',
+      calculation: 'fixed',
+      amount: 30_000,
+      displayTime: { kind: 'full-end', value: 0 },
+    },
+    source,
+  );
+
+  expect(heartCount(created)).toBe(4);
+  expect(created.heartBoosts).toHaveLength(0);
+});
+
 it('Action52は時間・パート期限、InvocationType抑止、外部解除を処理する', () => {
   const initial = cleanGame();
   const source = initial.deck[0];
