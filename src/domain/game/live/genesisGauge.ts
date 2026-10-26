@@ -38,7 +38,7 @@ export function calculateStarGatherGenesisGaugeDelta(input: {
   const sign = input.effectValue < 0 ? -1 : 1;
   const magnitude = Math.abs(Math.fround(input.effectValue));
   if (input.actionType === 39) {
-    return Math.trunc(input.effectValue);
+    return Math.trunc(input.effectValue) * sign;
   }
   const scale = genesisGaugeScale(input.gaugeType);
   if (scale === null) return 0;
