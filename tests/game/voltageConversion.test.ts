@@ -79,6 +79,29 @@ it('Action22で変換された熱気はActionType46の吸収対象にならな�
   expect(result.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
 });
 
+it('Action22のLove出力はActionType30追加Buffを適用して使用回数を消費する', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const withLoveBuff = applyEffect(
+    initial,
+    {
+      kind: 'love-up-additional-buff',
+      calculation: 1n,
+      num: 1_000_000n,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0n },
+      disabledType: 1,
+      disabledCount: 1n,
+    },
+    source,
+  );
+  const active = applyEffect(withLoveBuff, { ...conversion, destination: 'love' }, source);
+  const result = changeResource(active, 'excitement', 10n, 'skill', source);
+  expect(result.temporaryScoreBoosts[0]?.percent).toBe(20);
+  expect(result.loveUpAdditionalBuffs).toHaveLength(0);
+});
+
 it('Action22は熟練度ボーナスの熱気も変換する', () => {
   const base = unboostedGame();
   const initial = {

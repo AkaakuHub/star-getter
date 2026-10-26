@@ -7,6 +7,7 @@ import { createSkillHearts } from './heartCreation';
 import { changeResource } from '../resources';
 import type { EffectApplier } from './induceSkillEffect';
 import { applyMentalBarrierAdditionalBuff } from './mentalBarrierAdditionalBuff';
+import { applyLoveUpAdditionalBuffs } from './loveUpAdditionalBuff';
 import { induceSkillEffects } from './induceSkillEffect';
 
 export function activateVoltageConversion(
@@ -84,9 +85,7 @@ export function convertVoltageIncrease(
     );
   } else if (conversion.destination === 'love') {
     const base = Math.trunc(raw);
-    const buffed = card
-      ? applyAdditionalBuff(next, 'attract', base, card)
-      : { state: next, value: base };
+    const buffed = applyLoveUpAdditionalBuffs(next, card, base);
     const percent = Math.trunc(buffed.value);
     if (percent !== 0) {
       next = {
