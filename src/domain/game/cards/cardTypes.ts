@@ -171,7 +171,6 @@ export type ActionType36Record = Readonly<{
   skillLevel: number;
   specialAppealSkillLevel: number;
   skillSkillLevel: number;
-  cardSkillVariants: readonly CardSkillVariantMaster[];
   modeIds?: readonly number[];
   modeParameterChanges?: Readonly<{
     modeId: number;

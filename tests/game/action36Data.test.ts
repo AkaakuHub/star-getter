@@ -2,6 +2,50 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
+import type { CardSkillVariantMaster } from '../../src/domain/game/cards/cardTypes';
+
+const cardSkillVariants: readonly CardSkillVariantMaster[] = [
+  {
+    skillType: 2,
+    seriesId: 200,
+    skillLevel: 1,
+    specialAppealSkillLevel: 1,
+    skillSkillLevel: 1,
+    variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+  },
+  {
+    skillType: 2,
+    seriesId: 201,
+    skillLevel: 1,
+    specialAppealSkillLevel: 1,
+    skillSkillLevel: 1,
+    variant: { cost: 3, effects: [], skillIcon: 21, special: null },
+  },
+  {
+    skillType: 3,
+    seriesId: 210,
+    skillLevel: 1,
+    specialAppealSkillLevel: 1,
+    skillSkillLevel: 1,
+    variant: {
+      modeEffects: [],
+      ability893Effects: [{ kind: 'voltage-set', amount: 1 }],
+      ability894Effects: [],
+    },
+  },
+  {
+    skillType: 3,
+    seriesId: 211,
+    skillLevel: 1,
+    specialAppealSkillLevel: 1,
+    skillSkillLevel: 1,
+    variant: {
+      modeEffects: [],
+      ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
+      ability894Effects: [],
+    },
+  },
+];
 
 it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
   const track = tracks[0];
@@ -31,24 +75,6 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
               skillLevel: 1,
               specialAppealSkillLevel: 1,
               skillSkillLevel: 1,
-              cardSkillVariants: [
-                {
-                  skillType: 2,
-                  seriesId: 200,
-                  skillLevel: 1,
-                  specialAppealSkillLevel: 1,
-                  skillSkillLevel: 1,
-                  variant: { cost: 2, effects: [], skillIcon: 20, special: null },
-                },
-                {
-                  skillType: 2,
-                  seriesId: 201,
-                  skillLevel: 1,
-                  specialAppealSkillLevel: 1,
-                  skillSkillLevel: 1,
-                  variant: { cost: 3, effects: [], skillIcon: 21, special: null },
-                },
-              ],
               modeParameterChanges: { modeId: 100, off: [], on: [] },
             },
             {
@@ -70,38 +96,12 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
               skillLevel: 1,
               specialAppealSkillLevel: 1,
               skillSkillLevel: 1,
-              cardSkillVariants: [
-                {
-                  skillType: 3,
-                  seriesId: 210,
-                  skillLevel: 1,
-                  specialAppealSkillLevel: 1,
-                  skillSkillLevel: 1,
-                  variant: {
-                    modeEffects: [],
-                    ability893Effects: [{ kind: 'voltage-set' as const, amount: 1 }],
-                    ability894Effects: [],
-                  },
-                },
-                {
-                  skillType: 3,
-                  seriesId: 211,
-                  skillLevel: 1,
-                  specialAppealSkillLevel: 1,
-                  skillSkillLevel: 1,
-                  variant: {
-                    modeEffects: [],
-                    ability893Effects: [{ kind: 'voltage-set' as const, amount: 2 }],
-                    ability894Effects: [],
-                  },
-                },
-              ],
             },
           ],
         }
       : card,
   );
-  const state = createGame(track, deck, 7);
+  const state = createGame(track, deck, 7, undefined, undefined, cardSkillVariants);
   const compiled = state.deck.find((card) => card.id === source.id);
   expect(compiled?.modeIds).toContain(100);
   expect(compiled?.modeIds).toContain(101);
@@ -147,22 +147,21 @@ it('ActionType36は系列IDに一致するMaster variantがない場合に失敗
               skillLevel: 1,
               specialAppealSkillLevel: 1,
               skillSkillLevel: 1,
-              cardSkillVariants: [
-                {
-                  skillType: 2,
-                  seriesId: 20,
-                  skillLevel: 1,
-                  specialAppealSkillLevel: 1,
-                  skillSkillLevel: 1,
-                  variant: { cost: 2, effects: [], skillIcon: 20, special: null },
-                },
-              ],
             },
           ],
         }
       : card,
   );
-  expect(() => createGame(track, deck, 7)).toThrow(
-    'モード切替スキル系列Masterを一意に解決できません。',
-  );
+  expect(() =>
+    createGame(track, deck, 7, undefined, undefined, [
+      {
+        skillType: 2,
+        seriesId: 20,
+        skillLevel: 1,
+        specialAppealSkillLevel: 1,
+        skillSkillLevel: 1,
+        variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+      },
+    ]),
+  ).toThrow('モード切替スキル系列Masterを一意に解決できません。');
 });

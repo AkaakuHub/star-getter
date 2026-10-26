@@ -43,15 +43,19 @@ import { advanceIngameMission } from './ingameMissions';
 import { createInitialEffectState } from './effects/initialState';
 import { refreshEffectInducers } from './effects/effectInduce';
 import { resolveActionEffects } from './cards/resolveActionEffects';
+import type { CardSkillVariantMaster } from './cards/cardTypes';
 export function createGame(
   track: Track,
   deck: readonly Card[],
   seed: number,
   heartShowLimit: number = starGatherHeartShowLimitSettings.defaultValue,
   tokenCatalog: readonly Card[] = [],
+  cardSkillVariants: readonly CardSkillVariantMaster[] = [],
 ): GameState {
-  const resolvedDeck = deck.map(resolveActionEffects);
-  const resolvedTokenCatalog = tokenCatalog.map(resolveActionEffects);
+  const resolvedDeck = deck.map((card) => resolveActionEffects(card, cardSkillVariants));
+  const resolvedTokenCatalog = tokenCatalog.map((card) =>
+    resolveActionEffects(card, cardSkillVariants),
+  );
   validateDeck(resolvedDeck);
   validateTrack(track);
   for (const card of resolvedTokenCatalog) validateCard(card);

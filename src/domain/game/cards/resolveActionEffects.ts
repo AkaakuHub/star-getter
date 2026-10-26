@@ -11,7 +11,10 @@ import { createHandInducer } from '../actionTypeEffects/handInduce';
 import { resolveHandPermanentEffects } from '../actionTypeEffects/handPermanent';
 import { isInt64 } from '../numeric';
 
-export function resolveActionEffects(card: Card): Card {
+export function resolveActionEffects(
+  card: Card,
+  cardSkillVariants: readonly CardSkillVariantMaster[],
+): Card {
   if (!card.actionEffects?.length) return card;
   const { actionEffects, ...resolved } = card;
   let effects = [...resolved.effects];
@@ -36,7 +39,7 @@ export function resolveActionEffects(card: Card): Card {
         'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_2',
       );
       const off = resolveCardSkillVariant(
-        actionEffect.cardSkillVariants,
+        cardSkillVariants,
         offSeriesId,
         actionEffect.skillType,
         actionEffect.skillLevel,
@@ -44,7 +47,7 @@ export function resolveActionEffects(card: Card): Card {
         actionEffect.skillSkillLevel,
       );
       const on = resolveCardSkillVariant(
-        actionEffect.cardSkillVariants,
+        cardSkillVariants,
         onSeriesId,
         actionEffect.skillType,
         actionEffect.skillLevel,
