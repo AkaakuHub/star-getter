@@ -214,7 +214,7 @@ it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactiv
   ).toHaveLength(0);
 });
 
-it('Action22のBarrier変換はActionType7追加補正前に小数値を切り上げない', () => {
+it('Action22のBarrier変換は追加補正後の耐久値を整数化する', () => {
   const initial = unboostedGame();
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
@@ -242,7 +242,38 @@ it('Action22のBarrier変換はActionType7追加補正前に小数値を切り�
     source,
   );
   const converted = changeResource(buffed, 'excitement', 1n, 'skill', source);
-  expect(converted.mentalBarriers[0]?.endurance).toBe(0);
+  expect(converted.mentalBarriers[0]?.endurance).toBe(1);
+});
+
+it('Action22のBarrier変換はActionType7追加補正前に小数1位へ切り上げる', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const conversionState = applyEffect(
+    initial,
+    {
+      ...conversion,
+      destination: 'mental-barrier',
+      num: 14_999,
+      outputDuration: { kind: 'stage', value: 0 },
+    },
+    source,
+  );
+  const buffed = applyEffect(
+    conversionState,
+    {
+      kind: 'mental-barrier-additional-buff',
+      calculation: 1,
+      num: 1_000_000n,
+      target: { kind: 'all' },
+      duration: { kind: 'stage', value: 0n },
+      disabledType: 0,
+      disabledCount: 0n,
+    },
+    source,
+  );
+  const converted = changeResource(buffed, 'excitement', 1n, 'skill', source);
+  expect(converted.mentalBarriers[0]?.endurance).toBe(3);
 });
 
 it('Action22のパート・ミリ秒期限とLoveUpの次回ハート回収解除を処理する', () => {

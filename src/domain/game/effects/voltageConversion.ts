@@ -122,11 +122,12 @@ export function convertVoltageIncrease(
       applyEffect,
     );
   } else {
+    const endurance = Math.fround(Math.ceil(Math.fround(raw * 10)) / 10);
     const output: Extract<Effect, { kind: 'mental-barrier' }> = {
       kind: 'mental-barrier',
       barrier: 'endurance',
       enduranceType: 'fixed',
-      endurance: raw,
+      endurance,
       attenuation: 0,
       duration: conversion.outputDuration,
     };
