@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { act } from '../../src/domain/game/actions';
-import { changeResource } from '../../src/domain/game/resources';
+import { changeResource, expireGaugeInfinities } from '../../src/domain/game/resources';
 import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { activateBloom, finishBloom } from '../../src/domain/game/bloom';
@@ -215,6 +215,29 @@ describe('無限ゲージ', () => {
     expect(ended.mentalTimerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
     expect(finishBloom(ended).stamina).toBe(42);
+  });
+
+  it('開花中の元気無限期限切れでも元気回復誘発を起こさない', () => {
+    const base = { ...game('bloom'), stamina: 42, mentalTimerSeconds: 0.4 };
+    const inducing = applyEffect(base, {
+      kind: 'mental-heart-induce',
+      num: 10_000n,
+      heartDuration: { kind: 'stage', value: 0 },
+      duration: { kind: 'milliseconds', value: 5_000n },
+      disabledType: 0,
+      disabledValue: 0n,
+    });
+    const initial = activateBloom(inducing, 1);
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'mental',
+      duration: { kind: 'milliseconds', value: 500 },
+    });
+    const ended = expireGaugeInfinities(active, 'milliseconds', 0.5);
+    expect(ended.gaugeInfinities).toHaveLength(0);
+    expect(ended.stamina).toBe(42);
+    expect(ended.mentalTimerSeconds).toBe(0);
+    expect(ended.hearts).toEqual(active.hearts);
   });
 
   it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {
