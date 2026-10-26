@@ -40,7 +40,10 @@ import { assertNeverActionEffect } from './assertNeverActionEffect';
 import type { Card } from './cardTypes';
 import type { Effect } from '../modelTypes';
 
-type RuntimeActionEffect = Exclude<NonNullable<Card['actionEffects']>[number], { actionType: 36 }>;
+type RuntimeActionEffect = Exclude<
+  NonNullable<Card['actionEffects']>[number],
+  { actionType: 36 | 901 }
+>;
 
 import { resolveEarlyActionEffect, type EarlyActionEffect } from './resolveEarlyActionEffect';
 

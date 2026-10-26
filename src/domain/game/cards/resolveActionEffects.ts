@@ -1,11 +1,13 @@
 import type { Card } from './cardTypes';
 import { resolveActionEffect } from './resolveActionEffect';
+import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessInduce';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
   const { actionEffects, ...resolved } = card;
   let effects = [...resolved.effects];
   let handPermanentEffects = [...(resolved.handPermanentEffects ?? [])];
+  let drawEffects = [...(resolved.drawEffects ?? [])];
   let modeIds = [...(resolved.modeIds ?? [])];
   let modeParameterChanges = resolved.modeParameterChanges;
   let modeSkillChanges = resolved.modeSkillChanges;
@@ -16,6 +18,10 @@ export function resolveActionEffects(card: Card): Card {
       modeParameterChanges = actionEffect.modeParameterChanges ?? modeParameterChanges;
       modeSkillChanges = actionEffect.modeSkillChanges ?? modeSkillChanges;
       modeAbilityChanges = actionEffect.modeAbilityChanges ?? modeAbilityChanges;
+      continue;
+    }
+    if (actionEffect.actionType === 901) {
+      drawEffects.push(createDrawSuccessInduceEffect(actionEffect));
       continue;
     }
     const effect = resolveActionEffect(actionEffect);
@@ -30,5 +36,6 @@ export function resolveActionEffects(card: Card): Card {
     ...(modeSkillChanges ? { modeSkillChanges } : {}),
     ...(modeAbilityChanges ? { modeAbilityChanges } : {}),
     ...(handPermanentEffects.length > 0 ? { handPermanentEffects } : {}),
+    ...(drawEffects.length > 0 ? { drawEffects } : {}),
   };
 }
