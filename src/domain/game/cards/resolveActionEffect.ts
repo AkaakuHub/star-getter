@@ -35,6 +35,7 @@ import { createProxySkillEffect } from '../actionTypeEffects/proxySkill';
 import { createTokenCardEffect } from '../actionTypeEffects/tokenCard';
 import { createSkillCooldownEffect } from '../actionTypeEffects/skillCooldown';
 import { createInduceSkillEffect } from '../actionTypeEffects/induceSkillEffect';
+import { createUseInduceEffect } from '../actionTypeEffects/useInduce';
 import { assertNeverActionEffect } from './assertNeverActionEffect';
 
 import type { Card } from './cardTypes';
@@ -260,7 +261,14 @@ function resolveLaterActionEffect(actionEffect: LaterActionEffect): Effect {
                                                                             ? createFixedParameterExtendEffect(
                                                                                 actionEffect,
                                                                               )
-                                                                            : assertNeverActionEffect(
-                                                                                actionEffect,
-                                                                              );
+                                                                            : actionEffect.actionType ===
+                                                                                  905 ||
+                                                                                actionEffect.actionType ===
+                                                                                  906
+                                                                              ? createUseInduceEffect(
+                                                                                  actionEffect,
+                                                                                )
+                                                                              : assertNeverActionEffect(
+                                                                                  actionEffect,
+                                                                                );
 }

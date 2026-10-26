@@ -11,6 +11,8 @@ import type { ActionType18Record } from './actionType18Record';
 import type { ActionType901Record } from './actionType901Record';
 import type { ActionType902Record } from './actionType902Record';
 import type { ActionType903Record } from './actionType903Record';
+import type { ActionType905Record } from './actionType905Record';
+import type { ActionType906Record } from './actionType906Record';
 import type { ActionType19Record } from './actionType19Record';
 import type { MoodActionRecord } from './moodActionRecord';
 export type { HandUseTrigger } from './handUseTrigger';
@@ -281,6 +283,8 @@ export type Card = Readonly<{
     | ActionType901Record
     | ActionType902Record
     | ActionType903Record
+    | ActionType905Record
+    | ActionType906Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
