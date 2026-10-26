@@ -5,6 +5,7 @@ import {
 } from '../parameters/parameterValueChange';
 import { applyEffect } from '../effects';
 import { withDeactivationKey, deactivateInducedEffects } from '../effects/effectInduce';
+import { deactivateModeAbilityEffects } from './modeAbility';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -35,6 +36,7 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
   let next = state;
   for (const id of ids) {
     const card = state.deck.find((item) => item.id === id);
+    if (card?.modeAbilityChanges) next = deactivateModeAbilityEffects(next, card);
     if (!card || !card.handUse || card.handUse.limitMemory !== 'reset') continue;
     for (const effect of card.handUse?.effects ?? []) {
       if (effect.kind === 'parameter-value-change')

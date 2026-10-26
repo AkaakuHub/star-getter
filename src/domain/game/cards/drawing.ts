@@ -5,6 +5,8 @@ import { activateHandPermanentEffects, disposeHandEffects } from './handEffects'
 import { applyDrawAbility } from './drawAbilities';
 import type { Card, GameState, HandShuffle } from '../model';
 import { initializeHandCardStats } from './skillCostChanges';
+import { activateModeAbilityEffects } from './modeAbility';
+import { applyEffect } from '../effects';
 
 export function handCapacity(state: GameState): number {
   if (state.handMaxCardEffects.length > 0) return Math.min(8, state.deck.length);
@@ -119,6 +121,7 @@ function drawUntil(state: GameState, count: number, trimOverflow: boolean): Game
       handEffectCardIds: [...next.handEffectCardIds.filter((id) => id !== card.id), card.id],
     };
     next = activateHandPermanentEffects(next, card);
+    next = activateModeAbilityEffects(next, card, applyEffect);
   }
   const maximum = handCapacity(next);
   if (trimOverflow && next.hand.length > maximum) {

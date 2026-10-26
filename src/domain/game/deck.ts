@@ -23,7 +23,7 @@ export function validateCard(card: Card): void {
     card.cost < 0 ||
     (card.mainEffect !== undefined && !Number.isSafeInteger(card.mainEffect)) ||
     Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
-    (card.effects.length === 0 && !card.modeSkillChanges) ||
+    (card.effects.length === 0 && !card.modeSkillChanges && !card.modeAbilityChanges) ||
     (card.relay !== undefined &&
       (!Number.isSafeInteger(card.relay.threshold) ||
         card.relay.threshold < 1 ||
@@ -43,6 +43,12 @@ export function validateCard(card: Card): void {
     ...(card.modeSkillChanges?.on.effects ?? []),
     ...(card.modeSkillChanges?.off.special?.effects ?? []),
     ...(card.modeSkillChanges?.on.special?.effects ?? []),
+    ...(card.modeAbilityChanges?.off.modeEffects ?? []),
+    ...(card.modeAbilityChanges?.off.ability893Effects ?? []),
+    ...(card.modeAbilityChanges?.off.ability894Effects ?? []),
+    ...(card.modeAbilityChanges?.on.modeEffects ?? []),
+    ...(card.modeAbilityChanges?.on.ability893Effects ?? []),
+    ...(card.modeAbilityChanges?.on.ability894Effects ?? []),
     ...(card.handPermanentEffects ?? []),
     ...(card.collectionEffects?.effects ?? []),
   ])
@@ -76,6 +82,17 @@ export function validateCard(card: Card): void {
       for (const effect of variant.effects) validateEffect(effect);
       if (variant.special) for (const effect of variant.special.effects) validateEffect(effect);
     }
+  }
+  if (card.modeAbilityChanges) {
+    if (!Number.isSafeInteger(card.modeAbilityChanges.modeId) || card.modeAbilityChanges.modeId < 1)
+      throw new Error('能力モードの設定が正しくありません。');
+    for (const variant of [card.modeAbilityChanges.off, card.modeAbilityChanges.on])
+      for (const effect of [
+        ...variant.modeEffects,
+        ...variant.ability893Effects,
+        ...variant.ability894Effects,
+      ])
+        validateEffect(effect);
   }
   if (card.modeParameterChanges) {
     if (

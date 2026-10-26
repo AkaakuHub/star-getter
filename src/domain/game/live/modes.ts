@@ -70,3 +70,16 @@ export function resolveModeSkill(card: Card, modes: ModeState): Card {
     ...(skillIcon === null ? {} : { skillIcon }),
   };
 }
+
+export function resolveModeAbility(card: Card, modes: ModeState): Card {
+  const changes = card.modeAbilityChanges;
+  if (!changes) return card;
+  const mode = modes.entries.find((entry) => entry.id === changes.modeId);
+  if (!mode) return card;
+  const variant = mode.on ? changes.on : changes.off;
+  return {
+    ...card,
+    ability893Effects: variant.ability893Effects,
+    ability894Effects: variant.ability894Effects,
+  };
+}

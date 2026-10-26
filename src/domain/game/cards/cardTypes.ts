@@ -21,6 +21,12 @@ export type ModeSkillVariant = Readonly<{
   special: Readonly<{ cost: number; extra: boolean; effects: readonly Effect[] }> | null;
 }>;
 
+export type ModeAbilityVariant = Readonly<{
+  modeEffects: readonly Effect[];
+  ability893Effects: readonly Effect[];
+  ability894Effects: readonly Effect[];
+}>;
+
 export type Card = Readonly<{
   id: string;
   name: string;
@@ -43,6 +49,11 @@ export type Card = Readonly<{
     modeId: number;
     off: ModeSkillVariant;
     on: ModeSkillVariant;
+  }>;
+  modeAbilityChanges?: Readonly<{
+    modeId: number;
+    off: ModeAbilityVariant;
+    on: ModeAbilityVariant;
   }>;
   handPermanentEffects?: readonly HandPermanentEffect[];
   tokenSeriesIds?: readonly number[];

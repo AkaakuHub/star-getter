@@ -61,6 +61,7 @@ export function createGame(
         ...(card.modeIds ?? []),
         ...(card.modeParameterChanges ? [card.modeParameterChanges.modeId] : []),
         ...(card.modeSkillChanges ? [card.modeSkillChanges.modeId] : []),
+        ...(card.modeAbilityChanges ? [card.modeAbilityChanges.modeId] : []),
       ]),
     ),
     modeReactions: [],

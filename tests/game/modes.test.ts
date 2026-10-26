@@ -4,6 +4,8 @@ import { drainModeChanges } from '../../src/domain/game/effects/modeChange';
 import { cardCost } from '../../src/domain/game/cards/cost';
 import { cardAt } from '../../src/domain/game/projection';
 import { createModes } from '../../src/domain/game/live/modes';
+import { activateModeAbilityEffects } from '../../src/domain/game/cards/modeAbility';
+import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
 import { act } from '../../src/domain/game/actions';
 import type { Card, Effect } from '../../src/domain/game/model';
 import { game, withHand } from './support/game';
@@ -103,6 +105,51 @@ describe('モード切替と切替時効果', () => {
     const used = act(enabled, { type: 'card', index: 0 });
     expect(used.excitement - enabled.excitement).toBe(28);
     expect(used.cardUses[0]?.cost).toBe(3);
+  });
+  it('Action36のモード別Abilityを切替時に解除して再起動する', () => {
+    const initial = modeGame();
+    const template = initial.deck[0];
+    if (!template) throw new Error('カードがありません。');
+    const card = {
+      ...template,
+      modeAbilityChanges: {
+        modeId: 1,
+        off: {
+          modeEffects: [{ kind: 'hand-limit', amount: 1 }],
+          ability893Effects: [{ kind: 'energy', amount: 1 }],
+          ability894Effects: [],
+        },
+        on: {
+          modeEffects: [{ kind: 'hand-limit', amount: 2 }],
+          ability893Effects: [{ kind: 'energy', amount: 3 }],
+          ability894Effects: [],
+        },
+      },
+    } as const;
+    const deck = initial.deck.map((item) => (item.id === card.id ? card : item));
+    const prepared = {
+      ...initial,
+      deck,
+      cardPool: deck,
+      hand: [card.id],
+      handEffectCardIds: [card.id],
+    };
+    const off = activateModeAbilityEffects(prepared, card, applyEffect);
+    expect(off.handLimit).toBe(initial.handLimit + 1);
+    const on = applyEffect(off, { kind: 'mode', modeId: 1n, change: 'on' });
+    expect(on.handLimit).toBe(initial.handLimit + 2);
+    const disposed = disposeHandEffects(on, [card.id]);
+    expect(disposed.handLimit).toBe(initial.handLimit);
+    const playing = act(
+      {
+        ...on,
+        phase: 'playing',
+        energy: 20,
+        drawPile: deck.filter((item) => item.id !== card.id).map((item) => item.id),
+      },
+      { type: 'card', index: 0 },
+    );
+    expect(playing.energy).toBe(20 - cardCost(on, card) + 3);
   });
   it('切替保留中は状態を変えず、解除後にFIFOで実行する', () => {
     let state = applyEffect(modeGame(), reaction);

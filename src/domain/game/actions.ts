@@ -1,7 +1,7 @@
 import { beginTokenGeneration, finishTokenGeneration } from './cards/tokens';
 import { applyBeforeUseAbility } from './cards/beforeUse';
 import { drainModeChanges } from './effects/modeChange';
-import { resolveModeSkill } from './live/modes';
+import { resolveModeAbility, resolveModeSkill } from './live/modes';
 import { collectHearts } from './hearts';
 import { type Action, type Card, type Effect, type GameState } from './model';
 import { applyEffect } from './effects';
@@ -231,8 +231,9 @@ function activateCard(
   }
   next = finishTokenGeneration(next, card.id);
   next = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
-  next = applyAbilityEffects(next, card, card.ability893Effects ?? [], applyEffect);
-  next = applyAbilityEffects(next, card, card.ability894Effects ?? [], applyEffect);
+  const ability = resolveModeAbility(card, next.modes);
+  next = applyAbilityEffects(next, card, ability.ability893Effects ?? [], applyEffect);
+  next = applyAbilityEffects(next, card, ability.ability894Effects ?? [], applyEffect);
   for (const effect of card.effects) {
     if (effect.kind !== 'use-hand' || allHand) continue;
     next = { ...next, modes: { ...next.modes, held: true } };

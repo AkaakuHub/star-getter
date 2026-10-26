@@ -6,6 +6,7 @@ import {
 } from '../parameters/parameterValueChange';
 import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
 import { completeDeckOutChecks } from './deckOutCheck';
+import { activateModeAbilityEffects, deactivateModeAbilityEffects } from '../cards/modeAbility';
 
 type ApplyEffect = (
   state: GameState,
@@ -31,6 +32,11 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
       (card) =>
         card.modeParameterChanges?.modeId === modeId && next.handEffectCardIds.includes(card.id),
     );
+    const modeAbilityCards = next.deck.filter(
+      (card) =>
+        card.modeAbilityChanges?.modeId === modeId && next.handEffectCardIds.includes(card.id),
+    );
+    for (const card of modeAbilityCards) next = deactivateModeAbilityEffects(next, card);
     for (const card of modeCards) {
       const active = next.activeModeParameterChanges.find(
         (item) => item.cardId === card.id && item.modeId === modeId,
@@ -56,6 +62,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
         ],
       };
     }
+    for (const card of modeAbilityCards) next = activateModeAbilityEffects(next, card, apply);
     if (!changed.on) continue;
     const listeners = next.modeReactions
       .map((reaction, index) => ({ reaction, index }))
