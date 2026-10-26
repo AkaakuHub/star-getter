@@ -1,6 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffects/apSpeedChange';
 import { applyEffect } from '../../src/domain/game/effects';
+import { applyApSpeedPercent } from '../../src/domain/game/effects/apSpeed';
 import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { startIngameMission } from '../../src/domain/game/ingameMissions';
 import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
@@ -100,6 +101,29 @@ it('ActionType21通知は実際に登録されたAP時間倍率を使う', () =>
   });
   const changed = applyEffect(startIngameMission(initial, 21n), effect, card);
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', () => {
+  const initial = missionState(21, 4500);
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const priorBuff = applyApSpeedPercent(initial, -100, 'stage');
+  const effect = createApSpeedChangeEffect({
+    skillEffectId: 22n,
+    details: [
+      { id: 1n, detailType: 'CHANGE_AP_INCREASE_SPEED_CALC_TYPE', targetMood: 0, value: 1n },
+      { id: 2n, detailType: 'CHANGE_AP_INCREASE_SPEED_NUM', targetMood: 0, value: -1n },
+      {
+        id: 3n,
+        detailType: 'CHANGE_AP_INCREASE_SPEED_DISPLAY_TIME_TYPE',
+        targetMood: 0,
+        value: 3n,
+      },
+    ],
+  });
+  const changed = applyEffect(startIngameMission(priorBuff, 21n), effect, card);
+  expect(changed.ingameMission?.count).toBeLessThan(4500);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(0);
 });
 
 it('負のActionType20効果はActionType44ミッション数を減らさない', () => {

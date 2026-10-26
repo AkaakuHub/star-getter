@@ -6,6 +6,7 @@ import type { IngameMission, IngameMissionRecord } from './ingameMissionTypes';
 import type { Effect } from './modelTypes';
 import { starGatherHeartCount } from './live/heartState';
 import { heartLimitValueWithoutLimit } from './effects/heartLimit';
+import { apIncreaseIntervalSeconds } from './effects/apSpeed';
 
 export function startIngameMission(state: GameState, groupId: bigint): GameState {
   const group = state.track.ingameMissionGroups.find((item) => BigInt(item.id) === groupId);
@@ -108,7 +109,7 @@ export function missionActionEffect(
                                 Math.fround(
                                   -(
                                     (state.apTimeEffects.at(-1)?.value ?? 0) /
-                                    before.track.stage.apIncreaseIntervalSeconds
+                                    apIncreaseIntervalSeconds(before)
                                   ),
                                 ) * Math.fround(10_000),
                               )
