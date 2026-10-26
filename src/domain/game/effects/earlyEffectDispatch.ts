@@ -16,6 +16,7 @@ import { activateAddVoltageSkill } from './addVoltageSkill';
 import { activateReshuffleSkill } from './reshuffleSkill';
 import { activateDrawSuccessInduce } from './drawSuccessInduce';
 import { activateSkillScoreUp } from './skillScoreUp';
+import { activateBranchInducer } from './branch';
 
 export function dispatchEarlyEffect(
   state: GameState,
@@ -26,6 +27,8 @@ export function dispatchEarlyEffect(
   effectPower: number,
   apply: EffectApplier,
 ): GameState | undefined {
+  if (effect.kind === 'branch' && effect.persistent === true)
+    return activateBranchInducer(state, effect, card);
   if (effect.kind === 'skill-score-up')
     return activateSkillScoreUp(state, effect, card, multiplier, addValue, effectPower);
   if (effect.kind === 'proxy-skill-forced-activation')

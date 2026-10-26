@@ -189,6 +189,8 @@ export function createGame(
     nextInducedSkillEffectId: 1,
     useInduceActivationCounts: {},
     effectInducers: [],
+    branchInducers: [],
+    nextBranchInducerId: 1,
     cardMoveInducers: [],
     lastPerformer: null,
     lastCardName: '',

@@ -44,6 +44,11 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'branch') {
+    if (
+      (effect.persistent !== undefined && typeof effect.persistent !== 'boolean') ||
+      (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
+    )
+      throw new Error('条件分岐の設定が正しくありません。');
     for (const child of [...effect.whenTrue, ...effect.whenFalse]) validateEffect(child);
     return;
   }

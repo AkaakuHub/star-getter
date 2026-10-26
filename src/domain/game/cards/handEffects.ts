@@ -21,7 +21,7 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
               ? { ...effect, invocationType: 0x388, deactivationKey }
               : effect.kind === 'skill-boost'
                 ? { ...effect, invocationType: 0x388, deactivationKey }
-                : withDeactivationKey(effect, deactivationKey),
+                : withDeactivationKey(effect, deactivationKey, true),
             card,
           );
   }

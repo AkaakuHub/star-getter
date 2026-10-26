@@ -2,6 +2,7 @@ import type { Card, Effect, GameState } from '../model';
 import type { EffectInduceEffect } from '../induceSkillEffectTypes';
 import type { EffectApplier } from './induceSkillEffect';
 import { deactivateMentalBarriers } from '../live/mentalBarriers';
+import { deactivateBranchInducers, refreshBranchInducers } from './branch';
 import { act } from '../actions';
 import { completeDeckOutChecks } from './deckOutCheck';
 const deactivationActions: readonly ((deactivationKey: string) => import('../model').Action)[] = [
@@ -93,7 +94,7 @@ export function refreshEffectInducers(state: GameState, apply: EffectApplier): G
       next = completeDeckOutChecks(apply(next, withDeactivationKey(effect, deactivationKey), card));
     }
   }
-  return next;
+  return refreshBranchInducers(next, apply);
 }
 
 function isEffectInducerActive(
@@ -134,8 +135,13 @@ function isEffectInducerActive(
   }
 }
 
-export function withDeactivationKey(effect: Effect, deactivationKey: string): Effect {
-  if ('deactivationKey' in effect) return { ...effect, deactivationKey };
+export function withDeactivationKey(
+  effect: Effect,
+  deactivationKey: string,
+  persistentBranch = false,
+): Effect {
+  if (effect.kind !== 'branch' && 'deactivationKey' in effect)
+    return { ...effect, deactivationKey };
   switch (effect.kind) {
     case 'infinity-gauge':
     case 'mental-barrier':
@@ -175,8 +181,14 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
     case 'branch':
       return {
         ...effect,
-        whenTrue: effect.whenTrue.map((child) => withDeactivationKey(child, deactivationKey)),
-        whenFalse: effect.whenFalse.map((child) => withDeactivationKey(child, deactivationKey)),
+        ...(persistentBranch ? { persistent: true } : {}),
+        deactivationKey,
+        whenTrue: effect.whenTrue.map((child) =>
+          withDeactivationKey(child, deactivationKey, persistentBranch),
+        ),
+        whenFalse: effect.whenFalse.map((child) =>
+          withDeactivationKey(child, deactivationKey, persistentBranch),
+        ),
       };
     case 'conditional':
       return {
@@ -195,7 +207,7 @@ export function withDeactivationKey(effect: Effect, deactivationKey: string): Ef
 }
 
 export function deactivateInducedEffects(state: GameState, deactivationKey: string): GameState {
-  let next = state;
+  let next = deactivateBranchInducers(state, deactivationKey);
   const removedInducers = next.effectInducers.filter(
     (inducer) => inducer.deactivationKey === deactivationKey,
   );

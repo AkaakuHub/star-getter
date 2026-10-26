@@ -18,6 +18,7 @@ import type { MoodSample } from './moodHistory';
 import type { ModeState } from './live/modes';
 import type { MoodKey } from './live/moodTimeline';
 import type { Effect } from './modelTypes';
+import type { GameCondition } from './conditions/model';
 import type { Card } from './cards/cardTypes';
 export type { Action } from './actionTypes';
 export type { Card } from './cards/cardTypes';
@@ -310,6 +311,16 @@ export type GameState = Readonly<{
   handUseHeartCollectionCounts: Readonly<Record<string, number>>;
   useInduceActivationCounts: Readonly<Record<string, number>>;
   effectInducers: readonly ActiveEffectInducer[];
+  branchInducers: readonly Readonly<{
+    id: number;
+    condition: GameCondition;
+    whenTrue: readonly Effect[];
+    whenFalse: readonly Effect[];
+    active: boolean | null;
+    deactivationKey: string | null;
+    sourceCardId: string | null;
+  }>[];
+  nextBranchInducerId: number;
   cardMoveInducers: readonly ActiveCardMoveInducer[];
   combo: number;
   lastCollectTick: number;

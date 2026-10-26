@@ -167,6 +167,8 @@ type EffectShape =
       condition: GameCondition;
       whenTrue: readonly Effect[];
       whenFalse: readonly Effect[];
+      persistent?: boolean;
+      deactivationKey?: string;
     }>
   | Readonly<{ kind: 'hearts'; amount: number; moodBonus?: MoodBonus; lifetimeSeconds?: number }>
   | SkillActionEffect
