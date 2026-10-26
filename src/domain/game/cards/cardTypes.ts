@@ -169,14 +169,16 @@ export type ActionType53Record = Readonly<{
 
 export type ActionType36Record = Readonly<{
   actionType: 36;
+  details: readonly ActionTypeDetail[];
   modeIds?: readonly number[];
   modeParameterChanges?: Readonly<{
     modeId: number;
     off: readonly ParameterValueChangeEffect[];
     on: readonly ParameterValueChangeEffect[];
   }>;
-  modeSkillChanges?: Readonly<{
-    modeId: number;
+  modeSkillChanges: Readonly<{
+    offSeriesId: number;
+    onSeriesId: number;
     off: ModeSkillVariant;
     on: ModeSkillVariant;
   }>;

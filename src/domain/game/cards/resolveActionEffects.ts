@@ -4,6 +4,7 @@ import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessI
 import { createOnDrawInduceRule } from '../actionTypeEffects/onDrawInduce';
 import { createHandInducer } from '../actionTypeEffects/handInduce';
 import { resolveHandPermanentEffects } from '../actionTypeEffects/handPermanent';
+import { isInt64 } from '../numeric';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -20,9 +21,27 @@ export function resolveActionEffects(card: Card): Card {
   let modeAbilityChanges = resolved.modeAbilityChanges;
   for (const actionEffect of actionEffects) {
     if (actionEffect.actionType === 36) {
-      modeIds = [...modeIds, ...(actionEffect.modeIds ?? [])];
+      const modeId = detailInt32(actionEffect.details, 'MODE_SKILL_CHANGE_MODE_ID');
+      const offSeriesId = detailInt32(
+        actionEffect.details,
+        'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_1',
+      );
+      const onSeriesId = detailInt32(
+        actionEffect.details,
+        'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_2',
+      );
+      if (
+        actionEffect.modeSkillChanges.offSeriesId !== offSeriesId ||
+        actionEffect.modeSkillChanges.onSeriesId !== onSeriesId
+      )
+        throw new Error('モード切替スキル系列データが詳細値と一致しません。');
+      modeIds = [...modeIds, ...(actionEffect.modeIds ?? []), modeId];
       modeParameterChanges = actionEffect.modeParameterChanges ?? modeParameterChanges;
-      modeSkillChanges = actionEffect.modeSkillChanges ?? modeSkillChanges;
+      modeSkillChanges = {
+        modeId,
+        off: actionEffect.modeSkillChanges.off,
+        on: actionEffect.modeSkillChanges.on,
+      };
       modeAbilityChanges = actionEffect.modeAbilityChanges ?? modeAbilityChanges;
       continue;
     }
@@ -59,4 +78,14 @@ export function resolveActionEffects(card: Card): Card {
     ...(drawRules.length > 0 ? { drawRules } : {}),
     ...(handInducers.length > 0 ? { handInducers } : {}),
   };
+}
+
+function detailInt32(
+  details: readonly Readonly<{ id: bigint; detailType: string; value: bigint }>[],
+  detailType: string,
+): number {
+  const detail = details.find((item) => item.detailType === detailType);
+  if (!detail || !isInt64(detail.id) || !isInt64(detail.value))
+    throw new Error('モード切替の詳細値がありません。');
+  return Number(BigInt.asIntN(32, detail.value));
 }
