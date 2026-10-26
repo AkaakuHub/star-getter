@@ -1,4 +1,5 @@
 import type { MemberId, UnitId } from './model';
+import { isInt64 } from './numeric';
 
 export type MentalRecoverAdditionalBuffTarget =
   | Readonly<{ kind: 'all' }>
@@ -11,20 +12,20 @@ export type MentalRecoverAdditionalBuff = Readonly<{
   percent: number;
   target: MentalRecoverAdditionalBuffTarget;
   remainingSeconds: number | null;
-  remainingSections: number | null;
-  remainingUses: number | null;
+  remainingSections: bigint | null;
+  remainingUses: bigint | null;
   deactivationKey: string | null;
 }>;
 
 export type MentalRecoverAdditionalBuffEffect = Readonly<{
   kind: 'recover-mental-additional-buff';
-  calculation: number;
-  num: number;
+  calculation: bigint;
+  num: bigint;
   target: MentalRecoverAdditionalBuffTarget;
   moodBonus?: Readonly<{ target: 1 | 2 | 3; perPoint: number }>;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
   disabledType: number;
-  disabledCount: number;
+  disabledCount: bigint;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -33,14 +34,14 @@ export function validateMentalRecoverAdditionalBuffEffect(
   effect: MentalRecoverAdditionalBuffEffect,
 ): void {
   if (
-    !Number.isSafeInteger(effect.calculation) ||
-    !Number.isSafeInteger(effect.num) ||
-    !Number.isSafeInteger(effect.duration.value) ||
-    (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
+    !isInt64(effect.calculation) ||
+    !isInt64(effect.num) ||
+    !isInt64(effect.duration.value) ||
+    (effect.duration.kind === 'sections' && effect.duration.value === 0n) ||
     !validTarget(effect.target) ||
     (effect.moodBonus !== undefined && !Number.isFinite(effect.moodBonus.perPoint)) ||
     !Number.isSafeInteger(effect.disabledType) ||
-    !Number.isSafeInteger(effect.disabledCount) ||
+    !isInt64(effect.disabledCount) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
     (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )

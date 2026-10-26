@@ -22,12 +22,12 @@ it('ActionType32は対象カードの元気回復を増幅し、指定回数で�
     clean,
     {
       kind: 'recover-mental-additional-buff',
-      calculation: 1,
-      num: 1_000_000,
+      calculation: 1n,
+      num: 1_000_000n,
       target: { kind: 'member', member: target.member },
-      duration: { kind: 'milliseconds', value: 10_000 },
+      duration: { kind: 'milliseconds', value: 10_000n },
       disabledType: 1,
-      disabledCount: 1,
+      disabledCount: 1n,
       deactivationKey: 'mental-recover-test',
     },
     source,
@@ -51,18 +51,18 @@ it('ActionType32はミリ秒・パート期限とInvocationType抑止を処理�
   if (!source || !nextSection) throw new Error('検証用データがありません。');
   const effect = {
     kind: 'recover-mental-additional-buff',
-    calculation: 1,
-    num: 1_000_000,
+    calculation: 1n,
+    num: 1_000_000n,
     target: { kind: 'all' },
-    duration: { kind: 'milliseconds', value: 500 },
+    duration: { kind: 'milliseconds', value: 500n },
     disabledType: 0,
-    disabledCount: 0,
+    disabledCount: 0n,
   } as const;
   const timed = applyEffect(initial, effect, source);
   expect(advanceTo(timed, 0.6).mentalRecoverAdditionalBuffs).toHaveLength(0);
   const sectioned = applyEffect(
     initial,
-    { ...effect, duration: { kind: 'sections', value: 1 } },
+    { ...effect, duration: { kind: 'sections', value: 1n } },
     source,
   );
   expect(
@@ -92,12 +92,12 @@ it('ActionType32の登録値にActionType52を適用する', () => {
     action52,
     {
       kind: 'recover-mental-additional-buff',
-      calculation: 1,
-      num: 500_000,
+      calculation: 1n,
+      num: 500_000n,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
+      duration: { kind: 'stage', value: 0n },
       disabledType: 0,
-      disabledCount: 0,
+      disabledCount: 0n,
     },
     source,
   );
@@ -114,12 +114,12 @@ it('ActionType32は小数の追加率をC#のintキャストで0方向へ切り�
       initial,
       {
         kind: 'recover-mental-additional-buff',
-        calculation: 1,
-        num,
+        calculation: 1n,
+        num: BigInt(num),
         target: { kind: 'all' },
-        duration: { kind: 'stage', value: 0 },
+        duration: { kind: 'stage', value: 0n },
         disabledType: 0,
-        disabledCount: 0,
+        disabledCount: 0n,
       },
       source,
     );

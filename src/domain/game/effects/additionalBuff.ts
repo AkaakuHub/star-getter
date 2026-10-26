@@ -28,8 +28,8 @@ export function applyAdditionalBuff(
       mentalRecoverAdditionalBuffs: state.mentalRecoverAdditionalBuffs.flatMap((buff) => {
         if (!mentalBuffs.some((item) => item.id === buff.id) || buff.remainingUses === null)
           return [buff];
-        const remainingUses = buff.remainingUses - 1;
-        return remainingUses > 0 ? [{ ...buff, remainingUses }] : [];
+        const remainingUses = buff.remainingUses - 1n;
+        return remainingUses > 0n ? [{ ...buff, remainingUses }] : [];
       }),
       resourceBoosts: state.resourceBoosts.flatMap((boost) =>
         !matches(boost) || boost.uses === null
