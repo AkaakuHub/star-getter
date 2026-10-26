@@ -12,6 +12,10 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
   expect(
     createTokenCardEffect({
       skillEffectId: 28n,
+      skillType: 2,
+      skillLevel: 1,
+      specialAppealSkillLevel: 0,
+      skillSkillLevel: 1,
       details: [
         { id: 1n, detailType: 'TOKEN_CARD_CARD_COUNT', value: 4_294_967_298n },
         { id: 2n, detailType: 'TOKEN_CARD_RESOURCE_ID', value: 9_007_201_402_224_640n },
@@ -27,6 +31,16 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
     kind: 'token-card',
     templateId: '-2147483648',
     count: 4_294_967_298n,
+    style: 1,
+    mood: 1,
+    skillSeriesId: 0,
+    skillLevel: 1,
+    abilitySeriesId: 0,
+    abilityLevel: 1,
+    sourceSkillType: 2,
+    sourceSkillLevel: 1,
+    sourceSpecialAppealSkillLevel: 0,
+    sourceSkillSkillLevel: 1,
     parameterDetails: {
       count: { id: 1n, value: 4_294_967_298n, unitsPerValue: 1 },
     },
@@ -35,10 +49,63 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
 });
 
 it('ActionType28は枚数とResourceIDの既定値を使う', () => {
-  expect(createTokenCardEffect({ skillEffectId: 28n, details: [] })).toEqual({
+  expect(
+    createTokenCardEffect({
+      skillEffectId: 28n,
+      skillType: 2,
+      skillLevel: 1,
+      specialAppealSkillLevel: 0,
+      skillSkillLevel: 1,
+      details: [],
+    }),
+  ).toEqual({
     kind: 'token-card',
     templateId: '0',
     count: 1n,
+    style: 1,
+    mood: 1,
+    skillSeriesId: 0,
+    skillLevel: 1,
+    abilitySeriesId: 0,
+    abilityLevel: 1,
+    sourceSkillType: 2,
+    sourceSkillLevel: 1,
+    sourceSpecialAppealSkillLevel: 0,
+    sourceSkillSkillLevel: 1,
+  });
+});
+
+it('ActionType28はC# int32 castとAbility参照レベルを適用する', () => {
+  expect(
+    createTokenCardEffect({
+      skillEffectId: 28n,
+      skillType: 3,
+      skillLevel: 2,
+      specialAppealSkillLevel: 3,
+      skillSkillLevel: 4,
+      details: [
+        { id: 1n, detailType: 'TOKEN_CARD_STYLE_TYPE', value: (1n << 32n) + 5n },
+        { id: 2n, detailType: 'TOKEN_CARD_MOOD_TYPE', value: 2n },
+        {
+          id: 3n,
+          detailType: 'TOKEN_CARD_SKILL_CARD_SKILL_SERIES_ID',
+          value: (1n << 32n) + 42n,
+        },
+        { id: 4n, detailType: 'TOKEN_CARD_ABILITY_CARD_SKILL_SERIES_ID', value: 81n },
+        { id: 5n, detailType: 'TOKEN_CARD_ABILITY_LEVEL_REFERENCE', value: 1n },
+      ],
+    }),
+  ).toMatchObject({
+    style: 5,
+    mood: 2,
+    skillSeriesId: 42,
+    skillLevel: 4,
+    abilitySeriesId: 81,
+    abilityLevel: 1,
+    sourceSkillType: 3,
+    sourceSkillLevel: 2,
+    sourceSpecialAppealSkillLevel: 3,
+    sourceSkillSkillLevel: 4,
   });
 });
 
@@ -101,6 +168,10 @@ it('ActionType28のカード枚数にActionType18の詳細値係数を適用す�
   const countDetailId = 12_345n;
   const effect = createTokenCardEffect({
     skillEffectId: 28n,
+    skillType: 2,
+    skillLevel: 1,
+    specialAppealSkillLevel: 0,
+    skillSkillLevel: 1,
     details: [
       {
         id: countDetailId,

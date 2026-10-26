@@ -149,7 +149,23 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   };
   const card = {
     ...source,
-    effects: [{ kind: 'token-card' as const, templateId: template.id, count: 2n }],
+    effects: [
+      {
+        kind: 'token-card' as const,
+        templateId: template.id,
+        count: 2n,
+        style: 1,
+        mood: 1,
+        skillSeriesId: 0,
+        skillLevel: 1,
+        abilitySeriesId: 0,
+        abilityLevel: 1 as const,
+        sourceSkillType: 2,
+        sourceSkillLevel: 1,
+        sourceSpecialAppealSkillLevel: 0,
+        sourceSkillSkillLevel: 1,
+      },
+    ],
   };
   const deck = initial.deck.map((item) => (item.id === source.id ? card : item));
   const state = {

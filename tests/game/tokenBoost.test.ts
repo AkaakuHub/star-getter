@@ -150,7 +150,7 @@ it('ActionType28は指定したトークンカードを直接追加し、デー�
   };
   const generated = applyEffect(
     customized,
-    { kind: 'token-card', templateId: 'action28-template', count: 2n, seriesIds: [42n] },
+    action28TokenEffect('action28-template', 2n, [42n], 2),
     undefined,
   );
   const added = generated.deck.filter((card) => card.id.startsWith('action28-template-'));
@@ -201,16 +201,36 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
     },
     source,
   );
-  const generated = applyEffect(
-    boosted,
-    { kind: 'token-card', templateId: template.id, count: 2n, seriesIds: [42n] },
-    source,
-  );
+  const generated = applyEffect(boosted, action28TokenEffect(template.id, 2n, [42n]), source);
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(
     initial.deck.filter((card) => card.token === 'story').length + 2,
   );
   expect(generated.action52Buffs).toHaveLength(1);
 });
+
+function action28TokenEffect(
+  templateId: string,
+  count: bigint,
+  seriesIds: readonly bigint[],
+  style = 1,
+) {
+  return {
+    kind: 'token-card' as const,
+    templateId,
+    count,
+    style,
+    mood: 1,
+    skillSeriesId: 0,
+    skillLevel: 1,
+    abilitySeriesId: 0,
+    abilityLevel: 1 as const,
+    sourceSkillType: 2,
+    sourceSkillLevel: 1,
+    sourceSpecialAppealSkillLevel: 0,
+    sourceSkillSkillLevel: 1,
+    seriesIds,
+  };
+}
 
 it('ActionType28は同一スキル内で指定カードを増幅後に交互追加する', () => {
   const initial = game('library');

@@ -14,6 +14,16 @@ export type TokenCardEffect = Readonly<{
   kind: 'token-card';
   templateId: string;
   count: bigint;
+  style: number;
+  mood: number;
+  skillSeriesId: number;
+  skillLevel: number;
+  abilitySeriesId: number;
+  abilityLevel: 1;
+  sourceSkillType: number;
+  sourceSkillLevel: number;
+  sourceSpecialAppealSkillLevel: number;
+  sourceSkillSkillLevel: number;
   seriesIds?: readonly bigint[];
   parameterDetails?: Readonly<Record<string, { id: bigint; value: bigint; unitsPerValue: number }>>;
 }>;
@@ -21,6 +31,17 @@ export type TokenCardEffect = Readonly<{
 export function validateTokenCardEffect(effect: TokenCardEffect): undefined {
   if (
     !effect.templateId ||
+    ![
+      effect.style,
+      effect.mood,
+      effect.skillSeriesId,
+      effect.skillLevel,
+      effect.abilitySeriesId,
+      effect.sourceSkillType,
+      effect.sourceSkillLevel,
+      effect.sourceSpecialAppealSkillLevel,
+      effect.sourceSkillSkillLevel,
+    ].every(Number.isSafeInteger) ||
     effect.count < -(1n << 63n) ||
     effect.count >= 1n << 63n ||
     effect.seriesIds?.some((id) => id < -(1n << 63n) || id >= 1n << 63n) ||
