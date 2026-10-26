@@ -16,5 +16,6 @@ export const tracks: readonly Track[] = [
     moodKeys: weatherTimeline,
     sections: weatherSections,
     ingameMissionGroups: [],
+    afterMentalDownEffects: [],
   },
 ];

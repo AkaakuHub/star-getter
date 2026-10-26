@@ -16,7 +16,10 @@ export function activateModeAbilityEffects(
   const deactivationKey = `mode-ability:${card.id}`;
   let next = state;
   for (const effect of variant.modeEffects)
-    next = completeDeckOutChecks(apply(next, withDeactivationKey(effect, deactivationKey), card));
+    next = completeDeckOutChecks(
+      apply(next, withDeactivationKey(effect, deactivationKey), card),
+      apply,
+    );
   return next;
 }
 

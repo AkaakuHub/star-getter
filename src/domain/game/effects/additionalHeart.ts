@@ -71,6 +71,7 @@ export function induceAdditionalHearts(
         inducer.addValue,
         effectPower,
       ),
+      apply,
     );
   }
   return next;

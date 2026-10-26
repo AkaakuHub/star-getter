@@ -60,12 +60,17 @@ it('ActionType24の子効果はCheckDeckOutを1回だけ通知する', () => {
   const configured = {
     ...state,
     deckOutCount: 3,
-    comboInducer: { ...inducer, effects: [{ kind: 'energy' as const, amount: 1 }] },
+    track: {
+      ...state.track,
+      afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }],
+    },
+    comboInducer: { ...inducer, effects: [{ kind: 'mood' as const, amount: 1 }] },
   };
   const complete = notifyComboSkillPoint(notifyComboSkillPoint(configured, source, 1), first, 1);
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(activated.deckOutCount).toBe(2);
   expect(activated.afterMentalDownEvents).toBe(1);
+  expect(activated.energy).toBe(configured.energy + 2);
 });
 
 it('ActionType24はlong積をfloat32へ直接変換する', () => {

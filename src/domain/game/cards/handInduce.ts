@@ -161,6 +161,6 @@ function applyEffects(
   apply: EffectApplier,
 ): GameState {
   return effects.reduce((next, effect) => {
-    return completeDeckOutChecks(apply(next, effect, card));
+    return completeDeckOutChecks(apply(next, effect, card), apply);
   }, state);
 }

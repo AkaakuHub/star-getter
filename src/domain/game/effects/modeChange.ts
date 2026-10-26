@@ -101,7 +101,7 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
         const effectPower = scales
           ? toInt32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
           : 1;
-        next = completeDeckOutChecks(apply(next, effect, source, 1, 0, effectPower));
+        next = completeDeckOutChecks(apply(next, effect, source, 1, 0, effectPower), apply);
       }
     }
   }

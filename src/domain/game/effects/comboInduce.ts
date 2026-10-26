@@ -82,6 +82,7 @@ export function advanceComboInducer(
       for (const effect of inducer.effects) {
         next = completeDeckOutChecks(
           applyEffect(next, effect, card, inducer.multiplier, inducer.addValue, effectPower),
+          applyEffect,
         );
       }
     }

@@ -97,6 +97,7 @@ export type Track = Readonly<{
   sections: readonly Section[];
   moodKeys: readonly MoodKey[];
   ingameMissionGroups: readonly IngameMissionGroup[];
+  afterMentalDownEffects: readonly Effect[];
 }>;
 
 export type CardUse = Readonly<{

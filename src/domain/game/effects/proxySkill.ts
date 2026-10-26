@@ -238,7 +238,7 @@ function applyProxyChild(
   addValue: number,
   apply: ApplyProxyEffect,
 ): GameState {
-  return completeDeckOutChecks(apply(state, child.effect, card, multiplier, addValue));
+  return completeDeckOutChecks(apply(state, child.effect, card, multiplier, addValue), apply);
 }
 
 function endProxyAbsorption(

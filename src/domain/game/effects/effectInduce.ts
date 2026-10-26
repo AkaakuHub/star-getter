@@ -94,7 +94,10 @@ export function refreshEffectInducers(state: GameState, apply: EffectApplier): G
     const card = next.cardPool.find((item) => item.id === inducer.sourceCardId);
     if (!card) throw new Error('効果誘発の発動元カードがありません。');
     for (const effect of inducer.effects) {
-      next = completeDeckOutChecks(apply(next, withDeactivationKey(effect, deactivationKey), card));
+      next = completeDeckOutChecks(
+        apply(next, withDeactivationKey(effect, deactivationKey), card),
+        apply,
+      );
     }
   }
   return refreshBranchInducers(next, apply);

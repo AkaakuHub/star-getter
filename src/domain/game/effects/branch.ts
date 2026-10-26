@@ -50,7 +50,10 @@ export function refreshBranchInducers(state: GameState, apply: EffectApplier): G
       : undefined;
     const effects = active ? branch.whenTrue : branch.whenFalse;
     for (const effect of effects) {
-      next = completeDeckOutChecks(apply(next, withDeactivationKey(effect, childKey, true), card));
+      next = completeDeckOutChecks(
+        apply(next, withDeactivationKey(effect, childKey, true), card),
+        apply,
+      );
     }
   }
   return next;
