@@ -1,9 +1,9 @@
 import type { Effect, ParameterValueChangeEffect } from '../modelTypes';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import type { MemberId } from '../model';
 import { int64ToFloat32, isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
-type Input = Readonly<{ skillEffectId: bigint; details: readonly Detail[] }>;
+type Input = Readonly<{ skillEffectId: bigint; details: readonly ActionTypeDetail[] }>;
 
 export function createParameterValueChangeEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
@@ -13,23 +13,21 @@ export function createParameterValueChangeEffect(input: Input): Effect {
   const base = int64ToFloat32(find(input.details, 'CHANGE_PARAM_VALUE_BASE_NUM')?.value ?? 10_000n);
   const increment = int64ToFloat32(find(input.details, 'CHANGE_PARAM_VALUE_ADD_NUM')?.value ?? 0n);
   const calculation = calculationFor(calculationType);
-  const params = input.details.filter(
+  const params = input.details.find(
     (detail) => detail.detailType === 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID',
-  );
+  )?.paramValues;
   const values =
     calculation === 'multiply'
-      ? params.map((detail) => {
-          if (!isInt64(detail.id) || !isInt64(detail.value))
-            throw new Error('詳細値が正しくありません。');
-          return int64ToFloat32(detail.value);
+      ? params?.map((value) => {
+          if (!isInt64(value)) throw new Error('詳細値が正しくありません。');
+          return int64ToFloat32(value);
         })
       : undefined;
   const members =
     calculation === 'fan-level'
-      ? params.map((detail) => {
-          if (!isInt64(detail.id) || !isInt64(detail.value))
-            throw new Error('詳細値が正しくありません。');
-          return memberId(int32(detail.value));
+      ? params?.map((value) => {
+          if (!isInt64(value)) throw new Error('詳細値が正しくありません。');
+          return memberId(int32(value));
         })
       : undefined;
   return {
@@ -63,7 +61,10 @@ function calculationFor(value: number): ParameterValueChangeEffect['calculation'
   }
 }
 
-function find(details: readonly Detail[], detailType: string): Detail | undefined {
+function find(
+  details: readonly ActionTypeDetail[],
+  detailType: string,
+): ActionTypeDetail | undefined {
   const detail = details.find((item) => item.detailType === detailType);
   if (detail && (!isInt64(detail.id) || !isInt64(detail.value)))
     throw new Error('詳細値が正しくありません。');

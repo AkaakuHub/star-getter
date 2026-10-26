@@ -24,7 +24,8 @@ it('ActionType18の能力別詳細値変更を手札効果へ接続する', () =
                 {
                   id: 5n,
                   detailType: 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID',
-                  value: 75n,
+                  value: 0n,
+                  paramValues: [75n],
                 },
               ],
               destination: 'handPermanentEffects' as const,
@@ -52,7 +53,12 @@ it('ActionType18のlong倍率値をfloat32へ直接変換する', () => {
     skillEffectId: 18n,
     details: [
       { id: 1n, detailType: 'CHANGE_PARAM_VALUE_CALC_TYPE', value: 2n },
-      { id: 2n, detailType: 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID', value: longValue },
+      {
+        id: 2n,
+        detailType: 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID',
+        value: 0n,
+        paramValues: [longValue],
+      },
     ],
   });
   expect(effect).toMatchObject({ values: [2 ** 54 + 2 ** 31] });
