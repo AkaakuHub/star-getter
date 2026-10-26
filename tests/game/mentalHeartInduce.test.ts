@@ -59,3 +59,53 @@ it('Action23はActionType52の値もC#のintキャストで0方向へ切り捨�
   );
   expect(heartCount(induceMentalHearts(inducing, 1))).toBe(1);
 });
+
+it('Action23はActionType16のメンバー・ユニット・トークン系列対象を発動元で判定する', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  const unit = original?.unit;
+  if (!original || unit === null || unit === undefined) throw new Error('対象カードがありません。');
+  const source = { ...original, tokenSeriesIds: [42] };
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) => (card.id === source.id ? source : card)),
+    cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
+  };
+  const targets = [
+    { kind: 'member', member: source.member },
+    { kind: 'unit', unit },
+    { kind: 'card-series', seriesId: 42 },
+  ] as const;
+
+  for (const target of targets) {
+    const boosted = applyEffect(
+      state,
+      {
+        kind: 'heart-boost',
+        percent: 50,
+        uses: 1n,
+        target,
+        duration: { kind: 'stage' },
+      },
+      source,
+    );
+    const inducing = activateMentalHeartInduce(
+      boosted,
+      {
+        kind: 'mental-heart-induce',
+        num: 10n,
+        heartDuration: { kind: 'milliseconds', value: 250 },
+        duration: { kind: 'stage', value: 0n },
+        disabledType: 0,
+        disabledValue: 0n,
+      },
+      source,
+      1,
+      0,
+    );
+
+    const result = induceMentalHearts(inducing, 10_000);
+    expect(heartCount(result) - heartCount(state)).toBe(15);
+    expect(result.heartBoosts).toHaveLength(0);
+  }
+});
