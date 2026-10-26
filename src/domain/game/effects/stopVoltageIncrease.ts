@@ -7,6 +7,7 @@ export function activateVoltageIncreaseStop(
   state: GameState,
   effect: StopVoltageIncreaseEffect,
 ): GameState {
+  if (effect.duration.value === 0 || effect.duration.value === 0n) return state;
   const indefinite = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...state,
@@ -17,7 +18,7 @@ export function activateVoltageIncreaseStop(
         remainingSeconds:
           indefinite || effect.duration.kind !== 'milliseconds'
             ? null
-            : Math.fround(effect.duration.value / 1000),
+            : Math.fround(effect.duration.value / Math.fround(1000)),
         remainingSections:
           indefinite || effect.duration.kind !== 'sections' ? null : effect.duration.value,
         deactivationKey: effect.deactivationKey ?? null,
@@ -43,8 +44,8 @@ export function expireVoltageIncreaseStopSections(state: GameState): GameState {
     ...state,
     voltageStops: state.voltageStops.flatMap((stop) => {
       if (stop.remainingSections === null) return [stop];
-      const remainingSections = stop.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...stop, remainingSections }] : [];
+      const remainingSections = stop.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...stop, remainingSections }] : [];
     }),
   };
 }

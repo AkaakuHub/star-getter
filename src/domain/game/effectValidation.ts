@@ -166,7 +166,8 @@ export function validateEffect(effect: Effect): void {
   }
   if (effect.kind === 'stop-voltage-increase') {
     if (
-      !Number.isSafeInteger(effect.duration.value) ||
+      (effect.duration.kind === 'milliseconds' && !Number.isFinite(effect.duration.value)) ||
+      (effect.duration.kind === 'sections' && !isInt64(effect.duration.value)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

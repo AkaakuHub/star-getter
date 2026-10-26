@@ -61,13 +61,13 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   expect(protectedAfter.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 2n);
 });
 
-it('熱気の自然増加停止を重ねると、すべての停止期限が切れるまでタイマーも停止する', () => {
+it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタイマーも停止する', () => {
   const initial = game('library');
   const immediate = applyEffect(initial, {
     kind: 'stop-voltage-increase',
     duration: { kind: 'milliseconds', value: 0 },
   });
-  expect(immediate.voltageStops).toHaveLength(1);
+  expect(immediate.voltageStops).toHaveLength(0);
   expect(advanceTo(immediate, 1 / 60).voltageStops).toHaveLength(0);
   const first = applyEffect(initial, {
     kind: 'stop-voltage-increase',
@@ -90,13 +90,13 @@ it('パート数で指定した熱気停止は指定回数の切替まで継続�
   const initial = game('library');
   const stops = applyEffect(initial, {
     kind: 'stop-voltage-increase',
-    duration: { kind: 'sections', value: 2 },
+    duration: { kind: 'sections', value: 2n },
   });
   const firstSection = initial.track.sections[1];
   const secondSection = initial.track.sections[2];
   if (!firstSection || !secondSection) throw new Error('パートが不足しています。');
   const first = advanceTo(stops, (firstSection.startBeat * 60) / initial.track.bpm);
-  expect(first.voltageStops[0]?.remainingSections).toBe(1);
+  expect(first.voltageStops[0]?.remainingSections).toBe(1n);
   expect(first.excitement).toBe(0);
   const second = advanceTo(first, (secondSection.startBeat * 60) / initial.track.bpm + 1 / 60);
   expect(second.voltageStops).toHaveLength(0);
@@ -107,7 +107,7 @@ it('外部解除型は指定期限で自動解除せず、Deactivatorで解除�
   const initial = game('library');
   const stopped = applyEffect(initial, {
     kind: 'stop-voltage-increase',
-    duration: { kind: 'sections', value: 1 },
+    duration: { kind: 'sections', value: 1n },
     invocationType: 0x388,
     deactivationKey: 'voltage-stop',
   });

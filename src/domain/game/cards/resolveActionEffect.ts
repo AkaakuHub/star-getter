@@ -4,6 +4,7 @@ import { createVoltageConvertEffect } from '../actionTypeEffects/voltageConvert'
 import { createMentalHeartInduceEffect } from '../actionTypeEffects/mentalHeartInduce';
 import { createComboInduceEffect } from '../actionTypeEffects/comboInduce';
 import { createHeartLimitChangeEffect } from '../actionTypeEffects/heartLimitChange';
+import { createStopVoltageIncreaseEffect } from '../actionTypeEffects/stopVoltageIncrease';
 import { createDeckSkillCostChangeEffect } from '../actionTypeEffects/deckSkillCostChange';
 import { createLoveUpAdditionalBuffEffect } from '../actionTypeEffects/loveUpAdditionalBuff';
 import { createVoltageUpAdditionalBuffEffect } from '../actionTypeEffects/voltageUpAdditionalBuff';
@@ -51,6 +52,8 @@ import { resolveEarlyActionEffect, type EarlyActionEffect } from './resolveEarly
 
 export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
   switch (actionEffect.actionType) {
+    case 26:
+      return createStopVoltageIncreaseEffect(actionEffect);
     case 1:
     case 2:
     case 3:
@@ -73,7 +76,7 @@ export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
   }
 }
 
-type LaterActionEffect = Exclude<RuntimeActionEffect, EarlyActionEffect>;
+type LaterActionEffect = Exclude<RuntimeActionEffect, EarlyActionEffect | { actionType: 26 }>;
 
 function resolveLaterActionEffect(actionEffect: LaterActionEffect): Effect {
   return actionEffect.actionType === 20

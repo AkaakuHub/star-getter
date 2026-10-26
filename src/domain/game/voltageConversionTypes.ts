@@ -5,7 +5,9 @@ export type VoltageConversionDuration = Readonly<{
 
 export type StopVoltageIncreaseEffect = Readonly<{
   kind: 'stop-voltage-increase';
-  duration: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  duration:
+    | Readonly<{ kind: 'milliseconds'; value: number }>
+    | Readonly<{ kind: 'sections'; value: bigint }>;
   invocationType?: number;
   deactivationKey?: string;
 }>;

@@ -17,6 +17,8 @@ import type { ActionType906Record } from './actionType906Record';
 import type { ActionType907Record } from './actionType907Record';
 import type { ActionType908Record } from './actionType908Record';
 import type { ActionType19Record } from './actionType19Record';
+import type { ActionType25Record } from './actionType25Record';
+import type { ActionType26Record } from './actionType26Record';
 import type { MoodActionRecord } from './moodActionRecord';
 export type { HandUseTrigger } from './handUseTrigger';
 import type { HandInducer } from './handInducer';
@@ -114,15 +116,6 @@ export type ActionType24Record = Readonly<{
   details: readonly ActionTypeDetail[];
   childEffects: readonly Effect[];
   destination: 'effects' | 'handPermanentEffects';
-  deactivationKey?: string;
-}>;
-
-export type ActionType25Record = Readonly<{
-  actionType: 25;
-  skillEffectId: bigint;
-  details: readonly ActionTypeDetail[];
-  destination: 'effects' | 'handPermanentEffects';
-  invocationType?: number;
   deactivationKey?: string;
 }>;
 
@@ -299,6 +292,7 @@ export type Card = Readonly<{
     | ActionType23Record
     | ActionType24Record
     | ActionType25Record
+    | ActionType26Record
     | ActionType27Record
     | ActionType28Record
     | ActionType29Record

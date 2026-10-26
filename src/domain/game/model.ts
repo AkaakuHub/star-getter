@@ -243,7 +243,7 @@ export type GameState = Readonly<{
   voltageStops: readonly Readonly<{
     id: number;
     remainingSeconds: number | null;
-    remainingSections: number | null;
+    remainingSections: bigint | null;
     deactivationKey: string | null;
   }>[];
   nextVoltageStopId: number;
