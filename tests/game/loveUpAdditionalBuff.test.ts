@@ -23,22 +23,22 @@ it('ActionType30は対象カードのSTAR増加を指定率で増幅し、回収
     clean,
     {
       kind: 'love-up-additional-buff',
-      calculation: 1,
-      num: 500_000,
+      calculation: 1n,
+      num: 500_000n,
       target: { kind: 'member', member: target.member },
-      duration: { kind: 'milliseconds', value: 10_000 },
+      duration: { kind: 'milliseconds', value: 10_000n },
       disabledType: 1,
-      disabledCount: 2,
+      disabledCount: 2n,
     },
     source,
   );
   const used = applyScoreBoost(buffed, 100, target);
   expect(used.boosts[0]?.percent).toBe(150);
-  expect(used.loveUpAdditionalBuffs[0]?.remainingUses).toBe(1);
+  expect(used.loveUpAdditionalBuffs[0]?.remainingUses).toBe(1n);
   const unmatched = applyScoreBoost(buffed, 100, source);
   expect(unmatched.boosts[0]?.percent).toBe(100);
   expect(unmatched.loveUpAdditionalBuffs).toHaveLength(1);
-  expect(collectHearts(addHearts(used, 1)).loveUpAdditionalBuffs[0]?.remainingUses).toBe(1);
+  expect(collectHearts(addHearts(used, 1)).loveUpAdditionalBuffs[0]?.remainingUses).toBe(1n);
   expect(applyScoreBoost(used, 100, target).loveUpAdditionalBuffs).toHaveLength(0);
 });
 
@@ -48,12 +48,12 @@ it('ActionType30は期限・InvocationType抑止・Deactivator解除を処理す
   if (!source) throw new Error('発動元カードがありません。');
   const effect = {
     kind: 'love-up-additional-buff',
-    calculation: 1,
-    num: 1_000_000,
+    calculation: 1n,
+    num: 1_000_000n,
     target: { kind: 'all' },
-    duration: { kind: 'milliseconds', value: 500 },
+    duration: { kind: 'milliseconds', value: 500n },
     disabledType: 0,
-    disabledCount: 0,
+    disabledCount: 0n,
   } as const;
   const timed = applyEffect(initial, effect, source);
   expect(advanceTo(timed, 0.6).loveUpAdditionalBuffs).toHaveLength(0);
@@ -79,12 +79,12 @@ it('ActionType30はパート期限で追加バフを解除する', () => {
     initial,
     {
       kind: 'love-up-additional-buff',
-      calculation: 1,
-      num: 1_000_000,
+      calculation: 1n,
+      num: 1_000_000n,
       target: { kind: 'all' },
-      duration: { kind: 'sections', value: 1 },
+      duration: { kind: 'sections', value: 1n },
       disabledType: 0,
-      disabledCount: 0,
+      disabledCount: 0n,
     },
     source,
   );
@@ -114,12 +114,12 @@ it('ActionType30の登録値にActionType52を適用し、回数を消費する'
     action52,
     {
       kind: 'love-up-additional-buff',
-      calculation: 1,
-      num: 500_000,
+      calculation: 1n,
+      num: 500_000n,
       target: { kind: 'all' },
-      duration: { kind: 'stage', value: 0 },
+      duration: { kind: 'stage', value: 0n },
       disabledType: 0,
-      disabledCount: 0,
+      disabledCount: 0n,
     },
     source,
   );
@@ -137,12 +137,12 @@ it('ActionType30は小数の追加率をC#のintキャストで0方向へ切り�
         initial,
         {
           kind: 'love-up-additional-buff',
-          calculation: 1,
-          num,
+          calculation: 1n,
+          num: BigInt(num),
           target: { kind: 'all' },
-          duration: { kind: 'stage', value: 0 },
+          duration: { kind: 'stage', value: 0n },
           disabledType: 0,
-          disabledCount: 0,
+          disabledCount: 0n,
         },
         source,
       ).loveUpAdditionalBuffs[0]?.percent,
@@ -159,12 +159,12 @@ it('ActionType30は0以下の計算値を追加バフとして登録しない', 
       initial,
       {
         kind: 'love-up-additional-buff',
-        calculation: 1,
-        num,
+        calculation: 1n,
+        num: BigInt(num),
         target: { kind: 'all' },
-        duration: { kind: 'stage', value: 0 },
+        duration: { kind: 'stage', value: 0n },
         disabledType: 1,
-        disabledCount: 1,
+        disabledCount: 1n,
       },
       source,
     );

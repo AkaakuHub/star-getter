@@ -1,6 +1,7 @@
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoost } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 import type { Card, GameState } from '../model';
 import type {
   LoveUpAdditionalBuffEffect,
@@ -14,9 +15,9 @@ export function activateLoveUpAdditionalBuff(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  if (effect.calculation !== 1) return state;
+  if (effect.calculation !== 1n) return state;
   const correction = effect.moodBonus
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
@@ -24,12 +25,14 @@ export function activateLoveUpAdditionalBuff(
         effect.moodBonus.perPoint,
       )
     : 0;
-  const numValue = Math.fround(Math.fround(effect.num) / Math.fround(10_000));
-  const base = Math.fround(
-    Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
-      Math.fround(multiplier),
+  const numValue = Math.fround(int64ToFloat32(effect.num) / Math.fround(10_000));
+  const base = toInt32(
+    Math.fround(
+      Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
+        Math.fround(multiplier),
+    ),
   );
-  const value = toInt32(base);
+  const value = base;
   if (value <= 0) return state;
   if (value > 0 && !source) throw new Error('STAR追加バフの発動元カードがありません。');
   const boosted =
@@ -43,7 +46,7 @@ export function activateLoveUpAdditionalBuff(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     remainingUses: effect.disabledType === 1 ? effect.disabledCount : null,
@@ -77,8 +80,8 @@ export function applyLoveUpAdditionalBuffs(
       ...state,
       loveUpAdditionalBuffs: state.loveUpAdditionalBuffs.flatMap((buff) => {
         if (!consumedIds.has(buff.id) || buff.remainingUses === null) return [buff];
-        const remainingUses = buff.remainingUses - 1;
-        return remainingUses < 1 ? [] : [{ ...buff, remainingUses }];
+        const remainingUses = buff.remainingUses - 1n;
+        return remainingUses < 1n ? [] : [{ ...buff, remainingUses }];
       }),
     },
   };
@@ -100,8 +103,8 @@ export function expireLoveUpAdditionalBuffSections(state: GameState): GameState 
     ...state,
     loveUpAdditionalBuffs: state.loveUpAdditionalBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+      const remainingSections = buff.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
     }),
   };
 }
