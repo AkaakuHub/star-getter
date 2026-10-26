@@ -19,11 +19,11 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
         ? applyParameterValueChange(next, card, effect)
         : applyEffect(
             next,
-            effect.kind === 'hand-limit'
+            effect.kind === 'hand-limit' ||
+              effect.kind === 'skill-boost' ||
+              effect.kind === 'ap-speed-change'
               ? { ...effect, invocationType: 0x388, deactivationKey }
-              : effect.kind === 'skill-boost'
-                ? { ...effect, invocationType: 0x388, deactivationKey }
-                : withDeactivationKey(effect, deactivationKey, true),
+              : withDeactivationKey(effect, deactivationKey, true),
             card,
           );
   }

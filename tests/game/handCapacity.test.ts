@@ -146,7 +146,7 @@ it('Action904のAction2子効果は手札離脱時に解除する', () => {
   expect(disposeHandEffects(active, [card.id]).skillScoreUps).toHaveLength(0);
 });
 
-it('Action904のAction52子効果は手札中に残り、手札離脱時に解除する', () => {
+it('Action904のAction52子効果は自動期限を止め、手札離脱時に解除する', () => {
   const initial = game();
   const original = initial.deck[0];
   if (!original) throw new Error('対象カードがありません。');

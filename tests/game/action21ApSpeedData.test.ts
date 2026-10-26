@@ -3,6 +3,10 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffects/apSpeedChange';
 import { act } from '../../src/domain/game/actions';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
 import { applyEffect } from '../../src/domain/game/effects';
 import { createGame } from '../../src/domain/game/simulation';
 
@@ -101,4 +105,58 @@ it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続す�
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
   const effect = compiled?.effects.find((item) => item.kind === 'ap-speed-change');
   expect(effect).toEqual(createApSpeedChangeEffect({ skillEffectId: 21_001n, details }));
+});
+
+it('ActionType21のHandPermanent詳細レコードを起動し、手札離脱時に解除する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 21 as const,
+              skillEffectId: 21_002n,
+              destination: 'handPermanentEffects' as const,
+              details: [
+                {
+                  id: 21_002_1n,
+                  detailType: 'CHANGE_AP_INCREASE_SPEED_CALC_TYPE',
+                  targetMood: 0,
+                  value: 1n,
+                },
+                {
+                  id: 21_002_2n,
+                  detailType: 'CHANGE_AP_INCREASE_SPEED_NUM',
+                  targetMood: 0,
+                  value: 100n,
+                },
+                {
+                  id: 21_002_3n,
+                  detailType: 'CHANGE_AP_INCREASE_SPEED_DISPLAY_TIME_TYPE',
+                  targetMood: 0,
+                  value: 1n,
+                },
+                {
+                  id: 21_002_4n,
+                  detailType: 'CHANGE_AP_INCREASE_SPEED_DISPLAY_TIME',
+                  targetMood: 0,
+                  value: 100n,
+                },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  if (!compiled) throw new Error('ActionType21の発動元カードがありません。');
+  const activated = activateHandPermanentEffects(state, compiled);
+  expect(activated.apTimeEffects).toHaveLength(1);
+  expect(activated.apTimeEffects[0]?.remainingSeconds).toBeNull();
+  const disposed = disposeHandEffects(activated, [compiled.id]);
+  expect(disposed.apTimeEffects).toHaveLength(0);
 });
