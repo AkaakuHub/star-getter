@@ -85,7 +85,7 @@ export function missionActionEffect(
             ? effect.kind === 'mental-barrier'
               ? state.mentalBarriers.length > before.mentalBarriers.length
                 ? (state.mentalBarriers.at(-1)?.endurance ?? 0)
-                : effect.endurance
+                : 0
               : 0
             : actionType === 10
               ? Math.max(0, state.excitement - before.excitement)

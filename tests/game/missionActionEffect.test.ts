@@ -3,6 +3,7 @@ import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffec
 import { applyEffect } from '../../src/domain/game/effects';
 import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { startIngameMission } from '../../src/domain/game/ingameMissions';
+import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
 import { game } from './support/game';
 
 function missionState(actionType: number, target: number) {
@@ -46,6 +47,38 @@ it('ActionType7通知は割合適用後の実際のバリア耐久値を使う',
   });
   expect(changed.mentalBarriers[0]?.endurance).toBe(50);
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('Proxyに吸収されたActionType7はミッション数へ加算しない', () => {
+  const initial = missionState(7, 1);
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const proxy = registerProxySkill(
+    initial,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 1,
+      periodParam: 3000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 7, targetAmount: 50 }],
+      effects: [],
+    },
+    card,
+  );
+  const changed = applyEffect(startIngameMission(proxy, 7n), {
+    kind: 'mental-barrier',
+    barrier: 'endurance',
+    enduranceType: 'fixed',
+    endurance: 50,
+    attenuation: 1,
+    duration: { kind: 'stage' },
+  });
+  expect(changed.mentalBarriers).toHaveLength(0);
+  expect(changed.ingameMission?.count).toBe(0);
 });
 
 it('ActionType21通知は実際に登録されたAP時間倍率を使う', () => {
