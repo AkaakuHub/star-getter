@@ -36,6 +36,7 @@ import { createTokenCardEffect } from '../actionTypeEffects/tokenCard';
 import { createSkillCooldownEffect } from '../actionTypeEffects/skillCooldown';
 import { createInduceSkillEffect } from '../actionTypeEffects/induceSkillEffect';
 import { createUseInduceEffect } from '../actionTypeEffects/useInduce';
+import { createThresholdInduceEffect } from '../actionTypeEffects/thresholdInduce';
 import { assertNeverActionEffect } from './assertNeverActionEffect';
 
 import type { Card } from './cardTypes';
@@ -268,7 +269,14 @@ function resolveLaterActionEffect(actionEffect: LaterActionEffect): Effect {
                                                                               ? createUseInduceEffect(
                                                                                   actionEffect,
                                                                                 )
-                                                                              : assertNeverActionEffect(
-                                                                                  actionEffect,
-                                                                                );
+                                                                              : actionEffect.actionType ===
+                                                                                    907 ||
+                                                                                  actionEffect.actionType ===
+                                                                                    908
+                                                                                ? createThresholdInduceEffect(
+                                                                                    actionEffect,
+                                                                                  )
+                                                                                : assertNeverActionEffect(
+                                                                                    actionEffect,
+                                                                                  );
 }

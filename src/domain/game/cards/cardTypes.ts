@@ -13,17 +13,13 @@ import type { ActionType902Record } from './actionType902Record';
 import type { ActionType903Record } from './actionType903Record';
 import type { ActionType905Record } from './actionType905Record';
 import type { ActionType906Record } from './actionType906Record';
+import type { ActionType907Record } from './actionType907Record';
+import type { ActionType908Record } from './actionType908Record';
 import type { ActionType19Record } from './actionType19Record';
 import type { MoodActionRecord } from './moodActionRecord';
 export type { HandUseTrigger } from './handUseTrigger';
 import type { HandInducer } from './handInducer';
-
-type ActionTypeDetail = Readonly<{
-  id: bigint;
-  detailType: string;
-  value: bigint;
-  targetMood?: number;
-}>;
+import type { ActionTypeDetail } from './actionTypeDetail';
 
 export type ActionType1Record = Readonly<{
   actionType: 1;
@@ -285,6 +281,8 @@ export type Card = Readonly<{
     | ActionType903Record
     | ActionType905Record
     | ActionType906Record
+    | ActionType907Record
+    | ActionType908Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
