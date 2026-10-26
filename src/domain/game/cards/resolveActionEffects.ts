@@ -15,6 +15,9 @@ import { createChangeModeEffect } from '../actionTypeEffects/changeMode';
 import { createVoltageLevelEffect } from '../actionTypeEffects/voltageLevel';
 import { createTokenBoostEffect } from '../actionTypeEffects/tokenBoost';
 import { createInfinityGaugeEffect } from '../actionTypeEffects/infinityGauge';
+import { createUseAllHandEffect } from '../actionTypeEffects/useAllHand';
+import { createSwitchTokenDeckEffect } from '../actionTypeEffects/switchTokenDeck';
+import { createIngameMissionEffect } from '../actionTypeEffects/ingameMission';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -92,7 +95,13 @@ export function resolveActionEffects(card: Card): Card {
                                   ? createVoltageLevelEffect(actionEffect)
                                   : actionEffect.actionType === 38
                                     ? createTokenBoostEffect(actionEffect)
-                                    : createInfinityGaugeEffect(actionEffect);
+                                    : actionEffect.actionType === 39
+                                      ? createInfinityGaugeEffect(actionEffect)
+                                      : actionEffect.actionType === 42
+                                        ? createUseAllHandEffect(actionEffect)
+                                        : actionEffect.actionType === 43
+                                          ? createSwitchTokenDeckEffect(actionEffect)
+                                          : createIngameMissionEffect(actionEffect);
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
