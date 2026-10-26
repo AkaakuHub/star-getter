@@ -1,4 +1,5 @@
-import type { Card, Effect, MemberId, UnitId } from './model';
+import type { Card, MemberId, UnitId } from './model';
+import { validateSkillHeartsEffect, type SkillHeartsEffect } from './skillHeartTypes';
 import { isInt64 } from './numeric';
 
 export type AdditionalHeartInduceCondition =
@@ -11,7 +12,7 @@ export type AdditionalHeartInduceEffect = Readonly<{
   kind: 'additional-heart-induce';
   condition: AdditionalHeartInduceCondition;
   apPower: bigint;
-  heartEffect: Extract<Effect, { kind: 'hearts' }>;
+  heartEffect: SkillHeartsEffect;
   duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
   invocationType?: number;
   deactivationKey?: string;
@@ -22,7 +23,7 @@ export type AdditionalHeartInducer = Readonly<{
   sourceCardId: string;
   condition: AdditionalHeartInduceCondition;
   apPower: bigint;
-  heartEffect: Extract<Effect, { kind: 'hearts' }>;
+  heartEffect: SkillHeartsEffect;
   addValue: number;
   multiplier: number;
   remainingSeconds: number | null;
@@ -31,6 +32,7 @@ export type AdditionalHeartInducer = Readonly<{
 }>;
 
 export function validateAdditionalHeartInduceEffect(effect: AdditionalHeartInduceEffect): void {
+  validateSkillHeartsEffect(effect.heartEffect);
   if (
     !isInt64(effect.apPower) ||
     !['all', 'member', 'main-effect', 'unit'].includes(effect.condition.kind) ||
@@ -40,8 +42,6 @@ export function validateAdditionalHeartInduceEffect(effect: AdditionalHeartInduc
     (effect.condition.kind === 'unit' && ![1, 2, 3].includes(effect.condition.unit)) ||
     !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
     !isInt64(effect.duration.value) ||
-    (effect.heartEffect.lifetimeSeconds !== undefined &&
-      !Number.isFinite(effect.heartEffect.lifetimeSeconds)) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
     (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
   )

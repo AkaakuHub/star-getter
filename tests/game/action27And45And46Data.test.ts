@@ -16,8 +16,20 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
               actionType: 27 as const,
               skillEffectId: 27_001n,
               destination: 'effects' as const,
-              details: [],
-              heartEffect: { kind: 'hearts' as const, amount: 1 },
+              details: [
+                {
+                  id: 27_001_1n,
+                  detailType: 'GET_ADDITIONAL_HEART_EFFECT_ID',
+                  value: 27_002n,
+                },
+              ],
+              heartEffect: {
+                kind: 'skill-hearts' as const,
+                skillEffectId: 27_002n,
+                calculation: 'fixed' as const,
+                amount: 10_000,
+                displayTime: { kind: 'full-end' as const, value: 0 },
+              },
             },
             {
               actionType: 45 as const,

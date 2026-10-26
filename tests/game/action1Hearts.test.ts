@@ -12,6 +12,7 @@ it('ActionType1は固定数を整数化してからEffectPowerを掛け、ミリ
     initial,
     {
       kind: 'skill-hearts',
+      skillEffectId: 1n,
       calculation: 'fixed',
       amount: 25_000,
       displayTime: { kind: 'milliseconds', value: 1_250 },
@@ -35,6 +36,7 @@ it('ActionType1の比率計算は自然発生数を基準にし、非ミリ秒�
     initial,
     {
       kind: 'skill-hearts',
+      skillEffectId: 2n,
       calculation: 'ratio',
       amount: 10_000,
       displayTime: { kind: 'sections', value: 1 },

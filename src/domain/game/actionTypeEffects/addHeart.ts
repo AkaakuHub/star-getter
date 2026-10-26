@@ -42,6 +42,7 @@ export function createAddHeartEffect(input: Input): Effect {
     throw new Error('ハート生成のパート期限は0にできません。');
   return {
     kind: 'skill-hearts',
+    skillEffectId: input.skillEffectId,
     calculation: calculationType === 1 ? 'ratio' : 'fixed',
     amount: int32(find(input.details, detailTypes.amount)?.value ?? 0n),
     ...(targetMood > 0
@@ -53,7 +54,6 @@ export function createAddHeartEffect(input: Input): Effect {
         }
       : {}),
     displayTime: displayTimeValue,
-    skillEffectId: input.skillEffectId,
   };
 }
 

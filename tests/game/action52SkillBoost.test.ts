@@ -152,6 +152,7 @@ it('ActionType16のハート追加バフをActionType52より先に適用する'
     skillBoost,
     {
       kind: 'skill-hearts',
+      skillEffectId: 3n,
       calculation: 'fixed',
       amount: 30_000,
       displayTime: { kind: 'full-end', value: 0 },

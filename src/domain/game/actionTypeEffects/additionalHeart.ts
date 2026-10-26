@@ -1,12 +1,13 @@
 import type { AdditionalHeartInduceEffect } from '../additionalHeartTypes';
-import type { Effect, MemberId, UnitId } from '../model';
+import type { MemberId, UnitId } from '../model';
+import type { SkillHeartsEffect } from '../skillHeartTypes';
 import { isInt64 } from '../numeric';
 
 type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
   details: readonly Detail[];
-  heartEffect: Extract<Effect, { kind: 'hearts' }>;
+  heartEffect: SkillHeartsEffect;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -30,6 +31,9 @@ export function createAdditionalHeartInduceEffect(input: Input): AdditionalHeart
   );
   const induceType = int32(details.induceType?.value ?? 0n);
   const induceValue = int32(details.induceValue?.value ?? 0n);
+  const effectId = details.effectId?.value ?? 0n;
+  if (input.heartEffect.skillEffectId !== effectId)
+    throw new Error('追加きらめきの子ActionType1 IDが一致しません。');
   const displayTimeType = int32(details.displayTimeType?.value ?? 1n);
   const displayTime = details.displayTime?.value ?? 0n;
   if (details.effectId && !isInt64(details.effectId.value))

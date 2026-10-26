@@ -16,7 +16,13 @@ it('ActionType27はlong詳細値から条件・AP倍率・期限を生成する'
         value: (1n << 53n) + 3n,
       },
     ],
-    heartEffect: { kind: 'hearts', amount: 1 },
+    heartEffect: {
+      kind: 'skill-hearts',
+      skillEffectId: 100n,
+      calculation: 'fixed',
+      amount: 10_000,
+      displayTime: { kind: 'full-end', value: 0 },
+    },
   });
 
   expect(effect).toMatchObject({

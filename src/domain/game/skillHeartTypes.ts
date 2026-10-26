@@ -2,6 +2,7 @@ import type { MoodBonus } from './modelTypes';
 
 export type SkillHeartsEffect = Readonly<{
   kind: 'skill-hearts';
+  skillEffectId: bigint;
   calculation: 'fixed' | 'ratio';
   amount: number;
   moodBonus?: MoodBonus;
@@ -10,6 +11,8 @@ export type SkillHeartsEffect = Readonly<{
 
 export function validateSkillHeartsEffect(effect: SkillHeartsEffect): void {
   if (
+    effect.skillEffectId < -(1n << 63n) ||
+    effect.skillEffectId >= 1n << 63n ||
     !['fixed', 'ratio'].includes(effect.calculation) ||
     !Number.isSafeInteger(effect.amount) ||
     (effect.moodBonus !== undefined &&

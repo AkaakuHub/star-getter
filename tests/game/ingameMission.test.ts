@@ -233,6 +233,7 @@ it('ActionType1ミッションは上限適用後に実際に追加されたき�
   const active = startIngameMission(state, 1n);
   const effect = {
     kind: 'skill-hearts' as const,
+    skillEffectId: 1n,
     calculation: 'fixed' as const,
     amount: 100_000,
     displayTime: { kind: 'full-end' as const, value: 0 },
