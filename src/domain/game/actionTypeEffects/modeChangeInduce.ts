@@ -1,10 +1,10 @@
 import type { Effect } from '../model';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import { isInt64 } from '../numeric';
 
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Readonly<{ id: bigint; detailType: string; value: bigint }>[];
-  thresholds: readonly bigint[] | null;
+  details: readonly ActionTypeDetail[];
   effects: readonly Effect[];
 }>;
 
@@ -12,7 +12,10 @@ export function createModeChangeInduceEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
   const targetModeId = value(input.details, 'MODE_CHANGE_INDUCE_TARGET_MODE_ID', 0n);
   const buffNum = value(input.details, 'MODE_CHANGE_INDUCE_BUFF_NUM', 0n);
-  const thresholds = input.thresholds ?? [];
+  const thresholdDetail = input.details.find(
+    (detail) => detail.detailType === 'MODE_CHANGE_INDUCE_COUNT_PARAMS_ID',
+  );
+  const thresholds = thresholdDetail?.paramValues ?? [];
   for (const threshold of thresholds) {
     if (!isInt64(threshold)) throw new Error('モード切替誘発の回数が正しくありません。');
   }

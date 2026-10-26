@@ -141,7 +141,6 @@ export type ActionType45Record = Readonly<{
   skillEffectId: bigint;
   details: readonly ActionTypeDetail[];
   childEffects: readonly Effect[];
-  thresholds: readonly bigint[];
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
@@ -149,8 +148,6 @@ export type ActionType46Record = Readonly<{
   actionType: 46;
   skillEffectId: bigint;
   details: readonly ActionTypeDetail[];
-  absorbActionTypes: readonly bigint[];
-  absorbAmounts: readonly bigint[];
   childEffects: readonly Readonly<{ actionType: number; effect: Effect }>[];
   destination: 'effects' | 'handPermanentEffects';
 }>;

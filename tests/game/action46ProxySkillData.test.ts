@@ -9,10 +9,20 @@ it('ActionType46は各詳細値と解決済みの吸収・誘発Effectを接続�
   expect(
     createProxySkillEffect({
       skillEffectId: 46n,
-      absorbActionTypes: [2n],
-      absorbAmounts: [2_147_483_648n],
       effects,
       details: [
+        {
+          id: 8n,
+          detailType: 'PROXY_SKILL_ABSORB_EFFECT_PARAMS_ID',
+          value: 0n,
+          paramValues: [2n],
+        },
+        {
+          id: 9n,
+          detailType: 'PROXY_SKILL_ABSORB_AMOUNT_PARAMS_ID',
+          value: 0n,
+          paramValues: [2_147_483_648n],
+        },
         { id: 1n, detailType: 'PROXY_SKILL_ABSORB_LIMIT', value: 3n },
         { id: 2n, detailType: 'PROXY_SKILL_ABSORB_PERIOD_TYPE', value: 5n },
         { id: 3n, detailType: 'PROXY_SKILL_ABSORB_PERIOD_PARAM', value: 10n },
@@ -40,10 +50,16 @@ it('ActionType46は必須の吸収配列がない場合に不正として扱う'
   expect(() =>
     createProxySkillEffect({
       skillEffectId: 46n,
-      absorbActionTypes: null,
-      absorbAmounts: [],
       effects: [],
-      details: [],
+      details: [
+        { id: 1n, detailType: 'PROXY_SKILL_ABSORB_EFFECT_PARAMS_ID', value: 0n },
+        {
+          id: 2n,
+          detailType: 'PROXY_SKILL_ABSORB_AMOUNT_PARAMS_ID',
+          value: 0n,
+          paramValues: [],
+        },
+      ],
     }),
   ).toThrow('Proxyスキルの吸収対象が正しくありません。');
 });
@@ -52,10 +68,20 @@ it('ActionType46 long値を保持し、longからfloat32へ直接変換する', 
   const longValue = (1n << 54n) + (1n << 30n) + 1n;
   const effect = createProxySkillEffect({
     skillEffectId: 46n,
-    absorbActionTypes: [],
-    absorbAmounts: [],
     effects: [],
     details: [
+      {
+        id: 4n,
+        detailType: 'PROXY_SKILL_ABSORB_EFFECT_PARAMS_ID',
+        value: 0n,
+        paramValues: [],
+      },
+      {
+        id: 5n,
+        detailType: 'PROXY_SKILL_ABSORB_AMOUNT_PARAMS_ID',
+        value: 0n,
+        paramValues: [],
+      },
       { id: 1n, detailType: 'PROXY_SKILL_ABSORB_PERIOD_TYPE', value: 5n },
       { id: 2n, detailType: 'PROXY_SKILL_ABSORB_PERIOD_PARAM', value: longValue },
       { id: 3n, detailType: 'PROXY_SKILL_INDUCE_POWER_PARAM', value: longValue },

@@ -1,13 +1,11 @@
 import type { ProxySkillEffect } from '../proxySkillTypes';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import type { Effect } from '../model';
 import { int64ToFloat32, isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
-  absorbActionTypes: readonly bigint[] | null;
-  absorbAmounts: readonly bigint[] | null;
+  details: readonly ActionTypeDetail[];
   effects: readonly Readonly<{ actionType: number; effect: Effect }>[];
 }>;
 
@@ -23,14 +21,16 @@ const detailTypes = {
 
 export function createProxySkillEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
+  const absorbActionTypes = params(input.details, 'PROXY_SKILL_ABSORB_EFFECT_PARAMS_ID');
+  const absorbAmounts = params(input.details, 'PROXY_SKILL_ABSORB_AMOUNT_PARAMS_ID');
   if (
-    input.absorbActionTypes === null ||
-    input.absorbAmounts === null ||
-    input.absorbActionTypes.length !== input.absorbAmounts.length
+    absorbActionTypes === null ||
+    absorbAmounts === null ||
+    absorbActionTypes.length !== absorbAmounts.length
   )
     throw new Error('Proxyスキルの吸収対象が正しくありません。');
-  const targets = input.absorbActionTypes.map((actionType, index) => {
-    const amount = input.absorbAmounts?.[index];
+  const targets = absorbActionTypes.map((actionType, index) => {
+    const amount = absorbAmounts[index];
     if (!isInt64(actionType) || amount === undefined || !isInt64(amount))
       throw new Error('Proxyスキルの吸収対象が正しくありません。');
     return {
@@ -65,11 +65,18 @@ export function createProxySkillEffect(input: Input): Effect {
   return effect;
 }
 
-function value(details: readonly Detail[], type: string, fallback: bigint): bigint {
+function value(details: readonly ActionTypeDetail[], type: string, fallback: bigint): bigint {
   const detail = details.find((item) => item.detailType === type);
   if (detail && (!isInt64(detail.id) || !isInt64(detail.value)))
     throw new Error('詳細値が正しくありません。');
   return detail?.value ?? fallback;
+}
+
+function params(details: readonly ActionTypeDetail[], type: string): readonly bigint[] | null {
+  const detail = details.find((item) => item.detailType === type);
+  if (!detail) return null;
+  if (!isInt64(detail.id) || !isInt64(detail.value)) throw new Error('詳細値が正しくありません。');
+  return detail.paramValues ?? null;
 }
 
 function int32(value: bigint): number {

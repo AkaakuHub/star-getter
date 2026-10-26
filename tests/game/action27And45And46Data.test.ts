@@ -51,7 +51,6 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
               details: [
                 { id: 45_001_1n, detailType: 'MODE_CHANGE_INDUCE_TARGET_MODE_ID', value: 1n },
               ],
-              thresholds: [],
               childEffects: [],
             },
             {
@@ -60,9 +59,19 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
               destination: 'effects' as const,
               details: [
                 { id: 46_001_1n, detailType: 'PROXY_SKILL_ABSORB_PERIOD_PARAM', value: 1n },
+                {
+                  id: 46_001_2n,
+                  detailType: 'PROXY_SKILL_ABSORB_EFFECT_PARAMS_ID',
+                  value: 0n,
+                  paramValues: [],
+                },
+                {
+                  id: 46_001_3n,
+                  detailType: 'PROXY_SKILL_ABSORB_AMOUNT_PARAMS_ID',
+                  value: 0n,
+                  paramValues: [],
+                },
               ],
-              absorbActionTypes: [],
-              absorbAmounts: [],
               childEffects: [],
             },
           ],
