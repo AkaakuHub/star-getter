@@ -188,7 +188,7 @@ export function createGame(
     nextSkillCooldownEffectId: 1,
     inducedSkillEffects: [],
     nextInducedSkillEffectId: 1,
-    useInduceActivationCounts: {},
+    skillEffectActivationCounts: {},
     effectInducers: [],
     branchInducers: [],
     nextBranchInducerId: 1,

@@ -11,14 +11,15 @@ it('使用誘発は子効果を実行し、子効果の発動数で上限を判�
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-1',
+    targetEffectId: 501n,
     limit: 1n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 501n }],
   };
   const first = applyEffect(state, effect, card);
   const second = applyEffect(first, effect, card);
   expect(first.energy).toBeGreaterThan(0);
   expect(second.energy).toBe(first.energy);
-  expect(second.useInduceActivationCounts[`${card.id}:induce-1`]).toBe(1);
+  expect(second.skillEffectActivationCounts[`${card.id}:501`]).toBe(1);
 });
 
 it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
@@ -28,13 +29,14 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-2',
+    targetEffectId: 502n,
     limit: 0n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 502n }],
   };
   const first = applyEffect({ ...initial, energy: 0 }, effect, card);
   const second = applyEffect(first, effect, card);
   expect(second.energy).toBeGreaterThan(first.energy);
-  expect(second.useInduceActivationCounts[`${card.id}:induce-2`]).toBe(2);
+  expect(second.skillEffectActivationCounts[`${card.id}:502`]).toBe(2);
 });
 
 it('ActionType905の発動上限をC#のint32へ変換する', () => {
@@ -44,13 +46,14 @@ it('ActionType905の発動上限をC#のint32へ変換する', () => {
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-3',
+    targetEffectId: 503n,
     limit: 18_014_398_509_481_984n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 503n }],
   };
   const first = applyEffect({ ...initial, energy: 0 }, effect, card);
   const second = applyEffect(first, effect, card);
   expect(second.energy).toBeGreaterThan(first.energy);
-  expect(second.useInduceActivationCounts[`${card.id}:induce-3`]).toBe(2);
+  expect(second.skillEffectActivationCounts[`${card.id}:503`]).toBe(2);
 });
 
 it('使用回数誘発はC#の増加前カウントを使い、要求回数ごとに判定する', () => {
@@ -60,9 +63,10 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-3',
+    targetEffectId: 504n,
     requireCount: 2n,
     limit: 0n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 504n }],
   };
   const firstUse = applyEffect(
     { ...initial, energy: 0, skillActivationCounts: { [card.id]: 1 } },
@@ -81,7 +85,7 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   );
   expect(secondUse.energy).toBe(firstUse.energy);
   expect(thirdUse.energy).toBeGreaterThan(secondUse.energy);
-  expect(thirdUse.useInduceActivationCounts[`${card.id}:induce-3`]).toBe(2);
+  expect(thirdUse.skillEffectActivationCounts[`${card.id}:504`]).toBe(2);
 });
 
 it('ActionType906のRequireCountをC#のint32へ変換する', () => {
@@ -91,9 +95,10 @@ it('ActionType906のRequireCountをC#のint32へ変換する', () => {
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-4',
+    targetEffectId: 505n,
     requireCount: 4_294_967_298n,
     limit: 0n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 505n }],
   };
   const activated = applyEffect(
     {
@@ -114,9 +119,10 @@ it('ActionType906は使用回数int32の折返し後もC#と同じ余り判定�
   const effect = {
     kind: 'use-count-induce' as const,
     sourceEffectId: 'induce-wrap',
+    targetEffectId: 506n,
     requireCount: 3n,
     limit: 0n,
-    effects: [{ kind: 'energy' as const, amount: 1 }],
+    effects: [{ kind: 'energy' as const, amount: 1, skillEffectId: 506n }],
   };
   const state = {
     ...initial,
@@ -127,6 +133,61 @@ it('ActionType906は使用回数int32の折返し後もC#と同じ余り判定�
   const result = applyEffect(state, effect, card);
 
   expect(result.energy).toBe(0);
+});
+
+it('ActionType905は同じ子効果を参照する誘発元で発動上限を共有する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const child = { kind: 'energy' as const, amount: 1, skillEffectId: 507n };
+  const first = applyEffect(
+    { ...initial, energy: 0 },
+    {
+      kind: 'use-induce',
+      sourceEffectId: 'induce-shared-a',
+      targetEffectId: 507n,
+      limit: 1n,
+      effects: [child],
+    },
+    card,
+  );
+  const second = applyEffect(
+    first,
+    {
+      kind: 'use-induce',
+      sourceEffectId: 'induce-shared-b',
+      targetEffectId: 507n,
+      limit: 1n,
+      effects: [child],
+    },
+    card,
+  );
+
+  expect(first.energy).toBeGreaterThan(0);
+  expect(second.energy).toBe(first.energy);
+  expect(second.skillEffectActivationCounts[`${card.id}:507`]).toBe(1);
+});
+
+it('ActionType905は通常実行済みの子効果回数も上限判定へ使う', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const child = { kind: 'energy' as const, amount: 1, skillEffectId: 508n };
+  const usedNormally = applyEffect({ ...initial, energy: 0 }, child, card);
+  const induced = applyEffect(
+    usedNormally,
+    {
+      kind: 'use-induce',
+      sourceEffectId: 'induce-after-normal-use',
+      targetEffectId: 508n,
+      limit: 1n,
+      effects: [child],
+    },
+    card,
+  );
+
+  expect(induced.energy).toBe(usedNormally.energy);
+  expect(induced.skillEffectActivationCounts[`${card.id}:508`]).toBe(1);
 });
 
 it('Action907は子効果のCheckDeckOutを実行する', () => {

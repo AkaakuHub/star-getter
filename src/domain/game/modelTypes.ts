@@ -332,4 +332,7 @@ type EffectShape =
   | ProxySkillEffect
   | ProxyForcedActivationEffect;
 export type Effect = EffectShape &
-  Readonly<{ parameterDetails?: Readonly<Record<string, ParameterDetailValue>> }>;
+  Readonly<{
+    parameterDetails?: Readonly<Record<string, ParameterDetailValue>>;
+    skillEffectId?: bigint;
+  }>;

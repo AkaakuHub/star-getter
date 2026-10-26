@@ -7,19 +7,12 @@ export function activateUseInduce(
   card: Card | undefined,
   apply: EffectApplier,
 ): GameState {
-  if (!effect.effects.length) return state;
-  const key = `${card?.id ?? ''}:${effect.sourceEffectId}`;
-  const activationCount = int32(state.useInduceActivationCounts[key] ?? 0);
+  if (effect.targetEffectId === null || effect.effects.length === 0) return state;
+  const key = `${card?.id ?? ''}:${effect.targetEffectId}`;
+  const activationCount = int32(state.skillEffectActivationCounts[key] ?? 0);
   const limit = int32(effect.limit);
   if (limit !== 0 && activationCount >= limit) return state;
-  const next = effect.effects.reduce((current, child) => apply(current, child, card), state);
-  return {
-    ...next,
-    useInduceActivationCounts: {
-      ...next.useInduceActivationCounts,
-      [key]: int32(activationCount + 1),
-    },
-  };
+  return effect.effects.reduce((current, child) => apply(current, child, card), state);
 }
 
 function int32(value: number | bigint): number {
@@ -40,6 +33,7 @@ export function activateUseCountInduce(
     {
       kind: 'use-induce',
       sourceEffectId: effect.sourceEffectId,
+      targetEffectId: effect.targetEffectId,
       limit: effect.limit,
       effects: effect.effects,
     },

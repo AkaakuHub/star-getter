@@ -309,7 +309,7 @@ export type GameState = Readonly<{
   handCollectionActivationCounts: Readonly<Record<string, number>>;
   handUseActivationCounts: Readonly<Record<string, number>>;
   handUseHeartCollectionCounts: Readonly<Record<string, number>>;
-  useInduceActivationCounts: Readonly<Record<string, number>>;
+  skillEffectActivationCounts: Readonly<Record<string, number>>;
   effectInducers: readonly ActiveEffectInducer[];
   branchInducers: readonly Readonly<{
     id: number;

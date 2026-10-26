@@ -18,6 +18,8 @@ import { validateSkillHeartsEffect } from './skillHeartTypes';
 import { validateSkillScoreUpEffect } from './skillScoreUpTypes';
 import { isInt64 } from './numeric';
 export function validateEffect(effect: Effect): void {
+  if (effect.skillEffectId !== undefined && !isInt64(effect.skillEffectId))
+    throw new Error('スキル効果IDが正しくありません。');
   if (effect.kind === 'add-voltage-skill') return validateAddVoltageSkillEffect(effect);
   if (effect.kind === 'search-unit' || effect.kind === 'search-token' || effect.kind === 'search') {
     if (!Number.isSafeInteger(effect.count) || effect.count < 1)

@@ -3,6 +3,7 @@ export type InduceSkillCondition = 'voltage' | 'mental-recover' | 'mental-barrie
 export type UseInduceEffect = Readonly<{
   kind: 'use-induce';
   sourceEffectId: string;
+  targetEffectId: bigint | null;
   limit: bigint;
   effects: readonly import('./modelTypes').Effect[];
 }>;
@@ -10,6 +11,7 @@ export type UseInduceEffect = Readonly<{
 export type UseCountInduceEffect = Readonly<{
   kind: 'use-count-induce';
   sourceEffectId: string;
+  targetEffectId: bigint | null;
   requireCount: bigint;
   limit: bigint;
   effects: readonly import('./modelTypes').Effect[];

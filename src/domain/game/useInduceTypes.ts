@@ -8,7 +8,14 @@ export function validateUseInduceEffect(
   effect: UseInduceEffect,
   validateChild: (effect: Effect) => void,
 ): void {
-  if (!effect.sourceEffectId || !isInt64(effect.limit) || !effect.effects.length)
+  if (
+    !effect.sourceEffectId ||
+    (effect.targetEffectId !== null && !isInt64(effect.targetEffectId)) ||
+    !isInt64(effect.limit) ||
+    (effect.targetEffectId === null && effect.effects.length !== 0) ||
+    (effect.targetEffectId !== null &&
+      (effect.effects.length !== 1 || effect.effects[0]?.skillEffectId !== effect.targetEffectId))
+  )
     throw new Error('使用誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);
 }
@@ -19,9 +26,12 @@ export function validateUseCountInduceEffect(
 ): void {
   if (
     !effect.sourceEffectId ||
+    (effect.targetEffectId !== null && !isInt64(effect.targetEffectId)) ||
     !isInt64(effect.requireCount) ||
     !isInt64(effect.limit) ||
-    !effect.effects.length
+    (effect.targetEffectId === null && effect.effects.length !== 0) ||
+    (effect.targetEffectId !== null &&
+      (effect.effects.length !== 1 || effect.effects[0]?.skillEffectId !== effect.targetEffectId))
   )
     throw new Error('使用回数誘発の設定が正しくありません。');
   for (const child of effect.effects) validateChild(child);

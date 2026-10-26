@@ -48,6 +48,7 @@ import {
   activateFixedParameterExtend,
   changeFixedParameterBase,
 } from './effects/fixedParameterExtend';
+import { incrementSkillEffectActivationCount } from './effects/skillEffectActivation';
 export { skillValue } from './effects/skillValue';
 export function applyEffect(
   state: GameState,
@@ -57,10 +58,9 @@ export function applyEffect(
   addValue = 0,
   effectPower = 1,
 ): GameState {
-  return refreshEffectInducers(
-    applyEffectInternal(state, effect, card, multiplier, addValue, effectPower),
-    applyEffect,
-  );
+  const applied = applyEffectInternal(state, effect, card, multiplier, addValue, effectPower);
+  const counted = incrementSkillEffectActivationCount(applied, effect, card);
+  return refreshEffectInducers(counted, applyEffect);
 }
 
 function applyEffectInternal(
