@@ -72,6 +72,50 @@ it('耐久バリアがあるときだけ子効果を有効化する', () => {
   expect(withoutBarrier.effectInducers[0]?.active).toBe(false);
 });
 
+it('ActionType31の子効果は誘発条件が外れても自身の期限まで残る', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('テスト用カードがありません。');
+  const barrier = applyEffect(
+    initial,
+    {
+      kind: 'mental-barrier',
+      barrier: 'endurance',
+      enduranceType: 'fixed',
+      endurance: 20,
+      attenuation: 0,
+      duration: { kind: 'stage' },
+    },
+    source,
+  );
+  const armed = applyEffect(
+    barrier,
+    {
+      kind: 'effect-induce',
+      sourceEffectId: 'voltage-additional-buff-child',
+      target: 'mental-barrier',
+      threshold: { kind: 'none', value: 0n },
+      effects: [
+        {
+          kind: 'voltage-up-additional-buff',
+          calculation: 1n,
+          num: 500_000n,
+          target: { kind: 'all' },
+          duration: { kind: 'milliseconds', value: 10_000n },
+          disabledType: 0,
+          disabledCount: 0n,
+        },
+      ],
+    },
+    source,
+  );
+
+  expect(armed.voltageUpAdditionalBuffs).toHaveLength(1);
+  const conditionEnded = refreshEffectInducers({ ...armed, mentalBarriers: [] }, applyEffect);
+  expect(conditionEnded.voltageUpAdditionalBuffs).toHaveLength(1);
+  expect(conditionEnded.effectInducers[0]?.active).toBe(false);
+});
+
 it('Deactivator解除後は効果誘発監視を破棄し、条件を満たしても再発動しない', () => {
   const initial = game('library');
   const source = initial.deck[0];

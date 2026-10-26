@@ -35,7 +35,6 @@ const deactivationActions: readonly ((deactivationKey: string) => import('../mod
   (deactivationKey) => ({ type: 'deactivate-heart-boost', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-score-up', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-fixed-parameter-extend', deactivationKey }),
-  (deactivationKey) => ({ type: 'deactivate-voltage-up-additional-buff', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-cost-change', deactivationKey }),
 ];
 
@@ -172,7 +171,6 @@ export function withDeactivationKey(
     case 'love-up-additional-buff':
     case 'recover-mental-additional-buff':
     case 'mental-barrier-additional-buff':
-    case 'voltage-up-additional-buff':
     case 'skill-cost-change':
     case 'stop-voltage-increase':
     case 'boost':

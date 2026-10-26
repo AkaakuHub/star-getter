@@ -46,7 +46,6 @@ export function activateVoltageUpAdditionalBuff(
         : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
-    deactivationKey: effect.deactivationKey ?? null,
   };
   return {
     ...boosted.state,

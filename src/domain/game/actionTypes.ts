@@ -27,7 +27,6 @@ type DeactivationAction = Readonly<{
     | 'deactivate-gauge-regeneration'
     | 'deactivate-search'
     | 'deactivate-heart-boost'
-    | 'deactivate-voltage-up-additional-buff'
     | 'deactivate-skill-cost-change'
     | 'deactivate-skill-score-up'
     | 'deactivate-fixed-parameter-extend';

@@ -49,7 +49,7 @@ it('Action901はAbility893の発火時にカード使用時点のHandCardStats�
   );
 });
 
-it('disabledType0はHandCardStats終了時にAction31追加バフを解除する', () => {
+it('ActionType31はHandCardStats終了時にも追加バフを解除しない', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('検証用カードがありません。');
@@ -98,7 +98,7 @@ it('disabledType0はHandCardStats終了時にAction31追加バフを解除する
     card,
   );
   expect(active.voltageUpAdditionalBuffs).toHaveLength(1);
-  expect(finishCardActivation(active).voltageUpAdditionalBuffs).toHaveLength(0);
+  expect(finishCardActivation(active).voltageUpAdditionalBuffs).toHaveLength(1);
 });
 
 it('disabledType省略時はbranchType3を継続扱いにする', () => {
