@@ -8,6 +8,8 @@ import { createHeartLimitChangeEffect } from '../actionTypeEffects/heartLimitCha
 import { createDeckSkillCostChangeEffect } from '../actionTypeEffects/deckSkillCostChange';
 import { createLoveUpAdditionalBuffEffect } from '../actionTypeEffects/loveUpAdditionalBuff';
 import { createVoltageUpAdditionalBuffEffect } from '../actionTypeEffects/voltageUpAdditionalBuff';
+import { createMentalRecoverAdditionalBuffEffect } from '../actionTypeEffects/mentalRecoverAdditionalBuff';
+import { createMentalBarrierAdditionalBuffEffect } from '../actionTypeEffects/mentalBarrierAdditionalBuff';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -53,13 +55,29 @@ export function resolveActionEffects(card: Card): Card {
                             targetMood: detail.targetMood ?? 0,
                           })),
                         })
-                      : createVoltageUpAdditionalBuffEffect({
-                          ...actionEffect,
-                          details: actionEffect.details.map((detail) => ({
-                            ...detail,
-                            targetMood: detail.targetMood ?? 0,
-                          })),
-                        });
+                      : actionEffect.actionType === 31
+                        ? createVoltageUpAdditionalBuffEffect({
+                            ...actionEffect,
+                            details: actionEffect.details.map((detail) => ({
+                              ...detail,
+                              targetMood: detail.targetMood ?? 0,
+                            })),
+                          })
+                        : actionEffect.actionType === 32
+                          ? createMentalRecoverAdditionalBuffEffect({
+                              ...actionEffect,
+                              details: actionEffect.details.map((detail) => ({
+                                ...detail,
+                                targetMood: detail.targetMood ?? 0,
+                              })),
+                            })
+                          : createMentalBarrierAdditionalBuffEffect({
+                              ...actionEffect,
+                              details: actionEffect.details.map((detail) => ({
+                                ...detail,
+                                targetMood: detail.targetMood ?? 0,
+                              })),
+                            });
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
