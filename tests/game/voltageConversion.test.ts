@@ -4,6 +4,7 @@ import { applyEffect } from '../../src/domain/game/effects';
 import { addHearts, collectHearts, heartCount } from '../../src/domain/game/hearts';
 import { changeResource } from '../../src/domain/game/resources';
 import { advanceTo } from '../../src/domain/game/simulation';
+import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
 import { game } from './support/game';
 
 const conversion = {
@@ -50,6 +51,32 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
   ]);
   expect(heartCount(result)).toBe(0);
   expect(changeResource({ ...latest, excitement: 10 }, 'excitement', -10n).excitement).toBe(0);
+});
+
+it('Action22で変換された熱気はActionType46の吸収対象にならない', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(initial, conversion, source);
+  const proxied = registerProxySkill(
+    active,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 1,
+      periodParam: 1000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 10, targetAmount: 10 }],
+      effects: [],
+    },
+    source,
+  );
+  const result = changeResource(proxied, 'excitement', 10n, 'skill', source);
+  expect(heartCount(result)).toBe(10);
+  expect(result.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
 });
 
 it('Action22は熟練度ボーナスの熱気も変換する', () => {

@@ -29,10 +29,6 @@ export function changeResource(
     const absorption = absorbSkillEffect(state, 14, BigInt.asIntN(32, amount));
     if (absorption.absorbed) return absorption.state;
   }
-  if (resource === 'excitement' && amount >= 0n) {
-    const absorption = absorbSkillEffect(state, 10, BigInt.asIntN(32, amount));
-    if (absorption.absorbed) return notifySkillEffectAmount(absorption.state, 0);
-  }
   if (resource === 'stamina' && amount >= 0n && source === 'skill') {
     const absorption = absorbSkillEffect(state, 5, BigInt.asUintN(32, amount));
     if (absorption.absorbed) return absorption.state;
@@ -41,6 +37,10 @@ export function changeResource(
     const conversion = convertVoltageIncrease(state, amount, card, applyEffect);
     if (conversion.converted) return notifySkillEffectAmount(conversion.state, 0);
     state = conversion.state;
+  }
+  if (resource === 'excitement' && amount >= 0n) {
+    const absorption = absorbSkillEffect(state, 10, BigInt.asIntN(32, amount));
+    if (absorption.absorbed) return notifySkillEffectAmount(absorption.state, 0);
   }
   if (resource === 'excitement' && amount > 0n) {
     const mastery = addMasteryVoltage(state, Math.fround(Number(amount)));
