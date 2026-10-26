@@ -64,7 +64,7 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(12n);
 });
 
-it('Proxyの負の目標値もC#と同じTotalAmount以上の判定を使う', () => {
+it('ActionType48の負の目標値は非絶対加算でC#と同じ下方向判定を使う', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -96,7 +96,7 @@ it('Proxyの負の目標値もC#と同じTotalAmount以上の判定を使う', (
   );
 
   expect(absorbed.moodSkillBuffs).toHaveLength(0);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
+  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-3n);
 });
 
 it('Proxyの絶対加算では負のActionType48変化を正数として吸収する', () => {

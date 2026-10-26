@@ -114,7 +114,10 @@ export function advanceProxySkillUses(
 
 export function isProxyTargetReached(
   effect: GameState['proxyAbsorptions'][number]['effects'][number],
+  isAbsoluteAdd = false,
 ): boolean {
+  if (effect.actionType === 48 && !isAbsoluteAdd && effect.targetAmount < 0n)
+    return effect.totalAmount <= effect.targetAmount;
   return effect.totalAmount >= effect.targetAmount;
 }
 
@@ -135,7 +138,8 @@ export function absorbSkillEffect(
     if (effectIndex < 0) continue;
     const effect = absorption.effects[effectIndex];
     if (!effect) continue;
-    if (absorption.hasAbsorbLimit && isProxyTargetReached(effect)) return { state, absorbed: true };
+    if (absorption.hasAbsorbLimit && isProxyTargetReached(effect, absorption.isAbsoluteAdd))
+      return { state, absorbed: true };
     const absorbedAmount =
       actionType === 48 && absorption.isAbsoluteAdd && amount < 0n ? -amount : amount;
     const effects = absorption.effects.map((item, index) =>
@@ -179,12 +183,12 @@ function matchesForcedActivationTarget(
     case 4:
       return (
         absorption.effects.length > 0 &&
-        absorption.effects.every((effect) => isProxyTargetReached(effect))
+        absorption.effects.every((effect) => isProxyTargetReached(effect, absorption.isAbsoluteAdd))
       );
     case 5:
       return !(
         absorption.effects.length > 0 &&
-        absorption.effects.every((effect) => isProxyTargetReached(effect))
+        absorption.effects.every((effect) => isProxyTargetReached(effect, absorption.isAbsoluteAdd))
       );
   }
 }
@@ -195,7 +199,9 @@ function finishProxyAbsorption(
   apply: ApplyProxyEffect,
 ): GameState {
   const checkTargets = absorption.induceTiming === 1 || absorption.induceCondition === 2;
-  const allTargetsReached = absorption.effects.every((effect) => isProxyTargetReached(effect));
+  const allTargetsReached = absorption.effects.every((effect) =>
+    isProxyTargetReached(effect, absorption.isAbsoluteAdd),
+  );
   if (checkTargets && !allTargetsReached)
     return releaseFailedProxyAbsorption(state, absorption, apply);
   const card = state.cardPool.find((item) => item.id === absorption.sourceId);
@@ -247,7 +253,9 @@ function endProxyAbsorption(
   apply: ApplyProxyEffect,
 ): GameState {
   const checkTargets = absorption.induceTiming === 1 || absorption.induceCondition === 2;
-  const allTargetsReached = absorption.effects.every((effect) => isProxyTargetReached(effect));
+  const allTargetsReached = absorption.effects.every((effect) =>
+    isProxyTargetReached(effect, absorption.isAbsoluteAdd),
+  );
   if (checkTargets && !allTargetsReached)
     return releaseFailedProxyAbsorption(state, absorption, apply);
   return updateProxyAbsorption(state, absorption, { ...absorption, isAbsorbEnd: true });
