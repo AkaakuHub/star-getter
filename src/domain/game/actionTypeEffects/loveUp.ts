@@ -1,5 +1,5 @@
 import type { Effect } from '../modelTypes';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{
   id: bigint;
@@ -39,12 +39,12 @@ export function createLoveUpEffect(input: Input): Effect {
   return {
     kind: 'skill-score-up',
     calculation,
-    amount: int32(find(input.details, 'LOVE_UP_NUM_BASE')?.value ?? 0n),
+    amount: int64ToFloat32(find(input.details, 'LOVE_UP_NUM_BASE')?.value ?? 0n),
     ...(targetMood > 0
       ? {
           moodBonus: {
             target: targetMood as 1 | 2 | 3,
-            perPoint: Math.fround(Math.fround(int32(mood?.value ?? 0n)) / 10_000),
+            perPoint: Math.fround(int64ToFloat32(mood?.value ?? 0n) / 10_000),
           },
         }
       : {}),

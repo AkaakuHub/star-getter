@@ -14,7 +14,7 @@ export type SkillScoreUpEffect = Readonly<{
 export function validateSkillScoreUpEffect(effect: SkillScoreUpEffect): void {
   if (
     !Number.isSafeInteger(effect.calculation) ||
-    !Number.isSafeInteger(effect.amount) ||
+    !Number.isFinite(effect.amount) ||
     (effect.moodBonus !== undefined &&
       (!Number.isFinite(effect.moodBonus.perPoint) ||
         ![1, 2, 3].includes(effect.moodBonus.target))) ||
