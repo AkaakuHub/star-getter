@@ -4,6 +4,7 @@ import { createApSpeedChangeEffect } from '../actionTypeEffects/apSpeedChange';
 import { createVoltageConvertEffect } from '../actionTypeEffects/voltageConvert';
 import { createMentalHeartInduceEffect } from '../actionTypeEffects/mentalHeartInduce';
 import { createComboInduceEffect } from '../actionTypeEffects/comboInduce';
+import { createHeartLimitChangeEffect } from '../actionTypeEffects/heartLimitChange';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -26,10 +27,18 @@ export function resolveActionEffects(card: Card): Card {
             ? createVoltageConvertEffect(actionEffect)
             : actionEffect.actionType === 23
               ? createMentalHeartInduceEffect(actionEffect)
-              : createComboInduceEffect({
-                  ...actionEffect,
-                  effects: actionEffect.childEffects,
-                });
+              : actionEffect.actionType === 24
+                ? createComboInduceEffect({
+                    ...actionEffect,
+                    effects: actionEffect.childEffects,
+                  })
+                : createHeartLimitChangeEffect({
+                    ...actionEffect,
+                    details: actionEffect.details.map((detail) => ({
+                      ...detail,
+                      targetMood: detail.targetMood ?? 0,
+                    })),
+                  });
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }

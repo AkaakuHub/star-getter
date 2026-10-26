@@ -263,3 +263,34 @@ it('ActionType24の詳細レコードは子EffectとともにcreateGameへ接続
     effects: [],
   });
 });
+
+it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 25 as const,
+              skillEffectId: 25_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 25_001_1n, detailType: 'CHANGE_HEART_LIMIT_NUM', value: 1n },
+                { id: 25_001_2n, detailType: 'CHANGE_HEART_LIMIT_DISPLAY_TIME_TYPE', value: 3n },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  expect(compiled?.effects.find((item) => item.kind === 'heart-limit-change')).toMatchObject({
+    kind: 'heart-limit-change',
+    calculationType: 1,
+    num: 1n,
+    duration: { kind: 'stage' },
+  });
+});
