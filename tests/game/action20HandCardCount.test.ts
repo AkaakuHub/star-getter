@@ -294,3 +294,34 @@ it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ
     duration: { kind: 'stage' },
   });
 });
+
+it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 29 as const,
+              skillEffectId: 29_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 29_001_1n, detailType: 'CHANGE_DECK_AP_NUM', value: -1n },
+                { id: 29_001_2n, detailType: 'CHANGE_DECK_AP_TARGET_RANGE', value: 1n },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  expect(compiled?.effects.find((item) => item.kind === 'deck-skill-cost-change')).toMatchObject({
+    kind: 'deck-skill-cost-change',
+    num: -1,
+    targetRange: 1,
+    target: 'all',
+  });
+});
