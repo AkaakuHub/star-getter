@@ -153,6 +153,11 @@ export type Card = Readonly<{
     | MoodActionRecord<42>
     | MoodActionRecord<43>
     | MoodActionRecord<44>
+    | MoodActionRecord<47>
+    | MoodActionRecord<48>
+    | MoodActionRecord<49>
+    | MoodActionRecord<50>
+    | MoodActionRecord<56>
   )[];
   ability893Effects?: readonly Effect[];
   ability894Effects?: readonly Effect[];

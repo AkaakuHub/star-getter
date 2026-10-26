@@ -18,6 +18,11 @@ import { createInfinityGaugeEffect } from '../actionTypeEffects/infinityGauge';
 import { createUseAllHandEffect } from '../actionTypeEffects/useAllHand';
 import { createSwitchTokenDeckEffect } from '../actionTypeEffects/switchTokenDeck';
 import { createIngameMissionEffect } from '../actionTypeEffects/ingameMission';
+import { createBeatHeartValueEffect } from '../actionTypeEffects/beatHeartValue';
+import { createMoodChangeEffect } from '../actionTypeEffects/moodChange';
+import { createHeartLimitBoostEffect } from '../actionTypeEffects/heartLimitBoost';
+import { createMoodValueBoostEffect } from '../actionTypeEffects/moodValueBoost';
+import { createMentalShieldEffect } from '../actionTypeEffects/mentalShield';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -101,7 +106,47 @@ export function resolveActionEffects(card: Card): Card {
                                         ? createUseAllHandEffect(actionEffect)
                                         : actionEffect.actionType === 43
                                           ? createSwitchTokenDeckEffect(actionEffect)
-                                          : createIngameMissionEffect(actionEffect);
+                                          : actionEffect.actionType === 44
+                                            ? createIngameMissionEffect(actionEffect)
+                                            : actionEffect.actionType === 47
+                                              ? createBeatHeartValueEffect({
+                                                  ...actionEffect,
+                                                  details: actionEffect.details.map((detail) => ({
+                                                    ...detail,
+                                                    targetMood: detail.targetMood ?? 0,
+                                                  })),
+                                                })
+                                              : actionEffect.actionType === 48
+                                                ? createMoodChangeEffect(actionEffect)
+                                                : actionEffect.actionType === 49
+                                                  ? createHeartLimitBoostEffect({
+                                                      ...actionEffect,
+                                                      details: actionEffect.details.map(
+                                                        (detail) => ({
+                                                          ...detail,
+                                                          targetMood: detail.targetMood ?? 0,
+                                                        }),
+                                                      ),
+                                                    })
+                                                  : actionEffect.actionType === 50
+                                                    ? createMoodValueBoostEffect({
+                                                        ...actionEffect,
+                                                        details: actionEffect.details.map(
+                                                          (detail) => ({
+                                                            ...detail,
+                                                            targetMood: detail.targetMood ?? 0,
+                                                          }),
+                                                        ),
+                                                      })
+                                                    : createMentalShieldEffect({
+                                                        ...actionEffect,
+                                                        details: actionEffect.details.map(
+                                                          (detail) => ({
+                                                            ...detail,
+                                                            targetMood: detail.targetMood ?? 0,
+                                                          }),
+                                                        ),
+                                                      });
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
