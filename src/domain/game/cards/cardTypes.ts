@@ -178,11 +178,6 @@ export type ActionType36Record = Readonly<{
     off: readonly ParameterValueChangeEffect[];
     on: readonly ParameterValueChangeEffect[];
   }>;
-  modeAbilityChanges?: Readonly<{
-    modeId: number;
-    off: ModeAbilityVariant;
-    on: ModeAbilityVariant;
-  }>;
 }>;
 
 export type CardSkillVariantMaster = Readonly<{
@@ -191,7 +186,7 @@ export type CardSkillVariantMaster = Readonly<{
   skillLevel: number;
   specialAppealSkillLevel: number;
   skillSkillLevel: number;
-  variant: ModeSkillVariant;
+  variant: ModeSkillVariant | ModeAbilityVariant;
 }>;
 
 export type ActionType29Record = Readonly<{

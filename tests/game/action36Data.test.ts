@@ -51,6 +51,52 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
               ],
               modeParameterChanges: { modeId: 100, off: [], on: [] },
             },
+            {
+              actionType: 36 as const,
+              details: [
+                { id: 4n, detailType: 'MODE_SKILL_CHANGE_MODE_ID', value: 101n },
+                {
+                  id: 5n,
+                  detailType: 'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_1',
+                  value: 210n,
+                },
+                {
+                  id: 6n,
+                  detailType: 'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_2',
+                  value: 211n,
+                },
+              ],
+              skillType: 3,
+              skillLevel: 1,
+              specialAppealSkillLevel: 1,
+              skillSkillLevel: 1,
+              cardSkillVariants: [
+                {
+                  skillType: 3,
+                  seriesId: 210,
+                  skillLevel: 1,
+                  specialAppealSkillLevel: 1,
+                  skillSkillLevel: 1,
+                  variant: {
+                    modeEffects: [],
+                    ability893Effects: [{ kind: 'voltage-set' as const, amount: 1 }],
+                    ability894Effects: [],
+                  },
+                },
+                {
+                  skillType: 3,
+                  seriesId: 211,
+                  skillLevel: 1,
+                  specialAppealSkillLevel: 1,
+                  skillSkillLevel: 1,
+                  variant: {
+                    modeEffects: [],
+                    ability893Effects: [{ kind: 'voltage-set' as const, amount: 2 }],
+                    ability894Effects: [],
+                  },
+                },
+              ],
+            },
           ],
         }
       : card,
@@ -58,6 +104,7 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
   const state = createGame(track, deck, 7);
   const compiled = state.deck.find((card) => card.id === source.id);
   expect(compiled?.modeIds).toContain(100);
+  expect(compiled?.modeIds).toContain(101);
   expect(compiled?.modeParameterChanges?.modeId).toBe(100);
   expect(compiled?.modeSkillChanges).toMatchObject({
     modeId: 100,
@@ -65,6 +112,11 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
     on: { cost: 3, skillIcon: 21 },
   });
   expect(state.modes.entries.some((mode) => mode.id === 100)).toBe(true);
+  expect(compiled?.modeAbilityChanges).toMatchObject({
+    modeId: 101,
+    off: { ability893Effects: [{ kind: 'voltage-set', amount: 1 }] },
+    on: { ability893Effects: [{ kind: 'voltage-set', amount: 2 }] },
+  });
 });
 
 it('ActionType36は系列IDに一致するMaster variantがない場合に失敗する', () => {

@@ -1,4 +1,9 @@
-import type { Card, CardSkillVariantMaster, ModeSkillVariant } from './cardTypes';
+import type {
+  Card,
+  CardSkillVariantMaster,
+  ModeAbilityVariant,
+  ModeSkillVariant,
+} from './cardTypes';
 import { resolveActionEffect } from './resolveActionEffect';
 import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessInduce';
 import { createOnDrawInduceRule } from '../actionTypeEffects/onDrawInduce';
@@ -48,12 +53,21 @@ export function resolveActionEffects(card: Card): Card {
       );
       modeIds = [...modeIds, ...(actionEffect.modeIds ?? []), modeId];
       modeParameterChanges = actionEffect.modeParameterChanges ?? modeParameterChanges;
-      modeSkillChanges = {
-        modeId,
-        off,
-        on,
-      };
-      modeAbilityChanges = actionEffect.modeAbilityChanges ?? modeAbilityChanges;
+      if (actionEffect.skillType === 3) {
+        modeAbilityChanges = {
+          modeId,
+          off: modeAbilityVariant(off),
+          on: modeAbilityVariant(on),
+        };
+      } else {
+        if (actionEffect.skillType !== 1 && actionEffect.skillType !== 2)
+          throw new Error('モード切替スキル種別が正しくありません。');
+        modeSkillChanges = {
+          modeId,
+          off: modeSkillVariant(off),
+          on: modeSkillVariant(on),
+        };
+      }
       continue;
     }
     if (actionEffect.actionType === 901) {
@@ -99,7 +113,7 @@ function resolveCardSkillVariant(
   skillLevel: number,
   specialAppealSkillLevel: number,
   skillSkillLevel: number,
-): ModeSkillVariant {
+): ModeSkillVariant | ModeAbilityVariant {
   const matches = masters.filter(
     (master) =>
       master.seriesId === seriesId &&
@@ -112,6 +126,16 @@ function resolveCardSkillVariant(
   const match = matches[0];
   if (!match) throw new Error('モード切替スキル系列Masterがありません。');
   return match.variant;
+}
+
+function modeSkillVariant(variant: ModeSkillVariant | ModeAbilityVariant): ModeSkillVariant {
+  if (!('cost' in variant)) throw new Error('モード切替SkillVariantが正しくありません。');
+  return variant;
+}
+
+function modeAbilityVariant(variant: ModeSkillVariant | ModeAbilityVariant): ModeAbilityVariant {
+  if (!('modeEffects' in variant)) throw new Error('モード切替AbilityVariantが正しくありません。');
+  return variant;
 }
 
 function detailInt32(
