@@ -1,5 +1,8 @@
 import { expect, it } from 'vite-plus/test';
+import { routes } from '../../src/content/routes';
+import { tracks } from '../../src/content/tracks';
 import { createLoveUpAdditionalBuffEffect } from '../../src/domain/game/actionTypeEffects/loveUpAdditionalBuff';
+import { createGame } from '../../src/domain/game/simulation';
 
 it('ActionType30はlong詳細値・Mood補正・対象・期限を正確に変換する', () => {
   const effect = createLoveUpAdditionalBuffEffect({
@@ -54,4 +57,43 @@ it('ActionType30はlong詳細値・Mood補正・対象・期限を正確に変�
   });
   if (effect.moodBonus?.target !== 2) throw new Error('Mood補正対象がありません。');
   expect(effect.moodBonus.perPoint).toBe(900_719_902_720);
+});
+
+it('ActionType30の詳細レコードをcreateGameでSTAR追加バフへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const details = [
+    {
+      id: 30_001_1n,
+      detailType: 'LOVE_UP_ADDITIONAL_BUFF_CALC_TYPE',
+      targetMood: 0,
+      value: 1n,
+    },
+    { id: 30_001_2n, detailType: 'LOVE_UP_ADDITIONAL_BUFF_NUM', targetMood: 0, value: 500_000n },
+    {
+      id: 30_001_3n,
+      detailType: 'LOVE_UP_ADDITIONAL_BUFF_DISPLAY_TIME_TYPE',
+      targetMood: 0,
+      value: 3n,
+    },
+  ] as const;
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 30 as const,
+              skillEffectId: 30_001n,
+              destination: 'effects' as const,
+              details,
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'love-up-additional-buff');
+  expect(effect).toEqual(createLoveUpAdditionalBuffEffect({ skillEffectId: 30_001n, details }));
 });
