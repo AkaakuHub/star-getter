@@ -1,4 +1,4 @@
-import type { Card } from './cardTypes';
+import type { Card, CardSkillVariantMaster, ModeSkillVariant } from './cardTypes';
 import { resolveActionEffect } from './resolveActionEffect';
 import { createDrawSuccessInduceEffect } from '../actionTypeEffects/drawSuccessInduce';
 import { createOnDrawInduceRule } from '../actionTypeEffects/onDrawInduce';
@@ -30,17 +30,28 @@ export function resolveActionEffects(card: Card): Card {
         actionEffect.details,
         'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_2',
       );
-      if (
-        actionEffect.modeSkillChanges.offSeriesId !== offSeriesId ||
-        actionEffect.modeSkillChanges.onSeriesId !== onSeriesId
-      )
-        throw new Error('モード切替スキル系列データが詳細値と一致しません。');
+      const off = resolveCardSkillVariant(
+        actionEffect.cardSkillVariants,
+        offSeriesId,
+        actionEffect.skillType,
+        actionEffect.skillLevel,
+        actionEffect.specialAppealSkillLevel,
+        actionEffect.skillSkillLevel,
+      );
+      const on = resolveCardSkillVariant(
+        actionEffect.cardSkillVariants,
+        onSeriesId,
+        actionEffect.skillType,
+        actionEffect.skillLevel,
+        actionEffect.specialAppealSkillLevel,
+        actionEffect.skillSkillLevel,
+      );
       modeIds = [...modeIds, ...(actionEffect.modeIds ?? []), modeId];
       modeParameterChanges = actionEffect.modeParameterChanges ?? modeParameterChanges;
       modeSkillChanges = {
         modeId,
-        off: actionEffect.modeSkillChanges.off,
-        on: actionEffect.modeSkillChanges.on,
+        off,
+        on,
       };
       modeAbilityChanges = actionEffect.modeAbilityChanges ?? modeAbilityChanges;
       continue;
@@ -79,6 +90,28 @@ export function resolveActionEffects(card: Card): Card {
     ...(drawRules.length > 0 ? { drawRules } : {}),
     ...(handInducers.length > 0 ? { handInducers } : {}),
   };
+}
+
+function resolveCardSkillVariant(
+  masters: readonly CardSkillVariantMaster[],
+  seriesId: number,
+  skillType: number,
+  skillLevel: number,
+  specialAppealSkillLevel: number,
+  skillSkillLevel: number,
+): ModeSkillVariant {
+  const matches = masters.filter(
+    (master) =>
+      master.seriesId === seriesId &&
+      master.skillType === skillType &&
+      master.skillLevel === skillLevel &&
+      master.specialAppealSkillLevel === specialAppealSkillLevel &&
+      master.skillSkillLevel === skillSkillLevel,
+  );
+  if (matches.length !== 1) throw new Error('モード切替スキル系列Masterを一意に解決できません。');
+  const match = matches[0];
+  if (!match) throw new Error('モード切替スキル系列Masterがありません。');
+  return match.variant;
 }
 
 function detailInt32(

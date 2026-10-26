@@ -27,13 +27,29 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
                   value: 4_294_967_497n,
                 },
               ],
+              skillType: 2,
+              skillLevel: 1,
+              specialAppealSkillLevel: 1,
+              skillSkillLevel: 1,
+              cardSkillVariants: [
+                {
+                  skillType: 2,
+                  seriesId: 200,
+                  skillLevel: 1,
+                  specialAppealSkillLevel: 1,
+                  skillSkillLevel: 1,
+                  variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+                },
+                {
+                  skillType: 2,
+                  seriesId: 201,
+                  skillLevel: 1,
+                  specialAppealSkillLevel: 1,
+                  skillSkillLevel: 1,
+                  variant: { cost: 3, effects: [], skillIcon: 21, special: null },
+                },
+              ],
               modeParameterChanges: { modeId: 100, off: [], on: [] },
-              modeSkillChanges: {
-                offSeriesId: 200,
-                onSeriesId: 201,
-                off: { cost: 2, effects: [], skillIcon: 20, special: null },
-                on: { cost: 3, effects: [], skillIcon: 21, special: null },
-              },
             },
           ],
         }
@@ -49,4 +65,52 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
     on: { cost: 3, skillIcon: 21 },
   });
   expect(state.modes.entries.some((mode) => mode.id === 100)).toBe(true);
+});
+
+it('ActionType36は系列IDに一致するMaster variantがない場合に失敗する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 36 as const,
+              details: [
+                { id: 1n, detailType: 'MODE_SKILL_CHANGE_MODE_ID', value: 1n },
+                {
+                  id: 2n,
+                  detailType: 'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_1',
+                  value: 20n,
+                },
+                {
+                  id: 3n,
+                  detailType: 'MODE_SKILL_CHANGE_CARD_SKILL_SERIES_ID_2',
+                  value: 21n,
+                },
+              ],
+              skillType: 2,
+              skillLevel: 1,
+              specialAppealSkillLevel: 1,
+              skillSkillLevel: 1,
+              cardSkillVariants: [
+                {
+                  skillType: 2,
+                  seriesId: 20,
+                  skillLevel: 1,
+                  specialAppealSkillLevel: 1,
+                  skillSkillLevel: 1,
+                  variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+                },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  expect(() => createGame(track, deck, 7)).toThrow(
+    'モード切替スキル系列Masterを一意に解決できません。',
+  );
 });
