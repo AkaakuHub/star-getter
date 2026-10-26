@@ -17,7 +17,7 @@ it('ボーナス得点のしきい値を満たすと子効果を有効化し、�
       kind: 'effect-induce',
       sourceEffectId: 'bonus-score-threshold',
       target: 'bonus-score',
-      threshold: { kind: 'at-least', value: 10 },
+      threshold: { kind: 'at-least', value: 100_000n },
       effects: [
         { kind: 'boost', multiplier: 1.2 },
         {
@@ -61,7 +61,7 @@ it('耐久バリアがあるときだけ子効果を有効化する', () => {
       kind: 'effect-induce',
       sourceEffectId: 'barrier-presence',
       target: 'mental-barrier',
-      threshold: { kind: 'none', value: 0 },
+      threshold: { kind: 'none', value: 0n },
       effects: [{ kind: 'boost', multiplier: 1.2 }],
     },
     source,
@@ -84,7 +84,7 @@ it('Deactivator解除後は効果誘発監視を破棄し、条件を満たし�
       sourceEffectId: 'deactivator-release',
       deactivationKey: 'parent-skill',
       target: 'bonus-score',
-      threshold: { kind: 'at-least', value: 10 },
+      threshold: { kind: 'at-least', value: 100_000n },
       effects: [{ kind: 'boost', multiplier: 1.2 }],
     },
     source,
@@ -96,4 +96,23 @@ it('Deactivator解除後は効果誘発監視を破棄し、条件を満たし�
   expect(released.effectInducers).toHaveLength(0);
   expect(released.boosts).toHaveLength(1);
   expect(refreshed.boosts).toEqual(released.boosts);
+});
+
+it('ActionType907はしきい値詳細値をint32化してからNumToValueへ渡す', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('テスト用カードがありません。');
+  const armed = applyEffect(
+    initial,
+    {
+      kind: 'effect-induce',
+      sourceEffectId: 'threshold-int32-wrap',
+      target: 'bonus-score',
+      threshold: { kind: 'at-least', value: 4_294_967_296n + 100_000n },
+      effects: [{ kind: 'boost', multiplier: 1.2 }],
+    },
+    source,
+  );
+
+  expect(armed.effectInducers[0]?.threshold.value).toBe(10);
 });

@@ -56,7 +56,10 @@ export function activateEffectInduce(
         sourceCardId: card.id,
         sourceEffectId,
         target: effect.target,
-        threshold: effect.threshold,
+        threshold: {
+          ...effect.threshold,
+          value: Math.fround(Number(BigInt.asIntN(32, effect.threshold.value)) / 10_000),
+        },
         effects: effect.effects,
         active: false,
         deactivationKey: effect.deactivationKey ?? null,

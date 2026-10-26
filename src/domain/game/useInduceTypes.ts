@@ -45,7 +45,7 @@ export function validateEffectInduceEffect(
     !effect.sourceEffectId ||
     !['mental-barrier', 'bonus-score'].includes(effect.target) ||
     !['none', 'at-least', 'at-most'].includes(effect.threshold.kind) ||
-    !Number.isFinite(effect.threshold.value) ||
+    !isInt64(effect.threshold.value) ||
     (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string') ||
     !effect.effects.length
   )

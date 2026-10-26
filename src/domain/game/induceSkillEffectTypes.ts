@@ -22,7 +22,7 @@ export type EffectInduceEffect = Readonly<{
   sourceEffectId: string;
   deactivationKey?: string;
   target: 'mental-barrier' | 'bonus-score';
-  threshold: Readonly<{ kind: 'none' | 'at-least' | 'at-most'; value: number }>;
+  threshold: Readonly<{ kind: 'none' | 'at-least' | 'at-most'; value: bigint }>;
   effects: readonly import('./modelTypes').Effect[];
 }>;
 
@@ -45,7 +45,7 @@ export type ActiveEffectInducer = Readonly<{
   sourceCardId: string;
   sourceEffectId: string;
   target: EffectInduceEffect['target'];
-  threshold: EffectInduceEffect['threshold'];
+  threshold: Readonly<{ kind: EffectInduceEffect['threshold']['kind']; value: number }>;
   effects: EffectInduceEffect['effects'];
   active: boolean;
   deactivationKey: string | null;
