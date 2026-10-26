@@ -4,7 +4,7 @@ import {
   activateModeParameterChanges,
   deactivateParameterValueChanges,
 } from '../parameters/parameterValueChange';
-import { int64ToFloat32, roundToEvenFloat32 } from '../numeric';
+import { int64ToFloat32 } from '../numeric';
 import { completeDeckOutChecks } from './deckOutCheck';
 import { activateModeAbilityEffects, deactivateModeAbilityEffects } from '../cards/modeAbility';
 
@@ -99,13 +99,18 @@ export function drainModeChanges(state: GameState, apply: ApplyEffect): GameStat
           effect.kind === 'excitement';
         const product = BigInt.asIntN(64, reaction.buffNum * BigInt(count));
         const effectPower = scales
-          ? roundToEvenFloat32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
+          ? toInt32(Math.fround(int64ToFloat32(product) / Math.fround(10_000)))
           : 1;
         next = completeDeckOutChecks(apply(next, effect, source, 1, 0, effectPower));
       }
     }
   }
   return { ...next, modes: { ...next.modes, changing: false } };
+}
+
+function toInt32(value: number): number {
+  if (!Number.isFinite(value)) return -2_147_483_648;
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function changeMode(
