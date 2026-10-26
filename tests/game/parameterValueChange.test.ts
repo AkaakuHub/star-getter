@@ -117,7 +117,7 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
   expect(result.energy).toBe(7);
 });
 
-it('詳細値へ係数を掛けた結果をC#と同じく0方向へ切り捨てる', () => {
+it('詳細値へ係数を掛けた結果をAPKと同じく正の無限大方向へ丸める', () => {
   const initial = game();
   const card = initial.deck.find((item) => item.id === 'class');
   if (!card) throw new Error('検証用カードがありません。');
@@ -136,7 +136,14 @@ it('詳細値へ係数を掛けた結果をC#と同じく0方向へ切り捨て�
       amount: { id: 202141300101n, value: 1n, unitsPerValue: 1 },
     },
   } as const;
-  expect(resolveEffectParameterDetails(changed, card, effect)).toMatchObject({ amount: 1 });
+  expect(resolveEffectParameterDetails(changed, card, effect)).toMatchObject({ amount: 2 });
+  const negative = resolveEffectParameterDetails(changed, card, {
+    ...effect,
+    parameterDetails: {
+      amount: { id: 202141300101n, value: -1n, unitsPerValue: 1 },
+    },
+  });
+  expect(negative).toMatchObject({ amount: -1 });
 });
 
 it('amount以外の詳細値も効果実行前に補正する', () => {

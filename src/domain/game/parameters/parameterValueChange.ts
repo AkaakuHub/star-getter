@@ -164,7 +164,7 @@ function resolveParameterDetailValue(
       ? -2147483648
       : Math.max(
           -2147483648,
-          Math.min(2147483647, Number.isNaN(multiplied) ? 0 : Math.trunc(multiplied)),
+          Math.min(2147483647, Number.isNaN(multiplied) ? 0 : Math.ceil(multiplied)),
         );
   return adjusted / detail.unitsPerValue;
 }
@@ -196,7 +196,7 @@ function resolveParameterDetailInteger(
       ? -2147483648
       : Math.max(
           -2147483648,
-          Math.min(2147483647, Number.isNaN(multiplied) ? 0 : Math.trunc(multiplied)),
+          Math.min(2147483647, Number.isNaN(multiplied) ? 0 : Math.ceil(multiplied)),
         );
   return BigInt(adjusted);
 }
