@@ -39,12 +39,7 @@ import { deactivateGaugeInfinities } from './resources';
 import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
 import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
-import {
-  missionActionEffect,
-  registerMissionAction,
-  registerMissionMember,
-  skipIngameMission,
-} from './ingameMissions';
+import { registerMissionMember, skipIngameMission } from './ingameMissions';
 import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
 import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
@@ -231,13 +226,10 @@ function activateCard(
   next = notifyComboSkillPoint(next, card, usedSkillCost);
   for (const effect of card.effects) {
     if (effect.kind === 'use-hand') continue;
-    const beforeEffect = next;
-    next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
+    next = applyEffect(next, effect, card);
   }
   const tokenGeneration = finishTokenGeneration(next, card.id);
   next = tokenGeneration.state;
-  if (tokenGeneration.actionType28Count > 0)
-    next = registerMissionAction(next, 28, tokenGeneration.actionType28Count);
   next = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
   const ability = resolveModeAbility(card, next.modes);
   next = applyAbilityEffects(next, card, ability.ability893Effects ?? [], applyEffect);

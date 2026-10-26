@@ -39,7 +39,7 @@ import { activateVoltageIncreaseStop } from './effects/stopVoltageIncrease';
 import { activateAdditionalHeartInduce } from './effects/additionalHeart';
 import { activateInducedSkillEffect } from './effects/induceSkillEffect';
 import { activateTokenDeckSplit } from './effects/tokenDeckSplit';
-import { startIngameMission } from './ingameMissions';
+import { missionActionEffect, startIngameMission } from './ingameMissions';
 import { activateBeatHeartValueBuff } from './effects/beatHeartValueBuff';
 import { activateHandMaxCard } from './effects/handMaxCard';
 import { activateMentalShield } from './effects/mentalShield';
@@ -60,7 +60,8 @@ export function applyEffect(
 ): GameState {
   const applied = applyEffectInternal(state, effect, card, multiplier, addValue, effectPower);
   const counted = incrementSkillEffectActivationCount(applied, effect, card);
-  return refreshEffectInducers(counted, applyEffect);
+  const notified = missionActionEffect(counted, effect, state);
+  return refreshEffectInducers(notified, applyEffect);
 }
 
 function applyEffectInternal(

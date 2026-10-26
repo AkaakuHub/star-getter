@@ -83,7 +83,9 @@ export function missionActionEffect(
           ? Math.max(0, state.stamina - before.stamina)
           : actionType === 7
             ? effect.kind === 'mental-barrier'
-              ? effect.endurance
+              ? state.mentalBarriers.length > before.mentalBarriers.length
+                ? (state.mentalBarriers.at(-1)?.endurance ?? 0)
+                : effect.endurance
               : 0
             : actionType === 10
               ? Math.max(0, state.excitement - before.excitement)
@@ -96,7 +98,21 @@ export function missionActionEffect(
                     : effect.kind === 'hand-limit'
                       ? state.handLimit - before.handLimit
                       : effect.kind === 'ap-speed-change'
-                        ? 0
+                        ? state.apTimeEffects.length > before.apTimeEffects.length
+                          ? state.apTimeEffects.at(-1)?.calculation === 'multiply'
+                            ? Math.fround(
+                                Math.fround(1 - (state.apTimeEffects.at(-1)?.value ?? 1)) *
+                                  Math.fround(10_000),
+                              )
+                            : Math.fround(
+                                Math.fround(
+                                  -(
+                                    (state.apTimeEffects.at(-1)?.value ?? 0) /
+                                    before.track.stage.apIncreaseIntervalSeconds
+                                  ),
+                                ) * Math.fround(10_000),
+                              )
+                          : 0
                         : effect.kind === 'heart-limit-change'
                           ? heartLimitValueWithoutLimit(state) - heartLimitValueWithoutLimit(before)
                           : 0;
@@ -196,6 +212,7 @@ function selectNextMission(state: GameState): GameState {
 }
 
 function actionCount(actionType: number, amount: number): number | null {
+  if (amount <= -1) return null;
   switch (actionType) {
     case 1:
     case 2:

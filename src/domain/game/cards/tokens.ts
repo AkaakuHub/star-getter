@@ -3,6 +3,7 @@ import type { TokenRequest, TokenTemplateReference } from '../tokenRequestTypes'
 import { boostTokenRequests } from './tokenBoost';
 import { initializeParameterValueFactors } from '../parameters/parameterValueChange';
 import { int64ToFloat32 } from '../numeric';
+import { registerMissionAction } from '../ingameMissions';
 
 export function addTokens(state: GameState, kind: TokenKind, count: number): GameState {
   return addTokenCards(state, { kind: 'token-kind', token: kind }, count, true);
@@ -94,6 +95,7 @@ export function finishTokenGeneration(
     }
     if (!added) break;
   }
+  if (actionType28Count > 0) next = registerMissionAction(next, 28, actionType28Count);
   return { state: next, actionType28Count };
 }
 

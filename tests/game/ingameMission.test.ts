@@ -4,7 +4,6 @@ import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/han
 import { act } from '../../src/domain/game/actions';
 import {
   advanceIngameMission,
-  missionActionEffect,
   registerMissionAction,
   registerMissionHeartCollect,
   registerMissionMember,
@@ -193,9 +192,8 @@ it('ActionType20のミッションへ手札上限の実変化量を通知する'
   const started = startIngameMission(state, 20n);
   const effect = handCardCountEffect(3, 3, 0n);
   const changed = applyEffect(started, effect, card);
-  const notified = missionActionEffect(changed, effect, started);
 
-  expect(notified.ingameMission?.cooldownSeconds).toBe(1);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 
 it('ActionType25ミッションは上限の実変化量を加算する', () => {
@@ -236,9 +234,8 @@ it('ActionType25ミッションは上限の実変化量を加算する', () => {
     duration: { kind: 'stage' },
   } as const;
   const changed = applyEffect(active, effect, card);
-  const notified = missionActionEffect(changed, effect, active);
 
-  expect(notified.ingameMission?.count).toBe(2);
+  expect(changed.ingameMission?.count).toBe(2);
 });
 
 it('ActionType1ミッションは上限適用後に実際に追加されたきらめき数を加算する', () => {
@@ -279,7 +276,6 @@ it('ActionType1ミッションは上限適用後に実際に追加されたき�
     displayTime: { kind: 'full-end' as const, value: 0 },
   };
   const changed = applyEffect(active, effect, card);
-  const notified = missionActionEffect(changed, effect, active);
 
-  expect(notified.ingameMission?.count).toBe(3);
+  expect(changed.ingameMission?.count).toBe(3);
 });
