@@ -41,9 +41,9 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
   const handCard = {
     ...source,
     handUse: {
-      trigger: { kind: 'heart-quantity-count' as const, count: 3 },
+      trigger: { kind: 'heart-quantity-count' as const, count: 3n },
       effects: [{ kind: 'mood' as const, amount: 1 }],
-      limit: 2,
+      limit: 2n,
     },
   };
   const state = {
@@ -71,7 +71,7 @@ it('Action903は子効果がないとき回収数の監視を登録しない', (
   const handCard = {
     ...source,
     handUse: {
-      trigger: { kind: 'heart-quantity-count' as const, count: 1 },
+      trigger: { kind: 'heart-quantity-count' as const, count: 1n },
       effects: [],
     },
   };
@@ -93,9 +93,9 @@ it('Action903の回収閾値と発動上限をC#のint32へ変換する', () => 
   const handCard = {
     ...source,
     handUse: {
-      trigger: { kind: 'heart-quantity-count' as const, count: 4_294_967_296 },
+      trigger: { kind: 'heart-quantity-count' as const, count: 4_294_967_296n },
       effects: [{ kind: 'mood' as const, amount: 1 }],
-      limit: 4_294_967_296,
+      limit: 4_294_967_296n,
     },
   };
   const state = {
@@ -108,6 +108,31 @@ it('Action903の回収閾値と発動上限をC#のint32へ変換する', () => 
   const second = notifyHandHeartCollect(first, 1, applyEffect);
   expect(second.moodOffset).toBe(2);
   expect(second.handUseActivationCounts[source.id]).toBe(2);
+});
+
+it('Action903は2^53超のlong閾値と発動上限をint32へ正確に変換する', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const handCard = {
+    ...source,
+    handUse: {
+      trigger: { kind: 'heart-quantity-count' as const, count: 9_007_199_254_740_993n },
+      effects: [{ kind: 'mood' as const, amount: 1 }],
+      limit: 9_007_199_254_740_993n,
+    },
+  };
+  const state = {
+    ...initial,
+    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
+    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
+    handEffectCardIds: [source.id],
+  };
+  const first = notifyHandHeartCollect(state, 1, applyEffect);
+  const second = notifyHandHeartCollect(first, 1, applyEffect);
+  expect(first.moodOffset).toBe(1);
+  expect(second.moodOffset).toBe(1);
+  expect(second.handUseActivationCounts[source.id]).toBe(1);
 });
 
 it('Action903のUSEは発動前に発動元かつSkillType2の使用だけ反映する', () => {

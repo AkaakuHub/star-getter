@@ -46,7 +46,7 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
             <h3>手札にある間</h3>
             <p>
               {handUseTriggerDescription(handUse.trigger)}
-              {handUse.limit === undefined || handUse.limit === 0
+              {handUse.limit === undefined || handUse.limit === 0n
                 ? ''
                 : `（最大${handUse.limit}回）`}
             </p>

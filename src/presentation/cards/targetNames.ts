@@ -18,11 +18,11 @@ function unitCardNames(unit: number): string {
 export function handUseTriggerDescription(trigger: HandUseTrigger): string {
   switch (trigger.kind) {
     case 'member':
-      return `${targetNames([trigger.member])}のスキルを使用したとき`;
+      return `${targetNames([int32(trigger.member)])}のスキルを使用したとき`;
     case 'skill-icon':
       return `スキル記号${trigger.icon}を使用したとき`;
     case 'unit':
-      return `${unitCardNames(trigger.unit)}を使用したとき`;
+      return `${unitCardNames(int32(trigger.unit))}を使用したとき`;
     case 'heart-quantity-count':
       return `${trigger.count}個のハートを回収したとき`;
     case 'same-card':
@@ -34,4 +34,8 @@ export function handUseTriggerDescription(trigger: HandUseTrigger): string {
     case 'section-change':
       return 'パートが変わったとき';
   }
+}
+
+function int32(value: bigint): number {
+  return Number(BigInt.asIntN(32, value));
 }

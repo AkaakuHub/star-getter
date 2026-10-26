@@ -12,7 +12,7 @@ export function notifyHandSkillUse(state: GameState, used: Card, apply: EffectAp
       case 'skill-icon':
         return int32(trigger.icon) === used.skillIcon;
       case 'unit':
-        return int32(trigger.unit) === used.unit;
+        return used.unit !== null && int32(trigger.unit) === used.unit;
       case 'heart-quantity-count':
         return false;
       case 'same-card':
@@ -145,8 +145,8 @@ function activateHandInducers(
   return { ...next, handUseActivationCounts: activationCounts };
 }
 
-function int32(value: number): number {
-  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
+function int32(value: number | bigint): number {
+  return Number(BigInt.asIntN(32, typeof value === 'bigint' ? value : BigInt(Math.trunc(value))));
 }
 
 function applyEffects(

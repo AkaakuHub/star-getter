@@ -77,9 +77,9 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
   if (!source || !baseUsed) throw new Error('カードがありません。');
   const used = { ...baseUsed, skillIcon: 77 };
   const triggers: readonly HandUseTrigger[] = [
-    { kind: 'member', member: used.member },
-    { kind: 'skill-icon', icon: 77 },
-    { kind: 'unit', unit: 2 },
+    { kind: 'member', member: BigInt(used.member) + 9_007_199_254_740_992n },
+    { kind: 'skill-icon', icon: 77n },
+    { kind: 'unit', unit: 2n },
     { kind: 'same-card' },
     { kind: 'any-skill' },
   ];
@@ -88,7 +88,7 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
       ...source,
       handUse: {
         trigger,
-        limit: 1,
+        limit: 1n,
         limitMemory: 'reset' as const,
         effects: [{ kind: 'energy' as const, amount: 1 }],
       },
@@ -157,7 +157,7 @@ it('パート切替時に手札誘発を一度実行する', () => {
     ...source,
     handUse: {
       trigger: { kind: 'section-change' as const },
-      limit: 1,
+      limit: 1n,
       effects: [{ kind: 'mood' as const, amount: 1 }],
     },
   };

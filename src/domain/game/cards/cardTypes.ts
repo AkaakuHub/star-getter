@@ -7,10 +7,10 @@ import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
 export type HandPermanentEffect = Effect;
 
 export type HandUseTrigger =
-  | Readonly<{ kind: 'member'; member: MemberId }>
-  | Readonly<{ kind: 'skill-icon'; icon: number }>
-  | Readonly<{ kind: 'unit'; unit: UnitId }>
-  | Readonly<{ kind: 'heart-quantity-count'; count: number }>
+  | Readonly<{ kind: 'member'; member: bigint }>
+  | Readonly<{ kind: 'skill-icon'; icon: bigint }>
+  | Readonly<{ kind: 'unit'; unit: bigint }>
+  | Readonly<{ kind: 'heart-quantity-count'; count: bigint }>
   | Readonly<{ kind: 'voltage-increase' | 'section-change' }>
   | Readonly<{ kind: 'same-card' | 'any-skill' }>;
 
@@ -65,7 +65,7 @@ export type Card = Readonly<{
   handUse?: Readonly<{
     trigger: HandUseTrigger;
     effects: readonly Effect[];
-    limit?: number;
+    limit?: bigint;
     limitMemory?: 'reset' | 'retain';
   }>;
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
