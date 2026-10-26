@@ -6,6 +6,7 @@ import { moodValue } from '../projection';
 import type { MentalBarrierEffect } from '../modelTypes';
 import type { Card, GameState } from '../model';
 import { induceSkillEffects, type EffectApplier } from './induceSkillEffect';
+import { registerMissionAction } from '../ingameMissions';
 
 export function applyMentalBarrier(
   state: GameState,
@@ -49,14 +50,16 @@ export function applyMentalBarrier(
   const attenuation = Math.fround(
     Math.fround(effect.attenuation + attenuationCorrection) / Math.fround(100),
   );
-  if (effect.enduranceType !== 'infinite' && endurance === 0) return boosted.state;
+  if (effect.enduranceType !== 'infinite' && endurance === 0)
+    return registerMissionAction(boosted.state, 7, endurance);
   const next = addMentalBarrier(boosted.state, effect, endurance, attenuation);
   if (!applyEffect || next.mentalBarriers.length === boosted.state.mentalBarriers.length)
-    return next;
-  return induceSkillEffects(
+    return registerMissionAction(next, 7, endurance);
+  const induced = induceSkillEffects(
     next,
     'mental-barrier',
     endurance === 0 ? state.maximumMental : Math.trunc(endurance),
     applyEffect,
   );
+  return registerMissionAction(induced, 7, endurance);
 }

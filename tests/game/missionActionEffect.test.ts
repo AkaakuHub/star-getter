@@ -50,8 +50,8 @@ it('ActionType7通知は割合適用後の実際のバリア耐久値を使う',
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 
-it('Proxyに吸収されたActionType7はミッション数へ加算しない', () => {
-  const initial = missionState(7, 1);
+it('Proxyに吸収されたActionType7もC#のEffectAmountでミッションへ通知する', () => {
+  const initial = missionState(7, 50);
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
   const proxy = registerProxySkill(
@@ -79,7 +79,8 @@ it('Proxyに吸収されたActionType7はミッション数へ加算しない', 
     duration: { kind: 'stage' },
   });
   expect(changed.mentalBarriers).toHaveLength(0);
-  expect(changed.ingameMission?.count).toBe(0);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+  expect(changed.ingameMission?.count).toBe(50);
 });
 
 it('ActionType21通知は実際に登録されたAP時間倍率を使う', () => {

@@ -49,25 +49,23 @@ export function missionActionEffect(
         ? 2
         : effect.kind === 'stamina'
           ? 5
-          : effect.kind === 'mental-barrier'
-            ? 7
-            : effect.kind === 'excitement'
-              ? 10
-              : effect.kind === 'energy'
-                ? 14
-                : effect.kind === 'shuffle'
-                  ? 13
-                  : effect.kind === 'hand-limit'
-                    ? 20
-                    : effect.kind === 'ap-speed-change'
-                      ? 21
-                      : effect.kind === 'heart-limit-change'
-                        ? 25
-                        : effect.kind === 'token-card'
-                          ? 28
-                          : effect.kind === 'disable-mental-down'
-                            ? 34
-                            : null;
+          : effect.kind === 'excitement'
+            ? 10
+            : effect.kind === 'energy'
+              ? 14
+              : effect.kind === 'shuffle'
+                ? 13
+                : effect.kind === 'hand-limit'
+                  ? 20
+                  : effect.kind === 'ap-speed-change'
+                    ? 21
+                    : effect.kind === 'heart-limit-change'
+                      ? 25
+                      : effect.kind === 'token-card'
+                        ? 28
+                        : effect.kind === 'disable-mental-down'
+                          ? 34
+                          : null;
   if (actionType === null) return state;
   const amount =
     actionType === 1
@@ -82,41 +80,35 @@ export function missionActionEffect(
           : (state.boosts.at(-1)?.percent ?? 0)
         : actionType === 5
           ? Math.max(0, state.stamina - before.stamina)
-          : actionType === 7
-            ? effect.kind === 'mental-barrier'
-              ? state.mentalBarriers.length > before.mentalBarriers.length
-                ? (state.mentalBarriers.at(-1)?.endurance ?? 0)
-                : 0
-              : 0
-            : actionType === 10
-              ? Math.max(0, state.excitement - before.excitement)
-              : actionType === 14
-                ? Math.max(0, state.energy - before.energy)
-                : actionType === 13 || actionType === 34
-                  ? 1
-                  : actionType === 28
-                    ? state.deck.length - before.deck.length
-                    : effect.kind === 'hand-limit'
-                      ? state.handLimit - before.handLimit
-                      : effect.kind === 'ap-speed-change'
-                        ? state.apTimeEffects.length > before.apTimeEffects.length
-                          ? state.apTimeEffects.at(-1)?.calculation === 'multiply'
-                            ? Math.fround(
-                                Math.fround(1 - (state.apTimeEffects.at(-1)?.value ?? 1)) *
-                                  Math.fround(10_000),
-                              )
-                            : Math.fround(
-                                Math.fround(
-                                  -(
-                                    (state.apTimeEffects.at(-1)?.value ?? 0) /
-                                    apIncreaseIntervalValue(before)
-                                  ),
-                                ) * Math.fround(10_000),
-                              )
-                          : 0
-                        : effect.kind === 'heart-limit-change'
-                          ? heartLimitValueWithoutLimit(state) - heartLimitValueWithoutLimit(before)
-                          : 0;
+          : actionType === 10
+            ? Math.max(0, state.excitement - before.excitement)
+            : actionType === 14
+              ? Math.max(0, state.energy - before.energy)
+              : actionType === 13 || actionType === 34
+                ? 1
+                : actionType === 28
+                  ? state.deck.length - before.deck.length
+                  : effect.kind === 'hand-limit'
+                    ? state.handLimit - before.handLimit
+                    : effect.kind === 'ap-speed-change'
+                      ? state.apTimeEffects.length > before.apTimeEffects.length
+                        ? state.apTimeEffects.at(-1)?.calculation === 'multiply'
+                          ? Math.fround(
+                              Math.fround(1 - (state.apTimeEffects.at(-1)?.value ?? 1)) *
+                                Math.fround(10_000),
+                            )
+                          : Math.fround(
+                              Math.fround(
+                                -(
+                                  (state.apTimeEffects.at(-1)?.value ?? 0) /
+                                  apIncreaseIntervalValue(before)
+                                ),
+                              ) * Math.fround(10_000),
+                            )
+                        : 0
+                      : effect.kind === 'heart-limit-change'
+                        ? heartLimitValueWithoutLimit(state) - heartLimitValueWithoutLimit(before)
+                        : 0;
   return registerMissionAction(state, actionType, amount);
 }
 
