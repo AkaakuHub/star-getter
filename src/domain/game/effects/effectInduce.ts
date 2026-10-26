@@ -34,6 +34,7 @@ const deactivationActions: readonly ((deactivationKey: string) => import('../mod
   (deactivationKey) => ({ type: 'deactivate-search', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-heart-boost', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-score-up', deactivationKey }),
+  (deactivationKey) => ({ type: 'deactivate-fixed-parameter-extend', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-voltage-up-additional-buff', deactivationKey }),
   (deactivationKey) => ({ type: 'deactivate-skill-cost-change', deactivationKey }),
 ];
@@ -175,6 +176,7 @@ export function withDeactivationKey(
     case 'skill-score-up':
     case 'amplify':
     case 'mood-change-skill':
+    case 'fixed-parameter-extend':
       return { ...effect, deactivationKey };
     case 'effect-induce':
       return { ...effect, deactivationKey };

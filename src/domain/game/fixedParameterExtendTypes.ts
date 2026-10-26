@@ -5,6 +5,7 @@ export type FixedParameterExtendEffect = Readonly<{
   target: 'ap' | 'voltage' | 'mental';
   calculation: 'add' | 'multiply' | 'fixed';
   value: bigint;
+  deactivationKey?: string;
   duration:
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>
     | Readonly<{ kind: 'stage' }>;
@@ -17,11 +18,13 @@ export type FixedParameterExtend = Readonly<{
   value: number;
   remainingSeconds: number | null;
   remainingSections: number | null;
+  deactivationKey: string | null;
 }>;
 
 export function validateFixedParameterExtendEffect(effect: FixedParameterExtendEffect): void {
   if (
     !isInt64(effect.value) ||
+    (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string') ||
     !['ap', 'voltage', 'mental'].includes(effect.target) ||
     !['add', 'multiply', 'fixed'].includes(effect.calculation) ||
     (effect.duration.kind !== 'stage' && !isInt64(effect.duration.value))

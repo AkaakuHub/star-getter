@@ -1,0 +1,40 @@
+import { expect, it } from 'vite-plus/test';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
+import { game } from './support/game';
+
+it('Action904のAction58子効果は手札離脱時に上限を戻す', () => {
+  const initial = game();
+  const original = initial.deck[0];
+  if (!original) throw new Error('対象カードがありません。');
+  const card = {
+    ...original,
+    handPermanentEffects: [
+      {
+        kind: 'fixed-parameter-extend' as const,
+        target: 'ap' as const,
+        calculation: 'add' as const,
+        value: 10n,
+        duration: { kind: 'stage' as const },
+      },
+    ],
+  };
+  const state = {
+    ...initial,
+    deck: [card],
+    cardPool: [card],
+    hand: [card.id],
+    handEffectCardIds: [card.id],
+    drawPile: [],
+    discard: [],
+  };
+
+  const active = activateHandPermanentEffects(state, card);
+
+  expect(active.maxEnergy).toBe(initial.maxEnergy + 10);
+  const disposed = disposeHandEffects(active, [card.id]);
+  expect(disposed.maxEnergy).toBe(initial.maxEnergy);
+  expect(disposed.fixedParameterExtends).toHaveLength(0);
+});

@@ -29,7 +29,8 @@ type DeactivationAction = Readonly<{
     | 'deactivate-heart-boost'
     | 'deactivate-voltage-up-additional-buff'
     | 'deactivate-skill-cost-change'
-    | 'deactivate-skill-score-up';
+    | 'deactivate-skill-score-up'
+    | 'deactivate-fixed-parameter-extend';
   deactivationKey: string;
 }>;
 

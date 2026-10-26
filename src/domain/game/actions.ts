@@ -45,6 +45,7 @@ import { deactivateGaugeRegenerations } from './live/gaugeRegeneration';
 import { deactivateSearchRequests } from './cards/search';
 import { deactivateHeartBoosts } from './live/heartBoosts';
 import { deactivateSkillCostChanges } from './cards/skillCostChanges';
+import { deactivateFixedParameterExtends } from './effects/fixedParameterExtend';
 import type { EffectApplier } from './effects/induceSkillEffect';
 
 export function act(state: GameState, action: Action): GameState {
@@ -107,9 +108,11 @@ function actInternal(state: GameState, action: Action): GameState {
       return {
         ...state,
         tokenBoosts: state.tokenBoosts.filter(
-          (boost) => boost.deactivationKey !== action.deactivationKey,
+          (buff) => buff.deactivationKey !== action.deactivationKey,
         ),
       };
+    case 'deactivate-fixed-parameter-extend':
+      return deactivateFixedParameterExtends(state, action.deactivationKey);
     case 'deactivate-infinity-gauge':
       return deactivateGaugeInfinities(state, action.deactivationKey);
     case 'deactivate-skill-cooldown':
@@ -145,7 +148,7 @@ function actInternal(state: GameState, action: Action): GameState {
       return {
         ...state,
         skillScoreUps: state.skillScoreUps.filter(
-          (buff) => buff.deactivationKey !== action.deactivationKey,
+          (boost) => boost.deactivationKey !== action.deactivationKey,
         ),
       };
   }

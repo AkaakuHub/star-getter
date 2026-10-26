@@ -31,12 +31,25 @@ export function activateFixedParameterExtend(
         ? Math.fround(int64ToFloat32(effect.duration.value) / 1000)
         : null,
     remainingSections: effect.duration.kind === 'sections' ? durationValue : null,
+    deactivationKey: effect.deactivationKey ?? null,
   };
   return recalculateFixedParameters({
     ...boosted.state,
     fixedParameterExtends: [...boosted.state.fixedParameterExtends, fixedParameterExtend],
     nextFixedParameterExtendId: boosted.state.nextFixedParameterExtendId + 1,
   });
+}
+
+export function deactivateFixedParameterExtends(
+  state: GameState,
+  deactivationKey: string,
+): GameState {
+  const fixedParameterExtends = state.fixedParameterExtends.filter(
+    (effect) => effect.deactivationKey !== deactivationKey,
+  );
+  return fixedParameterExtends.length === state.fixedParameterExtends.length
+    ? state
+    : recalculateFixedParameters({ ...state, fixedParameterExtends });
 }
 
 function int32(value: number | bigint): number {
