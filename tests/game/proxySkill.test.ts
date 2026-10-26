@@ -3,6 +3,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
+import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import {
   advanceProxySkillPeriods,
@@ -40,11 +41,7 @@ it('Proxyに吸収された手札数加算を目標数へ反映せず、期限�
     },
     source,
   );
-  const absorbed = applyEffect(state, {
-    kind: 'hand-limit',
-    amount: 1,
-    duration: { kind: 'milliseconds', value: 100 },
-  });
+  const absorbed = applyEffect(state, handCardCountEffect(1, 1, 100n));
   expect(absorbed.handLimit).toBe(5);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(1n);
   expect(advanceTo(absorbed, 0.2).handLimit).toBe(4);
@@ -94,7 +91,7 @@ it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発�
     },
     source,
   );
-  const absorbed = applyEffect(active, { kind: 'hand-limit', amount: 1 }, source);
+  const absorbed = applyEffect(active, handCardCountEffect(1, 3, 0n), source);
   const withoutProxy = { ...absorbed, proxyAbsorptions: [] };
   const baseline = advanceTo(withoutProxy, 0.2).energy;
   const induced = advanceTo(absorbed, 0.2).energy;
@@ -212,7 +209,7 @@ it('Proxy誘発タイミング3はAPKのIsAbsorbEnd判定に従う', () => {
     },
     source,
   );
-  const absorbed = applyEffect(active, { kind: 'hand-limit', amount: 1 }, source);
+  const absorbed = applyEffect(active, handCardCountEffect(1, 3, 0n), source);
   const ended = advanceProxySkillPeriods(absorbed, 0.2, applyEffect);
   expect(ended.proxyAbsorptions[0]?.isAbsorbEnd).toBe(true);
   const afterSection = advanceProxySkillSections(ended, applyEffect);

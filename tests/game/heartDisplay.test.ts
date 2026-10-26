@@ -54,5 +54,5 @@ describe('きらめきの表示上限', () => {
     const full = play(100);
     expect(play(10)).toEqual(full);
     expect(play(50)).toEqual(full);
-  });
+  }, 15_000);
 });

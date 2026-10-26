@@ -8,6 +8,7 @@ import {
   disposeHandEffects,
 } from '../../src/domain/game/cards/handEffects';
 import { applyEffect } from '../../src/domain/game/effects';
+import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
 import { advanceTo, createGame } from '../../src/domain/game/simulation';
 import { advanceHandLimitEffects } from '../../src/domain/game/effects/handLimit';
@@ -26,13 +27,7 @@ function game() {
 }
 
 it('手札目標数の期限後に上限を戻しても保持中の手札は減らさない', () => {
-  const expanded = fillHand(
-    applyEffect(game(), {
-      kind: 'hand-limit',
-      amount: 3,
-      duration: { kind: 'sections', value: 1 },
-    }),
-  );
+  const expanded = fillHand(applyEffect(game(), handCardCountEffect(3, 2, 1n)));
   expect(handCapacity(expanded)).toBe(8);
   expect(expanded.hand).toHaveLength(8);
   const nextSection = expanded.track.sections[1];
@@ -43,24 +38,20 @@ it('手札目標数の期限後に上限を戻しても保持中の手札は減�
 });
 
 it('ミリ秒期限の手札数変更を期限後に解除する', () => {
-  const state = applyEffect(game(), {
-    kind: 'hand-limit',
-    amount: 1,
-    duration: { kind: 'milliseconds', value: 100 },
-  });
+  const state = applyEffect(game(), handCardCountEffect(1, 1, 100n));
   expect(state.handLimit).toBe(6);
   expect(advanceTo(state, 0.2).handLimit).toBe(5);
 });
 
 it('InvocationType 0x388と0x38bは自動期限を止め、Deactivator解除で元へ戻す', () => {
   for (const invocationType of [0x388, 0x38b] as const) {
-    const state = applyEffect(game(), {
-      kind: 'hand-limit',
-      amount: 1,
-      duration: { kind: 'milliseconds', value: 100 },
-      invocationType,
-      deactivationKey: `ability-${invocationType}`,
-    });
+    const state = applyEffect(
+      game(),
+      handCardCountEffect(1, 1, 100n, {
+        invocationType,
+        deactivationKey: `ability-${invocationType}`,
+      }),
+    );
     const afterTimer = advanceHandLimitEffects(state, 1).state;
     expect(afterTimer.handLimit).toBe(6);
     expect(afterTimer.handLimitEffects).toHaveLength(1);
@@ -79,13 +70,7 @@ it('Action904の子Action20は手札中だけ有効で、離脱時に解除す�
   if (!original) throw new Error('対象カードがありません。');
   const card = {
     ...original,
-    handPermanentEffects: [
-      {
-        kind: 'hand-limit' as const,
-        amount: -1,
-        duration: { kind: 'sections' as const, value: 1 },
-      },
-    ],
+    handPermanentEffects: [handCardCountEffect(-1, 2, 1n)],
   };
   const state = {
     ...initial,
@@ -110,7 +95,7 @@ it('Action904は通常ドローで手札へ入った時点で子効果を発動�
   if (!original) throw new Error('対象カードがありません。');
   const card = {
     ...original,
-    handPermanentEffects: [{ kind: 'hand-limit' as const, amount: -1 }],
+    handPermanentEffects: [handCardCountEffect(-1, 3, 0n)],
   };
   const state = {
     ...initial,
@@ -197,7 +182,7 @@ it('Action904のAction52子効果は手札中に残り、手札離脱時に解�
 
 it('手札枚数変更にスキル増幅を適用して整数化する', () => {
   const state = { ...game(), amplification: 150 };
-  const next = applyEffect(state, { kind: 'hand-limit', amount: 3 });
+  const next = applyEffect(state, handCardCountEffect(3, 3, 0n));
   expect(next.handLimit).toBe(9);
 });
 
@@ -223,7 +208,7 @@ it('ActionType20へ発動元対象のActionType52補正を適用して整数化�
     },
     source,
   );
-  const changed = applyEffect(boosted, { kind: 'hand-limit', amount: 3 }, source);
+  const changed = applyEffect(boosted, handCardCountEffect(3, 3, 0n), source);
   expect(changed.handLimit).toBe(9);
 });
 
@@ -245,7 +230,7 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
       handCountChanges: {},
     },
   };
-  const changed = applyEffect(activated, { kind: 'hand-limit', amount: -1 }, source);
+  const changed = applyEffect(activated, handCardCountEffect(-1, 3, 0n), source);
   const finished = finishCardActivation(changed);
   expect(finished.hand).toHaveLength(3);
   expect(finished.discard).toHaveLength(2);

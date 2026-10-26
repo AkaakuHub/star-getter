@@ -1,5 +1,6 @@
 import { tokenNames } from '../labels/tokens';
 import type { Card } from '../../domain/game/model';
+import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
 
 const appeal = { smile: 1, pure: 1, cool: 1 };
 
@@ -78,10 +79,7 @@ export const routeTokens: readonly Card[] = [
     exhausts: true,
     drawAbility: 'clock',
     beforeUseEffects: [{ kind: 'tokens', token: 'bookmark', count: 1 }],
-    effects: [
-      { kind: 'hand-limit', amount: 3, duration: { kind: 'sections', value: 1 } },
-      { kind: 'mood', amount: 80 },
-    ],
+    effects: [handCardCountEffect(3, 2, 1n), { kind: 'mood', amount: 80 }],
   },
   {
     id: 'bookmark',

@@ -207,6 +207,42 @@ export function resolveEffectParameterDetails(
   effect: Effect,
 ): Effect {
   if (!effect.parameterDetails) return effect;
+  if (effect.kind === 'hand-limit') {
+    return {
+      ...effect,
+      calculationType: int32(
+        resolveParameterDetailInteger(
+          state,
+          card,
+          effect,
+          'calculationType',
+          BigInt(effect.calculationType),
+        ),
+      ),
+      amount: Number(
+        BigInt.asIntN(
+          32,
+          resolveParameterDetailInteger(state, card, effect, 'amount', BigInt(effect.amount)),
+        ),
+      ),
+      displayTimeType: int32(
+        resolveParameterDetailInteger(
+          state,
+          card,
+          effect,
+          'displayTimeType',
+          BigInt(effect.displayTimeType),
+        ),
+      ),
+      displayTime: resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'displayTime',
+        effect.displayTime,
+      ),
+    };
+  }
   const resolved = { ...effect };
   for (const [key] of Object.entries(effect.parameterDetails)) {
     const value = Object.getOwnPropertyDescriptor(effect, key)?.value;
@@ -227,4 +263,8 @@ export function resolveEffectParameterDetails(
 
 function parameterKey(id: bigint): bigint {
   return (id / 10_000n) * 10_000n + (id % 100n);
+}
+
+function int32(value: bigint): number {
+  return Number(BigInt.asIntN(32, value));
 }

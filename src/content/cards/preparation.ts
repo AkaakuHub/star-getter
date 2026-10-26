@@ -1,4 +1,5 @@
 import type { Card, Effect } from '../../domain/game/model';
+import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
 
 const hearts = [8, 12, 15, 30, 60, 90, 120, 150, 225, 300, 375] as const;
 const boosts = [2, 3, 4, 8, 16, 24, 32, 40, 60, 80, 100] as const;
@@ -25,7 +26,7 @@ export const preparationCards: readonly Card[] = [
         applyCount: 0n,
       },
       { kind: 'ap-speed', percent: 14, duration: 'section' },
-      { kind: 'hand-limit', amount: 1, duration: { kind: 'sections', value: 1 } },
+      handCardCountEffect(1, 2, 1n),
     ],
     drawEffects: [
       {

@@ -17,6 +17,7 @@ import { validateHeartBoostEffect } from './heartBoostTypes';
 import { validateSkillHeartsEffect } from './skillHeartTypes';
 import { validateSkillScoreUpEffect } from './skillScoreUpTypes';
 import { isInt64 } from './numeric';
+import { validateHandCardCountEffect } from './actionTypeEffects/handCardCount';
 export function validateEffect(effect: Effect): void {
   if (effect.skillEffectId !== undefined && !isInt64(effect.skillEffectId))
     throw new Error('スキル効果IDが正しくありません。');
@@ -116,6 +117,7 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'ingame-mission' && !Number.isSafeInteger(effect.groupId))
     throw new Error('ミッションのグループIDが正しくありません。');
   if (effect.kind === 'ingame-mission') return;
+  if (effect.kind === 'hand-limit') return validateHandCardCountEffect(effect);
   if (effect.kind === 'proxy-skill') {
     if (
       !Number.isSafeInteger(effect.absorbLimit) ||

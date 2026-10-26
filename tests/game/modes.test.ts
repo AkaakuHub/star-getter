@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { drainModeChanges } from '../../src/domain/game/effects/modeChange';
 import { cardCost } from '../../src/domain/game/cards/cost';
 import { cardAt } from '../../src/domain/game/projection';
@@ -115,12 +116,12 @@ describe('モード切替と切替時効果', () => {
       modeAbilityChanges: {
         modeId: 1,
         off: {
-          modeEffects: [{ kind: 'hand-limit', amount: 1 }],
+          modeEffects: [handCardCountEffect(1, 3, 0n)],
           ability893Effects: [{ kind: 'energy', amount: 1 }],
           ability894Effects: [],
         },
         on: {
-          modeEffects: [{ kind: 'hand-limit', amount: 2 }],
+          modeEffects: [handCardCountEffect(2, 3, 0n)],
           ability893Effects: [{ kind: 'energy', amount: 3 }],
           ability894Effects: [],
         },

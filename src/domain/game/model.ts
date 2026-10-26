@@ -162,7 +162,7 @@ export type GameState = Readonly<{
     expirationAmount: number;
     deactivationKey: string | null;
     remainingSeconds: number | null;
-    remainingSections: number | null;
+    remainingSections: bigint | null;
   }>[];
   heartLimitBase: number;
   heartLimitBuffs: readonly Readonly<{

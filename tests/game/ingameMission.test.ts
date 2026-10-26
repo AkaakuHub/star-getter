@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
+import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { act } from '../../src/domain/game/actions';
 import {
   advanceIngameMission,
@@ -128,6 +129,33 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   };
   const used = act(state, { type: 'card', index: 0 });
   expect(used.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('ActionType20のミッションへ手札上限の実変化量を通知する', () => {
+  const initial = game();
+  const card = initial.deck[0];
+  if (!card) throw new Error('カードがありません。');
+  const record = {
+    missionType: 2 as const,
+    probability: 100,
+    rare: false,
+    param1: 3,
+    param2: 20,
+    addParam: 0,
+    baseScore: 0,
+    addScore: 0,
+    text: '手札上限を$TargetValue$枚増加',
+  };
+  const state = {
+    ...initial,
+    track: { ...initial.track, ingameMissionGroups: [{ id: 20, records: [record] }] },
+  };
+  const started = startIngameMission(state, 20);
+  const effect = handCardCountEffect(3, 3, 0n);
+  const changed = applyEffect(started, effect, card);
+  const notified = missionActionEffect(changed, effect, started);
+
+  expect(notified.ingameMission?.cooldownSeconds).toBe(1);
 });
 
 it('ActionType25ミッションは上限の実変化量を加算する', () => {

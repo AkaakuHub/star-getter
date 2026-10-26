@@ -2,6 +2,7 @@ import type { Card, Effect, GameState } from '../model';
 import { skillValue } from './skillValue';
 import { isProxyTargetReached } from './proxySkill';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 
 type HandLimitEffect = Extract<Effect, { kind: 'hand-limit' }>;
 
@@ -12,19 +13,16 @@ export function applyHandLimit(
   multiplier: number,
   addValue = 0,
 ): GameState {
+  if (effect.calculationType !== 1) throw new Error('手札枚数変更の計算種別が正しくありません。');
   const baseAmount = effect.amount;
-  const duration = effect.duration;
-  if (duration?.kind === 'sections' && duration.value === 0)
+  if (effect.displayTimeType === 2 && effect.displayTime === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
-  const scaledAmount = Math.trunc(Math.fround((baseAmount + addValue) * multiplier));
-  const skillBoosted = skillValue(
-    state,
-    scaledAmount,
-    { kind: 'hand-limit', amount: baseAmount },
-    card,
+  const scaledAmount = int32(
+    Math.fround(Math.fround(baseAmount + Math.fround(addValue)) * Math.fround(multiplier)),
   );
+  const skillBoosted = skillValue(state, scaledAmount, effect, card);
   const action52 = applyAction52SkillBoostForCard(state, card, skillBoosted);
-  const amount = Math.trunc(action52.value);
+  const amount = int32(action52.value);
   const currentState = action52.state;
   const absorption = amount >= 0 ? absorbHandLimit(currentState, amount) : null;
   const appliedAmount = absorption?.absorbed ? 0 : amount;
@@ -39,13 +37,13 @@ export function applyHandLimit(
             expirationAmount: -amount,
             deactivationKey: effect.deactivationKey ?? null,
             remainingSeconds:
-              effect.invocationType !== undefined || duration?.kind !== 'milliseconds'
+              effect.invocationType !== undefined || effect.displayTimeType !== 1
                 ? null
-                : Math.fround(duration.value / 1000),
+                : Math.fround(int64ToFloat32(effect.displayTime) / 1000),
             remainingSections:
-              effect.invocationType !== undefined || duration?.kind !== 'sections'
+              effect.invocationType !== undefined || effect.displayTimeType !== 2
                 ? null
-                : duration.value,
+                : effect.displayTime,
           },
         ];
   return {
@@ -75,9 +73,13 @@ export function advanceHandLimitEffects(state: GameState, elapsedSeconds: number
 export function expireHandLimitSections(state: GameState): HandLimitExpiry {
   return expireHandLimitEffects(state, (effect) => {
     if (effect.remainingSections === null) return effect;
-    const remainingSections = effect.remainingSections - 1;
-    return remainingSections > 0 ? { ...effect, remainingSections } : null;
+    const remainingSections = effect.remainingSections - 1n;
+    return remainingSections > 0n ? { ...effect, remainingSections } : null;
   });
+}
+
+function int32(value: number): number {
+  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
 }
 
 export function deactivateHandLimitEffects(

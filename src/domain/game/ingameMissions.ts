@@ -94,7 +94,7 @@ export function missionActionEffect(
                   : actionType === 28
                     ? state.deck.length - before.deck.length
                     : effect.kind === 'hand-limit'
-                      ? effect.amount
+                      ? state.handLimit - before.handLimit
                       : effect.kind === 'ap-speed-change'
                         ? effect.num
                         : effect.kind === 'heart-limit-change'

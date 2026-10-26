@@ -3,6 +3,7 @@ import type { Card, Effect, GameState } from '../model';
 import { applyEffect, skillValue } from '../effects';
 import { moodValue } from '../projection';
 import { applyApSpeedPercent } from '../effects/apSpeed';
+import { handCardCountEffect } from '../actionTypeEffects/handCardCount';
 
 export function applyDrawAbility(state: GameState, card: Card): GameState {
   const drawn = (card.drawEffects ?? []).reduce(
@@ -37,7 +38,7 @@ function applyNamedDrawAbility(state: GameState, card: Card): GameState {
     const effects: readonly Effect[] = [
       { kind: 'stamina', amount: -14, moodBonus: { target: 3, perPoint: -0.07 } },
       { kind: 'ap-speed', percent: -14, duration: 'section' },
-      { kind: 'hand-limit', amount: -1, duration: { kind: 'sections', value: 1 } },
+      handCardCountEffect(-1, 2, 1n),
     ];
     return effects.reduce<GameState>(
       (current, effect) => applyEffect(current, effect, card),

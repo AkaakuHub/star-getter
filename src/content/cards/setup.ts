@@ -1,4 +1,5 @@
 import type { Card } from '../../domain/game/model';
+import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
 
 export const setupCards: readonly Card[] = [
   {
@@ -18,7 +19,7 @@ export const setupCards: readonly Card[] = [
     drawAbility: 'camera',
     effects: [
       { kind: 'ap-speed', percent: 30, duration: 'section' },
-      { kind: 'hand-limit', amount: 2, duration: { kind: 'sections', value: 1 } },
+      handCardCountEffect(2, 2, 1n),
       {
         kind: 'conditional',
         condition: 'last-section',
@@ -39,7 +40,7 @@ export const setupCards: readonly Card[] = [
     useAbility: 'class',
     effects: [
       { kind: 'energy', amount: 30 },
-      { kind: 'hand-limit', amount: 3, duration: { kind: 'sections', value: 1 } },
+      handCardCountEffect(3, 2, 1n),
       { kind: 'amplify', percent: 30, duration: 'section' },
       { kind: 'shuffle', recoverDiscard: true, destination: 'draw' },
     ],

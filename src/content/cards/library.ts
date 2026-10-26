@@ -1,5 +1,6 @@
 import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card } from '../../domain/game/model';
+import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
 
 export const libraryCards: readonly Card[] = [
   {
@@ -22,7 +23,7 @@ export const libraryCards: readonly Card[] = [
           condition: 'first-section',
           effects: [
             { kind: 'ap-speed', percent: 80, duration: 'section' },
-            { kind: 'hand-limit', amount: 3, duration: { kind: 'sections', value: 1 } },
+            handCardCountEffect(3, 2, 1n),
             { kind: 'tokens', token: 'story', count: 30 },
           ],
         },
