@@ -7,6 +7,7 @@ import { validateInduceSkillEffect } from './induceSkillEffectTypes';
 import type { Effect } from './model';
 import { validateMoodChangeSkillEffect } from './moodChangeSkillTypes';
 import { validateBeatHeartValueBuff } from './beatHeartValueBuffTypes';
+import { validateBeatPointBuffEffect } from './beatPointBuffTypes';
 import { validateHeartLimitBoost } from './heartLimitBoostTypes';
 import { validateMoodValueBoost } from './moodValueBoostTypes';
 import { validateGenesisSkill } from './genesisSkillTypes';
@@ -272,6 +273,7 @@ export function validateEffect(effect: Effect): void {
   if (effect.kind === 'heart-boost') return validateHeartBoostEffect(effect);
   if (effect.kind === 'skill-hearts') return validateSkillHeartsEffect(effect);
   if (effect.kind === 'skill-score-up') return validateSkillScoreUpEffect(effect);
+  if (effect.kind === 'beat-point-buff') return validateBeatPointBuffEffect(effect);
   if (effect.kind === 'beat-heart-value-buff') {
     validateBeatHeartValueBuff(effect);
     return;
