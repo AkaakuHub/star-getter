@@ -127,7 +127,7 @@ export function convertVoltageIncrease(
       kind: 'mental-barrier',
       barrier: 'endurance',
       enduranceType: 'fixed',
-      endurance: Math.ceil(Math.fround(raw * 10)) / 10,
+      endurance: raw,
       attenuation: 0,
       duration: conversion.outputDuration,
     };
