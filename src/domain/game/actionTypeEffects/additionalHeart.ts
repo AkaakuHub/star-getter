@@ -1,5 +1,4 @@
 import type { AdditionalHeartInduceEffect } from '../additionalHeartTypes';
-import type { MemberId, UnitId } from '../model';
 import type { SkillHeartsEffect } from '../skillHeartTypes';
 import { isInt64 } from '../numeric';
 
@@ -30,7 +29,7 @@ export function createAdditionalHeartInduceEffect(input: Input): AdditionalHeart
     ]),
   );
   const induceType = int32(details.induceType?.value ?? 0n);
-  const induceValue = int32(details.induceValue?.value ?? 0n);
+  const induceValue = details.induceValue?.value ?? 0n;
   const effectId = details.effectId?.value ?? 0n;
   if (input.heartEffect.skillEffectId !== effectId)
     throw new Error('追加きらめきの子ActionType1 IDが一致しません。');
@@ -49,11 +48,11 @@ export function createAdditionalHeartInduceEffect(input: Input): AdditionalHeart
   };
 }
 
-function condition(type: number, value: number): AdditionalHeartInduceEffect['condition'] {
+function condition(type: number, value: bigint): AdditionalHeartInduceEffect['condition'] {
   if (type === 0) return { kind: 'all' };
-  if (type === 1) return { kind: 'member', member: memberId(value) };
+  if (type === 1) return { kind: 'member', member: value };
   if (type === 2) return { kind: 'main-effect', actionType: value };
-  if (type === 3) return { kind: 'unit', unit: unitId(value) };
+  if (type === 3) return { kind: 'unit', unit: int32(value) };
   throw new Error('追加きらめき誘発の条件種別が正しくありません。');
 }
 
@@ -62,28 +61,6 @@ function duration(type: number, value: bigint): AdditionalHeartInduceEffect['dur
   if (type === 2) return { kind: 'sections', value };
   if (type === 3) return { kind: 'stage', value };
   throw new Error('追加きらめき誘発の期限種別が正しくありません。');
-}
-
-function memberId(value: number): MemberId {
-  if (
-    value === 0 ||
-    value === 1021 ||
-    value === 1022 ||
-    value === 1030 ||
-    value === 1031 ||
-    value === 1032 ||
-    value === 1033 ||
-    value === 1041 ||
-    value === 1042 ||
-    value === 1053
-  )
-    return value;
-  throw new Error('追加きらめき誘発のメンバーが正しくありません。');
-}
-
-function unitId(value: number): UnitId {
-  if (value === 1 || value === 2 || value === 3) return value;
-  throw new Error('追加きらめき誘発のユニットが正しくありません。');
 }
 
 function findDetail(details: readonly Detail[], detailType: string): Detail | undefined {

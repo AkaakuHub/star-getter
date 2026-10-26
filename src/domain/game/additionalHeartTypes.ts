@@ -1,12 +1,12 @@
-import type { Card, MemberId, UnitId } from './model';
+import type { Card } from './model';
 import { validateSkillHeartsEffect, type SkillHeartsEffect } from './skillHeartTypes';
 import { isInt64 } from './numeric';
 
 export type AdditionalHeartInduceCondition =
   | Readonly<{ kind: 'all' }>
-  | Readonly<{ kind: 'member'; member: MemberId }>
-  | Readonly<{ kind: 'main-effect'; actionType: number }>
-  | Readonly<{ kind: 'unit'; unit: UnitId }>;
+  | Readonly<{ kind: 'member'; member: bigint }>
+  | Readonly<{ kind: 'main-effect'; actionType: bigint }>
+  | Readonly<{ kind: 'unit'; unit: number }>;
 
 export type AdditionalHeartInduceEffect = Readonly<{
   kind: 'additional-heart-induce';
@@ -36,10 +36,12 @@ export function validateAdditionalHeartInduceEffect(effect: AdditionalHeartInduc
   if (
     !isInt64(effect.apPower) ||
     !['all', 'member', 'main-effect', 'unit'].includes(effect.condition.kind) ||
-    (effect.condition.kind === 'member' && !Number.isSafeInteger(effect.condition.member)) ||
-    (effect.condition.kind === 'main-effect' &&
-      !Number.isSafeInteger(effect.condition.actionType)) ||
-    (effect.condition.kind === 'unit' && ![1, 2, 3].includes(effect.condition.unit)) ||
+    (effect.condition.kind === 'member' && !isInt64(effect.condition.member)) ||
+    (effect.condition.kind === 'main-effect' && !isInt64(effect.condition.actionType)) ||
+    (effect.condition.kind === 'unit' &&
+      (!Number.isInteger(effect.condition.unit) ||
+        effect.condition.unit < -2_147_483_648 ||
+        effect.condition.unit > 2_147_483_647)) ||
     !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
     !isInt64(effect.duration.value) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
@@ -56,9 +58,9 @@ export function matchesAdditionalHeartCondition(
     case 'all':
       return true;
     case 'member':
-      return card.member === condition.member;
+      return BigInt(card.member) === condition.member;
     case 'main-effect':
-      return card.mainEffect === condition.actionType;
+      return card.mainEffect !== undefined && BigInt(card.mainEffect) === condition.actionType;
     case 'unit':
       return card.unit === condition.unit;
   }

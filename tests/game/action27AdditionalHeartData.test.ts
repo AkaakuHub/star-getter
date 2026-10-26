@@ -32,3 +32,28 @@ it('ActionType27はlong詳細値から条件・AP倍率・期限を生成する'
     duration: { kind: 'sections', value: (1n << 53n) + 3n },
   });
 });
+
+it('ActionType27のメンバーとSkillMainEffect条件値はlongのまま保持する', () => {
+  for (const [type, value, kind, key] of [
+    [1n, (1n << 32n) + 1021n, 'member', 'member'],
+    [2n, (1n << 32n) + 25n, 'main-effect', 'actionType'],
+  ] as const) {
+    const effect = createAdditionalHeartInduceEffect({
+      skillEffectId: 27n,
+      details: [
+        { id: 1n, detailType: 'GET_ADDITIONAL_HEART_INDUCE_TYPE', value: type },
+        { id: 2n, detailType: 'GET_ADDITIONAL_HEART_INDUCE_VALUE', value },
+        { id: 3n, detailType: 'GET_ADDITIONAL_HEART_EFFECT_ID', value: 100n },
+      ],
+      heartEffect: {
+        kind: 'skill-hearts',
+        skillEffectId: 100n,
+        calculation: 'fixed',
+        amount: 10_000,
+        displayTime: { kind: 'full-end', value: 0 },
+      },
+    });
+
+    expect(effect.condition).toEqual({ kind, [key]: value });
+  }
+});
