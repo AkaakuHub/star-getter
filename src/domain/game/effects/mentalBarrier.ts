@@ -56,7 +56,7 @@ export function applyMentalBarrier(
   return induceSkillEffects(
     next,
     'mental-barrier',
-    endurance === 0 ? 100 : Math.trunc(endurance),
+    endurance === 0 ? state.maximumMental : Math.trunc(endurance),
     applyEffect,
   );
 }

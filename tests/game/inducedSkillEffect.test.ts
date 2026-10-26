@@ -81,6 +81,27 @@ it('ActionType41はバリア登録が成立したときに耐久値を通知す�
   expect(next.moodOffset).toBe(5);
 });
 
+it('ActionType7の耐久無限バリアは最大元気値をActionType41へ通知する', () => {
+  const initial = { ...game(), maximumMental: 200, stamina: 200 };
+  const active = applyEffect(initial, {
+    ...effect,
+    condition: 'mental-barrier',
+    num: 10_000n,
+    deckUnderAdd: 0n,
+    deckUnderLimit: 0n,
+    effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
+  });
+  const next = applyEffect(active, {
+    kind: 'mental-barrier',
+    barrier: 'endurance',
+    enduranceType: 'infinite',
+    endurance: 0,
+    attenuation: 1,
+    duration: { kind: 'stage' },
+  });
+  expect(next.moodOffset).toBe(200);
+});
+
 it('ActionType41はdeck補正上限をC#同様にint32へ変換する', () => {
   const initial = game();
   const active = applyEffect(initial, {
