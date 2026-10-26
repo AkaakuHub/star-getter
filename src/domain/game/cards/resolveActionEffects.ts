@@ -23,6 +23,11 @@ import { createMoodChangeEffect } from '../actionTypeEffects/moodChange';
 import { createHeartLimitBoostEffect } from '../actionTypeEffects/heartLimitBoost';
 import { createMoodValueBoostEffect } from '../actionTypeEffects/moodValueBoost';
 import { createMentalShieldEffect } from '../actionTypeEffects/mentalShield';
+import { createGenesisSkillEffect } from '../actionTypeEffects/genesisSkill';
+import { createSkillBoostEffect } from '../actionTypeEffects/skillBoost';
+import { createHandMaxCardEffect } from '../actionTypeEffects/handMaxCard';
+import { createProxyForcedActivationEffect } from '../actionTypeEffects/proxyForcedActivation';
+import { createFixedParameterExtendEffect } from '../actionTypeEffects/fixedParameterExtend';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -138,15 +143,42 @@ export function resolveActionEffects(card: Card): Card {
                                                           }),
                                                         ),
                                                       })
-                                                    : createMentalShieldEffect({
-                                                        ...actionEffect,
-                                                        details: actionEffect.details.map(
-                                                          (detail) => ({
-                                                            ...detail,
-                                                            targetMood: detail.targetMood ?? 0,
-                                                          }),
-                                                        ),
-                                                      });
+                                                    : actionEffect.actionType === 51
+                                                      ? createGenesisSkillEffect(actionEffect)
+                                                      : actionEffect.actionType === 52
+                                                        ? createSkillBoostEffect({
+                                                            ...actionEffect,
+                                                            details: actionEffect.details.map(
+                                                              (detail) => ({
+                                                                ...detail,
+                                                                targetMood: detail.targetMood ?? 0,
+                                                              }),
+                                                            ),
+                                                          })
+                                                        : actionEffect.actionType === 54
+                                                          ? createHandMaxCardEffect({
+                                                              skillEffectId:
+                                                                actionEffect.skillEffectId,
+                                                              details: actionEffect.details,
+                                                            })
+                                                          : actionEffect.actionType === 56
+                                                            ? createMentalShieldEffect({
+                                                                ...actionEffect,
+                                                                details: actionEffect.details.map(
+                                                                  (detail) => ({
+                                                                    ...detail,
+                                                                    targetMood:
+                                                                      detail.targetMood ?? 0,
+                                                                  }),
+                                                                ),
+                                                              })
+                                                            : actionEffect.actionType === 57
+                                                              ? createProxyForcedActivationEffect(
+                                                                  actionEffect,
+                                                                )
+                                                              : createFixedParameterExtendEffect(
+                                                                  actionEffect,
+                                                                );
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
