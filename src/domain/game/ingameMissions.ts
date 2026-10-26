@@ -76,8 +76,12 @@ export function missionActionEffect(
           : 0
       : actionType === 2
         ? effect.kind === 'skill-score-up'
-          ? (state.skillScoreUps.at(-1)?.percent ?? 0)
-          : (state.boosts.at(-1)?.percent ?? 0)
+          ? state.skillScoreUps.length > before.skillScoreUps.length
+            ? (state.skillScoreUps.at(-1)?.percent ?? 0)
+            : 0
+          : state.boosts.length > before.boosts.length
+            ? (state.boosts.at(-1)?.percent ?? 0)
+            : 0
         : actionType === 5
           ? Math.max(0, state.stamina - before.stamina)
           : actionType === 10

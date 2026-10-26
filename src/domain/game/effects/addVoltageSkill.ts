@@ -6,6 +6,7 @@ import { moodValue } from '../projection';
 import { calculateSkillMoodCorrection } from '../live/skillMood';
 import { applyAdditionalBuff } from './additionalBuff';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { registerMissionAction } from '../ingameMissions';
 
 export function activateAddVoltageSkill(
   state: GameState,
@@ -33,7 +34,7 @@ export function activateAddVoltageSkill(
   const base = Math.fround(int32(combined));
   const additional = applyAdditionalBuff(state, 'excitement', base, card);
   const boosted = applyAction52SkillBoostForCard(additional.state, card, int32(additional.value));
-  if (effect.numberType !== 1) return boosted.state;
+  if (effect.numberType !== 1) return registerMissionAction(boosted.state, 10, 0);
   return changeResource(
     boosted.state,
     'excitement',
@@ -42,6 +43,7 @@ export function activateAddVoltageSkill(
     card,
     apply,
     true,
+    (next, amount) => registerMissionAction(next, 10, amount),
   );
 }
 

@@ -1,11 +1,13 @@
 import { expect, it } from 'vite-plus/test';
 import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffects/apSpeedChange';
+import { createAddVoltageEffect } from '../../src/domain/game/actionTypeEffects/addVoltage';
 import { applyEffect } from '../../src/domain/game/effects';
 import { applyApSpeedPercent } from '../../src/domain/game/effects/apSpeed';
 import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { startIngameMission } from '../../src/domain/game/ingameMissions';
 import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
 import { game } from './support/game';
+import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
 
 function missionState(actionType: number, target: number) {
   const initial = game();
@@ -142,4 +144,53 @@ it('子効果で発動したActionType14もActionType44へ通知する', () => {
     whenFalse: [],
   });
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('ActionType10は上限適用前のC# EffectAmountをミッションへ通知する', () => {
+  const initial = missionState(10, 10);
+  const capped = {
+    ...initial,
+    maximumVoltageLevel: 1,
+    excitement: voltageThreshold(1),
+  };
+  const effect = createAddVoltageEffect({
+    skillEffectId: 10n,
+    details: [
+      { id: 1n, detailType: 'ADD_VOLTAGE_NUM', value: 100_000n },
+      { id: 2n, detailType: 'ADD_VOLTAGE_NUM_TYPE', value: 1n },
+    ],
+  });
+  const changed = applyEffect(startIngameMission(capped, 10n), effect);
+  expect(changed.excitement).toBe(capped.excitement);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+});
+
+it('Proxyに吸収されたActionType2は既存Boost量でミッションを進めない', () => {
+  const initial = missionState(2, 1);
+  const card = initial.deck[0];
+  if (!card) throw new Error('Proxy発動元カードがありません。');
+  const withPreviousBoost = applyEffect(initial, { kind: 'boost', multiplier: 1.05 });
+  const proxy = registerProxySkill(
+    withPreviousBoost,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 1,
+      periodParam: 3000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 2, targetAmount: 20 }],
+      effects: [],
+    },
+    card,
+  );
+  const changed = applyEffect(startIngameMission(proxy, 2n), {
+    kind: 'boost',
+    multiplier: 1.05,
+  });
+  expect(changed.boosts).toHaveLength(withPreviousBoost.boosts.length);
+  expect(changed.ingameMission?.count).toBe(0);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(0);
 });
