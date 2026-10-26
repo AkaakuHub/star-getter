@@ -72,9 +72,9 @@ function actInternal(state: GameState, action: Action): GameState {
     case 'card':
       return useCard(state, action.index);
     case 'switch-token-deck':
-      return switchTokenDeck(state);
+      return switchTokenDeck(state, applyEffect);
     case 'deactivate-token-deck':
-      return deactivateTokenDeck(state, action.deactivationKey);
+      return deactivateTokenDeck(state, action.deactivationKey, applyEffect);
     case 'skip-ingame-mission':
       return skipIngameMission(state);
     case 'deactivate-hand-limit': {

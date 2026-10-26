@@ -96,6 +96,57 @@ it('ActionType43の系列IDをC#のint32へ変換してから照合する', () =
   ]).toContain(selected.id);
 });
 
+it('ActionType43の分割後にデッキアウト確認を実行する', () => {
+  const base = game('bloom');
+  const selected = base.deck[5];
+  if (!selected) throw new Error('対象カードがありません。');
+  const state = {
+    ...base,
+    deck: base.deck.map((item) =>
+      item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
+    ),
+    deckOutCount: 1,
+    track: { ...base.track, afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }] },
+  };
+  const split = applyEffect(state, {
+    kind: 'token-deck-split',
+    seriesIds: [42n],
+    duration: { kind: 'stage', value: 0 },
+  });
+  expect(split.deckOutCount).toBe(0);
+  expect(split.afterMentalDownEvents).toBe(state.afterMentalDownEvents + 1);
+  expect(split.energy).toBe(state.energy + 2);
+});
+
+it('ActionType43は空のサブデッキへの切替後にデッキアウト確認を実行する', () => {
+  const base = game('bloom');
+  const selected = base.deck[5];
+  if (!selected) throw new Error('対象カードがありません。');
+  const split = applyEffect(
+    {
+      ...base,
+      deck: base.deck.map((item) =>
+        item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
+      ),
+      track: { ...base.track, afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }] },
+    },
+    { kind: 'token-deck-split', seriesIds: [42n], duration: { kind: 'stage', value: 0 } },
+  );
+  const emptySubDeck = split.tokenDeckSplit;
+  if (!emptySubDeck) throw new Error('分割デッキがありません。');
+  const switched = act(
+    {
+      ...split,
+      deckOutCount: 1,
+      tokenDeckSplit: { ...emptySubDeck, sub: { hand: [], drawPile: [], discard: [] } },
+    },
+    { type: 'switch-token-deck' },
+  );
+  expect(switched.deckOutCount).toBe(0);
+  expect(switched.afterMentalDownEvents).toBe(split.afterMentalDownEvents + 1);
+  expect(switched.energy).toBe(split.energy + 2);
+});
+
 it('期限切れでメインデッキへ戻す', () => {
   const base = game('bloom');
   const selectedId = base.deck[5]?.id;

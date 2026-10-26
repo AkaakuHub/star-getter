@@ -267,7 +267,7 @@ function advanceTick(state: GameState): GameState {
     ),
     dt,
   );
-  const tokenDeckState = advanceIngameMission(advanceTokenDeckSplit(gauges, dt), dt);
+  const tokenDeckState = advanceIngameMission(advanceTokenDeckSplit(gauges, dt, applyEffect), dt);
   const proxyPeriodState = advanceProxySkillPeriods(tokenDeckState, dt, applyEffect);
   const comboState = advanceComboInducer(proxyPeriodState, dt, applyEffect);
   let next: GameState = advanceHearts({

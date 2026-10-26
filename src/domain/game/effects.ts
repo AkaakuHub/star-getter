@@ -177,7 +177,7 @@ function applyEffectInternal(
     case 'token-boost':
       return activateTokenBoost(state, effect, card, multiplier, addValue);
     case 'token-deck-split':
-      return activateTokenDeckSplit(state, effect);
+      return activateTokenDeckSplit(state, effect, applyEffect);
     case 'ingame-mission':
       return startIngameMission(state, effect.groupId);
     case 'hand-limit':

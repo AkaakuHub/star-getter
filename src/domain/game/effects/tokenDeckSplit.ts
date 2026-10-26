@@ -3,6 +3,8 @@ import { activateHandPermanentEffects, disposeHandEffects } from '../cards/handE
 import { fillHandToCount } from '../cards/drawing';
 import type { GameState } from '../model';
 import type { TokenDeckSplit, TokenDeckZones } from '../tokenDeckSplitTypes';
+import { completeDeckOutChecks } from './deckOutCheck';
+import type { EffectApplier } from './induceSkillEffect';
 
 function zones(state: GameState): TokenDeckZones {
   return { hand: state.hand, drawPile: state.drawPile, discard: state.discard };
@@ -19,6 +21,7 @@ function withZones(state: GameState, value: TokenDeckZones): GameState {
 export function activateTokenDeckSplit(
   state: GameState,
   effect: Extract<import('../modelTypes').Effect, { kind: 'token-deck-split' }>,
+  applyEffect: EffectApplier,
 ): GameState {
   if (state.tokenDeckSplit) return state;
   if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
@@ -67,16 +70,17 @@ export function activateTokenDeckSplit(
     const stats = inactiveSubStats[id];
     if (stats) inactiveSubStats[id] = { ...stats, isActive: false };
   }
-  return {
+  const completed: GameState = {
     ...next,
     randomSeed: subState.randomSeed,
     handCardStats: { ...next.handCardStats, ...inactiveSubStats },
     drawContext: 'idle',
     tokenDeckSplit: { ...split, main: activeMain, sub: zones(subState) },
   };
+  return completeDeckOutChecks(completed, applyEffect);
 }
 
-export function switchTokenDeck(state: GameState): GameState {
+export function switchTokenDeck(state: GameState, applyEffect?: EffectApplier): GameState {
   const split = state.tokenDeckSplit;
   if (!split) return state;
   const incoming = split.active === 'main' ? split.sub : split.main;
@@ -108,16 +112,19 @@ export function switchTokenDeck(state: GameState): GameState {
     const card = next.deck.find((item) => item.id === id);
     if (card) next = activateHandPermanentEffects(next, card);
   }
-  return { ...next, tokenDeckSplit: { ...updated, [incomingName]: zones(next) } };
+  const switched = { ...next, tokenDeckSplit: { ...updated, [incomingName]: zones(next) } };
+  return incoming.hand.length === 0 && applyEffect
+    ? completeDeckOutChecks(switched, applyEffect)
+    : switched;
 }
 
-function mergeTokenDeck(state: GameState): GameState {
+function mergeTokenDeck(state: GameState, applyEffect: EffectApplier): GameState {
   const split = state.tokenDeckSplit;
   if (!split) return state;
   const mainState =
     split.active === 'main'
       ? { ...state, tokenDeckSplit: { ...split, main: zones(state) } }
-      : switchTokenDeck(state);
+      : switchTokenDeck(state, applyEffect);
   const activeSplit = mainState.tokenDeckSplit;
   if (!activeSplit) return mainState;
   const sub = activeSplit.sub;
@@ -133,24 +140,37 @@ function mergeTokenDeck(state: GameState): GameState {
   return { ...withZones(mainState, merged), tokenDeckSplit: null };
 }
 
-export function deactivateTokenDeck(state: GameState, deactivationKey: string): GameState {
-  return state.tokenDeckSplit?.deactivationKey === deactivationKey ? mergeTokenDeck(state) : state;
+export function deactivateTokenDeck(
+  state: GameState,
+  deactivationKey: string,
+  applyEffect: EffectApplier,
+): GameState {
+  return state.tokenDeckSplit?.deactivationKey === deactivationKey
+    ? mergeTokenDeck(state, applyEffect)
+    : state;
 }
 
-export function advanceTokenDeckSplit(state: GameState, seconds: number): GameState {
+export function advanceTokenDeckSplit(
+  state: GameState,
+  seconds: number,
+  applyEffect: EffectApplier,
+): GameState {
   const split = state.tokenDeckSplit;
   if (!split || split.remainingSeconds === null) return state;
   const remainingSeconds = split.remainingSeconds - seconds;
   return remainingSeconds <= 0
-    ? mergeTokenDeck(state)
+    ? mergeTokenDeck(state, applyEffect)
     : { ...state, tokenDeckSplit: { ...split, remainingSeconds } };
 }
 
-export function expireTokenDeckSplitSections(state: GameState): GameState {
+export function expireTokenDeckSplitSections(
+  state: GameState,
+  applyEffect: EffectApplier,
+): GameState {
   const split = state.tokenDeckSplit;
   if (!split || split.remainingSections === null) return state;
   const remainingSections = split.remainingSections - 1n;
   return remainingSections <= 0n
-    ? mergeTokenDeck(state)
+    ? mergeTokenDeck(state, applyEffect)
     : { ...state, tokenDeckSplit: { ...split, remainingSections } };
 }

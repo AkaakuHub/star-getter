@@ -22,7 +22,7 @@ import { expireSectionHeartBoosts } from './live/heartBoosts';
 import { expireBeatPointBuffSections } from './effects/beatPointBuff';
 
 export function advanceSectionChange(state: GameState, applyEffect: EffectApplier): GameState {
-  let next = expireTokenDeckSplitSections(state);
+  let next = expireTokenDeckSplitSections(state, applyEffect);
   next = expireSkillCooldownSections(next);
   next = expireInducedSkillEffectSections(next);
   next = expireApSpeedSections(next);
