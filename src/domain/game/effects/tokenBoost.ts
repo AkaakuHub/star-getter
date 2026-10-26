@@ -18,7 +18,9 @@ export function activateTokenBoost(
   );
   if (base <= 0) return state;
   const boosted = card ? applyAction52SkillBoost(state, card, base) : { state, value: base };
-  const value = card ? toInt32(boosted.value) : base;
+  const value = Number.isFinite(boosted.value)
+    ? Math.fround(boosted.value)
+    : Math.fround(-3.4028234663852886e38);
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
     ...boosted.state,
@@ -40,10 +42,4 @@ export function activateTokenBoost(
       },
     ],
   };
-}
-
-function toInt32(value: number): number {
-  if (!Number.isFinite(value) || value < -2_147_483_648 || value > 2_147_483_647)
-    return -2_147_483_648;
-  return Math.trunc(value);
 }

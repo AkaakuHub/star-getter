@@ -338,6 +338,6 @@ it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適�
     source,
   );
   expect(float32Value.tokenBoosts[0]?.value).toBe(
-    Math.trunc(Math.fround(Math.fround(16_777_216) / Math.fround(10_000))),
+    Math.fround(Math.fround(16_777_216) / Math.fround(10_000)),
   );
 });
