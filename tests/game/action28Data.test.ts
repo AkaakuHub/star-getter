@@ -16,8 +16,10 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
               actionType: 28 as const,
               skillEffectId: 28_001n,
               destination: 'effects' as const,
-              details: [{ id: 28_001_1n, detailType: 'TOKEN_CARD_CARD_COUNT', value: 2n }],
-              templateId: source.id,
+              details: [
+                { id: 28_001_1n, detailType: 'TOKEN_CARD_CARD_COUNT', value: 2n },
+                { id: 28_001_2n, detailType: 'TOKEN_CARD_RESOURCE_ID', value: 481n },
+              ],
             },
           ],
         }
@@ -26,7 +28,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
   expect(compiled?.effects.find((item) => item.kind === 'token-card')).toMatchObject({
     kind: 'token-card',
-    templateId: source.id,
+    templateId: '481',
     count: 2n,
   });
 });

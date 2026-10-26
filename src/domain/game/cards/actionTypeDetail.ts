@@ -3,4 +3,5 @@ export type ActionTypeDetail = Readonly<{
   detailType: string;
   value: bigint;
   targetMood?: number;
+  paramValues?: readonly bigint[];
 }>;

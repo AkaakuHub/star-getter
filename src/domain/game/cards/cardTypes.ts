@@ -133,7 +133,6 @@ export type ActionType28Record = Readonly<{
   actionType: 28;
   skillEffectId: bigint;
   details: readonly ActionTypeDetail[];
-  templateId: string;
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
