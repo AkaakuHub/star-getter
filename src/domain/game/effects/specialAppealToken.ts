@@ -86,7 +86,7 @@ export function startSpecialAppealTokenCooldown(
   return {
     ...state,
     specialAppealTokens: state.specialAppealTokens.map((current) =>
-      current.targetMember === token.targetMember
+      current.tokenSetId === token.tokenSetId
         ? {
             ...current,
             remainingCoolTime: Math.max(
