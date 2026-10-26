@@ -65,7 +65,10 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
       floatToInt32(action52.value),
       inducer.heartLifetimeSeconds,
     );
-    const updated = { ...inducer, induces: inducer.induces + 1 };
+    const updated = {
+      ...inducer,
+      induces: Number(BigInt.asIntN(32, BigInt(inducer.induces + 1))),
+    };
     next = {
       ...next,
       mentalHeartInducers:

@@ -32,6 +32,27 @@ it('Action23はActionType1の値をC#のintキャストで0方向へ切り捨て
   expect(heartCount(induceMentalHearts(inducing, 1))).toBe(1);
 });
 
+it('Action23は解除回数をC#のint32として折り返してlong閾値と比較する', () => {
+  const initial = game();
+  const state = {
+    ...initial,
+    mentalHeartInducers: [
+      {
+        id: 1,
+        sourceCardId: null,
+        precomputedNum: 0,
+        heartLifetimeSeconds: 1,
+        remainingSeconds: null,
+        remainingSections: null,
+        disabledOnInduceCount: -2_147_483_648n,
+        induces: 2_147_483_647,
+        deactivationKey: null,
+      },
+    ],
+  };
+  expect(induceMentalHearts(state, 1).mentalHeartInducers).toHaveLength(0);
+});
+
 it('Action23はActionType52の値もC#のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const withBuff = applyEffect(initial, {
