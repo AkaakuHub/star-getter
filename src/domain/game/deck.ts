@@ -39,7 +39,7 @@ export function validateCard(card: Card): void {
     ...card.effects,
     ...(card.drawEffects ?? []),
     ...(card.beforeUseEffects ?? []),
-    ...(card.handUse?.effects ?? []),
+    ...(card.handInducers?.flatMap((inducer) => inducer.effects) ?? []),
     ...(card.modeParameterChanges?.off ?? []),
     ...(card.modeParameterChanges?.on ?? []),
     ...(card.modeSkillChanges?.off.effects ?? []),

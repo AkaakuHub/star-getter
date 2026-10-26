@@ -1,5 +1,6 @@
 import type { Card, Effect, GameState } from '../model';
 import type { HandUseTrigger } from './cardTypes';
+import { handInducerStateKey } from './handInducer';
 import type { EffectApplier } from '../effects/induceSkillEffect';
 import { completeDeckOutChecks } from '../effects/deckOutCheck';
 
@@ -80,22 +81,24 @@ export function notifyHandHeartCollect(
   for (const id of state.handEffectCardIds) {
     const card = state.cardPool.find((item) => item.id === id);
     if (!card) throw new Error('手札効果のカードがありません。');
-    const handUse = card.handUse;
-    const trigger = handUse?.trigger;
-    if (!handUse?.effects.length || trigger?.kind !== 'heart-quantity-count') continue;
-    const count = int32((collectionCounts[id] ?? 0) + int32(collectedCount));
-    collectionCounts[id] = count;
-    const activationCount = int32(activationCounts[id] ?? 0);
-    if (
-      (handUse.limit !== undefined &&
-        int32(handUse.limit) !== 0 &&
-        int32(handUse.limit) <= activationCount) ||
-      count < int32(trigger.count)
-    )
-      continue;
-    collectionCounts[id] = 0;
-    next = applyEffects(next, handUse.effects, card, apply);
-    activationCounts[id] = int32(activationCount + 1);
+    for (const inducer of card.handInducers ?? []) {
+      const trigger = inducer.trigger;
+      if (!inducer.effects.length || trigger.kind !== 'heart-quantity-count') continue;
+      const key = handInducerStateKey(card.id, inducer.sourceEffectId);
+      const count = int32((collectionCounts[key] ?? 0) + int32(collectedCount));
+      collectionCounts[key] = count;
+      const activationCount = int32(activationCounts[key] ?? 0);
+      if (
+        (inducer.limit !== undefined &&
+          int32(inducer.limit) !== 0 &&
+          int32(inducer.limit) <= activationCount) ||
+        count < int32(trigger.count)
+      )
+        continue;
+      collectionCounts[key] = 0;
+      next = applyEffects(next, inducer.effects, card, apply);
+      activationCounts[key] = int32(activationCount + 1);
+    }
   }
   return {
     ...next,
@@ -130,17 +133,19 @@ function activateHandInducers(
   for (const id of state.handEffectCardIds) {
     const card = state.cardPool.find((item) => item.id === id);
     if (!card) throw new Error('手札効果のカードがありません。');
-    const handUse = card.handUse;
-    if (!handUse || !handUse.effects.length || !matches(handUse.trigger, card)) continue;
-    const activationCount = int32(activationCounts[id] ?? 0);
-    if (
-      handUse.limit !== undefined &&
-      int32(handUse.limit) !== 0 &&
-      int32(handUse.limit) <= activationCount
-    )
-      continue;
-    next = applyEffects(next, handUse.effects, card, apply);
-    activationCounts[id] = int32(activationCount + 1);
+    for (const inducer of card.handInducers ?? []) {
+      if (!inducer.effects.length || !matches(inducer.trigger, card)) continue;
+      const key = handInducerStateKey(card.id, inducer.sourceEffectId);
+      const activationCount = int32(activationCounts[key] ?? 0);
+      if (
+        inducer.limit !== undefined &&
+        int32(inducer.limit) !== 0 &&
+        int32(inducer.limit) <= activationCount
+      )
+        continue;
+      next = applyEffects(next, inducer.effects, card, apply);
+      activationCounts[key] = int32(activationCount + 1);
+    }
   }
   return { ...next, handUseActivationCounts: activationCounts };
 }

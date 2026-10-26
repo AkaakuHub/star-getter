@@ -10,10 +10,11 @@ import type { ActionType17Record } from './actionType17Record';
 import type { ActionType18Record } from './actionType18Record';
 import type { ActionType901Record } from './actionType901Record';
 import type { ActionType902Record } from './actionType902Record';
+import type { ActionType903Record } from './actionType903Record';
 import type { ActionType19Record } from './actionType19Record';
 import type { MoodActionRecord } from './moodActionRecord';
-import type { HandUseTrigger } from './handUseTrigger';
 export type { HandUseTrigger } from './handUseTrigger';
+import type { HandInducer } from './handInducer';
 
 type ActionTypeDetail = Readonly<{
   id: bigint;
@@ -279,6 +280,7 @@ export type Card = Readonly<{
     | ActionType18Record
     | ActionType901Record
     | ActionType902Record
+    | ActionType903Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
@@ -329,12 +331,7 @@ export type Card = Readonly<{
   ability894Effects?: readonly Effect[];
   drawEffects?: readonly Effect[];
   beforeUseEffects?: readonly Effect[];
-  handUse?: Readonly<{
-    trigger: HandUseTrigger;
-    effects: readonly Effect[];
-    limit?: bigint;
-    limitMemory?: 'reset' | 'retain';
-  }>;
+  handInducers?: readonly HandInducer[];
   relay?: Readonly<{ threshold: number; hearts: number; beats?: boolean; moodBonus?: MoodBonus }>;
   token?: TokenKind;
   exhausts?: true;

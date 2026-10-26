@@ -6,6 +6,7 @@ import {
 import { applyEffect } from '../effects';
 import { withDeactivationKey, deactivateInducedEffects } from '../effects/effectInduce';
 import { deactivateModeAbilityEffects } from './modeAbility';
+import { handInducerStateKey } from './handInducer';
 
 export function activateHandPermanentEffects(state: GameState, card: Card): GameState {
   const effects = card.handPermanentEffects;
@@ -37,11 +38,23 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
   for (const id of ids) {
     const card = state.deck.find((item) => item.id === id);
     if (card?.modeAbilityChanges) next = deactivateModeAbilityEffects(next, card);
-    if (!card || !card.handUse || card.handUse.limitMemory !== 'reset') continue;
-    for (const effect of card.handUse?.effects ?? []) {
+    if (!card) continue;
+    const resetInducers = (card.handInducers ?? []).filter(
+      (inducer) => inducer.limitMemory === 'reset',
+    );
+    for (const effect of resetInducers.flatMap((inducer) => inducer.effects)) {
       if (effect.kind === 'parameter-value-change')
         next = applyParameterValueChange(next, card, effect, true);
     }
+    const resetKeys = new Set(
+      resetInducers.map((inducer) => handInducerStateKey(card.id, inducer.sourceEffectId)),
+    );
+    next = {
+      ...next,
+      handUseActivationCounts: Object.fromEntries(
+        Object.entries(next.handUseActivationCounts).filter(([key]) => !resetKeys.has(key)),
+      ),
+    };
   }
   for (const active of state.activeModeParameterChanges) {
     if (!ids.includes(active.cardId)) continue;
@@ -52,6 +65,14 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
   }
   const activeHandPermanentCardIds = state.activeHandPermanentCardIds.filter(
     (id) => !ids.includes(id),
+  );
+  const removedHandInducerKeys = new Set(
+    ids.flatMap((id) => {
+      const card = state.cardPool.find((item) => item.id === id);
+      return (card?.handInducers ?? []).map((inducer) =>
+        handInducerStateKey(id, inducer.sourceEffectId),
+      );
+    }),
   );
   for (const id of state.activeHandPermanentCardIds) {
     if (!ids.includes(id)) continue;
@@ -85,14 +106,11 @@ export function disposeHandEffects(state: GameState, ids: readonly string[]): Ga
         );
       }),
     ),
-    handUseActivationCounts: Object.fromEntries(
-      Object.entries(state.handUseActivationCounts).filter(([id]) => {
-        if (!ids.includes(id)) return true;
-        return state.deck.find((card) => card.id === id)?.handUse?.limitMemory !== 'reset';
-      }),
-    ),
+    handUseActivationCounts: next.handUseActivationCounts,
     handUseHeartCollectionCounts: Object.fromEntries(
-      Object.entries(state.handUseHeartCollectionCounts).filter(([id]) => !ids.includes(id)),
+      Object.entries(state.handUseHeartCollectionCounts).filter(
+        ([key]) => !removedHandInducerKeys.has(key),
+      ),
     ),
   };
 }

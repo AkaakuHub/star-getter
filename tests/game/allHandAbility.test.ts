@@ -51,10 +51,13 @@ it('ActionType42はC#と同じ順に手札誘発を先に実行してからAbili
   const updatedInducer = {
     ...inducer,
     effects: [],
-    handUse: {
-      trigger: { kind: 'any-skill' as const },
-      effects: [{ kind: 'mood' as const, amount: 1 }],
-    },
+    handInducers: [
+      {
+        sourceEffectId: 'test-inducer',
+        trigger: { kind: 'any-skill' as const },
+        effects: [{ kind: 'mood' as const, amount: 1 }],
+      },
+    ],
   };
   const deck = initial.deck.map((item) =>
     item.id === source.id ? updatedSource : item.id === inducer.id ? updatedInducer : item,

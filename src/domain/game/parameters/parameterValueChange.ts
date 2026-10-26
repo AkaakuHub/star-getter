@@ -82,7 +82,7 @@ export function initializeParameterValueFactors(
       ...(card.ability894Effects ?? []),
       ...(card.drawEffects ?? []),
       ...(card.beforeUseEffects ?? []),
-      ...(card.handUse?.effects ?? []),
+      ...(card.handInducers?.flatMap((inducer) => inducer.effects) ?? []),
       ...(card.modeParameterChanges?.off ?? []),
       ...(card.modeParameterChanges?.on ?? []),
       ...(card.collectionEffects?.effects ?? []),

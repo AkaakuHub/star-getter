@@ -5,7 +5,7 @@ import { EffectDetails } from './EffectDetails';
 import { handUseTriggerDescription } from './targetNames';
 
 export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
-  const { drawEffects, handUse, collectionEffects, ...traitsCard } = card;
+  const { drawEffects, handInducers, collectionEffects, ...traitsCard } = card;
   const traits = describeCardTraits(traitsCard);
   return (
     <div className="card-performance">
@@ -41,18 +41,18 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
             <EffectDetails effects={drawEffects} />
           </section>
         )}
-        {handUse && (
-          <section>
+        {handInducers?.map((inducer) => (
+          <section key={inducer.sourceEffectId}>
             <h3>手札にある間</h3>
             <p>
-              {handUseTriggerDescription(handUse.trigger)}
-              {handUse.limit === undefined || handUse.limit === 0n
+              {handUseTriggerDescription(inducer.trigger)}
+              {inducer.limit === undefined || inducer.limit === 0n
                 ? ''
-                : `（最大${handUse.limit}回）`}
+                : `（最大${inducer.limit}回）`}
             </p>
-            <EffectDetails effects={handUse.effects} />
+            <EffectDetails effects={inducer.effects} />
           </section>
-        )}
+        ))}
         {collectionEffects && (
           <section>
             <h3>

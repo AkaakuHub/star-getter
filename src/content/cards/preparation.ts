@@ -49,13 +49,16 @@ export const preparationCards: readonly Card[] = [
         ]),
       },
     ],
-    handUse: {
-      trigger: { kind: 'unit', unit: 2n },
-      effects: [
-        { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
-        { kind: 'cost-reduction', amount: 9, target: { kind: 'unit', unit: 2 } },
-        { kind: 'cost-reduction', amount: 9, target: { kind: 'token', token: 'shadow' } },
-      ],
-    },
+    handInducers: [
+      {
+        sourceEffectId: 'preparation-hand-use',
+        trigger: { kind: 'unit', unit: 2n },
+        effects: [
+          { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
+          { kind: 'cost-reduction', amount: 9, target: { kind: 'unit', unit: 2 } },
+          { kind: 'cost-reduction', amount: 9, target: { kind: 'token', token: 'shadow' } },
+        ],
+      },
+    ],
   },
 ];
