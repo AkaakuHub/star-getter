@@ -30,8 +30,7 @@ export function activateVoltageConversion(
     destination: effect.destination,
     num,
     outputDuration: effect.outputDuration,
-    disabledOnConvertCount:
-      effect.disabledType === 1 && effect.disabledValue !== 0n ? effect.disabledValue : null,
+    disabledOnConvertCount: effect.disabledType === 1 ? effect.disabledValue : null,
     conversions: 0,
     expireOnHeartCollect: effect.destination === 'love' && effect.convertDisabledType <= 2,
     remainingSeconds:

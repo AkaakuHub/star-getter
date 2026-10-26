@@ -114,6 +114,27 @@ it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {
   expect(twice.voltageConversions).toHaveLength(1);
 });
 
+it('ActionType22は解除回数0もlong比較に残し、int32周回後に解除する', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    { ...conversion, disabledType: 1, disabledValue: 0n },
+    source,
+  );
+  const nearWrap = {
+    ...active,
+    voltageConversions: active.voltageConversions.map((item) => ({
+      ...item,
+      conversions: -1,
+    })),
+  };
+  expect(
+    changeResource(nearWrap, 'excitement', 1n, 'skill', source).voltageConversions,
+  ).toHaveLength(0);
+});
+
 it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する', () => {
   const initial = unboostedGame();
   const source = initial.deck[0];
