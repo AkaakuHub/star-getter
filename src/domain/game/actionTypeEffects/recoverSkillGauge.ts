@@ -1,5 +1,5 @@
 import type { Effect } from '../modelTypes';
-import { isInt64 } from '../numeric';
+import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Detail = Readonly<{
   id: bigint;
@@ -18,12 +18,12 @@ export function createRecoverSkillGaugeEffect(input: Input): Effect {
     throw new Error('AP回復の空模様対象が正しくありません。');
   return {
     kind: 'energy',
-    amount: Math.fround(int32(base?.value ?? 0n) / 10_000),
+    amount: Math.fround(int64ToFloat32(base?.value ?? 0n) / 10_000),
     ...(targetMood > 0
       ? {
           moodBonus: {
             target: targetMood as 1 | 2 | 3,
-            perPoint: Math.fround(int32(mood?.value ?? 0n) / 10_000),
+            perPoint: Math.fround(int64ToFloat32(mood?.value ?? 0n) / 10_000),
           },
         }
       : {}),
@@ -35,8 +35,4 @@ function find(details: readonly Detail[], detailType: string): Detail | undefine
   if (detail && (!isInt64(detail.id) || !isInt64(detail.value)))
     throw new Error('詳細値が正しくありません。');
   return detail;
-}
-
-function int32(value: bigint): number {
-  return Number(BigInt.asIntN(32, value));
 }
