@@ -244,11 +244,14 @@ export function expireGaugeInfinities(
   let next: GameState = { ...state, gaugeInfinities: active };
   for (const gauge of ended) {
     if (active.some((infinity) => infinity.gauge === gauge)) continue;
-    if (gauge === 'mental')
-      next = induceMentalHearts(
-        { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
-        next.maximumMental,
-      );
+    if (gauge === 'mental') {
+      next = next.bloom
+        ? { ...next, mentalTimerSeconds: 0 }
+        : induceMentalHearts(
+            { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
+            next.maximumMental,
+          );
+    }
     if (gauge === 'voltage') {
       const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
       next = next.bloom
@@ -269,11 +272,14 @@ export function deactivateGaugeInfinities(state: GameState, deactivationKey: str
   let next: GameState = { ...state, gaugeInfinities: active };
   for (const gauge of new Set(removed.map((infinity) => infinity.gauge))) {
     if (active.some((infinity) => infinity.gauge === gauge)) continue;
-    if (gauge === 'mental')
-      next = induceMentalHearts(
-        { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
-        next.maximumMental,
-      );
+    if (gauge === 'mental') {
+      next = next.bloom
+        ? { ...next, mentalTimerSeconds: 0 }
+        : induceMentalHearts(
+            { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 },
+            next.maximumMental,
+          );
+    }
     if (gauge === 'voltage') {
       const target = voltageThreshold(Math.min(10, next.maximumVoltageLevel));
       next = next.bloom

@@ -189,6 +189,34 @@ describe('無限ゲージ', () => {
     expect(ended.bloom?.progress).toBe(bloom.progress + BigInt(delta));
   });
 
+  it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {
+    const base = { ...game('bloom'), stamina: 42, mentalTimerSeconds: 0.4 };
+    const inducing = applyEffect(base, {
+      kind: 'mental-heart-induce',
+      num: 10_000n,
+      heartDuration: { kind: 'stage', value: 0 },
+      duration: { kind: 'milliseconds', value: 5_000n },
+      disabledType: 0,
+      disabledValue: 0n,
+    });
+    const initial = activateBloom(inducing, 1);
+    const active = applyEffect(initial, {
+      kind: 'infinity-gauge',
+      gauge: 'mental',
+      duration: { kind: 'stage', value: 0 },
+      invocationType: 0x388,
+      deactivationKey: 'mental-infinity',
+    });
+    const ended = act(active, {
+      type: 'deactivate-infinity-gauge',
+      deactivationKey: 'mental-infinity',
+    });
+    expect(ended.stamina).toBe(42);
+    expect(ended.mentalTimerSeconds).toBe(0);
+    expect(ended.hearts).toEqual(active.hearts);
+    expect(finishBloom(ended).stamina).toBe(42);
+  });
+
   it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {
     const base = game('bloom');
     const initial = {
