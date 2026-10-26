@@ -1,6 +1,10 @@
 import { expect, it } from 'vite-plus/test';
 import { createTokenCardEffect } from '../../src/domain/game/actionTypeEffects/tokenCard';
-import { requestTokenCard } from '../../src/domain/game/cards/tokens';
+import {
+  beginTokenGeneration,
+  finishTokenGeneration,
+  requestTokenCard,
+} from '../../src/domain/game/cards/tokens';
 import { game } from './support/game';
 
 it('ActionType28はカードテンプレートとlong枚数・series IDを接続する', () => {
@@ -49,4 +53,37 @@ it('ActionType28はAbilityのSkillSeriesがないTokenCardCardDataを追加し�
   const result = requestTokenCard(state, 'token-without-skill-series', 1, source.id);
   expect(result.deck).toHaveLength(initial.deck.length);
   expect(result.nextTokenId).toBe(initial.nextTokenId);
+});
+
+it('ActionType28はseries detailのlong値で補正対象を照合し、生成カードにはint32値を設定する', () => {
+  const initial = game();
+  const template = initial.tokenCatalog[0];
+  const source = initial.deck[0];
+  if (!template || !source) throw new Error('TokenCardCardDataがありません。');
+  const seriesId = (1n << 32n) + 42n;
+  const state = {
+    ...initial,
+    tokenCatalog: [{ ...template, id: 'action28-series-template', tokenSeriesIds: [9] }],
+    tokenBoosts: [
+      {
+        calculation: 'add' as const,
+        value: 1,
+        target: { kind: 'all' as const },
+        seriesIds: [seriesId],
+        remainingUses: null,
+        remainingSeconds: null,
+        remainingSections: null,
+        deactivationKey: null,
+      },
+    ],
+  };
+
+  const grouped = beginTokenGeneration(state, source.id);
+  const result = finishTokenGeneration(
+    requestTokenCard(grouped, 'action28-series-template', 2n, source.id, [seriesId]),
+    source.id,
+  ).state;
+  const generated = result.deck.filter((card) => card.id.startsWith('action28-series-template-'));
+  expect(generated).toHaveLength(2);
+  expect(generated.every((card) => card.tokenSeriesIds?.join(',') === '42')).toBe(true);
 });

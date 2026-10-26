@@ -81,6 +81,7 @@ export function finishTokenGeneration(
   let actionType28Count = 0;
   const pending = group.requests.map((request, index) => ({
     template: request.template,
+    seriesIds: request.seriesIds,
     isActionType28: request.template.kind === 'template',
     count: boosted.counts[index] ?? 0,
   }));
@@ -88,7 +89,7 @@ export function finishTokenGeneration(
     let added = false;
     for (const request of pending) {
       if (request.count < 1 || next.deck.length >= rules.maxDeckSize) continue;
-      next = addTokenCards(next, request.template, 1, false);
+      next = addTokenCards(next, request.template, 1, false, request.seriesIds);
       request.count--;
       if (request.isActionType28) actionType28Count++;
       if (next.deck.length < rules.maxDeckSize) added = true;
@@ -112,7 +113,13 @@ function requestToken(state: GameState, request: TokenRequest, sourceId: string 
     };
   }
   const boosted = boostTokenRequests(state, [request], sourceId, false);
-  return addTokenCards(boosted.state, request.template, boosted.counts[0] ?? 0, true);
+  return addTokenCards(
+    boosted.state,
+    request.template,
+    boosted.counts[0] ?? 0,
+    true,
+    request.seriesIds,
+  );
 }
 
 function addTokenCards(
@@ -120,6 +127,7 @@ function addTokenCards(
   templateReference: TokenTemplateReference,
   count: number,
   throwIfMissing: boolean,
+  seriesIds?: readonly bigint[],
 ): GameState {
   const template =
     templateReference.kind === 'token-kind'
@@ -132,7 +140,12 @@ function addTokenCards(
   const addable = Math.max(0, rules.maxDeckSize - state.deck.length);
   const generated = Array.from(
     { length: Math.min(Math.max(0, Math.trunc(count)), addable) },
-    (_, index) => ({ ...template, id: `${template.id}-${state.nextTokenId + index}` }),
+    (_, index) => {
+      const card = { ...template, id: `${template.id}-${state.nextTokenId + index}` };
+      return templateReference.kind === 'template'
+        ? { ...card, tokenSeriesIds: (seriesIds ?? []).map(int32) }
+        : card;
+    },
   );
   const split = state.tokenDeckSplit;
   const splitMatches = (card: (typeof generated)[number]) =>
@@ -171,4 +184,8 @@ function addTokenCards(
     },
     generated,
   );
+}
+
+function int32(value: bigint): number {
+  return Number(BigInt.asIntN(32, value));
 }
