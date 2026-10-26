@@ -22,7 +22,8 @@ export function activateHandPermanentEffects(state: GameState, card: Card): Game
             effect.kind === 'hand-limit' ||
               effect.kind === 'skill-boost' ||
               effect.kind === 'ap-speed-change' ||
-              effect.kind === 'voltage-convert'
+              effect.kind === 'voltage-convert' ||
+              effect.kind === 'mental-heart-induce'
               ? { ...effect, invocationType: 0x388, deactivationKey }
               : withDeactivationKey(effect, deactivationKey, true),
             card,

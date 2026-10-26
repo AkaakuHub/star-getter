@@ -3,6 +3,7 @@ import { act } from '../../src/domain/game/actions';
 import { activateBloom, changeBloomResource, finishBloom } from '../../src/domain/game/bloom';
 import { applyEffect } from '../../src/domain/game/effects';
 import { calculateStarGatherGenesisGaugeDelta } from '../../src/domain/game/live/genesisGauge';
+import { heartCount } from '../../src/domain/game/hearts';
 import { rules } from '../../src/domain/game/model';
 import { advanceTo } from '../../src/domain/game/simulation';
 import { canUseSpecial } from '../../src/domain/game/special';
@@ -91,6 +92,26 @@ describe('開花の専用ゲージ', () => {
     expect([changed.energy, changed.stamina, changed.excitement]).toEqual([0, 80, 40]);
     expect(finishBloom(changed).bloom).toBeNull();
     expect(finishBloom(changed).stamina).toBe(80);
+  });
+
+  it('開花終了時にC#のMental値変更通知をActionType23へ伝える', () => {
+    const initial = game();
+    const source = initial.deck[0];
+    if (!source) throw new Error('ActionType23の発動元カードがありません。');
+    const mentalHeartInducing = applyEffect(
+      activateBloom({ ...initial, stamina: 80 }, 1),
+      {
+        kind: 'mental-heart-induce',
+        num: 10_000n,
+        heartDuration: { kind: 'stage', value: 0 },
+        duration: { kind: 'stage', value: 0n },
+        disabledType: 0,
+        disabledValue: 0n,
+      },
+      source,
+    );
+    const before = heartCount(mentalHeartInducing);
+    expect(heartCount(finishBloom(mentalHeartInducing))).toBe(before + 80);
   });
 
   it('発動前の増幅だけが強度を増やし、発動後の増幅はすでに決まった強度を変えない', () => {

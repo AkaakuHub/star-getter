@@ -85,6 +85,10 @@ export function finishBloom(state: GameState): GameState {
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'mental')) {
     next = { ...next, stamina: next.maximumMental, mentalTimerSeconds: 0 };
     next = induceMentalHearts(next, next.maximumMental);
+  } else if (next.disableMentalDownEffects.length > 0) {
+    next = induceMentalHearts(next, 0);
+  } else if (!next.resting || next.stamina > 0) {
+    next = induceMentalHearts(next, Math.trunc(next.stamina));
   }
   return next;
 }
