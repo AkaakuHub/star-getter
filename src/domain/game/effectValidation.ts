@@ -204,14 +204,18 @@ export function validateEffect(effect: Effect): void {
       (duration.kind === 'milliseconds' ||
         duration.kind === 'sections' ||
         (allowStage && duration.kind === 'stage')) &&
-      Number.isSafeInteger(duration.value) &&
-      duration.value >= (duration.kind === 'sections' ? 1 : 0);
+      isInt64(duration.value) &&
+      duration.value >= BigInt(duration.kind === 'sections' ? 1 : 0);
+    const validHeartDuration =
+      (effect.heartDuration.kind === 'milliseconds' || effect.heartDuration.kind === 'stage') &&
+      Number.isSafeInteger(effect.heartDuration.value) &&
+      effect.heartDuration.value >= 0;
     if (
-      !Number.isSafeInteger(effect.num) ||
+      !isInt64(effect.num) ||
       ![0, 1].includes(effect.disabledType) ||
-      !Number.isSafeInteger(effect.disabledValue) ||
+      !isInt64(effect.disabledValue) ||
       !validDuration(effect.duration, true) ||
-      !validDuration(effect.heartDuration, true) ||
+      !validHeartDuration ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

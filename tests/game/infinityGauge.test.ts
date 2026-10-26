@@ -94,11 +94,11 @@ describe('無限ゲージ', () => {
     };
     const inducing = applyEffect(initial, {
       kind: 'mental-heart-induce',
-      num: 10_000,
+      num: 10_000n,
       heartDuration: { kind: 'stage', value: 0 },
-      duration: { kind: 'milliseconds', value: 5_000 },
+      duration: { kind: 'milliseconds', value: 5_000n },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     });
     const active = applyEffect(inducing, {
       kind: 'infinity-gauge',
@@ -114,11 +114,11 @@ describe('無限ゲージ', () => {
   it('Action23の詳細値をC#のint32へ変換する', () => {
     const active = applyEffect(game(), {
       kind: 'mental-heart-induce',
-      num: 2_147_483_648,
+      num: 2_147_483_648n,
       heartDuration: { kind: 'stage', value: 0 },
-      duration: { kind: 'milliseconds', value: 5_000 },
+      duration: { kind: 'milliseconds', value: 5_000n },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     });
     expect(active.mentalHeartInducers[0]?.precomputedNum).toBe(-2_147_483_648);
   });
@@ -176,11 +176,11 @@ describe('無限ゲージ', () => {
     };
     const inducing = applyEffect(initial, {
       kind: 'mental-heart-induce',
-      num: 10_000,
+      num: 10_000n,
       heartDuration: { kind: 'stage', value: 0 },
-      duration: { kind: 'milliseconds', value: 5_000 },
+      duration: { kind: 'milliseconds', value: 5_000n },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     });
     const blooming = activateBloom(inducing, 1);
     const voltage = applyEffect(blooming, {

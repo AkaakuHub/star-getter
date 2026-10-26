@@ -3,6 +3,7 @@ import type { MentalHeartInduceEffect, MentalHeartInducer } from '../mentalHeart
 import { createSkillHearts } from './heartCreation';
 import { applyAdditionalBuff } from './additionalBuff';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 
 export function activateMentalHeartInduce(
   state: GameState,
@@ -11,7 +12,7 @@ export function activateMentalHeartInduce(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const raw = Math.fround(
     Math.fround(Math.fround(int32(effect.num)) + Math.fround(addValue)) * Math.fround(multiplier),
@@ -29,7 +30,7 @@ export function activateMentalHeartInduce(
     remainingSeconds:
       suppressDuration || effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       suppressDuration || effect.duration.kind !== 'sections' ? null : effect.duration.value,
     disabledOnInduceCount: effect.disabledType === 1 ? effect.disabledValue : null,
@@ -69,7 +70,8 @@ export function induceMentalHearts(state: GameState, currentMental: number): Gam
     next = {
       ...next,
       mentalHeartInducers:
-        updated.disabledOnInduceCount !== null && updated.induces === updated.disabledOnInduceCount
+        updated.disabledOnInduceCount !== null &&
+        BigInt(updated.induces) === updated.disabledOnInduceCount
           ? next.mentalHeartInducers.filter((item) => item.id !== updated.id)
           : next.mentalHeartInducers.map((item) => (item.id === updated.id ? updated : item)),
     };
@@ -93,8 +95,8 @@ export function expireMentalHeartInducerSections(state: GameState): GameState {
     ...state,
     mentalHeartInducers: state.mentalHeartInducers.flatMap((inducer) => {
       if (inducer.remainingSections === null) return [inducer];
-      const remainingSections = inducer.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...inducer, remainingSections }] : [];
+      const remainingSections = inducer.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...inducer, remainingSections }] : [];
     }),
   };
 }

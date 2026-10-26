@@ -1,10 +1,10 @@
 export type MentalHeartInduceEffect = Readonly<{
   kind: 'mental-heart-induce';
-  num: number;
+  num: bigint;
   heartDuration: Readonly<{ kind: 'milliseconds' | 'stage'; value: number }>;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: bigint }>;
   disabledType: 0 | 1;
-  disabledValue: number;
+  disabledValue: bigint;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -15,8 +15,8 @@ export type MentalHeartInducer = Readonly<{
   precomputedNum: number;
   heartLifetimeSeconds: number;
   remainingSeconds: number | null;
-  remainingSections: number | null;
-  disabledOnInduceCount: number | null;
+  remainingSections: bigint | null;
+  disabledOnInduceCount: bigint | null;
   induces: number;
   deactivationKey: string | null;
 }>;
