@@ -1,5 +1,8 @@
 import { expect, it } from 'vite-plus/test';
+import { routes } from '../../src/content/routes';
+import { tracks } from '../../src/content/tracks';
 import { createHeartLimitChangeEffect } from '../../src/domain/game/actionTypeEffects/heartLimitChange';
+import { createGame } from '../../src/domain/game/simulation';
 
 it('ActionType25はlongの詳細値・対象Mood・期限を保持して計算種別をint32化する', () => {
   const effect = createHeartLimitChangeEffect({
@@ -36,4 +39,33 @@ it('ActionType25はlongの詳細値・対象Mood・期限を保持して計算�
     bonusMoodValue: (1n << 53n) + 9n,
     duration: { kind: 'sections', value: (1n << 53n) + 1n },
   });
+});
+
+it('ActionType25の詳細レコードをcreateGameでハート上限効果へ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const details = [
+    { id: 25_001_1n, detailType: 'CHANGE_HEART_LIMIT_CALC_TYPE', targetMood: 0, value: 1n },
+    { id: 25_001_2n, detailType: 'CHANGE_HEART_LIMIT_NUM', targetMood: 0, value: 15_000n },
+    { id: 25_001_3n, detailType: 'CHANGE_HEART_LIMIT_DISPLAY_TIME_TYPE', targetMood: 0, value: 3n },
+  ] as const;
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 25 as const,
+              skillEffectId: 25_001n,
+              destination: 'effects' as const,
+              details,
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'heart-limit-change');
+  expect(effect).toEqual(createHeartLimitChangeEffect({ skillEffectId: 25_001n, details }));
 });
