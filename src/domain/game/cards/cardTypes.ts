@@ -285,6 +285,7 @@ export type Card = Readonly<{
     | ActionType7Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
+    | MoodActionRecord<13>
     | ActionType20Record
     | ActionType21Record
     | ActionType22Record
