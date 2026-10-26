@@ -72,6 +72,13 @@ export type ActionType29Record = Readonly<{
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
+type MoodActionRecord<T extends number> = Readonly<{
+  actionType: T;
+  skillEffectId: bigint;
+  details: readonly ActionTypeDetail[];
+  destination: 'effects' | 'handPermanentEffects';
+}>;
+
 export type HandPermanentEffect = Effect;
 
 export type HandUseTrigger =
@@ -134,6 +141,8 @@ export type Card = Readonly<{
     | ActionType24Record
     | ActionType25Record
     | ActionType29Record
+    | MoodActionRecord<30>
+    | MoodActionRecord<31>
   )[];
   ability893Effects?: readonly Effect[];
   ability894Effects?: readonly Effect[];

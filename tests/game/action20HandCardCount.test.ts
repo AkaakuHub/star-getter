@@ -325,3 +325,33 @@ it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ�
     target: 'all',
   });
 });
+
+it('ActionType30/31の詳細レコードはcreateGameで各追加バフへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 30 as const,
+              skillEffectId: 30_001n,
+              destination: 'effects' as const,
+              details: [],
+            },
+            {
+              actionType: 31 as const,
+              skillEffectId: 31_001n,
+              destination: 'effects' as const,
+              details: [],
+            },
+          ],
+        }
+      : card,
+  );
+  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  expect(compiled?.effects.some((item) => item.kind === 'love-up-additional-buff')).toBe(true);
+  expect(compiled?.effects.some((item) => item.kind === 'voltage-up-additional-buff')).toBe(true);
+});

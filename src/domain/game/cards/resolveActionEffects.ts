@@ -6,6 +6,8 @@ import { createMentalHeartInduceEffect } from '../actionTypeEffects/mentalHeartI
 import { createComboInduceEffect } from '../actionTypeEffects/comboInduce';
 import { createHeartLimitChangeEffect } from '../actionTypeEffects/heartLimitChange';
 import { createDeckSkillCostChangeEffect } from '../actionTypeEffects/deckSkillCostChange';
+import { createLoveUpAdditionalBuffEffect } from '../actionTypeEffects/loveUpAdditionalBuff';
+import { createVoltageUpAdditionalBuffEffect } from '../actionTypeEffects/voltageUpAdditionalBuff';
 
 export function resolveActionEffects(card: Card): Card {
   if (!card.actionEffects?.length) return card;
@@ -41,7 +43,23 @@ export function resolveActionEffects(card: Card): Card {
                         targetMood: detail.targetMood ?? 0,
                       })),
                     })
-                  : createDeckSkillCostChangeEffect(actionEffect);
+                  : actionEffect.actionType === 29
+                    ? createDeckSkillCostChangeEffect(actionEffect)
+                    : actionEffect.actionType === 30
+                      ? createLoveUpAdditionalBuffEffect({
+                          ...actionEffect,
+                          details: actionEffect.details.map((detail) => ({
+                            ...detail,
+                            targetMood: detail.targetMood ?? 0,
+                          })),
+                        })
+                      : createVoltageUpAdditionalBuffEffect({
+                          ...actionEffect,
+                          details: actionEffect.details.map((detail) => ({
+                            ...detail,
+                            targetMood: detail.targetMood ?? 0,
+                          })),
+                        });
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
