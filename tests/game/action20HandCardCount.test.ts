@@ -177,3 +177,31 @@ it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接�
   const effect = compiled?.effects.find((item) => item.kind === 'ap-speed-change');
   expect(effect).toMatchObject({ kind: 'ap-speed-change', calculationType: 1, num: 100n });
 });
+
+it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 22 as const,
+              skillEffectId: 22_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 22_001_1n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_TYPE', value: 1n },
+                { id: 22_001_2n, detailType: 'CONVERT_VOLTAGE_UP_NUM', value: 100n },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'voltage-convert');
+  expect(effect).toMatchObject({ kind: 'voltage-convert', destination: 'hearts', num: 100 });
+});
