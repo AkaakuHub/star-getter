@@ -35,5 +35,10 @@ export type ProxySkillEffect = Readonly<{
 
 export type ProxyForcedActivationEffect = Readonly<{
   kind: 'proxy-skill-forced-activation';
-  targetType: 1 | 2 | 3 | 4 | 5;
+  targetType: bigint;
 }>;
+
+export function validateProxyForcedActivationEffect(effect: ProxyForcedActivationEffect): void {
+  if (effect.targetType < -(1n << 63n) || effect.targetType >= 1n << 63n)
+    throw new Error('Proxyスキル強制発動の設定が正しくありません。');
+}

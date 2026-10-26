@@ -16,6 +16,7 @@ import {
   validateUseInduceEffect,
 } from './useInduceTypes';
 import { validateReshuffleSkillEffect } from './reshuffleSkillTypes';
+import { validateProxyForcedActivationEffect } from './proxySkillTypes';
 
 type SpecialEffect = Extract<
   Effect,
@@ -35,7 +36,8 @@ type SpecialEffect = Extract<
       | 'use-count-induce'
       | 'effect-induce'
       | 'card-move-induce'
-      | 'reshuffle-skill';
+      | 'reshuffle-skill'
+      | 'proxy-skill-forced-activation';
   }
 >;
 
@@ -90,6 +92,9 @@ export function validateSpecialEffect(
     case 'reshuffle-skill':
       validateReshuffleSkillEffect(effect);
       break;
+    case 'proxy-skill-forced-activation':
+      validateProxyForcedActivationEffect(effect);
+      break;
   }
   return true;
 }
@@ -110,6 +115,7 @@ function isSpecialEffect(effect: Effect): effect is SpecialEffect {
     effect.kind === 'use-count-induce' ||
     effect.kind === 'effect-induce' ||
     effect.kind === 'card-move-induce' ||
-    effect.kind === 'reshuffle-skill'
+    effect.kind === 'reshuffle-skill' ||
+    effect.kind === 'proxy-skill-forced-activation'
   );
 }

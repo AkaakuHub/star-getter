@@ -269,10 +269,18 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
         : absorption,
     ),
   };
-  const forced = applyEffect(reached, { kind: 'proxy-skill-forced-activation', targetType: 4 });
+  const forced = applyEffect(reached, { kind: 'proxy-skill-forced-activation', targetType: 4n });
   expect(forced.proxyAbsorptions.map((absorption) => absorption.isAbsorbEnd)).toEqual([
     true,
     false,
+  ]);
+  const forcedUnlimited = applyEffect(reached, {
+    kind: 'proxy-skill-forced-activation',
+    targetType: 9_007_203_549_708_291n,
+  });
+  expect(forcedUnlimited.proxyAbsorptions.map((absorption) => absorption.isAbsorbEnd)).toEqual([
+    false,
+    true,
   ]);
   expect(advanceTo(forced, 1).proxyAbsorptions).toHaveLength(2);
 });
