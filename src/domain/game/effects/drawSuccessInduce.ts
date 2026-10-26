@@ -4,6 +4,11 @@ import type { Card, GameState } from '../model';
 import type { DrawSuccessInduceEffect } from '../drawSuccessInduceTypes';
 import type { EffectApplier } from './induceSkillEffect';
 import { deactivateInducedEffects, withDeactivationKey } from './effectInduce';
+import { int64ToFloat32 } from '../numeric';
+
+function numToValue(value: bigint): number {
+  return Math.fround(int64ToFloat32(value) / Math.fround(10_000));
+}
 
 export function evaluateDrawSuccessInduce(
   state: GameState,
@@ -16,18 +21,15 @@ export function evaluateDrawSuccessInduce(
     return true;
   switch (branchType) {
     case 2: {
-      const numToValue = Math.fround(Math.fround(Number(branchValue)) / 10_000);
-      const factor = numToValue / 100;
+      const factor = Math.fround(numToValue(branchValue) / Math.fround(100));
       const currentPercent = Math.fround(Math.trunc(state.stamina) / state.maximumMental);
-      return currentPercent !== factor;
+      return currentPercent <= factor;
     }
     case 4: {
-      const numToValue = Math.fround(Math.fround(Number(branchValue)) / 10_000);
-      return moodValue(state) <= numToValue;
+      return Math.fround(moodValue(state)) <= numToValue(branchValue);
     }
     case 5: {
-      const numToValue = Math.fround(Math.fround(Number(branchValue)) / 10_000);
-      return voltageLevel(state.excitement, state.maximumVoltageLevel) <= numToValue;
+      return voltageLevel(state.excitement, state.maximumVoltageLevel) <= numToValue(branchValue);
     }
     case 6:
       return BigInt(state.track.sections.indexOf(sectionAt(state)) + 1) <= branchValue;
