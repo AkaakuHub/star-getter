@@ -2,17 +2,17 @@ import type { MoodBonus } from './modelTypes';
 
 export type MentalShieldEffect = Readonly<{
   kind: 'mental-shield';
-  durabilityType: 1 | 2 | 3;
-  durability: number;
-  moodBonus?: MoodBonus;
+  durabilityType: bigint;
+  durability: bigint;
+  moodBonus?: MoodBonus & Readonly<{ perPointLong?: bigint }>;
   duration:
-    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+    | Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>
     | Readonly<{ kind: 'stage' }>;
-  applyCount: number;
+  applyCount: bigint;
 }>;
 
 export type MentalShield = Readonly<{
-  durabilityType: 1 | 2 | 3;
+  durabilityType: number;
   durability: number;
   applyCount: number;
   remainingSeconds: number | null;
@@ -20,12 +20,15 @@ export type MentalShield = Readonly<{
 }>;
 
 export function validateMentalShieldEffect(effect: MentalShieldEffect): void {
+  const isInt64 = (value: bigint) => value >= -(1n << 63n) && value < 1n << 63n;
   if (
-    !Number.isSafeInteger(effect.durability) ||
-    !Number.isSafeInteger(effect.applyCount) ||
-    (effect.duration.kind !== 'stage' && !Number.isSafeInteger(effect.duration.value)) ||
+    !isInt64(effect.durabilityType) ||
+    !isInt64(effect.durability) ||
+    !isInt64(effect.applyCount) ||
+    (effect.duration.kind !== 'stage' && !isInt64(effect.duration.value)) ||
     (effect.moodBonus !== undefined &&
       (!Number.isFinite(effect.moodBonus.perPoint) ||
+        (effect.moodBonus.perPointLong !== undefined && !isInt64(effect.moodBonus.perPointLong)) ||
         ![0, 1, 2, 3].includes(effect.moodBonus.target)))
   )
     throw new Error('元気シールドの設定が正しくありません。');

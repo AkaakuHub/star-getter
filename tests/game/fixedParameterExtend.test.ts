@@ -115,10 +115,10 @@ it('元気上限を伸ばして回復し、比率シールドに拡張後の上�
     extended,
     {
       kind: 'mental-shield',
-      durabilityType: 1,
-      durability: 100_000,
+      durabilityType: 1n,
+      durability: 100_000n,
       duration: { kind: 'stage' },
-      applyCount: 0,
+      applyCount: 0n,
     },
     source,
   );

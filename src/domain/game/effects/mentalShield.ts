@@ -12,6 +12,7 @@ export function activateMentalShield(
   addValue: number,
   effectPower: number,
 ): GameState {
+  const durabilityType = int32(effect.durabilityType);
   const durability = int32(effect.durability);
   const applyCount = int32(effect.applyCount);
   const durationValue = effect.duration.kind === 'stage' ? 0 : int32(effect.duration.value);
@@ -19,13 +20,20 @@ export function activateMentalShield(
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
         moodValue(state),
-        effect.moodBonus.perPoint,
+        Math.fround(
+          Number(
+            BigInt.asIntN(
+              32,
+              effect.moodBonus.perPointLong ?? BigInt(Math.trunc(effect.moodBonus.perPoint)),
+            ),
+          ),
+        ),
       )
     : 0;
   const rawDurability = Math.fround(Math.fround(durability) / 10_000);
   const rawAddValue = Math.fround(Math.fround(addValue) / 10_000);
   let value: number;
-  if (effect.durabilityType === 1) {
+  if (durabilityType === 1) {
     const ratio = Math.fround(
       Math.fround(Math.fround(moodCorrection / 100) + Math.fround(rawDurability / 100)) +
         Math.fround(rawAddValue / 100),
@@ -34,7 +42,7 @@ export function activateMentalShield(
       Math.fround(Math.fround(ratio * Math.fround(multiplier)) * state.maximumMental) *
         Math.fround(effectPower),
     );
-  } else if (effect.durabilityType === 2) {
+  } else if (durabilityType === 2) {
     value = Math.fround(
       Math.fround(Math.fround(moodCorrection + rawDurability) + rawAddValue) *
         Math.fround(multiplier),
@@ -44,18 +52,20 @@ export function activateMentalShield(
   }
   const boosted = applyAction52SkillBoostForCard(state, card, value);
   const shield: MentalShield = {
-    durabilityType: effect.durabilityType,
+    durabilityType,
     durability: Math.trunc(boosted.value),
     applyCount,
     remainingSeconds:
-      effect.duration.kind === 'milliseconds' ? Math.fround(durationValue / 1000) : null,
+      effect.duration.kind === 'milliseconds'
+        ? Math.fround(durationValue / Math.fround(1000))
+        : null,
     remainingSections: effect.duration.kind === 'sections' && hasFollowingSection(state) ? 1 : null,
   };
   return { ...boosted.state, mentalShields: [...boosted.state.mentalShields, shield] };
 }
 
-function int32(value: number): number {
-  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
+function int32(value: bigint): number {
+  return Number(BigInt.asIntN(32, value));
 }
 
 export function advanceMentalShields(state: GameState, elapsedSeconds: number): GameState {

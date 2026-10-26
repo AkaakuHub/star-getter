@@ -211,10 +211,10 @@ it('シールドは自然減少とスキル由来の元気減少を防ぐ', () =
   const initial = { ...game(), hand: [], handEffectCardIds: [], stamina: 100, targetBoosts: [] };
   const shield = applyEffect(initial, {
     kind: 'mental-shield',
-    durabilityType: 2,
-    durability: 100_000,
+    durabilityType: 2n,
+    durability: 100_000n,
     duration: { kind: 'stage' },
-    applyCount: 0,
+    applyCount: 0n,
   });
   const damaged = applyEffect(shield, { kind: 'stamina', amount: -14 });
   expect(damaged.stamina).toBe(96);
