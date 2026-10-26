@@ -103,7 +103,9 @@ type HeartBoostEffect = Readonly<{
   percent: number;
   uses: number | null;
   target?: HeartBoostTarget;
-  duration?: Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+  duration?:
+    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+    | Readonly<{ kind: 'stage' }>;
   invocationType?: number;
   deactivationKey?: string;
   moodBonus?: MoodBonus;

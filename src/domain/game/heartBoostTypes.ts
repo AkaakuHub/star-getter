@@ -9,6 +9,7 @@ export function validateHeartBoostEffect(effect: Extract<Effect, { kind: 'heart-
     (target?.kind === 'unit' && ![1, 2, 3].includes(target.unit)) ||
     (target?.kind === 'card-series' && !Number.isSafeInteger(target.seriesId)) ||
     (effect.duration !== undefined &&
+      effect.duration.kind !== 'stage' &&
       (!Number.isSafeInteger(effect.duration.value) ||
         effect.duration.value < (effect.duration.kind === 'sections' ? 1 : 0))) ||
     (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||

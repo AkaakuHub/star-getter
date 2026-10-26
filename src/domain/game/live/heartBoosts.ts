@@ -36,9 +36,11 @@ export function addHeartBoost(
           ? null
           : effect.duration === undefined
             ? 0
-            : effect.duration.kind === 'milliseconds'
-              ? Math.fround(effect.duration.value / 1000)
-              : null,
+            : effect.duration.kind === 'stage'
+              ? null
+              : effect.duration.kind === 'milliseconds'
+                ? Math.fround(effect.duration.value / 1000)
+                : null,
         remainingSections:
           !suppressDuration && effect.duration?.kind === 'sections' ? effect.duration.value : null,
         deactivationKey: effect.deactivationKey ?? null,
