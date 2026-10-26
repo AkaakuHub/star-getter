@@ -225,6 +225,7 @@ export type Card = Readonly<{
     | MoodActionRecord<51>
     | MoodActionRecord<52>
     | MoodActionRecord<54>
+    | MoodActionRecord<55>
     | MoodActionRecord<57>
     | MoodActionRecord<58>
   )[];

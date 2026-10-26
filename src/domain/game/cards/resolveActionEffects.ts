@@ -28,6 +28,7 @@ import { createSkillBoostEffect } from '../actionTypeEffects/skillBoost';
 import { createHandMaxCardEffect } from '../actionTypeEffects/handMaxCard';
 import { createProxyForcedActivationEffect } from '../actionTypeEffects/proxyForcedActivation';
 import { createFixedParameterExtendEffect } from '../actionTypeEffects/fixedParameterExtend';
+import { createResetSpecialEffect } from '../actionTypeEffects/resetSpecial';
 import { createAdditionalHeartInduceEffect } from '../actionTypeEffects/additionalHeart';
 import { createModeChangeInduceEffect } from '../actionTypeEffects/modeChangeInduce';
 import { createProxySkillEffect } from '../actionTypeEffects/proxySkill';
@@ -201,27 +202,39 @@ export function resolveActionEffects(card: Card): Card {
                                                                             actionEffect.details,
                                                                         })
                                                                       : actionEffect.actionType ===
-                                                                          56
-                                                                        ? createMentalShieldEffect({
-                                                                            ...actionEffect,
-                                                                            details:
-                                                                              actionEffect.details.map(
-                                                                                (detail) => ({
-                                                                                  ...detail,
-                                                                                  targetMood:
-                                                                                    detail.targetMood ??
-                                                                                    0,
-                                                                                }),
-                                                                              ),
-                                                                          })
+                                                                          55
+                                                                        ? createResetSpecialEffect(
+                                                                            actionEffect,
+                                                                          )
                                                                         : actionEffect.actionType ===
-                                                                            57
-                                                                          ? createProxyForcedActivationEffect(
-                                                                              actionEffect,
+                                                                            56
+                                                                          ? createMentalShieldEffect(
+                                                                              {
+                                                                                ...actionEffect,
+                                                                                details:
+                                                                                  actionEffect.details.map(
+                                                                                    (detail) => ({
+                                                                                      ...detail,
+                                                                                      targetMood:
+                                                                                        detail.targetMood ??
+                                                                                        0,
+                                                                                    }),
+                                                                                  ),
+                                                                              },
                                                                             )
-                                                                          : createFixedParameterExtendEffect(
-                                                                              actionEffect,
-                                                                            );
+                                                                          : actionEffect.actionType ===
+                                                                              57
+                                                                            ? createProxyForcedActivationEffect(
+                                                                                actionEffect,
+                                                                              )
+                                                                            : actionEffect.actionType ===
+                                                                                58
+                                                                              ? createFixedParameterExtendEffect(
+                                                                                  actionEffect,
+                                                                                )
+                                                                              : assertNever(
+                                                                                  actionEffect,
+                                                                                );
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }
@@ -230,4 +243,8 @@ export function resolveActionEffects(card: Card): Card {
     effects,
     ...(handPermanentEffects.length > 0 ? { handPermanentEffects } : {}),
   };
+}
+
+function assertNever(value: never): never {
+  throw new Error(`未対応のActionTypeです: ${String(value)}`);
 }

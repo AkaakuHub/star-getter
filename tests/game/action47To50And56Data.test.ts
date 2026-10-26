@@ -3,7 +3,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
 
-it('ActionType47〜52/54/56〜58の詳細レコードを各Effectへ接続する', () => {
+it('ActionType47〜52/54〜58の詳細レコードを各Effectへ接続する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
@@ -11,12 +11,14 @@ it('ActionType47〜52/54/56〜58の詳細レコードを各Effectへ接続する
     card.id === source.id
       ? {
           ...card,
-          actionEffects: ([47, 48, 49, 50, 51, 52, 54, 56, 57, 58] as const).map((actionType) => ({
-            actionType,
-            skillEffectId: BigInt(actionType) * 1000n + 1n,
-            destination: 'effects' as const,
-            details: [],
-          })),
+          actionEffects: ([47, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58] as const).map(
+            (actionType) => ({
+              actionType,
+              skillEffectId: BigInt(actionType) * 1000n + 1n,
+              destination: 'effects' as const,
+              details: [],
+            }),
+          ),
         }
       : card,
   );
@@ -33,4 +35,5 @@ it('ActionType47〜52/54/56〜58の詳細レコードを各Effectへ接続する
     true,
   );
   expect(compiled?.effects.some((item) => item.kind === 'fixed-parameter-extend')).toBe(true);
+  expect(compiled?.effects.some((item) => item.kind === 'reset-special')).toBe(true);
 });
