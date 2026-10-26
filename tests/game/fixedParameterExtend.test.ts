@@ -61,6 +61,17 @@ it('ActionType58の値をC#のint32へ変換する', () => {
   expect(extended.fixedParameterExtends[0]?.value).toBe(-2_147_483_648);
 });
 
+it('ActionType58の熱気上限をStageVoltageLevelSettingsの最終段階で止める', () => {
+  const extended = applyEffect(game(), {
+    kind: 'fixed-parameter-extend',
+    target: 'voltage',
+    calculation: 'fixed',
+    value: 3_000n,
+    duration: { kind: 'stage' },
+  });
+  expect(extended.maximumVoltageLevel).toBe(2_000);
+});
+
 it('期限終了後にAP上限を元へ戻す', () => {
   const initial = game();
   const source = initial.deck[0];

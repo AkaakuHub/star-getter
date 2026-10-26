@@ -7,6 +7,7 @@ import { energyMaximum, changeMaximum } from '../parameters/maximum';
 import { voltageThreshold } from '../live/voltageLevel';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { int64ToFloat32 } from '../numeric';
+import stageVoltageLevelSettingCount from '../../../content/master/stageVoltageLevelSettingCount.json';
 
 export function activateFixedParameterExtend(
   state: GameState,
@@ -106,7 +107,10 @@ function recalculateFixedParameters(state: GameState): GameState {
       .filter((effect) => effect.target === 'ap')
       .map((effect) => ({ calculation: effect.calculation, value: effect.value })),
   );
-  const maximumVoltageLevel = Math.max(1, maximum('voltage', state.fixedParameterBase.voltage));
+  const maximumVoltageLevel = Math.max(
+    1,
+    Math.min(stageVoltageLevelSettingCount, maximum('voltage', state.fixedParameterBase.voltage)),
+  );
   const mental = maximum('mental', state.fixedParameterBase.mental);
   const maximumMental = Math.max(1, Math.min(mental, state.fixedParameterBase.mental * 10));
   const apInfinite = state.gaugeInfinities.some(
