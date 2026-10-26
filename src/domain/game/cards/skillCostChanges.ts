@@ -105,10 +105,10 @@ function conditionValue(state: GameState, source: Card, change: SkillCostChange)
     case 8:
       return currentHand.filter((card) => card.mainEffect === change.conditionId).length;
     case 9:
-      return (
+      return Math.fround(
         state.boosts.reduce((sum, boost) => sum + boost.percent, 0) +
-        state.skillScoreUps.reduce((sum, boost) => sum + boost.percent, 0) +
-        state.temporaryScoreBoosts.reduce((sum, boost) => sum + boost.percent, 0)
+          state.skillScoreUps.reduce((sum, boost) => sum + boost.percent, 0) +
+          state.temporaryScoreBoosts.reduce((sum, boost) => sum + boost.percent, 0),
       );
     case 10:
       return currentHand.filter((card) => card.style === change.conditionId).length;

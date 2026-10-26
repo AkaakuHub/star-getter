@@ -133,6 +133,37 @@ it('Action17の条件4は最大元気に対する整数元気割合を使う', (
   expect(cardCost(changed, source) - cardCost(initial, source)).toBe(5);
 });
 
+it('Action17の条件9はC#のfloat精度に丸めたBonusScoreValueを使う', () => {
+  const initial = {
+    ...game(),
+    boosts: [{ percent: 16_777_216, untilTick: 999_999 }],
+    skillScoreUps: [
+      {
+        percent: 1,
+        untilTick: 999_999,
+        remainingSeconds: null,
+        remainingSections: null,
+        removeOnHeartCollect: false,
+        deactivationKey: null,
+      },
+    ],
+  };
+  const source = initial.deck.find((card) => card.id === 'class');
+  if (!source) throw new Error('検証用カードがありません。');
+  const changed = applyEffect(
+    initial,
+    {
+      kind: 'skill-cost-change',
+      amount: 1,
+      minimum: 0,
+      maximum: 20_000_000,
+      conditionType: 9,
+    },
+    source,
+  );
+  expect(cardCost(changed, source) - cardCost(initial, source)).toBe(16_777_216);
+});
+
 it('Action17のメンバー使用数は使用カードが手札を離れた後も手札統計に残す', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
