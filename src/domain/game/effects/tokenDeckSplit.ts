@@ -80,7 +80,7 @@ export function activateTokenDeckSplit(
   return completeDeckOutChecks(completed, applyEffect);
 }
 
-export function switchTokenDeck(state: GameState, applyEffect?: EffectApplier): GameState {
+export function switchTokenDeck(state: GameState, applyEffect: EffectApplier): GameState {
   const split = state.tokenDeckSplit;
   if (!split) return state;
   const incoming = split.active === 'main' ? split.sub : split.main;
@@ -113,9 +113,7 @@ export function switchTokenDeck(state: GameState, applyEffect?: EffectApplier): 
     if (card) next = activateHandPermanentEffects(next, card);
   }
   const switched = { ...next, tokenDeckSplit: { ...updated, [incomingName]: zones(next) } };
-  return incoming.hand.length === 0 && applyEffect
-    ? completeDeckOutChecks(switched, applyEffect)
-    : switched;
+  return incoming.hand.length === 0 ? completeDeckOutChecks(switched, applyEffect) : switched;
 }
 
 function mergeTokenDeck(state: GameState, applyEffect: EffectApplier): GameState {
