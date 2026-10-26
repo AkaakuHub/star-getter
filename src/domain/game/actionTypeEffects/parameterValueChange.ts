@@ -5,7 +5,7 @@ import { int64ToFloat32, isInt64 } from '../numeric';
 
 type Input = Readonly<{ skillEffectId: bigint; details: readonly ActionTypeDetail[] }>;
 
-export function createParameterValueChangeEffect(input: Input): Effect {
+export function createParameterValueChangeEffect(input: Input): Effect | null {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
   const calculationType = int32(find(input.details, 'CHANGE_PARAM_VALUE_CALC_TYPE')?.value ?? 1n);
   const targetDetailId = find(input.details, 'CHANGE_PARAM_VALUE_ACTION_ID')?.value ?? 0n;
@@ -16,6 +16,7 @@ export function createParameterValueChangeEffect(input: Input): Effect {
   const params = input.details.find(
     (detail) => detail.detailType === 'CHANGE_PARAM_VALUE_MULTIPLY_PARAMS_ID',
   )?.paramValues;
+  if (calculation !== 'add' && params === undefined) return null;
   const values =
     calculation === 'multiply'
       ? params?.map((value) => {

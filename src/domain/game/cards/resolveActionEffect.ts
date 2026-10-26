@@ -50,7 +50,7 @@ type RuntimeActionEffect = Exclude<
 
 import { resolveEarlyActionEffect, type EarlyActionEffect } from './resolveEarlyActionEffect';
 
-export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
+export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect | null {
   switch (actionEffect.actionType) {
     case 26:
       return createStopVoltageIncreaseEffect(actionEffect);

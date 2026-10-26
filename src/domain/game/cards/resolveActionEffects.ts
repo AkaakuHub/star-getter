@@ -62,6 +62,7 @@ export function resolveActionEffects(card: Card): Card {
       continue;
     }
     const effect = resolveActionEffect(actionEffect);
+    if (effect === null) continue;
     if (actionEffect.destination === 'effects') effects.push(effect);
     else handPermanentEffects.push(effect);
   }

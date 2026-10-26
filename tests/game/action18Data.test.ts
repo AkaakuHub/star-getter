@@ -63,3 +63,7 @@ it('ActionType18のlong倍率値をfloat32へ直接変換する', () => {
   });
   expect(effect).toMatchObject({ values: [2 ** 54 + 2 ** 31] });
 });
+
+it('ActionType18は配列詳細がないfan-level効果を登録しない', () => {
+  expect(createParameterValueChangeEffect({ skillEffectId: 18n, details: [] })).toBeNull();
+});

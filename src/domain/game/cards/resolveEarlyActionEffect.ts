@@ -25,7 +25,7 @@ export type EarlyActionEffect = Extract<
   }
 >;
 
-export function resolveEarlyActionEffect(actionEffect: EarlyActionEffect): Effect {
+export function resolveEarlyActionEffect(actionEffect: EarlyActionEffect): Effect | null {
   switch (actionEffect.actionType) {
     case 1:
       return createAddHeartEffect(actionEffect);
