@@ -19,6 +19,7 @@ import { validateSkillScoreUpEffect } from './skillScoreUpTypes';
 import { isInt64 } from './numeric';
 import { validateHandCardCountEffect } from './actionTypeEffects/handCardCount';
 import { validateApSpeedChangeEffect } from './actionTypeEffects/apSpeedChange';
+import { validateMentalBarrierEffect } from './mentalBarrierTypes';
 export function validateEffect(effect: Effect): void {
   if (effect.skillEffectId !== undefined && !isInt64(effect.skillEffectId))
     throw new Error('スキル効果IDが正しくありません。');
@@ -330,6 +331,7 @@ export function validateEffect(effect: Effect): void {
     return;
   }
   if (effect.kind === 'energy' && Number.isFinite(effect.amount)) return;
+  if (effect.kind === 'mental-barrier') return validateMentalBarrierEffect(effect);
   if (
     !('amount' in effect) ||
     !Number.isSafeInteger(effect.amount) ||

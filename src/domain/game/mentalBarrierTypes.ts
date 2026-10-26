@@ -22,3 +22,17 @@ export type MentalBarrierEffect = Readonly<{
     | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
     | Readonly<{ kind: 'stage' }>;
 }>;
+
+export function validateMentalBarrierEffect(effect: MentalBarrierEffect): void {
+  if (
+    !Number.isFinite(effect.endurance) ||
+    !Number.isFinite(effect.attenuation) ||
+    (effect.enduranceMoodBonus !== undefined &&
+      (!Number.isFinite(effect.enduranceMoodBonus.perPoint) ||
+        ![1, 2, 3].includes(effect.enduranceMoodBonus.target))) ||
+    (effect.attenuationMoodBonus !== undefined &&
+      (!Number.isFinite(effect.attenuationMoodBonus.perPoint) ||
+        ![1, 2, 3].includes(effect.attenuationMoodBonus.target)))
+  )
+    throw new Error('元気バリアの効果量が正しくありません。');
+}
