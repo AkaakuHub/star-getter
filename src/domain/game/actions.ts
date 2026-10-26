@@ -240,8 +240,7 @@ function activateCard(
     next = registerMissionAction(next, 28, tokenGeneration.actionType28Count);
   next = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
   const ability = resolveModeAbility(card, next.modes);
-  if (card.modeAbilityChanges)
-    next = applyAbilityEffects(next, card, ability.ability893Effects ?? [], applyEffect);
+  next = applyAbilityEffects(next, card, ability.ability893Effects ?? [], applyEffect);
   next = applyAbilityEffects(next, card, ability.ability894Effects ?? [], applyEffect);
   for (const effect of card.effects) {
     if (effect.kind !== 'use-hand' || allHand) continue;

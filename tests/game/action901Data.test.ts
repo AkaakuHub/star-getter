@@ -43,7 +43,7 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
   expect(compiled?.drawEffects).toBeUndefined();
 });
 
-it('ActionType901はドロー時にAbility893から条件付き子効果を発動する', () => {
+it('ActionType901はドロー時とカード使用時にAbility893から条件付き子効果を発動する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const card: Card = {
@@ -89,5 +89,5 @@ it('ActionType901はドロー時にAbility893から条件付き子効果を発�
   expect(drawn.moodOffset - initial.moodOffset).toBe(10);
   const started = act(initial, { type: 'start' });
   const used = act(started, { type: 'card', index: 0 });
-  expect(used.moodOffset).toBe(started.moodOffset);
+  expect(used.moodOffset - started.moodOffset).toBe(10);
 });
