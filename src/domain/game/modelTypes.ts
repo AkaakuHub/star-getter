@@ -240,7 +240,7 @@ type EffectShape =
       bonusMoodTarget: 0 | 1 | 2 | 3;
       bonusMoodValue: bigint;
       duration:
-        | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>
+        | Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>
         | Readonly<{ kind: 'stage' }>;
       invocationType?: number;
       deactivationKey?: string;

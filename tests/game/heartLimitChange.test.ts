@@ -23,7 +23,7 @@ it('加算変更は期限後に解除し、既存の基礎上限へ戻る', () =
       num: 20_000n,
       bonusMoodTarget: 0,
       bonusMoodValue: 0n,
-      duration: { kind: 'milliseconds', value: 1000 },
+      duration: { kind: 'milliseconds', value: 1000n },
     },
     card,
   );
@@ -42,7 +42,7 @@ it('ActionType25の表示期限0パートは次のパート変更で解除する
     num: 10_000n,
     bonusMoodTarget: 0,
     bonusMoodValue: 0n,
-    duration: { kind: 'sections', value: 0 },
+    duration: { kind: 'sections', value: 0n },
   } as const;
 
   validateEffect(effect);
@@ -107,7 +107,7 @@ it('パート期限と外部解除で上限変更を解除し、直接上限変�
       num: 20_000n,
       bonusMoodTarget: 0,
       bonusMoodValue: 0n,
-      duration: { kind: 'sections', value: 1 },
+      duration: { kind: 'sections', value: 1n },
       deactivationKey: 'limit',
     },
     card,

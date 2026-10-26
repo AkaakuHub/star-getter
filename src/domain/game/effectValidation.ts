@@ -237,7 +237,7 @@ export function validateEffect(effect: Effect): void {
       ![0, 1, 2, 3].includes(effect.bonusMoodTarget) ||
       !isInt64(effect.bonusMoodValue) ||
       !['milliseconds', 'sections', 'stage'].includes(effect.duration.kind) ||
-      (effect.duration.kind !== 'stage' && !Number.isSafeInteger(effect.duration.value)) ||
+      (effect.duration.kind !== 'stage' && !isInt64(effect.duration.value)) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||
       (effect.deactivationKey !== undefined && typeof effect.deactivationKey !== 'string')
     )

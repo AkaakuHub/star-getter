@@ -282,6 +282,32 @@ export function resolveEffectParameterDetails(
       ),
     };
   }
+  if (effect.kind === 'heart-limit-change') {
+    return {
+      ...effect,
+      num: resolveParameterDetailInteger(state, card, effect, 'num', effect.num),
+      bonusMoodValue: resolveParameterDetailInteger(
+        state,
+        card,
+        effect,
+        'bonusMoodValue',
+        effect.bonusMoodValue,
+      ),
+      duration:
+        effect.duration.kind === 'stage'
+          ? effect.duration
+          : {
+              ...effect.duration,
+              value: resolveParameterDetailInteger(
+                state,
+                card,
+                effect,
+                'displayTime',
+                effect.duration.value,
+              ),
+            },
+    };
+  }
   const resolved = { ...effect };
   for (const [key] of Object.entries(effect.parameterDetails)) {
     const value = Object.getOwnPropertyDescriptor(effect, key)?.value;

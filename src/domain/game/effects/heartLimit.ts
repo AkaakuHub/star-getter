@@ -86,7 +86,7 @@ export function activateHeartLimitChange(
       effect.invocationType === 0x38b ||
       effect.duration.kind !== 'milliseconds'
         ? null
-        : Math.fround(effect.duration.value / 1000),
+        : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
       effect.invocationType === 0x388 ||
       effect.invocationType === 0x38b ||
@@ -127,8 +127,8 @@ export function advanceHeartLimitBuffs(state: GameState, elapsedSeconds: number)
 export function expireHeartLimitBuffSections(state: GameState): GameState {
   const heartLimitBuffs = state.heartLimitBuffs.flatMap((buff) => {
     if (buff.remainingSections === null) return [buff];
-    const remainingSections = buff.remainingSections - 1;
-    return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
+    const remainingSections = buff.remainingSections - 1n;
+    return remainingSections > 0n ? [{ ...buff, remainingSections }] : [];
   });
   return heartLimitBuffs.length === state.heartLimitBuffs.length
     ? state
