@@ -2,6 +2,10 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createVoltageConvertEffect } from '../../src/domain/game/actionTypeEffects/voltageConvert';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
 import { createGame } from '../../src/domain/game/simulation';
 
 it('ActionType22はlong詳細値をC#同様にint32へ変換して効果を作る', () => {
@@ -60,4 +64,38 @@ it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
   const effect = compiled?.effects.find((item) => item.kind === 'voltage-convert');
   expect(effect).toEqual(createVoltageConvertEffect({ skillEffectId: 22_001n, details }));
+});
+
+it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離脱時に解除する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const details = [
+    { id: 22_002_1n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_TYPE', value: 1n },
+    { id: 22_002_2n, detailType: 'CONVERT_VOLTAGE_UP_NUM', value: 10_000n },
+    { id: 22_002_3n, detailType: 'CONVERT_VOLTAGE_UP_DISPLAY_TIME_TYPE', value: 1n },
+    { id: 22_002_4n, detailType: 'CONVERT_VOLTAGE_UP_DISPLAY_TIME', value: 100n },
+  ] as const;
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 22 as const,
+              skillEffectId: 22_002n,
+              destination: 'handPermanentEffects' as const,
+              details,
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  if (!compiled) throw new Error('ActionType22の発動元カードがありません。');
+  const activated = activateHandPermanentEffects(state, compiled);
+  expect(activated.voltageConversions).toHaveLength(1);
+  expect(activated.voltageConversions[0]?.remainingSeconds).toBeNull();
+  expect(disposeHandEffects(activated, [compiled.id]).voltageConversions).toHaveLength(0);
 });
