@@ -3,7 +3,10 @@ import { evaluateCondition } from '../../src/domain/game/conditions/evaluate';
 import { conditionContext } from '../../src/domain/game/conditions/gameContext';
 import type { ConditionContext, GameCondition } from '../../src/domain/game/conditions/model';
 import { applyEffect } from '../../src/domain/game/effects';
-import { deactivateInducedEffects } from '../../src/domain/game/effects/effectInduce';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
 import { game } from './support/game';
 
 const context: ConditionContext = {
@@ -125,41 +128,46 @@ describe('カード共通の条件判定', () => {
     expect(result.maxEnergy).toBe(bloom.maxEnergy + 1);
   });
   it('永続分岐は条件変化時に前の子効果を解除して切り替える', () => {
-    const initial = game();
-    const source = initial.deck[0];
-    if (!source) throw new Error('発動元カードがありません。');
-    const branch = applyEffect(
-      initial,
-      {
-        kind: 'branch',
-        persistent: true,
-        deactivationKey: 'permanent-branch',
-        condition: { kind: 'mood-at-least', value: 1 },
-        whenTrue: [
-          {
-            kind: 'skill-boost',
-            num: 200_000,
-            target: { kind: 'all' },
-            duration: { kind: 'stage', value: 0n },
-            uses: null,
-          },
-        ],
-        whenFalse: [
-          {
-            kind: 'skill-boost',
-            num: 100_000,
-            target: { kind: 'all' },
-            duration: { kind: 'stage', value: 0n },
-            uses: null,
-          },
-        ],
-      },
-      source,
-    );
+    const original = game();
+    const originalSource = original.deck[0];
+    if (!originalSource) throw new Error('発動元カードがありません。');
+    const source = {
+      ...originalSource,
+      handPermanentEffects: [
+        {
+          kind: 'branch',
+          condition: { kind: 'mood-at-least', value: 1 },
+          whenTrue: [
+            {
+              kind: 'skill-boost',
+              num: 200_000,
+              target: { kind: 'all' },
+              duration: { kind: 'stage', value: 0n },
+              uses: null,
+            },
+          ],
+          whenFalse: [
+            {
+              kind: 'skill-boost',
+              num: 100_000,
+              target: { kind: 'all' },
+              duration: { kind: 'stage', value: 0n },
+              uses: null,
+            },
+          ],
+        },
+      ],
+    } as const;
+    const initial = {
+      ...original,
+      deck: original.deck.map((card) => (card.id === source.id ? source : card)),
+      cardPool: original.cardPool.map((card) => (card.id === source.id ? source : card)),
+    };
+    const branch = activateHandPermanentEffects(initial, source);
     expect(branch.action52Buffs.map((buff) => buff.percent)).toEqual([10]);
     const switched = applyEffect(branch, { kind: 'mood', amount: 10 }, source);
     expect(switched.action52Buffs.map((buff) => buff.percent)).toEqual([20]);
-    const ended = deactivateInducedEffects(switched, 'permanent-branch');
+    const ended = disposeHandEffects(switched, [source.id]);
     expect(ended.branchInducers).toHaveLength(0);
     expect(ended.action52Buffs).toHaveLength(0);
   });
