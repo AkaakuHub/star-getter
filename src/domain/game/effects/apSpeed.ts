@@ -59,7 +59,7 @@ export function applyApSpeedChange(
       const legacyBoosted = skillValue(currentState, rate, { kind: 'energy', amount: rate }, card);
       const boosted = applyAction52SkillBoostForCard(currentState, card, legacyBoosted);
       currentState = boosted.state;
-      rate = int32(boosted.value);
+      if (boosted.value !== Number.POSITIVE_INFINITY) rate = int32(boosted.value);
     } else {
       currentState = applyAction52SkillBoostForCard(currentState, card, rate).state;
     }
@@ -133,6 +133,7 @@ export function expireApSpeedSections(state: GameState): GameState {
 }
 
 function int32(value: bigint | number): number {
+  if (typeof value === 'number' && !Number.isFinite(value)) return -2_147_483_648;
   const integer = typeof value === 'bigint' ? value : BigInt(Math.trunc(value));
   return Number(BigInt.asIntN(32, integer));
 }

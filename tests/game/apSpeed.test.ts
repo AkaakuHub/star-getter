@@ -117,6 +117,33 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
   expect(changed.apTimeEffects.at(-1)?.value).toBe(2500);
 });
 
+it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持する', () => {
+  const base = game();
+  const source = base.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const initial = {
+    ...base,
+    handEffectCardIds: [],
+    targetBoosts: [],
+    amplification: 100,
+    storyAmplification: 0,
+    action52Buffs: [
+      {
+        id: 999,
+        percent: Number.MAX_VALUE,
+        target: { kind: 'all' as const },
+        remainingSeconds: null,
+        remainingSections: null,
+        remainingUses: null,
+        skillTokenSeriesIds: null,
+        deactivationKey: null,
+      },
+    ],
+  };
+  const changed = applyEffect(initial, speedEffect, source);
+  expect(changed.apTimeEffects.at(-1)?.value).toBe(Math.fround(7000 / 10_000));
+});
+
 it('Action21のパート期限とミリ秒期限を解除する', () => {
   const initial = game();
   const sectionEffect = applyEffect(initial, {
