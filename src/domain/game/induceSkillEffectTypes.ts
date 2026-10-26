@@ -63,16 +63,16 @@ export type ActiveCardMoveInducer = Readonly<{
 export type InduceSkillEffectInput = Readonly<{
   kind: 'induce-skill-effect';
   condition: InduceSkillCondition;
-  num: number;
-  deckUnderAdd: number;
-  deckOverAdd: number;
-  deckUnderLimit: number;
-  deckOverLimit: number;
+  num: bigint;
+  deckUnderAdd: bigint;
+  deckOverAdd: bigint;
+  deckUnderLimit: bigint;
+  deckOverLimit: bigint;
   deckCardMax: number;
   effects: readonly Readonly<{ actionType: number; effect: import('./modelTypes').Effect }>[];
   duration:
     | Readonly<{ kind: 'stage' }>
-    | Readonly<{ kind: 'milliseconds' | 'sections'; value: number }>;
+    | Readonly<{ kind: 'milliseconds' | 'sections'; value: bigint }>;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -80,35 +80,36 @@ export type InduceSkillEffectInput = Readonly<{
 export type InducedSkillEffect = Readonly<{
   id: number;
   condition: InduceSkillCondition;
-  num: number;
-  deckUnderAdd: number;
-  deckOverAdd: number;
-  deckUnderLimit: number;
-  deckOverLimit: number;
+  num: bigint;
+  deckUnderAdd: bigint;
+  deckOverAdd: bigint;
+  deckUnderLimit: bigint;
+  deckOverLimit: bigint;
   deckCardMax: number;
   addValue: number;
   multiplier: number;
   effects: InduceSkillEffectInput['effects'];
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   sourceCardId: string | null;
   deactivationKey: string | null;
 }>;
 
 export function validateInduceSkillEffect(effect: InduceSkillEffectInput): void {
+  const validLong = (value: bigint) => value >= -(1n << 63n) && value < 1n << 63n;
   const validDuration =
     effect.duration.kind === 'stage' ||
-    (Number.isSafeInteger(effect.duration.value) &&
-      effect.duration.value >= (effect.duration.kind === 'sections' ? 1 : 0));
+    (validLong(effect.duration.value) &&
+      effect.duration.value >= (effect.duration.kind === 'sections' ? 1n : 0n));
   if (
     !['voltage', 'mental-recover', 'mental-barrier'].includes(effect.condition) ||
-    !Number.isSafeInteger(effect.num) ||
-    !Number.isSafeInteger(effect.deckUnderAdd) ||
-    !Number.isSafeInteger(effect.deckOverAdd) ||
-    !Number.isSafeInteger(effect.deckUnderLimit) ||
-    effect.deckUnderLimit < 0 ||
-    !Number.isSafeInteger(effect.deckOverLimit) ||
-    effect.deckOverLimit < 0 ||
+    !validLong(effect.num) ||
+    !validLong(effect.deckUnderAdd) ||
+    !validLong(effect.deckOverAdd) ||
+    !validLong(effect.deckUnderLimit) ||
+    effect.deckUnderLimit < 0n ||
+    !validLong(effect.deckOverLimit) ||
+    effect.deckOverLimit < 0n ||
     !Number.isSafeInteger(effect.deckCardMax) ||
     effect.deckCardMax < 1 ||
     !validDuration ||

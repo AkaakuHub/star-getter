@@ -9,11 +9,11 @@ import { game } from './support/game';
 const effect = {
   kind: 'induce-skill-effect',
   condition: 'mental-recover',
-  num: 10_000,
-  deckUnderAdd: 5_000,
-  deckOverAdd: 0,
-  deckUnderLimit: 2,
-  deckOverLimit: 0,
+  num: 10_000n,
+  deckUnderAdd: 5_000n,
+  deckOverAdd: 0n,
+  deckUnderLimit: 2n,
+  deckOverLimit: 0n,
   deckCardMax: 4,
   effects: [
     { actionType: 1, effect: { kind: 'mood', amount: 2 } },
@@ -47,9 +47,9 @@ it('ActionType41は負のイベントを無視し、電圧上昇を対応する�
   const active = applyEffect(initial, {
     ...effect,
     condition: 'voltage',
-    num: 10_000,
-    deckUnderAdd: 0,
-    deckUnderLimit: 0,
+    num: 10_000n,
+    deckUnderAdd: 0n,
+    deckUnderLimit: 0n,
     effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
   });
   const negative = changeResource(active, 'excitement', -5n, 'skill', undefined, applyEffect);
@@ -66,8 +66,8 @@ it('ActionType41はバリア登録が成立したときに耐久値を通知す�
   const active = applyEffect(game(), {
     ...effect,
     condition: 'mental-barrier',
-    deckUnderAdd: 0,
-    deckUnderLimit: 0,
+    deckUnderAdd: 0n,
+    deckUnderLimit: 0n,
     effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
   });
   const next = applyEffect(active, {
@@ -86,12 +86,30 @@ it('ActionType41はdeck補正上限をC#同様にint32へ変換する', () => {
   const active = applyEffect(initial, {
     ...effect,
     deckCardMax: initial.deck.length + 1,
-    deckUnderAdd: 10_000,
-    deckUnderLimit: 4_294_967_296,
+    deckUnderAdd: 10_000n,
+    deckUnderLimit: 4_294_967_296n,
     effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
   });
   const next = changeResource(active, 'stamina', 1n, 'skill', undefined, applyEffect);
   expect(next.moodOffset).toBe(1);
+});
+
+it('ActionType41はlong詳細値とパート期限を2^53超でも保持する', () => {
+  const initial = game();
+  const exactLong = 9_007_199_254_740_993n;
+  const next = applyEffect(initial, {
+    ...effect,
+    num: exactLong,
+    deckUnderAdd: exactLong,
+    deckUnderLimit: exactLong,
+    duration: { kind: 'sections', value: exactLong },
+  });
+  const induced = next.inducedSkillEffects[0];
+  if (!induced) throw new Error('ActionType41の誘発効果がありません。');
+  expect(induced.num).toBe(exactLong);
+  expect(induced.deckUnderAdd).toBe(exactLong);
+  expect(induced.deckUnderLimit).toBe(exactLong);
+  expect(induced.remainingSections).toBe(exactLong);
 });
 
 it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', () => {
@@ -132,7 +150,7 @@ it('ActionType41はミリ秒期限とDeactivator解除を適用する', () => {
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
     initial,
-    { ...effect, duration: { kind: 'milliseconds', value: 500 }, deactivationKey: 'induced' },
+    { ...effect, duration: { kind: 'milliseconds', value: 500n }, deactivationKey: 'induced' },
     source,
   );
   expect(advanceTo(active, 0.6).inducedSkillEffects).toHaveLength(0);
@@ -144,7 +162,7 @@ it('ActionType41はミリ秒期限とDeactivator解除を適用する', () => {
     initial,
     {
       ...effect,
-      duration: { kind: 'milliseconds', value: 500 },
+      duration: { kind: 'milliseconds', value: 500n },
       invocationType: 0x388,
       deactivationKey: 'permanent',
     },

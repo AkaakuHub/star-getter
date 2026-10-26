@@ -1,6 +1,7 @@
 import type { Card, Effect, GameState } from '../model';
 import type { InduceSkillCondition, InduceSkillEffectInput } from '../induceSkillEffectTypes';
 import { completeDeckOutChecks } from './deckOutCheck';
+import { int64ToFloat32 } from '../numeric';
 
 export type EffectApplier = (
   state: GameState,
@@ -18,7 +19,7 @@ export function activateInducedSkillEffect(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const permanent = effect.invocationType === 0x388 || effect.invocationType === 0x38b;
   return {
@@ -40,7 +41,7 @@ export function activateInducedSkillEffect(
         remainingSeconds:
           permanent || effect.duration.kind !== 'milliseconds'
             ? null
-            : Math.fround((effect.duration.value ?? 0) / 1000),
+            : Math.fround(int64ToFloat32(effect.duration.value) / Math.fround(1000)),
         remainingSections:
           permanent || effect.duration.kind !== 'sections' ? null : effect.duration.value,
         deactivationKey: effect.deactivationKey ?? null,
@@ -73,8 +74,8 @@ export function induceSkillEffects(
       int32(under ? induced.deckUnderLimit : induced.deckOverLimit),
     );
     const add = under ? induced.deckUnderAdd : induced.deckOverAdd;
-    const targetValue = numToValue(Math.fround(Math.fround(induced.num) * Math.fround(value)));
-    const addFactor = numToValue(add);
+    const targetValue = numToValue(Math.fround(int64ToFloat32(induced.num) * Math.fround(value)));
+    const addFactor = numToValue(int64ToFloat32(add));
     const effectPower = Math.fround(
       targetValue * Math.fround(Math.fround(addFactor * clampedDiff) + 1),
     );
@@ -100,8 +101,8 @@ function numToValue(value: number): number {
   return Math.fround(Math.fround(value) / Math.fround(10_000));
 }
 
-function int32(value: number): number {
-  return Number(BigInt.asIntN(32, BigInt(Math.trunc(value))));
+function int32(value: bigint): number {
+  return Number(BigInt.asIntN(32, value));
 }
 
 export function advanceInducedSkillEffects(state: GameState, elapsedSeconds: number): GameState {
@@ -120,7 +121,7 @@ export function expireInducedSkillEffectSections(state: GameState): GameState {
     ...state,
     inducedSkillEffects: state.inducedSkillEffects.flatMap((effect) => {
       if (effect.remainingSections === null) return [effect];
-      const remainingSections = effect.remainingSections - 1;
+      const remainingSections = effect.remainingSections - 1n;
       return remainingSections > 0 ? [{ ...effect, remainingSections }] : [];
     }),
   };
