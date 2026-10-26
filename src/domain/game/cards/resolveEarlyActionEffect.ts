@@ -13,13 +13,16 @@ import { createCardSearchEffect } from '../actionTypeEffects/cardSearch';
 import { createHeartUpEffect } from '../actionTypeEffects/heartUp';
 import { createRecoverSkillGaugeEffect } from '../actionTypeEffects/recoverSkillGauge';
 import { createSkillCostChangeEffect } from '../actionTypeEffects/skillCostChange';
+import { createParameterValueChangeEffect } from '../actionTypeEffects/parameterValueChange';
 import { assertNeverActionEffect } from './assertNeverActionEffect';
 
 type RuntimeActionEffect = Exclude<NonNullable<Card['actionEffects']>[number], { actionType: 36 }>;
 
 export type EarlyActionEffect = Extract<
   RuntimeActionEffect,
-  { actionType: 1 | 2 | 3 | 5 | 6 | 7 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 19 }
+  {
+    actionType: 1 | 2 | 3 | 5 | 6 | 7 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19;
+  }
 >;
 
 export function resolveEarlyActionEffect(actionEffect: EarlyActionEffect): Effect {
@@ -67,6 +70,8 @@ export function resolveEarlyActionEffect(actionEffect: EarlyActionEffect): Effec
       return createHeartUpEffect(actionEffect);
     case 17:
       return createSkillCostChangeEffect(actionEffect);
+    case 18:
+      return createParameterValueChangeEffect(actionEffect);
     case 19:
       return { kind: 'card-move', destination: actionEffect.moveDestination };
   }

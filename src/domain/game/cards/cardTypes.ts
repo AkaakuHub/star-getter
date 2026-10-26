@@ -7,6 +7,7 @@ import type { SpecialAppealTokenCardSet } from '../specialAppealTokenTypes';
 import type { ActionType12Record } from './actionType12Record';
 import type { ActionType14Record } from './actionType14Record';
 import type { ActionType17Record } from './actionType17Record';
+import type { ActionType18Record } from './actionType18Record';
 import type { ActionType19Record } from './actionType19Record';
 import type { MoodActionRecord } from './moodActionRecord';
 
@@ -279,6 +280,7 @@ export type Card = Readonly<{
     | ActionType7Record
     | ActionType14Record
     | ActionType17Record
+    | ActionType18Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>

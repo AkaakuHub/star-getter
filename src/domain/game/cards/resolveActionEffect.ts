@@ -60,6 +60,7 @@ export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
     case 15:
     case 16:
     case 17:
+    case 18:
     case 19:
       return resolveEarlyActionEffect(actionEffect);
     default:
