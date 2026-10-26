@@ -10,7 +10,13 @@ type ApSpeedChange = Extract<Effect, { kind: 'ap-speed-change' }>;
 
 export function apIncreaseIntervalSeconds(state: GameState): number {
   const originalBase = Math.fround(state.track.stage.apIncreaseIntervalSeconds);
-  let value = originalBase;
+  const value = apIncreaseIntervalValue(state);
+  const bounded = Math.fround(Math.max(originalBase * 0.1, value));
+  return Math.fround(Math.ceil(Math.fround(bounded * 10)) / 10);
+}
+
+export function apIncreaseIntervalValue(state: GameState): number {
+  let value = Math.fround(state.track.stage.apIncreaseIntervalSeconds);
   const additions = state.apTimeEffects.filter((effect) => effect.calculation === 'add');
   for (const effect of additions) value = Math.fround(value + Math.fround(effect.value));
   const multipliers = state.apTimeEffects.filter((effect) => effect.calculation === 'multiply');
@@ -21,8 +27,8 @@ export function apIncreaseIntervalSeconds(state: GameState): number {
     );
     value = Math.fround(value * Math.fround(Math.max(-1, sum) + 1));
   }
-  const bounded = Math.fround(Math.max(originalBase * 0.1, value));
-  return Math.fround(Math.ceil(Math.fround(bounded * 10)) / 10);
+  const minimum = Math.fround(Math.fround(state.track.stage.apIncreaseIntervalSeconds) * 0.1);
+  return Math.fround(Math.max(minimum, value));
 }
 
 export function applyApSpeedChange(

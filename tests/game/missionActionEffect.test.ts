@@ -104,7 +104,7 @@ it('ActionType21通知は実際に登録されたAP時間倍率を使う', () =>
 });
 
 it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', () => {
-  const initial = missionState(21, 4500);
+  const initial = missionState(21, 6000);
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
   const priorBuff = applyApSpeedPercent(initial, -100, 'stage');
@@ -122,7 +122,7 @@ it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', (
     ],
   });
   const changed = applyEffect(startIngameMission(priorBuff, 21n), effect, card);
-  expect(changed.ingameMission?.count).toBeLessThan(4500);
+  expect(changed.ingameMission?.count).toBe(4310);
   expect(changed.ingameMission?.cooldownSeconds).toBe(0);
 });
 
