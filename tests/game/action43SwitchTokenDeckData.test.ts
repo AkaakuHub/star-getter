@@ -8,7 +8,12 @@ it('ActionType43はlongの系列IDと期限を保持し、seriesをint32化す�
       invocationType: 0x388,
       deactivationKey: 'split',
       details: [
-        { id: 1n, detailType: 'SWITCH_TOKEN_CARD_DECK_SERIES_ID', value: 4_294_967_338n },
+        {
+          id: 1n,
+          detailType: 'SWITCH_TOKEN_CARD_DECK_SERIES_ID',
+          value: 7n,
+          paramValues: [4_294_967_338n],
+        },
         { id: 2n, detailType: 'SWITCH_TOKEN_CARD_DECK_DISPLAY_TIME_TYPE', value: 2n },
         { id: 3n, detailType: 'SWITCH_TOKEN_CARD_DECK_DISPLAY_TIME', value: (1n << 53n) + 3n },
       ],
@@ -27,6 +32,22 @@ it('ActionType43は系列指定なしを全系列として表し、期限の既�
     seriesIds: null,
     duration: { kind: 'milliseconds', value: 0 },
   });
+});
+
+it('ActionType43は空のseries paramsを全系列指定に変換しない', () => {
+  expect(
+    createSwitchTokenDeckEffect({
+      skillEffectId: 43n,
+      details: [
+        {
+          id: 1n,
+          detailType: 'SWITCH_TOKEN_CARD_DECK_SERIES_ID',
+          value: 7n,
+          paramValues: [],
+        },
+      ],
+    }),
+  ).toMatchObject({ seriesIds: [] });
 });
 
 it('ActionType43のミリ秒longをfloat32へ直接変換する', () => {

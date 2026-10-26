@@ -1,10 +1,10 @@
 import type { Effect } from '../model';
+import type { ActionTypeDetail } from '../cards/actionTypeDetail';
 import { int64ToFloat32, isInt64 } from '../numeric';
 
-type Detail = Readonly<{ id: bigint; detailType: string; value: bigint }>;
 type Input = Readonly<{
   skillEffectId: bigint;
-  details: readonly Detail[];
+  details: readonly ActionTypeDetail[];
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -17,8 +17,11 @@ const detailTypes = {
 
 export function createSwitchTokenDeckEffect(input: Input): Effect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
-  const seriesDetails = input.details.filter((item) => item.detailType === detailTypes.seriesId);
-  for (const item of seriesDetails) checked(item);
+  const seriesDetail = detail(input.details, detailTypes.seriesId);
+  const seriesIds = seriesDetail?.paramValues?.map((value) => {
+    if (!isInt64(value)) throw new Error('詳細値が正しくありません。');
+    return value;
+  });
   const displayTimeType = int32(detail(input.details, detailTypes.displayTimeType)?.value ?? 1n);
   const displayTime = detail(input.details, detailTypes.displayTime)?.value ?? 0n;
   const duration =
@@ -32,20 +35,20 @@ export function createSwitchTokenDeckEffect(input: Input): Effect {
   if (duration === null) throw new Error('トークンカードデッキ切替の期限種別が正しくありません。');
   return {
     kind: 'token-deck-split',
-    seriesIds: seriesDetails.length === 0 ? null : seriesDetails.map((item) => item.value),
+    seriesIds: seriesIds ?? null,
     duration,
     ...(input.invocationType !== undefined ? { invocationType: input.invocationType } : {}),
     ...(input.deactivationKey !== undefined ? { deactivationKey: input.deactivationKey } : {}),
   };
 }
 
-function detail(details: readonly Detail[], type: string): Detail | undefined {
+function detail(details: readonly ActionTypeDetail[], type: string): ActionTypeDetail | undefined {
   const item = details.find((value) => value.detailType === type);
   if (item) checked(item);
   return item;
 }
 
-function checked(item: Detail): void {
+function checked(item: ActionTypeDetail): void {
   if (!isInt64(item.id) || !isInt64(item.value)) throw new Error('詳細値が正しくありません。');
 }
 
