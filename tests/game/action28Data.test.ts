@@ -27,6 +27,6 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
   expect(compiled?.effects.find((item) => item.kind === 'token-card')).toMatchObject({
     kind: 'token-card',
     templateId: source.id,
-    count: 2,
+    count: 2n,
   });
 });

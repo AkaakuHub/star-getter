@@ -2,6 +2,7 @@ import { type GameState, type TokenKind, rules } from '../model';
 import type { TokenRequest, TokenTemplateReference } from '../tokenRequestTypes';
 import { boostTokenRequests } from './tokenBoost';
 import { initializeParameterValueFactors } from '../parameters/parameterValueChange';
+import { int64ToFloat32 } from '../numeric';
 
 export function addTokens(state: GameState, kind: TokenKind, count: number): GameState {
   return addTokenCards(state, { kind: 'token-kind', token: kind }, count, true);
@@ -38,19 +39,27 @@ export function applyTokenCardEffect(
 export function requestTokenCard(
   state: GameState,
   templateId: string,
-  count: number,
+  count: number | bigint,
   sourceId: string | null,
   seriesIds?: readonly number[] | readonly bigint[],
 ): GameState {
+  if (!state.tokenCatalog.some((card) => card.id === templateId)) return state;
+  const grouped = state.tokenGroups.some((group) => group.sourceId === sourceId);
+  const requestCount =
+    typeof count === 'bigint'
+      ? grouped
+        ? Number(BigInt.asIntN(32, count))
+        : int64ToFloat32(count)
+      : count;
   if (
-    count < 1 ||
-    !Number.isSafeInteger(count) ||
-    !state.tokenCatalog.some((card) => card.id === templateId)
+    !Number.isFinite(requestCount) ||
+    requestCount < 1 ||
+    (typeof count === 'number' && !Number.isSafeInteger(count))
   )
     return state;
   const request: TokenRequest = {
     template: { kind: 'template', templateId },
-    count,
+    count: requestCount,
     ...(seriesIds === undefined
       ? {}
       : { seriesIds: seriesIds.map((id) => (typeof id === 'bigint' ? id : BigInt(id))) }),
@@ -58,14 +67,19 @@ export function requestTokenCard(
   return requestToken(state, request, sourceId);
 }
 
-export function finishTokenGeneration(state: GameState, sourceId: string): GameState {
+export function finishTokenGeneration(
+  state: GameState,
+  sourceId: string,
+): Readonly<{ state: GameState; actionType28Count: number }> {
   const group = state.tokenGroups.at(-1);
   if (!group || group.sourceId !== sourceId)
     throw new Error('追加カードの生成順序が正しくありません。');
   const boosted = boostTokenRequests(state, group.requests, sourceId, true);
   let next: GameState = { ...boosted.state, tokenGroups: state.tokenGroups.slice(0, -1) };
+  let actionType28Count = 0;
   const pending = group.requests.map((request, index) => ({
     template: request.template,
+    isActionType28: request.template.kind === 'template',
     count: boosted.counts[index] ?? 0,
   }));
   while (next.deck.length < rules.maxDeckSize) {
@@ -74,11 +88,12 @@ export function finishTokenGeneration(state: GameState, sourceId: string): GameS
       if (request.count < 1 || next.deck.length >= rules.maxDeckSize) continue;
       next = addTokenCards(next, request.template, 1, false);
       request.count--;
+      if (request.isActionType28) actionType28Count++;
       if (next.deck.length < rules.maxDeckSize) added = true;
     }
     if (!added) break;
   }
-  return next;
+  return { state: next, actionType28Count };
 }
 
 function requestToken(state: GameState, request: TokenRequest, sourceId: string | null): GameState {

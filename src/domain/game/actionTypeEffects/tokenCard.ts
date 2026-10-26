@@ -11,7 +11,7 @@ export function createTokenCardEffect(input: Input): TokenCardEffect {
   if (!isInt64(input.skillEffectId)) throw new Error('スキル効果IDが正しくありません。');
   if (!input.templateId) throw new Error('追加カードのテンプレートがありません。');
   const countDetail = find(input.details, 'TOKEN_CARD_CARD_COUNT');
-  const count = Number(BigInt.asIntN(32, countDetail?.value ?? 1n));
+  const count = countDetail?.value ?? 1n;
   const seriesIds = input.details
     .filter((detail) => detail.detailType === 'TOKEN_CARD_SERIES_ID')
     .map((detail) => {

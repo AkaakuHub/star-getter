@@ -74,7 +74,7 @@ export function useSpecial(state: GameState, cardId: string): GameState {
     },
   };
   for (const effect of card.special.effects) next = applyEffect(next, effect, card);
-  next = finishTokenGeneration(next, card.id);
+  next = finishTokenGeneration(next, card.id).state;
   next = notifyHandSkillUse(next, card, applyEffect);
   if (token) next = startSpecialAppealTokenCooldown(next, token);
   const completed = flushDeckActions({

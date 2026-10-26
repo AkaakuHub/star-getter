@@ -131,6 +131,46 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   expect(used.ingameMission?.cooldownSeconds).toBe(1);
 });
 
+it('一斉生成後のActionType28実生成枚数をミッションへ通知する', () => {
+  const initial = game('library');
+  const sourceId = initial.hand[0];
+  const source = initial.deck.find((card) => card.id === sourceId);
+  const template = initial.tokenCatalog.find((card) => card.token === 'story');
+  if (!source || !template) throw new Error('ActionType28の検証カードがありません。');
+  const record = {
+    missionType: 2 as const,
+    probability: 1,
+    rare: false,
+    param1: 10,
+    param2: 28,
+    addParam: 0,
+    baseScore: 0,
+    addScore: 0,
+    text: 'カード追加を$TargetValue$枚実行',
+  };
+  const card = {
+    ...source,
+    effects: [{ kind: 'token-card' as const, templateId: template.id, count: 2n }],
+  };
+  const deck = initial.deck.map((item) => (item.id === source.id ? card : item));
+  const state = {
+    ...initial,
+    randomSeed: 7,
+    energy: initial.maxEnergy,
+    deck,
+    cardPool: initial.cardPool.map((item) => (item.id === source.id ? card : item)),
+    track: {
+      ...initial.track,
+      ingameMissionGroups: [{ id: 28, records: [record] }],
+    },
+  };
+  const started = applyEffect(state, { kind: 'ingame-mission', groupId: 28n });
+  const used = act(started, { type: 'card', index: 0 });
+
+  expect(used.deck.length - started.deck.length).toBeGreaterThan(0);
+  expect(used.ingameMission?.count).toBe(2);
+});
+
 it('ActionType20のミッションへ手札上限の実変化量を通知する', () => {
   const initial = game();
   const card = initial.deck[0];

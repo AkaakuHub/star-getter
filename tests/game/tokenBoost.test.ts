@@ -30,7 +30,7 @@ it('追加カードの増幅は元指定枚数を超えて配分せず、同一�
   let state = beginTokenGeneration(boosted, source.id);
   state = requestTokens(state, 'story', 2, source.id, [42]);
   state = requestTokens(state, 'clock', 2, source.id, [42]);
-  const finished = finishTokenGeneration(state, source.id);
+  const finished = finishTokenGeneration(state, source.id).state;
   expect(finished.deck.filter((card) => card.token === 'story')).toHaveLength(2);
   expect(finished.deck.filter((card) => card.token === 'clock')).toHaveLength(2);
   expect(finished.tokenBoosts).toHaveLength(0);
@@ -150,13 +150,38 @@ it('ActionType28は指定したトークンカードを直接追加し、デー�
   };
   const generated = applyEffect(
     customized,
-    { kind: 'token-card', templateId: 'action28-template', count: 2, seriesIds: [42n] },
+    { kind: 'token-card', templateId: 'action28-template', count: 2n, seriesIds: [42n] },
     undefined,
   );
   const added = generated.deck.filter((card) => card.id.startsWith('action28-template-'));
   expect(added).toHaveLength(2);
   expect(added.every((card) => card.style === 2)).toBe(true);
   expect(generated.drawPile.filter((id) => id.startsWith('action28-template-'))).toHaveLength(2);
+});
+
+it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成ではint32化する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  const template = initial.tokenCatalog.find((card) => card.token === 'story');
+  if (!source || !template) throw new Error('カードがありません。');
+  const state = {
+    ...initial,
+    deck: [source],
+    cardPool: [source],
+    drawPile: [source.id],
+    hand: [],
+    tokenCatalog: [template],
+    tokenGroups: [],
+  };
+  const count = (1n << 32n) + 1n;
+  const ordinary = requestTokenCard(state, template.id, count, source.id);
+  expect(ordinary.deck).toHaveLength(100);
+
+  const grouped = finishTokenGeneration(
+    requestTokenCard(beginTokenGeneration(state, source.id), template.id, count, source.id),
+    source.id,
+  ).state;
+  expect(grouped.deck).toHaveLength(2);
 });
 
 it('ActionType28はActionType52を消費せず、生成数を変えない', () => {
@@ -178,7 +203,7 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
   );
   const generated = applyEffect(
     boosted,
-    { kind: 'token-card', templateId: template.id, count: 2, seriesIds: [42n] },
+    { kind: 'token-card', templateId: template.id, count: 2n, seriesIds: [42n] },
     source,
   );
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(
@@ -212,7 +237,7 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
   );
   let state = beginTokenGeneration(boosted, source.id);
   state = requestTokenCard(state, 'action28-template', 2, source.id, [42]);
-  state = finishTokenGeneration(state, source.id);
+  state = finishTokenGeneration(state, source.id).state;
   expect(state.deck.filter((card) => card.id.startsWith('action28-template-'))).toHaveLength(2);
   expect(state.tokenBoosts).toHaveLength(0);
 });

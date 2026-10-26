@@ -14,7 +14,7 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
   ).toEqual({
     kind: 'token-card',
     templateId: 'token-template',
-    count: 2,
+    count: 4_294_967_298n,
     seriesIds: [(1n << 53n) + 1n],
   });
 });
@@ -22,7 +22,7 @@ it('ActionType28はカードテンプレートとlong枚数・series IDを接続
 it('ActionType28は枚数の既定値を1にし、カードテンプレート必須にする', () => {
   expect(
     createTokenCardEffect({ skillEffectId: 28n, templateId: 'token-template', details: [] }),
-  ).toEqual({ kind: 'token-card', templateId: 'token-template', count: 1 });
+  ).toEqual({ kind: 'token-card', templateId: 'token-template', count: 1n });
   expect(() => createTokenCardEffect({ skillEffectId: 28n, templateId: '', details: [] })).toThrow(
     '追加カードのテンプレートがありません。',
   );

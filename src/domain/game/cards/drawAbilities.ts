@@ -10,7 +10,7 @@ export function applyDrawAbility(state: GameState, card: Card): GameState {
     (next, effect) => applyEffect(next, effect, card),
     beginTokenGeneration(state, card.id),
   );
-  return finishTokenGeneration(applyNamedDrawAbility(drawn, card), card.id);
+  return finishTokenGeneration(applyNamedDrawAbility(drawn, card), card.id).state;
 }
 
 function applyNamedDrawAbility(state: GameState, card: Card): GameState {

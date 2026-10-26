@@ -34,7 +34,12 @@ import { deactivateGaugeInfinities } from './resources';
 import { deactivateSkillCooldownEffects } from './effects/skillCooldown';
 import { deactivateInducedSkillEffects } from './effects/induceSkillEffect';
 import { deactivateTokenDeck, switchTokenDeck } from './effects/tokenDeckSplit';
-import { missionActionEffect, registerMissionMember, skipIngameMission } from './ingameMissions';
+import {
+  missionActionEffect,
+  registerMissionAction,
+  registerMissionMember,
+  skipIngameMission,
+} from './ingameMissions';
 import { deactivateBeatHeartValueBuffs } from './effects/beatHeartValueBuff';
 import { deactivateMoodChangeSkills } from './effects/moodChangeSkill';
 import { deactivateHeartLimitAdditionalBuffs } from './effects/heartLimitBoost';
@@ -225,7 +230,10 @@ function activateCard(
     const beforeEffect = next;
     next = missionActionEffect(applyEffect(next, effect, card), effect, beforeEffect);
   }
-  next = finishTokenGeneration(next, card.id);
+  const tokenGeneration = finishTokenGeneration(next, card.id);
+  next = tokenGeneration.state;
+  if (tokenGeneration.actionType28Count > 0)
+    next = registerMissionAction(next, 28, tokenGeneration.actionType28Count);
   next = registerMissionMember(notifyHandSkillUse(next, card, applyEffect), card.member);
   const ability = resolveModeAbility(card, next.modes);
   next = applyAbilityEffects(next, card, ability.ability893Effects ?? [], applyEffect);
@@ -254,7 +262,7 @@ function applyAbilityEffects(
   if (effects.length === 0) return state;
   let next = beginTokenGeneration(state, card.id);
   for (const effect of effects) next = applyEffect(next, effect, card);
-  return finishTokenGeneration(next, card.id);
+  return finishTokenGeneration(next, card.id).state;
 }
 
 function retireCard(state: GameState, card: Card): GameState {
