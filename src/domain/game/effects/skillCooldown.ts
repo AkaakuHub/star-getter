@@ -76,8 +76,8 @@ export function expireSkillCooldownSections(state: GameState): GameState {
     ...state,
     skillCooldownEffects: state.skillCooldownEffects.flatMap((effect) => {
       if (effect.remainingSections === null) return [effect];
-      const remainingSections = effect.remainingSections - 1;
-      return remainingSections > 0 ? [{ ...effect, remainingSections }] : [];
+      const remainingSections = effect.remainingSections - 1n;
+      return remainingSections > 0n ? [{ ...effect, remainingSections }] : [];
     }),
   };
 }

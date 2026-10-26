@@ -1,3 +1,8 @@
+export type SkillCooldownDuration =
+  | Readonly<{ kind: 'milliseconds'; value: number }>
+  | Readonly<{ kind: 'sections'; value: bigint }>
+  | Readonly<{ kind: 'stage'; value: number }>;
+
 export type SkillCooldownEffect = Readonly<{
   id: number;
   num: number;
@@ -7,10 +12,10 @@ export type SkillCooldownEffect = Readonly<{
   deckOverLimit: number;
   deckCardMax: number | null;
   deckCardCountAtActivation: number;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration: SkillCooldownDuration;
   updatesWithDeckCount: boolean;
   remainingSeconds: number | null;
-  remainingSections: number | null;
+  remainingSections: bigint | null;
   deactivationKey: string | null;
 }>;
 
@@ -22,7 +27,7 @@ export type SkillCooldownEffectInput = Readonly<{
   deckUnderLimit: number;
   deckOverLimit: number;
   deckCardMax: number | null;
-  duration: Readonly<{ kind: 'milliseconds' | 'sections' | 'stage'; value: number }>;
+  duration: SkillCooldownDuration;
   invocationType?: number;
   deactivationKey?: string;
 }>;
@@ -34,8 +39,9 @@ export function validateSkillCooldownEffect(effect: SkillCooldownEffectInput): v
     !Number.isSafeInteger(effect.deckOverAdd) ||
     !Number.isSafeInteger(effect.deckUnderLimit) ||
     !Number.isSafeInteger(effect.deckOverLimit) ||
-    !Number.isSafeInteger(effect.duration.value) ||
-    (effect.duration.kind === 'sections' && effect.duration.value === 0) ||
+    (effect.duration.kind === 'sections'
+      ? effect.duration.value === 0n
+      : !Number.isSafeInteger(effect.duration.value)) ||
     ((effect.deckUnderAdd !== 0 || effect.deckOverAdd !== 0) &&
       (effect.deckCardMax === null ||
         !Number.isSafeInteger(effect.deckCardMax) ||
