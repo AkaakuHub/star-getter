@@ -36,7 +36,9 @@ export function activateAdditionalHeartInduce(
         ? null
         : Math.fround(int64ToFloat32(effect.duration.value) / 1000),
     remainingSections:
-      indefinite || effect.duration.kind !== 'sections' ? null : effect.duration.value,
+      indefinite || effect.duration.kind !== 'sections'
+        ? null
+        : BigInt.asIntN(32, effect.duration.value),
     deactivationKey: effect.deactivationKey ?? null,
   };
   return {
@@ -93,7 +95,7 @@ export function expireAdditionalHeartInducerSections(state: GameState): GameStat
     ...state,
     additionalHeartInducers: state.additionalHeartInducers.flatMap((inducer) => {
       if (inducer.remainingSections === null) return [inducer];
-      const remainingSections = inducer.remainingSections - 1n;
+      const remainingSections = BigInt.asIntN(32, inducer.remainingSections - 1n);
       return remainingSections > 0n ? [{ ...inducer, remainingSections }] : [];
     }),
   };

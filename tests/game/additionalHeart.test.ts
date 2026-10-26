@@ -3,6 +3,7 @@ import { act } from '../../src/domain/game/actions';
 import { applyEffect } from '../../src/domain/game/effects';
 import {
   advanceAdditionalHeartInducers,
+  expireAdditionalHeartInducerSections,
   induceAdditionalHearts,
 } from '../../src/domain/game/effects/additionalHeart';
 import { heartCount } from '../../src/domain/game/hearts';
@@ -165,4 +166,30 @@ it('Action27の0ミリ秒期限は誘発を登録しない', () => {
   );
   expect(armed.additionalHeartInducers).toHaveLength(0);
   expect(advanceAdditionalHeartInducers(armed, 1 / 60).additionalHeartInducers).toHaveLength(0);
+});
+
+it('ActionType27のパート期限はC#と同じint32へ変換して減算する', () => {
+  const initial = game('library');
+  const source = initial.deck[0];
+  if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');
+  const armed = applyEffect(
+    initial,
+    {
+      kind: 'additional-heart-induce',
+      condition: { kind: 'all' },
+      apPower: 0n,
+      heartEffect: {
+        kind: 'skill-hearts',
+        skillEffectId: 27n,
+        calculation: 'fixed',
+        amount: 10_000,
+        displayTime: { kind: 'full-end', value: 0 },
+      },
+      duration: { kind: 'sections', value: (1n << 32n) + 1n },
+    },
+    source,
+  );
+
+  expect(armed.additionalHeartInducers[0]?.remainingSections).toBe(1n);
+  expect(expireAdditionalHeartInducerSections(armed).additionalHeartInducers).toHaveLength(0);
 });
