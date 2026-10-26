@@ -1,6 +1,19 @@
 import type { Card, GameState } from '../model';
 import { applyEffect } from '../effects';
+import { beginTokenGeneration, finishTokenGeneration } from './tokens';
+import type { EffectApplier } from '../effects/induceSkillEffect';
 export { notifyHandCardBeforeUse, notifyHandSkillUse } from './handInduce';
+
+export function applyAbilityEffects(
+  state: GameState,
+  card: Card,
+  effects: readonly import('../model').Effect[],
+  apply: EffectApplier,
+): GameState {
+  let next = beginTokenGeneration(state, card.id);
+  for (const effect of effects) next = apply(next, effect, card);
+  return finishTokenGeneration(next, card.id).state;
+}
 
 export function applyUseAbility(state: GameState, card: Card): GameState {
   let next = state;

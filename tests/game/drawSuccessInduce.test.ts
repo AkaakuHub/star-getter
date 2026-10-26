@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '../../src/domain/game/effects';
 import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
-import { act } from '../../src/domain/game/actions';
+import { fillHandToCount } from '../../src/domain/game/cards/drawing';
 import { evaluateDrawSuccessInduce } from '../../src/domain/game/effects/drawSuccessInduce';
-import { game, withHand } from './support/game';
+import { game } from './support/game';
 
 it('ActionType901の元気割合条件はC#同様に以下で判定し、IsActiveで分岐する', () => {
   const state = { ...game(), stamina: 40, maximumMental: 100, excitement: 100_000_000 };
@@ -16,7 +16,7 @@ it('ActionType901の元気割合条件はC#同様に以下で判定し、IsActiv
   expect(evaluateDrawSuccessInduce(state, true, 2n + 4_294_967_296n, 500_000n)).toBe(true);
 });
 
-it('Action901はAbility893の発火時にカード使用時点のHandCardStatsを参照する', () => {
+it('Action901はAbility893の発火時にドロー時点のHandCardStatsを参照する', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('検証用カードがありません。');
@@ -40,12 +40,16 @@ it('Action901はAbility893の発火時にカード使用時点のHandCardStats�
     deck: [card],
     cardPool: [card],
     energy: 100,
-    lastActionTick: -1_000_000,
+    hand: [],
+    handCardStats: {},
+    handEffectCardIds: [],
+    drawPile: [card.id],
+    discard: [],
+    drawContext: 'idle' as const,
   };
-  const state = withHand(base, [card.id]);
-  const result = act(state, { type: 'card', index: 0 });
+  const result = fillHandToCount(base, 1);
   expect(result.moodOffset).toBe(
-    applyEffect(state, card.ability893Effects[0].whenTrue[0], card).moodOffset,
+    applyEffect(base, card.ability893Effects[0].whenTrue[0], card).moodOffset,
   );
 });
 

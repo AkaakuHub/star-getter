@@ -4,6 +4,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import type { Card } from '../../src/domain/game/model';
 import { createGame } from '../../src/domain/game/simulation';
+import { fillHandToCount } from '../../src/domain/game/cards/drawing';
 
 it('ActionType901の条件分岐と子効果をAbility893へ接続する', () => {
   const track = tracks[0];
@@ -42,7 +43,7 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
   expect(compiled?.drawEffects).toBeUndefined();
 });
 
-it('ActionType901はカード使用時にAbility893から条件付き子効果を発動する', () => {
+it('ActionType901はドロー時にAbility893から条件付き子効果を発動する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const card: Card = {
@@ -75,7 +76,18 @@ it('ActionType901はカード使用時にAbility893から条件付き子効果�
     { ...card, id: 'action-901-c', actionEffects: [] },
   ];
   const initial = createGame(track, deck, 7);
+  const drawState = {
+    ...initial,
+    hand: [],
+    handCardStats: {},
+    handEffectCardIds: [],
+    drawPile: [card.id],
+    discard: [],
+    drawContext: 'idle' as const,
+  };
+  const drawn = fillHandToCount(drawState, 1);
+  expect(drawn.moodOffset - initial.moodOffset).toBe(10);
   const started = act(initial, { type: 'start' });
   const used = act(started, { type: 'card', index: 0 });
-  expect(used.moodOffset - started.moodOffset).toBe(10);
+  expect(used.moodOffset).toBe(started.moodOffset);
 });
