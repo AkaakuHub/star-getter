@@ -4,6 +4,21 @@ import type { PerformerId, MemberId, UnitId, CostumeId, TokenKind } from '../mod
 import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
 
+type ActionType20Detail = Readonly<{
+  id: bigint;
+  detailType: string;
+  value: bigint;
+}>;
+
+export type ActionType20Record = Readonly<{
+  actionType: 20;
+  skillEffectId: bigint;
+  details: readonly ActionType20Detail[];
+  destination: 'effects' | 'handPermanentEffects';
+  invocationType?: number;
+  deactivationKey?: string;
+}>;
+
 export type HandPermanentEffect = Effect;
 
 export type HandUseTrigger =
@@ -58,6 +73,7 @@ export type Card = Readonly<{
   handPermanentEffects?: readonly HandPermanentEffect[];
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
+  actionEffects?: readonly ActionType20Record[];
   ability893Effects?: readonly Effect[];
   ability894Effects?: readonly Effect[];
   drawEffects?: readonly Effect[];

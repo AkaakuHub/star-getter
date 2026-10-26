@@ -23,7 +23,10 @@ export function validateCard(card: Card): void {
     card.cost < 0 ||
     (card.mainEffect !== undefined && !Number.isSafeInteger(card.mainEffect)) ||
     Object.values(card.appeal).some((value) => !Number.isSafeInteger(value) || value <= 0) ||
-    (card.effects.length === 0 && !card.modeSkillChanges && !card.modeAbilityChanges) ||
+    (card.effects.length === 0 &&
+      !card.handPermanentEffects?.length &&
+      !card.modeSkillChanges &&
+      !card.modeAbilityChanges) ||
     (card.relay !== undefined &&
       (!Number.isSafeInteger(card.relay.threshold) ||
         card.relay.threshold < 1 ||

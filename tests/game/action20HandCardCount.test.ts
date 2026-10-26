@@ -5,6 +5,10 @@ import { act } from '../../src/domain/game/actions';
 import { createHandCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
 import { applyEffect } from '../../src/domain/game/effects';
 import { createGame } from '../../src/domain/game/simulation';
+import {
+  activateHandPermanentEffects,
+  disposeHandEffects,
+} from '../../src/domain/game/cards/handEffects';
 
 function game() {
   const track = tracks[0];
@@ -42,4 +46,102 @@ it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持
   const applied = applyEffect(game(), effect);
   expect(applied.handLimit).toBe(4);
   expect(applied.handLimitEffects[0]?.remainingSections).toBe((1n << 53n) + 1n);
+});
+
+it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 20 as const,
+              skillEffectId: 20_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 20_001_1n, detailType: 'CHANGE_HAND_CARD_COUNT_NUM', value: 1n },
+                {
+                  id: 20_001_2n,
+                  detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME_TYPE',
+                  value: 3n,
+                },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  const effect = compiled?.effects.find((item) => item.kind === 'hand-limit');
+  if (!effect) throw new Error('ActionType20が生成されていません。');
+  expect(effect).toMatchObject({ kind: 'hand-limit', amount: 1, displayTimeType: 3 });
+  const expected = applyEffect(
+    state,
+    createHandCardCountEffect({
+      skillEffectId: 20_001n,
+      details: [
+        { id: 20_001_1n, detailType: 'CHANGE_HAND_CARD_COUNT_NUM', value: 1n },
+        { id: 20_001_2n, detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME_TYPE', value: 3n },
+      ],
+    }),
+    compiled,
+  );
+  expect(applyEffect(state, effect, compiled)).toEqual(expected);
+});
+
+it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱時に解除する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 20 as const,
+              skillEffectId: 20_002n,
+              destination: 'handPermanentEffects' as const,
+              details: [
+                { id: 20_002_1n, detailType: 'CHANGE_HAND_CARD_COUNT_NUM', value: 1n },
+                {
+                  id: 20_002_2n,
+                  detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME_TYPE',
+                  value: 1n,
+                },
+                { id: 20_002_3n, detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME', value: 1n },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const state = createGame(track, deck, 7);
+  const compiled = state.deck.find((card) => card.id === source.id);
+  if (!compiled) throw new Error('カードがありません。');
+  const active = activateHandPermanentEffects(state, compiled);
+  const baseState = createGame(track, routes.bloom.deck, 7);
+  const baseCard = baseState.deck.find((card) => card.id === source.id);
+  if (!baseCard) throw new Error('比較対象のカードがありません。');
+  const expected = activateHandPermanentEffects(baseState, {
+    ...baseCard,
+    handPermanentEffects: [
+      createHandCardCountEffect({
+        skillEffectId: 20_002n,
+        details: [
+          { id: 20_002_1n, detailType: 'CHANGE_HAND_CARD_COUNT_NUM', value: 1n },
+          { id: 20_002_2n, detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME_TYPE', value: 1n },
+          { id: 20_002_3n, detailType: 'CHANGE_HAND_CARD_COUNT_DISPLAY_TIME', value: 1n },
+        ],
+      }),
+    ],
+  });
+  expect(active.handLimit).toBe(expected.handLimit);
+  expect(active.handLimitEffects[0]?.remainingSeconds).toBeNull();
+  expect(active.handLimitEffects[0]?.deactivationKey).toBe(`hand-permanent:${source.id}`);
+  expect(disposeHandEffects(active, [source.id]).handLimit).toBe(state.handLimit);
 });

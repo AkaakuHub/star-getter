@@ -42,6 +42,7 @@ import { advanceTokenDeckSplit } from './effects/tokenDeckSplit';
 import { advanceIngameMission } from './ingameMissions';
 import { createInitialEffectState } from './effects/initialState';
 import { refreshEffectInducers } from './effects/effectInduce';
+import { resolveActionEffects } from './cards/resolveActionEffects';
 export function createGame(
   track: Track,
   deck: readonly Card[],
@@ -49,15 +50,17 @@ export function createGame(
   heartShowLimit: number = starGatherHeartShowLimitSettings.defaultValue,
   tokenCatalog: readonly Card[] = [],
 ): GameState {
-  validateDeck(deck);
+  const resolvedDeck = deck.map(resolveActionEffects);
+  const resolvedTokenCatalog = tokenCatalog.map(resolveActionEffects);
+  validateDeck(resolvedDeck);
   validateTrack(track);
-  for (const card of tokenCatalog) validateCard(card);
+  for (const card of resolvedTokenCatalog) validateCard(card);
   resolveStarGatherHeartDrawCount(0, heartShowLimit);
-  const lead = deck[0];
+  const lead = resolvedDeck[0];
   const initial: GameState = {
     supportLevels: {},
     modes: createModes(
-      deck.flatMap((card) => [
+      resolvedDeck.flatMap((card) => [
         ...(card.modeIds ?? []),
         ...(card.modeParameterChanges ? [card.modeParameterChanges.modeId] : []),
         ...(card.modeSkillChanges ? [card.modeSkillChanges.modeId] : []),
@@ -69,8 +72,8 @@ export function createGame(
     currentSkillType: null,
     tick: 0,
     track,
-    deck: [...deck],
-    cardPool: [...deck],
+    deck: [...resolvedDeck],
+    cardPool: [...resolvedDeck],
     hand: [lead.id],
     activeHandPermanentCardIds: [],
     proxyCards: [],
@@ -81,12 +84,12 @@ export function createGame(
     activeModeParameterChanges: [],
     skillUseDestinations: {},
     handEffectCardIds: [lead.id],
-    drawPile: deck.filter((card) => card.id !== lead.id).map((card) => card.id),
+    drawPile: resolvedDeck.filter((card) => card.id !== lead.id).map((card) => card.id),
     tokenDeckSplit: null,
     ingameMission: null,
     deckOutCount: 0,
     discard: [],
-    tokenCatalog,
+    tokenCatalog: resolvedTokenCatalog,
     nextTokenId: 1,
     tokenGroups: [],
     tokenBoosts: [],
