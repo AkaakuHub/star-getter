@@ -150,9 +150,8 @@ export function setVoltageValue(
   _applyEffect?: EffectApplier,
 ): GameState {
   const target = Math.max(0, Math.trunc(Math.fround(amount)));
-  const delta = Math.trunc(Math.fround(target - state.excitement));
   if (state.bloom) {
-    return changeBloomResource(state, 'excitement', BigInt(delta));
+    return changeBloomGauge(state, Math.fround(target - state.excitement));
   }
   if (state.gaugeInfinities.some((infinity) => infinity.gauge === 'voltage' && !infinity.suspended))
     return state;

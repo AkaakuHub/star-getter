@@ -42,10 +42,9 @@ export function calculateStarGatherGenesisGaugeDelta(input: {
   }
   const scale = genesisGaugeScale(input.gaugeType);
   if (scale === null) return 0;
-  const delta = Math.fround(
-    Math.fround(magnitude / Math.fround(Math.sqrt(Math.fround(magnitude * Math.fround(scale))))) *
-      Math.fround(input.currentGenesisEffectValue),
-  );
+  const scaledMagnitude = Math.fround(magnitude * Math.fround(scale));
+  const delta =
+    (magnitude / Math.sqrt(scaledMagnitude)) * Math.fround(input.currentGenesisEffectValue);
   return Math.trunc(delta) * sign;
 }
 

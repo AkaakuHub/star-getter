@@ -55,3 +55,18 @@ it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後�
   expect(set.voltageConversions).toHaveLength(1);
   expect(set.hearts).toEqual(active.hearts);
 });
+
+it('ActionType37は開花中に熱気の差分をC#の専用ゲージ式で加算する', () => {
+  const state = {
+    ...game('bloom'),
+    excitement: 100,
+    bloom: { progress: 10n, strength: 3.5, rollback: { energy: 0, stamina: 0, excitement: 100 } },
+  };
+  const target = voltageThreshold(10);
+  const effectValue = Math.fround(target - state.excitement);
+  const magnitude = Math.abs(effectValue);
+  const delta = Math.trunc((magnitude / Math.sqrt(magnitude)) * state.bloom.strength);
+  const set = applyEffect(state, { kind: 'voltage-set', amount: target });
+  expect(set.excitement).toBe(state.excitement);
+  expect(set.bloom?.progress).toBe(10n + BigInt(delta));
+});

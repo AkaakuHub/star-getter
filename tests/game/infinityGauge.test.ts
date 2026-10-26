@@ -176,16 +176,17 @@ describe('無限ゲージ', () => {
       invocationType: 0x388,
       deactivationKey: 'voltage-infinity',
     });
-    const progress = active.bloom?.progress;
-    if (progress === undefined) throw new Error('開花が発動していません。');
+    const bloom = active.bloom;
+    if (!bloom) throw new Error('開花が発動していません。');
     const ended = act(active, {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
     expect(ended.excitement).toBe(active.excitement);
-    expect(ended.bloom?.progress).toBe(
-      progress + BigInt(Math.trunc(Math.fround(voltageThreshold(10) - active.excitement))),
-    );
+    const effectValue = Math.fround(voltageThreshold(10) - active.excitement);
+    const magnitude = Math.abs(effectValue);
+    const delta = Math.trunc((magnitude / Math.sqrt(magnitude)) * bloom.strength);
+    expect(ended.bloom?.progress).toBe(bloom.progress + BigInt(delta));
   });
 
   it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {

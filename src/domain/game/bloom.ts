@@ -57,7 +57,7 @@ export function changeBloomResource(
 export function changeBloomGauge(state: GameState, effectValue: number): GameState {
   if (!state.bloom) throw new Error('開花が発動していません。');
   const delta = calculateStarGatherGenesisGaugeDelta({
-    actionType: 39,
+    actionType: 0,
     gaugeType: 1,
     effectValue,
     currentGenesisEffectValue: state.bloom.strength,
