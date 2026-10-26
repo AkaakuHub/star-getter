@@ -22,7 +22,9 @@ export function evaluateDrawSuccessInduce(
   switch (branchType) {
     case 2: {
       const factor = Math.fround(numToValue(branchValue) / Math.fround(100));
-      const currentPercent = Math.fround(Math.trunc(state.stamina) / state.maximumMental);
+      const currentPercent = Math.fround(
+        Math.fround(Math.trunc(state.stamina)) / Math.fround(state.maximumMental),
+      );
       return currentPercent <= factor;
     }
     case 4: {
