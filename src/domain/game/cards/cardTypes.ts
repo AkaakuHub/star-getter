@@ -115,6 +115,26 @@ export type ActionType53Record = Readonly<{
   destination: 'effects' | 'handPermanentEffects';
 }>;
 
+export type ActionType36Record = Readonly<{
+  actionType: 36;
+  modeIds?: readonly number[];
+  modeParameterChanges?: Readonly<{
+    modeId: number;
+    off: readonly ParameterValueChangeEffect[];
+    on: readonly ParameterValueChangeEffect[];
+  }>;
+  modeSkillChanges?: Readonly<{
+    modeId: number;
+    off: ModeSkillVariant;
+    on: ModeSkillVariant;
+  }>;
+  modeAbilityChanges?: Readonly<{
+    modeId: number;
+    off: ModeAbilityVariant;
+    on: ModeAbilityVariant;
+  }>;
+}>;
+
 export type ActionType29Record = Readonly<{
   actionType: 29;
   skillEffectId: bigint;
@@ -222,6 +242,7 @@ export type Card = Readonly<{
     | MoodActionRecord<33>
     | MoodActionRecord<34>
     | MoodActionRecord<35>
+    | ActionType36Record
     | MoodActionRecord<37>
     | MoodActionRecord<38>
     | MoodActionRecord<39>
