@@ -2,6 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '../../src/domain/game/simulation';
+import { int64ToFloat32 } from '../../src/domain/game/numeric';
 
 it('ActionType1の詳細値をSkillHeart Effectへ接続する', () => {
   const track = tracks[0];
@@ -32,5 +33,41 @@ it('ActionType1の詳細値をSkillHeart Effectへ接続する', () => {
     calculation: 'fixed',
     amount: 10_000,
     displayTime: { kind: 'full-end' },
+  });
+});
+
+it('ActionType1のMood補正longをC#と同じfloat32に変換する', () => {
+  const track = tracks[0];
+  const source = routes.bloom.deck[0];
+  if (!track || !source) throw new Error('ゲームデータがありません。');
+  const mood = (1n << 54n) + (1n << 30n) + 1n;
+  const deck = routes.bloom.deck.map((card) =>
+    card.id === source.id
+      ? {
+          ...card,
+          actionEffects: [
+            {
+              actionType: 1 as const,
+              skillEffectId: 1_001n,
+              destination: 'effects' as const,
+              details: [
+                { id: 1_001_1n, detailType: 'HEART_CALC_TYPE', value: 1n },
+                {
+                  id: 1_001_2n,
+                  detailType: 'HEART_NUM_BONUS_MOOD',
+                  targetMood: 2,
+                  value: mood,
+                },
+              ],
+            },
+          ],
+        }
+      : card,
+  );
+  const effect = createGame(track, deck, 7)
+    .deck.find((card) => card.id === source.id)
+    ?.effects.find((item) => item.kind === 'skill-hearts');
+  expect(effect).toMatchObject({
+    moodBonus: { target: 2, perPoint: Math.fround(int64ToFloat32(mood) / 10_000) },
   });
 });
