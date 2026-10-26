@@ -149,10 +149,10 @@ export function describeEffect(effect: Effect): string {
       return `自然発生するきらめきに${Math.trunc(effect.amount / 10_000)}個を加算する。`;
     case 'beat-heart-value-buff':
       return effect.calculation === 'multiply'
-        ? `自然発生するハート数を${effect.amount / 10_000}倍にする。`
+        ? `自然発生するハート数を${Number(effect.amount) / 10_000}倍にする。`
         : effect.calculation === 'fixed'
-          ? `自然発生するハート数を${effect.amount / 10_000}個にする。`
-          : `自然発生するハート数を${effect.amount / 10_000}個増加する。`;
+          ? `自然発生するハート数を${Number(effect.amount) / 10_000}個にする。`
+          : `自然発生するハート数を${Number(effect.amount) / 10_000}個増加する。`;
     case 'mood-change-skill':
       return '空模様の値を変化させる。';
     case 'heart-boost':

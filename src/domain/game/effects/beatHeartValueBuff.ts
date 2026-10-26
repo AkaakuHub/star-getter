@@ -2,6 +2,7 @@ import { calculateSkillMoodCorrection } from '../live/skillMood';
 import type { Card, Effect, GameState } from '../model';
 import { moodValue } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
+import { int64ToFloat32 } from '../numeric';
 
 type BeatHeartValueBuffEffect = Extract<Effect, { kind: 'beat-heart-value-buff' }>;
 
@@ -12,16 +13,20 @@ export function activateBeatHeartValueBuff(
   multiplier: number,
   addValue: number,
 ): GameState {
-  if (effect.duration?.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration?.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const correction = effect.moodBonus
     ? calculateSkillMoodCorrection(
         effect.moodBonus.target,
         moodValue(state),
-        Math.fround(Math.fround(effect.moodBonus.perPoint) / Math.fround(10_000)),
+        Math.fround(
+          int64ToFloat32(
+            effect.moodBonus.perPointLong ?? BigInt(Math.trunc(effect.moodBonus.perPoint)),
+          ) / Math.fround(10_000),
+        ),
       )
     : 0;
-  const num = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.amount))));
+  const num = Number(BigInt.asIntN(32, effect.amount));
   const numValue = Math.fround(Math.fround(num) / Math.fround(10_000));
   let value = Math.fround(
     Math.fround(Math.fround(correction + numValue) + Math.fround(addValue)) *
@@ -44,7 +49,7 @@ export function activateBeatHeartValueBuff(
         remainingSeconds:
           suppressDuration || effect.duration?.kind !== 'milliseconds'
             ? null
-            : Math.fround(effect.duration.value / 1000),
+            : Math.fround(int64ToFloat32(effect.duration.value) / Math.fround(1000)),
         remainingSections:
           suppressDuration || effect.duration?.kind !== 'sections' ? null : effect.duration.value,
         deactivationKey: effect.deactivationKey ?? null,
@@ -75,7 +80,7 @@ export function expireBeatHeartValueBuffSections(state: GameState): GameState {
     ...state,
     beatHeartValueBuffs: state.beatHeartValueBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
+      const remainingSections = buff.remainingSections - 1n;
       return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
     }),
   };

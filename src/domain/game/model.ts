@@ -278,7 +278,7 @@ export type GameState = Readonly<{
     calculation: 'add' | 'multiply' | 'fixed';
     value: number;
     remainingSeconds: number | null;
-    remainingSections: number | null;
+    remainingSections: bigint | null;
     deactivationKey: string | null;
   }>[];
   heartBoosts: readonly HeartBoostState[];

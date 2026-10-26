@@ -11,7 +11,7 @@ it('Action47の加算は自然発生ハート数へ加算する', () => {
   if (!source) throw new Error('発動元カードがありません。');
   const buffed = applyEffect(
     initial,
-    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 1_000_000 },
+    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 1_000_000n },
     source,
   );
   expect(beatHeartCount(buffed) - beatHeartCount(initial)).toBe(100);
@@ -23,13 +23,13 @@ it('Action47は乗算・固定値の順にBuffを適用する', () => {
   if (!source) throw new Error('発動元カードがありません。');
   const multiplied = applyEffect(
     initial,
-    { kind: 'beat-heart-value-buff', calculation: 'multiply', amount: 20_000 },
+    { kind: 'beat-heart-value-buff', calculation: 'multiply', amount: 20_000n },
     source,
   );
   expect(beatHeartCount(multiplied)).toBe(beatHeartCount(initial) * 2);
   const fixed = applyEffect(
     initial,
-    { kind: 'beat-heart-value-buff', calculation: 'fixed', amount: 50_000 },
+    { kind: 'beat-heart-value-buff', calculation: 'fixed', amount: 50_000n },
     source,
   );
   expect(beatHeartCount(fixed)).toBe(5);
@@ -48,13 +48,13 @@ it('Action47の正値にAction52を適用し、負値には適用しない', () 
   });
   const buffed = applyEffect(
     action52,
-    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 1_000_000 },
+    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 1_000_000n },
     source,
   );
   expect(beatHeartCount(buffed) - beatHeartCount(initial)).toBe(150);
   const negative = applyEffect(
     initial,
-    { kind: 'beat-heart-value-buff', calculation: 'add', amount: -1_000_000 },
+    { kind: 'beat-heart-value-buff', calculation: 'add', amount: -1_000_000n },
     source,
   );
   expect(beatHeartCount(negative)).toBe(beatHeartCount(initial) - 100);
@@ -66,10 +66,20 @@ it('Action47の詳細値をC#のint32とfloat32へ変換する', () => {
   if (!source) throw new Error('発動元カードがありません。');
   const wrapped = applyEffect(
     initial,
-    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 2_147_483_648 },
+    { kind: 'beat-heart-value-buff', calculation: 'add', amount: 2_147_483_648n },
     source,
   );
   expect(wrapped.beatHeartValueBuffs[0]?.value).toBe(-214_748.359375);
+});
+
+it('Action47は2^53超のlongをint32へ正確に折り返す', () => {
+  const initial = game('library');
+  const next = applyEffect(initial, {
+    kind: 'beat-heart-value-buff',
+    calculation: 'add',
+    amount: 9_007_199_254_750_991n,
+  });
+  expect(next.beatHeartValueBuffs[0]?.value).toBe(0);
 });
 
 it('Action47は指定パートで解除される', () => {
@@ -81,8 +91,8 @@ it('Action47は指定パートで解除される', () => {
     {
       kind: 'beat-heart-value-buff',
       calculation: 'add',
-      amount: 1_000_000,
-      duration: { kind: 'sections', value: 1 },
+      amount: 1_000_000n,
+      duration: { kind: 'sections', value: 1n },
     },
     source,
   );
@@ -102,8 +112,8 @@ it('Action47のミリ秒期限とInvocationTypeによる期限抑止・外部解
     {
       kind: 'beat-heart-value-buff',
       calculation: 'add',
-      amount: 1_000_000,
-      duration: { kind: 'milliseconds', value: 1000 },
+      amount: 1_000_000n,
+      duration: { kind: 'milliseconds', value: 1000n },
       deactivationKey: 'beat-buff',
     },
     source,
@@ -114,8 +124,8 @@ it('Action47のミリ秒期限とInvocationTypeによる期限抑止・外部解
     {
       kind: 'beat-heart-value-buff',
       calculation: 'add',
-      amount: 1_000_000,
-      duration: { kind: 'milliseconds', value: 1000 },
+      amount: 1_000_000n,
+      duration: { kind: 'milliseconds', value: 1000n },
       invocationType: 0x388,
       deactivationKey: 'beat-buff',
     },
