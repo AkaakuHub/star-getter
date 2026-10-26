@@ -116,7 +116,7 @@ export function validateEffect(effect: Effect): void {
       throw new Error('トークンカードデッキ切替の設定が正しくありません。');
     return;
   }
-  if (effect.kind === 'ingame-mission' && !Number.isSafeInteger(effect.groupId))
+  if (effect.kind === 'ingame-mission' && !isInt64(effect.groupId))
     throw new Error('ミッションのグループIDが正しくありません。');
   if (effect.kind === 'ingame-mission') return;
   if (effect.kind === 'hand-limit') return validateHandCardCountEffect(effect);

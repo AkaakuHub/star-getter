@@ -207,7 +207,7 @@ type EffectShape =
   | DrawSuccessInduceEffect
   | InduceEffect
   | Readonly<{ kind: 'tokens'; token: TokenKind; count: number; seriesIds?: readonly number[] }>
-  | Readonly<{ kind: 'ingame-mission'; groupId: number }>
+  | Readonly<{ kind: 'ingame-mission'; groupId: bigint }>
   | Readonly<{
       kind: 'token-deck-split';
       seriesIds: readonly bigint[] | null;

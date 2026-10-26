@@ -16,7 +16,7 @@ export type IngameMissionGroup = Readonly<{
 }>;
 
 export type IngameMission = Readonly<{
-  groupId: number;
+  groupId: bigint;
   records: readonly IngameMissionRecord[];
   currentIndex: number;
   target: number;

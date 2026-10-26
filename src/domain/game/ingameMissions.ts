@@ -7,8 +7,8 @@ import type { Effect } from './modelTypes';
 import { starGatherHeartCount } from './live/heartState';
 import { heartLimitValueWithoutLimit } from './effects/heartLimit';
 
-export function startIngameMission(state: GameState, groupId: number): GameState {
-  const group = state.track.ingameMissionGroups.find((item) => item.id === groupId);
+export function startIngameMission(state: GameState, groupId: bigint): GameState {
+  const group = state.track.ingameMissionGroups.find((item) => BigInt(item.id) === groupId);
   if (!group) return { ...state, ingameMission: null };
   const initial: IngameMission = {
     groupId,

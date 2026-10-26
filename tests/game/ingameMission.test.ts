@@ -47,7 +47,7 @@ it('グループからミッションを選び、達成数・報酬・次のミ�
       ingameMissionGroups: [{ id: 7, records }],
     },
   };
-  const started = applyEffect(state, { kind: 'ingame-mission', groupId: 7 });
+  const started = applyEffect(state, { kind: 'ingame-mission', groupId: 7n });
   expect(started.ingameMission?.target).toBe(2);
   const cleared = registerMissionHeartCollect(started, 2);
   expect(cleared.ingameMission?.clearCount).toBe(3);
@@ -85,7 +85,7 @@ it('ActionType2以外のスキル効果ではActionType2ミッションを進め
       ],
     },
   };
-  const started = applyEffect(state, { kind: 'ingame-mission', groupId: 8 });
+  const started = applyEffect(state, { kind: 'ingame-mission', groupId: 8n });
   expect(registerMissionAction(started, 10, 5).ingameMission?.count).toBe(0);
   expect(registerMissionAction(started, 13, 1).ingameMission?.cooldownSeconds).toBe(1);
   expect(registerMissionMember(started, 1032).ingameMission?.count).toBe(0);
@@ -111,7 +111,7 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   const updatedCard = {
     ...card,
     effects: [
-      { kind: 'ingame-mission' as const, groupId: 9 },
+      { kind: 'ingame-mission' as const, groupId: 9n },
       { kind: 'shuffle' as const, recoverDiscard: false, destination: 'draw' as const },
     ],
   };
@@ -150,7 +150,7 @@ it('ActionType20のミッションへ手札上限の実変化量を通知する'
     ...initial,
     track: { ...initial.track, ingameMissionGroups: [{ id: 20, records: [record] }] },
   };
-  const started = startIngameMission(state, 20);
+  const started = startIngameMission(state, 20n);
   const effect = handCardCountEffect(3, 3, 0n);
   const changed = applyEffect(started, effect, card);
   const notified = missionActionEffect(changed, effect, started);
@@ -186,7 +186,7 @@ it('ActionType25ミッションは上限の実変化量を加算する', () => {
       ],
     },
   };
-  const active = startIngameMission(state, 25);
+  const active = startIngameMission(state, 25n);
   const effect = {
     kind: 'heart-limit-change',
     calculationType: 1,
@@ -230,7 +230,7 @@ it('ActionType1ミッションは上限適用後に実際に追加されたき�
       ],
     },
   };
-  const active = startIngameMission(state, 1);
+  const active = startIngameMission(state, 1n);
   const effect = {
     kind: 'skill-hearts' as const,
     calculation: 'fixed' as const,
