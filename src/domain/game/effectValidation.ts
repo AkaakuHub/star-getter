@@ -196,7 +196,7 @@ export function validateEffect(effect: Effect): void {
       !Number.isSafeInteger(effect.num) ||
       ![0, 1, 2].includes(effect.convertDisabledType) ||
       ![0, 1].includes(effect.disabledType) ||
-      !Number.isSafeInteger(effect.disabledValue) ||
+      !isInt64(effect.disabledValue) ||
       !validDuration(effect.displayDuration, false) ||
       !validDuration(effect.outputDuration, true) ||
       (effect.invocationType !== undefined && !Number.isSafeInteger(effect.invocationType)) ||

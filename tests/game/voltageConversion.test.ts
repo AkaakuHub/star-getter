@@ -14,7 +14,7 @@ const conversion = {
   convertDisabledType: 0,
   displayDuration: { kind: 'stage', value: 0 },
   disabledType: 0,
-  disabledValue: 0,
+  disabledValue: 0n,
 } as const;
 
 function unboostedGame() {
@@ -90,13 +90,28 @@ it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で�
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
     initial,
-    { ...conversion, num: 25000, disabledType: 1, disabledValue: 1 },
+    { ...conversion, num: 25000, disabledType: 1, disabledValue: 1n },
     source,
   );
   const converted = changeResource(active, 'excitement', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(25);
   expect(converted.voltageConversions).toHaveLength(0);
   expect(converted.excitement).toBe(initial.excitement);
+});
+
+it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {
+  const initial = unboostedGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    { ...conversion, disabledType: 1, disabledValue: (1n << 32n) + 2n },
+    source,
+  );
+  const once = changeResource(active, 'excitement', 1n, 'skill', source);
+  const twice = changeResource(once, 'excitement', 1n, 'skill', source);
+  expect(once.voltageConversions).toHaveLength(1);
+  expect(twice.voltageConversions).toHaveLength(1);
 });
 
 it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する', () => {

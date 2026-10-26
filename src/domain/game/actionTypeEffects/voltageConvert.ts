@@ -36,7 +36,7 @@ export function createVoltageConvertEffect(input: Input): Effect {
   const displayTimeType = int32(details.displayTimeType?.value ?? 1n);
   const displayTime = int32(details.displayTime?.value ?? 0n);
   const disabledType = disabledTypeFor(int32(details.disabledType?.value ?? 0n));
-  const disabledValue = int32(details.disabled?.value ?? 0n);
+  const disabledValue = details.disabled?.value ?? 0n;
   const destination = destinationFor(convertType);
   if (![0, 1, 2].includes(convertDisabledType))
     throw new Error('変換後の解除種別が正しくありません。');

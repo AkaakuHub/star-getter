@@ -31,7 +31,7 @@ export function activateVoltageConversion(
     num,
     outputDuration: effect.outputDuration,
     disabledOnConvertCount:
-      effect.disabledType === 1 && effect.disabledValue !== 0 ? effect.disabledValue : null,
+      effect.disabledType === 1 && effect.disabledValue !== 0n ? effect.disabledValue : null,
     conversions: 0,
     expireOnHeartCollect: effect.destination === 'love' && effect.convertDisabledType <= 2,
     remainingSeconds:
@@ -150,11 +150,11 @@ export function convertVoltageIncrease(
         applyEffect,
       );
   }
-  const conversions = conversion.conversions + 1;
+  const conversions = Number(BigInt.asIntN(32, BigInt(conversion.conversions + 1)));
   next = {
     ...next,
     voltageConversions:
-      conversion.disabledOnConvertCount === conversions
+      conversion.disabledOnConvertCount === BigInt(conversions)
         ? next.voltageConversions.filter((item) => item.id !== conversion.id)
         : next.voltageConversions.map((item) =>
             item.id === conversion.id ? { ...item, conversions } : item,

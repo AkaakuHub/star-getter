@@ -46,7 +46,7 @@ it('Action52は対象ActionType52の値へ割合を加え、回数期限を消�
       convertDisabledType: 0,
       displayDuration: { kind: 'stage', value: 0 },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     },
     source,
   );
@@ -94,7 +94,7 @@ it('Action52の対象外カードでは回数期限を消費しない', () => {
       convertDisabledType: 0,
       displayDuration: { kind: 'stage', value: 0 },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     },
     source,
   );

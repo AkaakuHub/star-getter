@@ -25,6 +25,6 @@ it('ActionType22はlong詳細値をC#同様にint32へ変換して効果を作�
     convertDisabledType: 1,
     displayDuration: { kind: 'stage', value: 0 },
     disabledType: 1,
-    disabledValue: 2,
+    disabledValue: (1n << 32n) + 2n,
   });
 });

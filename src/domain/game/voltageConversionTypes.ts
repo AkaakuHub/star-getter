@@ -15,7 +15,7 @@ export type VoltageConversion = Readonly<{
   destination: 'hearts' | 'love' | 'stamina' | 'mental-barrier';
   num: number;
   outputDuration: VoltageConversionDuration;
-  disabledOnConvertCount: number | null;
+  disabledOnConvertCount: bigint | null;
   conversions: number;
   expireOnHeartCollect: boolean;
   remainingSeconds: number | null;
@@ -38,7 +38,7 @@ export type VoltageConvertEffect = Readonly<{
   convertDisabledType: 0 | 1 | 2;
   displayDuration: VoltageConversionDuration;
   disabledType: 0 | 1;
-  disabledValue: number;
+  disabledValue: bigint;
   invocationType?: number;
   deactivationKey?: string;
 }>;

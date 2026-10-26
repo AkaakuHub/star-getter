@@ -46,7 +46,7 @@ it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後�
       convertDisabledType: 0,
       displayDuration: { kind: 'stage', value: 0 },
       disabledType: 0,
-      disabledValue: 0,
+      disabledValue: 0n,
     },
     source,
   );
