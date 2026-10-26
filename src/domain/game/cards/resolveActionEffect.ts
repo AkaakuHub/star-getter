@@ -56,6 +56,7 @@ export function resolveActionEffect(actionEffect: RuntimeActionEffect): Effect {
     case 11:
     case 12:
     case 13:
+    case 14:
     case 15:
     case 16:
     case 19:

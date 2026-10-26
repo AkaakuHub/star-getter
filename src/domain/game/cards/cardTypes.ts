@@ -5,6 +5,7 @@ import type { Effect } from '../modelTypes';
 import type { MoodBonus, ParameterValueChangeEffect } from '../modelTypes';
 import type { SpecialAppealTokenCardSet } from '../specialAppealTokenTypes';
 import type { ActionType12Record } from './actionType12Record';
+import type { ActionType14Record } from './actionType14Record';
 import type { ActionType19Record } from './actionType19Record';
 
 type ActionTypeDetail = Readonly<{
@@ -224,8 +225,6 @@ type MoodActionRecord<T extends number> = Readonly<{
   deactivationKey?: string;
 }>;
 
-export type HandPermanentEffect = Effect;
-
 export type HandUseTrigger =
   | Readonly<{ kind: 'member'; member: bigint }>
   | Readonly<{ kind: 'skill-icon'; icon: bigint }>
@@ -275,7 +274,7 @@ export type Card = Readonly<{
     off: ModeAbilityVariant;
     on: ModeAbilityVariant;
   }>;
-  handPermanentEffects?: readonly HandPermanentEffect[];
+  handPermanentEffects?: readonly Effect[];
   tokenSeriesIds?: readonly number[];
   effects: readonly Effect[];
   actionEffects?: readonly (
@@ -285,6 +284,7 @@ export type Card = Readonly<{
     | ActionType5Record
     | ActionType6Record
     | ActionType7Record
+    | ActionType14Record
     | ActionType19Record
     | MoodActionRecord<10>
     | MoodActionRecord<11>
