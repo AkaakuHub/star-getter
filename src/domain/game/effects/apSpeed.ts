@@ -78,7 +78,7 @@ export function applyApSpeedChange(
     calculation = 'add';
   }
   if ((calculation === 'multiply' && value === 1) || (calculation === 'add' && value === 0))
-    return state;
+    return currentState;
   const absorption = absorbedAmount > 0 ? absorbApSpeed(currentState, absorbedAmount) : null;
   if (absorption?.absorbed) return { ...currentState, proxyAbsorptions: absorption.absorptions };
   const suppressDuration = effect.invocationType === 0x388 || effect.invocationType === 0x38b;

@@ -117,6 +117,33 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
   expect(changed.apTimeEffects.at(-1)?.value).toBe(2500);
 });
 
+it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消費する', () => {
+  const base = game();
+  const source = base.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const initial = {
+    ...base,
+    amplification: 100,
+    storyAmplification: 0,
+    handEffectCardIds: [],
+    targetBoosts: [],
+  };
+  const boosted = applyEffect(
+    initial,
+    {
+      kind: 'skill-boost',
+      num: 500_000,
+      target: { kind: 'member', member: source.member },
+      duration: { kind: 'stage', value: 0n },
+      uses: 1n,
+    },
+    source,
+  );
+  const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 0n }, source);
+  expect(changed.action52Buffs).toHaveLength(0);
+  expect(changed.apTimeEffects).toHaveLength(0);
+});
+
 it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持する', () => {
   const base = game();
   const source = base.deck[0];
