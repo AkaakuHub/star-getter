@@ -320,7 +320,7 @@ type EffectShape =
       members?: readonly MemberId[];
       moodBonus?: MoodBonus;
     }>
-  | Readonly<{ kind: 'mode'; modeId: number; change: ModeChange['change'] }>
+  | Readonly<{ kind: 'mode'; modeId: bigint; change: ModeChange['change'] }>
   | Readonly<{
       kind: 'mode-reaction';
       modeId: number;

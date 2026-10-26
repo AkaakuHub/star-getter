@@ -11,8 +11,8 @@ import { game, withHand } from './support/game';
 function modeGame() {
   return { ...game('library'), modes: createModes([2, 1, 2]), excitement: 0 };
 }
-const on: Effect = { kind: 'mode', modeId: 1, change: 'on' };
-const off: Effect = { kind: 'mode', modeId: 1, change: 'off' };
+const on: Effect = { kind: 'mode', modeId: 1n, change: 'on' };
+const off: Effect = { kind: 'mode', modeId: 1n, change: 'off' };
 const reaction: Effect = {
   kind: 'mode-reaction',
   modeId: 1,
@@ -44,16 +44,25 @@ describe('モード切替と切替時効果', () => {
   it('ActionType35のModeChangeType.Alternateは現在状態を反転する', () => {
     const toggledOn = applyEffect(modeGame(), {
       kind: 'mode',
-      modeId: 1,
+      modeId: 1n,
       change: 'alternate',
     });
     expect(toggledOn.modes.entries.find((entry) => entry.id === 1)?.on).toBe(true);
     const toggledOff = applyEffect(toggledOn, {
       kind: 'mode',
-      modeId: 1,
+      modeId: 1n,
       change: 'alternate',
     });
     expect(toggledOff.modes.entries.find((entry) => entry.id === 1)?.on).toBe(false);
+  });
+
+  it('ActionType35のlong ModeIdをC#のint32へ変換する', () => {
+    const changed = applyEffect(modeGame(), {
+      kind: 'mode',
+      modeId: 4_294_967_297n,
+      change: 'on',
+    });
+    expect(changed.modes.entries.find((entry) => entry.id === 1)?.on).toBe(true);
   });
   it('Action36のモード別スキル詳細をAction35の切替に合わせて選ぶ', () => {
     const initial = game();
@@ -87,7 +96,7 @@ describe('モード切替と切替時効果', () => {
       phase: 'playing' as const,
       energy: 100,
     };
-    const enabled = applyEffect(state, { kind: 'mode', modeId: 88, change: 'on' });
+    const enabled = applyEffect(state, { kind: 'mode', modeId: 88n, change: 'on' });
     expect(cardCost(state, card)).toBe(1);
     expect(cardCost(enabled, card)).toBe(3);
     expect(cardAt(enabled, 0).effects).toEqual([{ kind: 'excitement', amount: 7 }]);
@@ -162,7 +171,7 @@ describe('モード切替と切替時効果', () => {
       kind: 'mode-reaction',
       modeId: 1,
       thresholds: [1n],
-      effects: [{ kind: 'mode', modeId: 2, change: 'on' }],
+      effects: [{ kind: 'mode', modeId: 2n, change: 'on' }],
       buffNum: 0n,
     });
     state = applyEffect(state, {
@@ -181,7 +190,7 @@ describe('モード切替と切替時効果', () => {
     const initial = modeGame();
     expect(applyEffect(initial, { ...reaction, modeId: 99 })).toBe(initial);
     expect(
-      applyEffect(initial, { ...on, modeId: 0 }).modes.entries.every((entry) => !entry.on),
+      applyEffect(initial, { ...on, modeId: 0n }).modes.entries.every((entry) => !entry.on),
     ).toBe(true);
   });
   it('一斉使用のカード処理中は切替時効果を保留する', () => {

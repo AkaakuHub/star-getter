@@ -213,12 +213,12 @@ it('モード変更で前の能力を解除し、新しい能力の詳細値変�
     modes: createModes([8]),
     handEffectCardIds: [...initial.handEffectCardIds, card.id],
   });
-  const enabled = applyEffect(prepared, { kind: 'mode', modeId: 8, change: 'on' }, card);
+  const enabled = applyEffect(prepared, { kind: 'mode', modeId: 8n, change: 'on' }, card);
   expect(enabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-on-change');
   const leftHand = disposeHandEffects(enabled, [card.id]);
   expect(leftHand.parameterValueFactors).toHaveLength(0);
   expect(leftHand.activeModeParameterChanges).toHaveLength(0);
-  const disabled = applyEffect(enabled, { kind: 'mode', modeId: 8, change: 'off' }, card);
+  const disabled = applyEffect(enabled, { kind: 'mode', modeId: 8n, change: 'off' }, card);
   expect(disabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-off-change');
   expect(disabled.parameterValueChangeCounts[card.id]?.['mode-on-change']).toBe(1);
   expect(disabled.parameterValueChangeCounts[card.id]?.['mode-off-change']).toBe(1);

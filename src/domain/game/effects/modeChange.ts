@@ -109,7 +109,10 @@ export function changeMode(
   return drainModeChanges(
     {
       ...state,
-      modes: enqueueModeChange(state.modes, { modeId: effect.modeId, change: effect.change }),
+      modes: enqueueModeChange(state.modes, {
+        modeId: Number(BigInt.asIntN(32, effect.modeId)),
+        change: effect.change,
+      }),
     },
     apply,
   );
