@@ -3,6 +3,7 @@ import { moodValueWithoutLimit } from '../projection';
 import { applyAction52SkillBoostForCard } from './action52SkillBoost';
 import { applyMoodValueAdditionalBuffs } from './moodValueBoost';
 import { absorbSkillEffect } from './proxySkill';
+import { int64ToFloat32 } from '../numeric';
 
 type MoodChangeSkillEffect = Extract<Effect, { kind: 'mood-change-skill' }>;
 
@@ -14,10 +15,10 @@ export function activateMoodChangeSkill(
   addValue: number,
   effectPower: number,
 ): GameState {
-  if (effect.duration.kind === 'sections' && effect.duration.value === 0)
+  if (effect.duration.kind === 'sections' && effect.duration.value === 0n)
     throw new Error('Display section count is 0. (displayTimeType: SECTION, displayTime: 0)');
   const currentMood = moodValueWithoutLimit(state);
-  const intNum = Number(BigInt.asIntN(32, BigInt(Math.trunc(effect.num))));
+  const intNum = Number(BigInt.asIntN(32, effect.num));
   const num = Math.fround(Math.fround(intNum) / Math.fround(10_000));
   let value: number;
   let calculation: 'add' | 'fixed';
@@ -67,7 +68,7 @@ export function activateMoodChangeSkill(
           effect.invocationType === 0x38b ||
           effect.duration.kind !== 'milliseconds'
             ? null
-            : Math.fround(effect.duration.value / 1000),
+            : Math.fround(int64ToFloat32(effect.duration.value) / Math.fround(1000)),
         remainingSections:
           effect.invocationType === 0x388 ||
           effect.invocationType === 0x38b ||
@@ -102,7 +103,7 @@ export function expireMoodChangeSkillSections(state: GameState): GameState {
     ...state,
     moodSkillBuffs: state.moodSkillBuffs.flatMap((buff) => {
       if (buff.remainingSections === null) return [buff];
-      const remainingSections = buff.remainingSections - 1;
+      const remainingSections = buff.remainingSections - 1n;
       return remainingSections > 0 ? [{ ...buff, remainingSections }] : [];
     }),
   };

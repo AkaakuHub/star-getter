@@ -260,7 +260,7 @@ export type GameState = Readonly<{
     calculation: 'add' | 'fixed';
     value: number;
     remainingSeconds: number | null;
-    remainingSections: number | null;
+    remainingSections: bigint | null;
     deactivationKey: string | null;
   }>[];
   costReductions: Readonly<Record<string, number>>;

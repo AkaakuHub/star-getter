@@ -27,8 +27,8 @@ function moodChange(num: number) {
   return {
     kind: 'mood-change-skill' as const,
     calculationType: 1 as const,
-    num,
-    duration: { kind: 'stage' as const, value: 0 },
+    num: BigInt(num),
+    duration: { kind: 'stage' as const, value: 0n },
   };
 }
 

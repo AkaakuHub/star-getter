@@ -14,8 +14,8 @@ it('Action48 calcType1にNumToValue・AddValue・MultiplyFactor・EffectPowerを
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: 50_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 50_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
     3,
@@ -34,12 +34,23 @@ it('Action48の詳細値をC#のint32へ変換してからNumToValueを計算す
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: 2_147_483_648,
-      duration: { kind: 'stage', value: 0 },
+      num: 2_147_483_648n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
   expect(changed.moodSkillBuffs[0]?.value).toBe(-214_748);
+});
+
+it('Action48は2^53超のlong詳細値を正確にint32化し、パート期限を保持する', () => {
+  const changed = applyEffect(game('library'), {
+    kind: 'mood-change-skill',
+    calculationType: 1,
+    num: 9_007_199_254_750_991n,
+    duration: { kind: 'sections', value: 9_007_199_254_750_991n },
+  });
+  expect(changed.moodSkillBuffs[0]?.value).toBe(0);
+  expect(changed.moodSkillBuffs[0]?.remainingSections).toBe(9_007_199_254_750_991n);
 });
 
 it('Action48 calcType2は現在の未制限気分値との差を加算する', () => {
@@ -51,8 +62,8 @@ it('Action48 calcType2は現在の未制限気分値との差を加算する', (
     {
       kind: 'mood-change-skill',
       calculationType: 2,
-      num: 15_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 15_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -68,8 +79,8 @@ it('Action48 calcType3は固定値を設定し、calcType4は負気分のとき�
     {
       kind: 'mood-change-skill',
       calculationType: 3,
-      num: 200_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 200_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
     2,
@@ -82,8 +93,8 @@ it('Action48 calcType3は固定値を設定し、calcType4は負気分のとき�
     {
       kind: 'mood-change-skill',
       calculationType: 4,
-      num: 10_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 10_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -95,8 +106,8 @@ it('Action48 calcType3は固定値を設定し、calcType4は負気分のとき�
       {
         kind: 'mood-change-skill',
         calculationType: 4,
-        num: 10_000,
-        duration: { kind: 'stage', value: 0 },
+        num: 10_000n,
+        duration: { kind: 'stage', value: 0n },
       },
       source,
     ),
@@ -119,8 +130,8 @@ it('Action48はActionType52で絶対値を補正してから整数化する', ()
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: 20_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 20_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -153,8 +164,8 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
     {
       kind: 'mood-change-skill',
       calculationType: 2,
-      num: 15_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 15_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -165,8 +176,8 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
     {
       kind: 'mood-change-skill',
       calculationType: 2,
-      num: 5_000,
-      duration: { kind: 'stage', value: 0 },
+      num: 5_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -183,8 +194,8 @@ it('Action48は秒・パート期限、期限抑止、外部解除を反映す�
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: 10_000,
-      duration: { kind: 'milliseconds', value: 1000 },
+      num: 10_000n,
+      duration: { kind: 'milliseconds', value: 1000n },
       deactivationKey: 'mood-change',
     },
     source,
@@ -195,8 +206,8 @@ it('Action48は秒・パート期限、期限抑止、外部解除を反映す�
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: 10_000,
-      duration: { kind: 'sections', value: 1 },
+      num: 10_000n,
+      duration: { kind: 'sections', value: 1n },
       invocationType: 0x388,
       deactivationKey: 'mood-change',
     },

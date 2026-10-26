@@ -89,8 +89,8 @@ it('Proxyの負の目標値もC#と同じTotalAmount以上の判定を使う', (
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: -30_000,
-      duration: { kind: 'stage', value: 0 },
+      num: -30_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
@@ -124,8 +124,8 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
     {
       kind: 'mood-change-skill',
       calculationType: 1,
-      num: -30_000,
-      duration: { kind: 'stage', value: 0 },
+      num: -30_000n,
+      duration: { kind: 'stage', value: 0n },
     },
     source,
   );
