@@ -14,7 +14,7 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   const driver = await GameDriver.create('library');
   driver.report('開始');
   expect(driver.state.storyAmplification).toBe(0);
-  await prepare(driver);
+  await prepare(driver, true);
   driver.report('準備完了');
   expect(driver.seconds).toBeLessThan(25);
   expect(durationSeconds(driver.state)).toBe(90);
@@ -33,17 +33,22 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   const lateStartTick = driver.state.tick;
   const lateRun = await runCollections(driver, durationSeconds(driver.state), 15);
   driver.report('連鎖停止時だけカードで再始動し手動回収主体で全区間終了');
-  const firstStory = driver.inputs.find(
-    (row) => row.input.kind === 'card' && row.input.card.instanceId.startsWith('story-'),
-  );
-  if (!firstStory) throw new Error('増幅後の貝がら使用がありません。');
-  const earlierRedraws = driver.inputs.filter(
+  const redraws = driver.inputs.filter(
     (row) =>
-      row.sequence < firstStory.sequence &&
       row.input.kind === 'collect' &&
       row.before.hand.map((card) => card.instanceId).join() !==
         row.after.hand.map((card) => card.instanceId).join(),
   );
+  const fifthRedraw = redraws[4];
+  if (!fifthRedraw) throw new Error('増幅前の回収リドローが5回ありません。');
+  const firstStory = driver.inputs.find(
+    (row) =>
+      row.sequence > fifthRedraw.sequence &&
+      row.input.kind === 'card' &&
+      row.after.storyUses > row.before.storyUses,
+  );
+  if (!firstStory) throw new Error('増幅後の貝がら使用がありません。');
+  const earlierRedraws = redraws.filter((row) => row.sequence < firstStory.sequence);
   expect(firstStory.before.deckSize).toBeGreaterThanOrEqual(95);
   expect(earlierRedraws.length).toBeGreaterThanOrEqual(5);
   const firstRedraw = earlierRedraws[0];
@@ -57,26 +62,26 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
   expect(lateRun.gain * BigInt(lateStartTick)).toBeGreaterThan(lateBefore * BigInt(lateRun.ticks));
   expect(driver.state.score).toBeGreaterThan(omitted.state.score);
   expect(driver.state.score).toBeGreaterThan(unplanned.state.score);
-  expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
+  expect(driver.state.score).toBeGreaterThan(10n ** 16n);
 });
 
 for (const seed of [456, 1234]) {
   test(`うなばら:別の初期手札でも準備から回収連鎖へ移行する（seed ${seed}）`, async () => {
     const driver = await GameDriver.create('library', seed);
-    await prepare(driver);
+    await prepare(driver, true);
     await amplifyAndWiden(driver);
     const run = await runCollections(driver, durationSeconds(driver.state), 15);
     expect(driver.state.phase).toBe('finished');
     expect(driver.state.hearts.heartLimit).toBe(10_000_000);
     expect(run.redraws).toBeGreaterThan(0);
     expect(run.collections).toBeGreaterThan(run.cards);
-    expect(driver.state.score).toBeGreaterThanOrEqual(10n ** 16n);
+    expect(driver.state.score).toBeGreaterThan(10n ** 16n);
   });
 }
 
 test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', async () => {
   const prepared = await GameDriver.create('library');
-  await prepare(prepared);
+  await prepare(prepared, true);
   const start = prepared.seconds;
   const score = prepared.state.score;
   await prepared.burst(2, 10);
@@ -105,9 +110,10 @@ test('うなばら:同じ曲で未準備の回収と準備後の回収を比較�
 
 test('うなばら:autoONはカードも手動回収も使わず間隔付きで連鎖する', async () => {
   const driver = await GameDriver.create('library');
-  await prepare(driver);
+  await prepare(driver, true);
   await amplifyAndWiden(driver);
   await armAutomaticCollection(driver);
+  await driver.setWaitMode(false);
   await driver.toggleAutomaticHearts();
   expect(driver.state.automaticHeart.enabled).toBe(true);
   const cards = driver.cardActions;
@@ -136,9 +142,10 @@ test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚�
   let repairs = 0;
   for (const speed of [5, 10, 15] as const) {
     const driver = await GameDriver.create('library');
-    await prepare(driver);
+    await prepare(driver, true);
     await amplifyAndWiden(driver);
     expect(driver.state.automaticHeart.enabled).toBe(false);
+    const inputStart = driver.inputs.length;
     const run = await runCollections(driver, durationSeconds(driver.state), speed);
     scores.push(driver.state.score);
     repairs += run.deckRepairs;
@@ -146,6 +153,17 @@ test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚�
     expect(run.collections).toBeGreaterThan(run.cards);
     expect(run.redraws).toBeGreaterThan(0);
     expect(run.collectionGain).toBeGreaterThan(run.cardGain);
+    const ticks = driver.inputs
+      .slice(inputStart)
+      .filter((row) => row.input.kind === 'collect')
+      .map((row) => Math.round(row.wallSeconds * 60));
+    const intervals = ticks.slice(1).map((tick, index) => {
+      const previous = ticks[index];
+      if (previous === undefined) throw new Error('直前の回収記録がありません。');
+      return tick - previous;
+    });
+    expect(Math.min(...intervals)).toBeGreaterThanOrEqual(60 / speed);
+    expect(Math.min(...intervals)).toBeLessThanOrEqual(60 / speed + 1);
   }
   const [slow, medium, fast] = scores;
   if (slow === undefined || medium === undefined || fast === undefined)

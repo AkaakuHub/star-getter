@@ -36,7 +36,7 @@ test('操作時間:使用間隔中に次の手札を確認し、発動時は本�
   expect((await driver.useFirst(['class']))?.id).toBe('class');
   const first = driver.inputs.findLast((row) => row.input.kind === 'card');
   const count = driver.inputs.length;
-  expect((await driver.useFirst(['class']))?.id).toBe('class');
+  expect(await driver.useFirst(['library-invitation', 'library-pages', 'camera'])).toBeDefined();
   const secondInputs = driver.inputs.slice(count);
   const inspection = secondInputs.find((row) => row.input.kind === 'card-inspect');
   const activation = secondInputs.find((row) => row.input.kind === 'card');

@@ -26,6 +26,7 @@ type Snapshot = Readonly<{
   hearts: number;
   heartLimit: number;
   storyAmplification: number;
+  storyUses: number;
   mood: number;
   phase: GameState['phase'];
   lastActionTick: number;
@@ -58,6 +59,10 @@ function snapshot(state: GameState): Snapshot {
     hearts: heartCount(state),
     heartLimit: state.hearts.heartLimit,
     storyAmplification: state.storyAmplification,
+    storyUses: state.cardPool.reduce(
+      (count, card) => count + (card.token === 'story' ? (state.cardUseCounts[card.id] ?? 0) : 0),
+      0,
+    ),
     mood: moodValue(state),
     phase: state.phase,
     lastActionTick: state.lastActionTick,
