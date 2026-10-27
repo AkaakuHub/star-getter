@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import type { Card } from '../../src/domain/game/model';
-import { createGame } from '../../src/domain/game/simulation';
-import { fillHandToCount } from '../../src/domain/game/cards/drawing';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 
 it('ActionType901の条件分岐と子効果をAbility893へ接続する', () => {
   const track = tracks[0];

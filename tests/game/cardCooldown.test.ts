@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game, withHand } from './support/game';
 
 for (const enabled of [false, true]) {

@@ -1,0 +1,3 @@
+[submodule "vendor/suku-sute-core"]
+	path = vendor/suku-sute-core
+	url = https://github.com/AkaakuHub/suku-sute-core.git

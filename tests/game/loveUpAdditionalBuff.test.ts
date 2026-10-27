@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { applyScoreBoost } from '../../src/domain/game/effects/scoreBoost';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { applyScoreBoost } from '@akaakuhub/suku-sute-core/game/effects/scoreBoost';
 import { game } from './support/game';
-import { addHearts, collectHearts } from '../../src/domain/game/hearts';
+import { addHearts, collectHearts } from '@akaakuhub/suku-sute-core/game/hearts';
 
 it('ActionType30は対象カードのSTAR増加を指定率で増幅し、回収時に解除する', () => {
   const initial = game();

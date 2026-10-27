@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { routes, type RouteId } from '../../content/routes';
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { createResultImage } from './createResultImage';
 import { resultShareData } from './shareScore';
 

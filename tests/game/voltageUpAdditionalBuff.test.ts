@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('ActionType31は対象カードの熱気増加を増幅し、C#どおり使用回数では解除しない', () => {

@@ -1,14 +1,14 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { createHandCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { applyEffect } from '../../src/domain/game/effects';
-import { createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { createHandCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 
 function game() {
   const track = tracks[0];

@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceProxySkillPeriods } from '../../src/domain/game/effects/proxySkill';
-import { createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceProxySkillPeriods } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻す', () => {
   const track = tracks[0];

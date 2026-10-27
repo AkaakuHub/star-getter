@@ -5,18 +5,18 @@ import {
   applyPercentBuffs,
   parameterValue,
   type ParameterBuff,
-} from '../../src/domain/game/parameters/buffs';
+} from '@akaakuhub/suku-sute-core/game/parameters/buffs';
 import {
   appealParameter,
   cardParameters,
   type StyleParameters,
-} from '../../src/domain/game/parameters/cardParameters';
+} from '@akaakuhub/suku-sute-core/game/parameters/cardParameters';
 import {
   changeMaximum,
   energyMaximum,
   staminaMaximum,
-} from '../../src/domain/game/parameters/maximum';
-import { applyEffect } from '../../src/domain/game/effects';
+} from '@akaakuhub/suku-sute-core/game/parameters/maximum';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 const buffs: readonly ParameterBuff[] = [

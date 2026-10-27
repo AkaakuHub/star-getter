@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import type { GameController } from '../../app/gameController';
-import { type CardUse, rules } from '../../domain/game/model';
+import { type CardUse, rules } from '@akaakuhub/suku-sute-core/game/model';
 import { HandCardFace } from './HandCardFace';
 import { cardMotion, cardMotionDuration, cardMotionKeyframes } from './cardMotion';
 

@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { collectionScore } from '../../src/domain/game/scoring';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { collectionScore } from '@akaakuhub/suku-sute-core/game/scoring';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import {
   calculateStarGatherCardAppealValue,
   calculateStarGatherAddScoreMax,
-} from '../../src/domain/game/live/clientScoreInput';
+} from '@akaakuhub/suku-sute-core/game/live/clientScoreInput';
 
 const ordinaryLimit = {
   additionalEnabled: false,

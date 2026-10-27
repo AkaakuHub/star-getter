@@ -1,12 +1,12 @@
 import { expect, it } from 'vite-plus/test';
-import type { GameState } from '../../src/domain/game/model';
-import { act } from '../../src/domain/game/actions';
-import { canUseSpecial, specialCards } from '../../src/domain/game/special';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { canUseSpecial, specialCards } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
-import { activateBloom } from '../../src/domain/game/bloom';
-import { cardCooldownTicks } from '../../src/domain/game/projection';
-import { applyEffect } from '../../src/domain/game/effects';
-import type { Card } from '../../src/domain/game/model';
+import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { cardCooldownTicks } from '@akaakuhub/suku-sute-core/game/projection';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 
 it('空模様0でも20APを支払って開花し、支払後のAPを保持する', () => {
   const state = { ...game(), energy: 20, maxEnergy: 20 };

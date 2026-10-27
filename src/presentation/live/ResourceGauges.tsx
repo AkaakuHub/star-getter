@@ -1,6 +1,6 @@
 import { BatteryMedium, Zap } from 'lucide-preact';
-import type { GameState } from '../../domain/game/model';
-import { voltageLevel, voltageProgress } from '../../domain/game/live/voltageLevel';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { voltageLevel, voltageProgress } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { liveLayout } from './layout';
 import { BloomGauge } from './BloomGauge';
 import { formatNumber } from '../score/formatNumber';

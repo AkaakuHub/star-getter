@@ -1,5 +1,5 @@
 import { expect, test } from 'vite-plus/test';
-import { canUseCard } from '../../src/domain/game/projection';
+import { canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
 import { GameDriver } from './driver';
 
 for (const waitMode of [false, true]) {

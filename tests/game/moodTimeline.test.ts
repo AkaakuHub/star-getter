@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { moodAtTime, validateMoodTimeline } from '../../src/domain/game/live/moodTimeline';
-import { moodValue, sectionAt } from '../../src/domain/game/projection';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { applyEffect } from '../../src/domain/game/effects';
+import { moodAtTime, validateMoodTimeline } from '@akaakuhub/suku-sute-core/game/live/moodTimeline';
+import { moodValue, sectionAt } from '@akaakuhub/suku-sute-core/game/projection';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 it('キーの時刻へ到達するまで前の値を保ち、補間せず切り替える', () => {

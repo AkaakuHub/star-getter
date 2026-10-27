@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { projectStarScore } from '../../src/presentation/score/starScore';
-import { rules } from '../../src/domain/game/model';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 
 it('ゼロでは本家と同じ12桁を埋め、3桁ごとに区切って現在の0だけを強調する', () => {
   const display = projectStarScore(0n);

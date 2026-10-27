@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 it('Action5はActionType5・52補正後の割合を最大元気へ適用する', () => {

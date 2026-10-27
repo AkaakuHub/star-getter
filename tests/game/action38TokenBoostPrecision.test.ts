@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 it('ActionType38はActionType52適用後のfloat値を保持する', () => {

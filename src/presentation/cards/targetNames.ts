@@ -1,5 +1,5 @@
 import { baseCards } from '../../content/baseCards';
-import type { HandUseTrigger } from '../../domain/game/cards/cardTypes';
+import type { HandUseTrigger } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
 
 export function targetNames(members: readonly number[]): string {
   return baseCards

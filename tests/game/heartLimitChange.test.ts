@@ -1,15 +1,15 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import {
   advanceHeartLimitBuffs,
   applyHeartLimit,
   deactivateHeartLimitBuffs,
   expireHeartLimitBuffSections,
-} from '../../src/domain/game/effects/heartLimit';
+} from '@akaakuhub/suku-sute-core/game/effects/heartLimit';
 import { game } from './support/game';
-import { validateEffect } from '../../src/domain/game/effectValidation';
+import { validateEffect } from '@akaakuhub/suku-sute-core/game/effectValidation';
 
 it('加算変更は期限後に解除し、既存の基礎上限へ戻る', () => {
   const state = game();

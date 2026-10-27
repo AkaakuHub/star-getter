@@ -1,14 +1,14 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { act } from '../../src/domain/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
   advanceIngameMission,
   registerMissionAction,
   registerMissionHeartCollect,
   registerMissionMember,
   startIngameMission,
-} from '../../src/domain/game/ingameMissions';
+} from '@akaakuhub/suku-sute-core/game/ingameMissions';
 import { game } from './support/game';
 import { tokenCardEffect } from './support/tokenCardEffect';
 

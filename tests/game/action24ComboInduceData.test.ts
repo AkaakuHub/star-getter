@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createComboInduceEffect } from '../../src/domain/game/actionTypeEffects/comboInduce';
-import { createGame } from '../../src/domain/game/simulation';
+import { createComboInduceEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/comboInduce';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType24はメンバー指定と期限をlongのint32化でEffectへ変換する', () => {
   const effect = createComboInduceEffect({

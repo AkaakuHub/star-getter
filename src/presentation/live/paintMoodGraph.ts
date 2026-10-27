@@ -1,5 +1,5 @@
-import type { Track } from '../../domain/game/model';
-import { projectMoodStepPoints } from '../../domain/game/live/moodGraph';
+import type { Track } from '@akaakuhub/suku-sute-core/game/model';
+import { projectMoodStepPoints } from '@akaakuhub/suku-sute-core/game/live/moodGraph';
 
 export function paintMoodGraph(context: CanvasRenderingContext2D, track: Track): void {
   const width = 750;

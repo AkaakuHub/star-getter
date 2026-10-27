@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { heartCount } from '../../src/domain/game/hearts';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game, withHand } from './support/game';
 
 it('開始時は901を実行せず、903/904だけ手札へ登録する', () => {

@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { beatHeartCount } from '../../src/domain/game/beat';
-import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
-import { addTokens } from '../../src/domain/game/cards/tokens';
-import { skillValue } from '../../src/domain/game/effects';
-import { heartCount } from '../../src/domain/game/hearts';
+import { beatHeartCount } from '@akaakuhub/suku-sute-core/game/beat';
+import { applyDrawAbility } from '@akaakuhub/suku-sute-core/game/cards/drawAbilities';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
+import { skillValue } from '@akaakuhub/suku-sute-core/game/effects';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game, withHand } from './support/game';
 
 function library(mood: number) {

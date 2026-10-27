@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
-import { applyEffect } from '../../src/domain/game/effects';
-import { expireDisableMentalDownEffectSections } from '../../src/domain/game/effects/disableMentalDown';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { expireDisableMentalDownEffectSections } from '@akaakuhub/suku-sute-core/game/effects/disableMentalDown';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('ActionType34は元気0での休憩移行と回復を防ぎ、時間切れで解除する', () => {

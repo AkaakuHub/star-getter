@@ -3,11 +3,11 @@ import {
   beginTokenGeneration,
   finishTokenGeneration,
   requestTokens,
-} from '../../src/domain/game/cards/tokens';
-import { boostTokenRequests } from '../../src/domain/game/cards/tokenBoost';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
-import { advanceTo } from '../../src/domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/cards/tokens';
+import { boostTokenRequests } from '@akaakuhub/suku-sute-core/game/cards/tokenBoost';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 import { tokenCardEffect } from './support/tokenCardEffect';
 

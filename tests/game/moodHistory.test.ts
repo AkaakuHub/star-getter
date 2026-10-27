@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { recordMoodHistory } from '../../src/domain/game/moodHistory';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { recordMoodHistory } from '@akaakuhub/suku-sute-core/game/moodHistory';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 function game() {
   const track = tracks[0];

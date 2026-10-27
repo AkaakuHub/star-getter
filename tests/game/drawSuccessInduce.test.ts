@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
-import { fillHandToCount } from '../../src/domain/game/cards/drawing';
-import { evaluateDrawSuccessInduce } from '../../src/domain/game/effects/drawSuccessInduce';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
+import { fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import { evaluateDrawSuccessInduce } from '@akaakuhub/suku-sute-core/game/effects/drawSuccessInduce';
 import { game } from './support/game';
 
 it('ActionType901の元気割合条件はC#同様に以下で判定し、IsActiveで分岐する', () => {

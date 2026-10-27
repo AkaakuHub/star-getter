@@ -12,7 +12,7 @@ import {
 import type { GamePreferences } from './gamePreferences';
 import { initialRoute, routeUrl } from './initialRoute';
 import { useGameControls } from './useGameControls';
-import { hasAvailableSpecial } from '../domain/game/special';
+import { hasAvailableSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { SpecialSelection } from '../presentation/special/SpecialSelection';
 
 type Panel = 'menu' | 'hand' | 'deck' | 'special';

@@ -1,5 +1,5 @@
 import { routes, type RouteId } from '../../content/routes';
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { formatScore } from '../cardDescription';
 import { paintResultGraph } from './paintResultGraph';
 

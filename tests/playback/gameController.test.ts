@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { canUseCard, cardCooldownTicks, durationSeconds } from '../../src/domain/game/projection';
-import { rules } from '../../src/domain/game/model';
+import {
+  canUseCard,
+  cardCooldownTicks,
+  durationSeconds,
+} from '@akaakuhub/suku-sute-core/game/projection';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { session } from './gameSession';
 
 describe('ゲーム時計とゲームの同期', () => {

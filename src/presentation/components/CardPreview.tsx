@@ -1,4 +1,4 @@
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { describeCard } from '../cardDescription';
 import { liveLayout } from '../live/layout';
 import { FittedText } from '../text/FittedText';

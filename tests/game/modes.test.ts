@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { drainModeChanges } from '../../src/domain/game/effects/modeChange';
-import { cardCost } from '../../src/domain/game/cards/cost';
-import { cardAt } from '../../src/domain/game/projection';
-import { createModes } from '../../src/domain/game/live/modes';
-import { activateModeAbilityEffects } from '../../src/domain/game/cards/modeAbility';
-import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
-import { act } from '../../src/domain/game/actions';
-import type { Card, Effect } from '../../src/domain/game/model';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { drainModeChanges } from '@akaakuhub/suku-sute-core/game/effects/modeChange';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
+import { cardAt } from '@akaakuhub/suku-sute-core/game/projection';
+import { createModes } from '@akaakuhub/suku-sute-core/game/live/modes';
+import { activateModeAbilityEffects } from '@akaakuhub/suku-sute-core/game/cards/modeAbility';
+import { disposeHandEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { game, withHand } from './support/game';
 
 function modeGame() {

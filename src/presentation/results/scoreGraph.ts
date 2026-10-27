@@ -1,5 +1,5 @@
-import type { ScoreSample } from '../../domain/game/scoreHistory';
-import type { MoodSample } from '../../domain/game/moodHistory';
+import type { ScoreSample } from '@akaakuhub/suku-sute-core/game/scoreHistory';
+import type { MoodSample } from '@akaakuhub/suku-sute-core/game/moodHistory';
 
 export function projectScoreGraph(
   history: readonly ScoreSample[],

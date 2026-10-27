@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { induceCardMoves } from '../../src/domain/game/effects/cardMoveInduce';
-import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { induceCardMoves } from '@akaakuhub/suku-sute-core/game/effects/cardMoveInduce';
+import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
 import { game } from './support/game';
 
 function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {

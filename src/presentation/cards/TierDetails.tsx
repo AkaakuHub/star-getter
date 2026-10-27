@@ -1,5 +1,5 @@
-import type { Effect } from '../../domain/game/model';
-import { calculateSkillMoodCorrection } from '../../domain/game/live/skillMood';
+import type { Effect } from '@akaakuhub/suku-sute-core/game/model';
+import { calculateSkillMoodCorrection } from '@akaakuhub/suku-sute-core/game/live/skillMood';
 import { describeEffect, effectConditions } from './describeEffect';
 import { targetNames } from './targetNames';
 

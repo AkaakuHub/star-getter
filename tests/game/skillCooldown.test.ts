@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { cardCooldownTicks } from '../../src/domain/game/projection';
-import { skillCooldownSeconds } from '../../src/domain/game/effects/skillCooldown';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { cardCooldownTicks } from '@akaakuhub/suku-sute-core/game/projection';
+import { skillCooldownSeconds } from '@akaakuhub/suku-sute-core/game/effects/skillCooldown';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 const duration = { kind: 'stage', value: 0 } as const;

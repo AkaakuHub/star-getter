@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { addHearts, advanceHearts, heartCount } from '../../src/domain/game/hearts';
+import { addHearts, advanceHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
 it('同じフレームの失効でも表示1個ずつと非表示バッチごとに得点上限を適用する', () => {

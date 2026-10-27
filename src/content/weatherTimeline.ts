@@ -1,4 +1,4 @@
-import type { MoodKey } from '../domain/game/live/moodTimeline';
+import type { MoodKey } from '@akaakuhub/suku-sute-core/game/live/moodTimeline';
 import { stageTiming } from './balance';
 
 const sourceSections = [

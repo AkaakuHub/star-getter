@@ -1,5 +1,5 @@
 import { resolveDeck, defaultDeckIds } from '../cards';
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { routeTokens } from './tokens';
 
 export const routeIds = ['library', 'bloom'] as const;

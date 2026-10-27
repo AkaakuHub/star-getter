@@ -1,11 +1,11 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   voltageLevel,
   voltageProgress,
   voltageThreshold,
-} from '../../src/domain/game/live/voltageLevel';
-import { act } from '../../src/domain/game/actions';
+} from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { game } from './support/game';
 
 it('通常上限1000を追加の共鳴で1500へ増やし、800万Pt刻みの閾値を使う', () => {

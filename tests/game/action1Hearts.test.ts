@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { beatHeartCount } from '../../src/domain/game/beat';
-import { heartCount } from '../../src/domain/game/hearts';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { beatHeartCount } from '@akaakuhub/suku-sute-core/game/beat';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
 it('ActionType1は固定数を整数化してからEffectPowerを掛け、ミリ秒寿命を使う', () => {

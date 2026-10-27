@@ -1,14 +1,14 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   applyAction52SkillBoost,
   activateAction52SkillBoost,
   advanceAction52SkillBoosts,
   deactivateAction52SkillBoosts,
   expireAction52SkillBoostSections,
-} from '../../src/domain/game/effects/action52SkillBoost';
-import { heartCount } from '../../src/domain/game/hearts';
-import { changeResource } from '../../src/domain/game/resources';
+} from '@akaakuhub/suku-sute-core/game/effects/action52SkillBoost';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
 import { game } from './support/game';
 
 function cleanGame() {

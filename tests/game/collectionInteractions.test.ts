@@ -1,15 +1,15 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { beatHeartCount } from '../../src/domain/game/beat';
-import { advanceHandCollectionAbilities } from '../../src/domain/game/cards/collectionAbilities';
-import { fillHand, shuffleHand } from '../../src/domain/game/cards/drawing';
-import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
-import { addTokens } from '../../src/domain/game/cards/tokens';
-import { addHearts, heartCount } from '../../src/domain/game/hearts';
-import type { GameState } from '../../src/domain/game/model';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { beatHeartCount } from '@akaakuhub/suku-sute-core/game/beat';
+import { advanceHandCollectionAbilities } from '@akaakuhub/suku-sute-core/game/cards/collectionAbilities';
+import { fillHand, shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import { disposeHandEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
+import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 function game(route: 'library' | 'bloom'): GameState {
   const track = tracks[0];

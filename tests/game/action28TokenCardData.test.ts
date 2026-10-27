@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { createTokenCardEffect } from '../../src/domain/game/actionTypeEffects/tokenCard';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { createTokenCardEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/tokenCard';
 import { game } from './support/game';
 import { tokenCardEffect } from './support/tokenCardEffect';
 

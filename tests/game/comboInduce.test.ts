@@ -1,14 +1,14 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
   activateComboInduce,
   advanceComboInducer,
   deactivateComboInducer,
   expireComboInducerSections,
   notifyComboSkillPoint,
-} from '../../src/domain/game/effects/comboInduce';
-import { heartCount } from '../../src/domain/game/hearts';
+} from '@akaakuhub/suku-sute-core/game/effects/comboInduce';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
 function setup(repeatAction: 0 | 1 | 2 = 0) {

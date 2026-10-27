@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceProxySkillUses } from '../../src/domain/game/effects/proxySkill';
-import { createProxySkillEffect } from '../../src/domain/game/actionTypeEffects/proxySkill';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceProxySkillUses } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
+import { createProxySkillEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/proxySkill';
 import { game } from './support/game';
 
 it('ActionType46は各詳細値と解決済みの吸収・誘発Effectを接続する', () => {

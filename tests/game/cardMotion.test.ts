@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
-import type { CardUse } from '../../src/domain/game/model';
+import type { CardUse } from '@akaakuhub/suku-sute-core/game/model';
 import { cardMotion } from '../../src/presentation/cards/cardMotion';
 import { handGeometry } from '../../src/presentation/handLayout';
 

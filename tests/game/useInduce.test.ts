@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { refreshEffectInducers } from '../../src/domain/game/effects/effectInduce';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { refreshEffectInducers } from '@akaakuhub/suku-sute-core/game/effects/effectInduce';
 import { game } from './support/game';
 
 it('使用誘発は子効果を実行し、子効果の発動数で上限を判定する', () => {

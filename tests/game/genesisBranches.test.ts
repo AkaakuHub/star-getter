@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { activateBloom } from '../../src/domain/game/bloom';
-import { applyEffect } from '../../src/domain/game/effects';
-import { addHearts, collectHearts } from '../../src/domain/game/hearts';
-import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
-import type { GameState } from '../../src/domain/game/model';
+import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { addHearts, collectHearts } from '@akaakuhub/suku-sute-core/game/hearts';
+import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { game, withHand } from './support/game';
 
 function rainState(): GameState {

@@ -1,13 +1,13 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   advanceAdditionalHeartInducers,
   expireAdditionalHeartInducerSections,
   induceAdditionalHearts,
-} from '../../src/domain/game/effects/additionalHeart';
-import { heartCount } from '../../src/domain/game/hearts';
-import { matchesAdditionalHeartCondition } from '../../src/domain/game/additionalHeartTypes';
+} from '@akaakuhub/suku-sute-core/game/effects/additionalHeart';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { matchesAdditionalHeartCondition } from '@akaakuhub/suku-sute-core/game/additionalHeartTypes';
 import { game } from './support/game';
 
 it('一致したスキル使用APからEffectPowerを求め、登録したAction1の子効果を実行する', () => {

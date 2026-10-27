@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { projectMoodStepPoints } from '../../src/domain/game/live/moodGraph';
+import { projectMoodStepPoints } from '@akaakuhub/suku-sute-core/game/live/moodGraph';
 import { tracks } from '../../src/content/tracks';
 import { resolveDeck, defaultDeckIds } from '../../src/content/cards';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('空模様の変更時刻まで値を保ち、−100から100へ垂直に切り替える', () => {
   expect(

@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { moodValue } from '../../src/domain/game/projection';
-import { heartCount } from '../../src/domain/game/hearts';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game, withHand } from './support/game';
 
 it('ActionType42は子カードのAbility894を起動する', () => {

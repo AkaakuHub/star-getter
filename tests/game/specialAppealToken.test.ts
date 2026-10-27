@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { activateSpecialAppealToken } from '../../src/domain/game/effects/specialAppealToken';
-import type { AddSpecialAppealTokenEffect } from '../../src/domain/game/specialAppealTokenTypes';
-import { canUseSpecial } from '../../src/domain/game/special';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { activateSpecialAppealToken } from '@akaakuhub/suku-sute-core/game/effects/specialAppealToken';
+import type { AddSpecialAppealTokenEffect } from '@akaakuhub/suku-sute-core/game/specialAppealTokenTypes';
+import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { game } from './support/game';
 
 it('対象メンバーのトークンだけを順序付きで追加し、同じ記録を重複させない', () => {

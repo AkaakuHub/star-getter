@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createHeartLimitChangeEffect } from '../../src/domain/game/actionTypeEffects/heartLimitChange';
-import { resolveEffectParameterDetails } from '../../src/domain/game/parameters/parameterValueChange';
-import { createGame } from '../../src/domain/game/simulation';
+import { createHeartLimitChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/heartLimitChange';
+import { resolveEffectParameterDetails } from '@akaakuhub/suku-sute-core/game/parameters/parameterValueChange';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('ActionType25はlongの詳細値・対象Mood・期限を保持して計算種別をint32化する', () => {

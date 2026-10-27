@@ -1,4 +1,4 @@
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { describeCardTraits } from '../cardDescription';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { EffectDetails } from './EffectDetails';

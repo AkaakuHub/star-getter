@@ -1,16 +1,26 @@
-import { cardCost } from '../domain/game/cards/cost';
-import { act } from '../domain/game/actions';
-import { type Action, type Card, type GameState, rules } from '../domain/game/model';
-import { canUseCard, cardAt, cardCooldownTicks, sectionAt } from '../domain/game/projection';
-import { resolveStarGatherHeartDrawCount } from '../domain/game/live/heartPresentation';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import {
+  type Action,
+  type Card,
+  type GameState,
+  rules,
+} from '@akaakuhub/suku-sute-core/game/model';
+import {
+  canUseCard,
+  cardAt,
+  cardCooldownTicks,
+  sectionAt,
+} from '@akaakuhub/suku-sute-core/game/projection';
+import { resolveStarGatherHeartDrawCount } from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
 import {
   advanceWaitMode,
   createWaitMode,
   releaseWaitMode,
   notifyWaitModeSkillUse,
   type WaitModeState,
-} from '../domain/game/live/waitMode';
-import { advanceTo } from '../domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/live/waitMode';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 import type { GameAudio } from './gameAudio';
 

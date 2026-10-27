@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { activateBloom, changeBloomResource, finishBloom } from '../../src/domain/game/bloom';
-import { applyEffect } from '../../src/domain/game/effects';
-import { calculateStarGatherGenesisGaugeDelta } from '../../src/domain/game/live/genesisGauge';
-import { heartCount } from '../../src/domain/game/hearts';
-import { rules } from '../../src/domain/game/model';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { canUseSpecial } from '../../src/domain/game/special';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import {
+  activateBloom,
+  changeBloomResource,
+  finishBloom,
+} from '@akaakuhub/suku-sute-core/game/bloom';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { calculateStarGatherGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/game/live/genesisGauge';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
 
 function active() {

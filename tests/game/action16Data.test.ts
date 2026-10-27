@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
-import { createHeartUpEffect } from '../../src/domain/game/actionTypeEffects/heartUp';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { createHeartUpEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/heartUp';
 
 it('ActionType16の対象・回数・期限詳細をきらめき増幅Effectへ接続する', () => {
   const track = tracks[0];

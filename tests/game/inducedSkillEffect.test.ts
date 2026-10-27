@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { changeResource } from '../../src/domain/game/resources';
-import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
+import { registerProxySkill } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 const effect = {

@@ -1,6 +1,6 @@
 import { Share2 } from 'lucide-preact';
 import type { RouteId } from '../../content/routes';
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { useResultShare } from './useResultShare';
 
 export function ResultShareButton({

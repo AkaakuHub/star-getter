@@ -1,4 +1,4 @@
-import type { TokenKind } from '../../domain/game/model';
+import type { TokenKind } from '@akaakuhub/suku-sute-core/game/model';
 
 export const tokenNames: Readonly<Record<TokenKind, string>> = {
   ensemble: 'ヨット',

@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   deactivateInducedEffects,
   refreshEffectInducers,
-} from '../../src/domain/game/effects/effectInduce';
+} from '@akaakuhub/suku-sute-core/game/effects/effectInduce';
 import { game } from './support/game';
 
 it('ボーナス得点のしきい値を満たすと子効果を有効化し、外れると解除する', () => {

@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
-import type { CardSkillVariantMaster } from '../../src/domain/game/cards/cardTypes';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import type { CardSkillVariantMaster } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
 
 const cardSkillVariants: readonly CardSkillVariantMaster[] = [
   {

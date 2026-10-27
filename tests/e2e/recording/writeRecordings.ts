@@ -3,7 +3,7 @@ import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { GameRecording, InputRecord } from './gameRecording';
 import { routes } from '../../../src/content/routes';
-import { rules } from '../../../src/domain/game/model';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 
 function describe(record: InputRecord): string {
   const input = record.input;

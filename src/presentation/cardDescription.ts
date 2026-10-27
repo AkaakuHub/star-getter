@@ -1,7 +1,7 @@
 import { scoreUnits } from './score/units';
 import { describeAbilities } from './cards/describeAbilities';
 import { describeEffect } from './cards/describeEffect';
-import type { Card } from '../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { targetNames } from './cards/targetNames';
 
 export function describeCard(card: Card): string {

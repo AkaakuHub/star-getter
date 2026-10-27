@@ -1,4 +1,7 @@
-import { baseGaugeIntervalSeconds, type StageGauges } from '../domain/game/live/gaugeTiming';
+import {
+  baseGaugeIntervalSeconds,
+  type StageGauges,
+} from '@akaakuhub/suku-sute-core/game/live/gaugeTiming';
 
 export const standardStage: StageGauges = {
   maxEnergy: 20,

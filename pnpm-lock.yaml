@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@akaakuhub/suku-sute-core':
+        specifier: file:vendor/suku-sute-core
+        version: file:vendor/suku-sute-core
       lucide-preact:
         specifier: ^0.577.0
         version: 0.577.0(preact@10.29.8)
@@ -38,6 +41,10 @@ importers:
         version: 1.4.0(@types/node@24.19.2)(@vitest/ui@5.0.5(vitest@5.0.5))(jiti@2.7.0)(typescript@6.0.3)(yaml@2.9.1)
 
 packages:
+
+  '@akaakuhub/suku-sute-core@file:vendor/suku-sute-core':
+    resolution: {directory: vendor/suku-sute-core, type: directory}
+    engines: {node: '>=24.22.1 <25'}
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -1603,6 +1610,8 @@ packages:
     resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
 snapshots:
+
+  '@akaakuhub/suku-sute-core@file:vendor/suku-sute-core': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:

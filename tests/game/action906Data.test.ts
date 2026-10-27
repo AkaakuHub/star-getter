@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType906の必要使用回数・上限と子効果IDを使用回数誘発へ接続する', () => {
   const track = tracks[0];

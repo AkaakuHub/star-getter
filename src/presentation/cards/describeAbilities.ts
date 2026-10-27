@@ -1,5 +1,5 @@
 import { describeEffect } from './describeEffect';
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handUseTriggerDescription } from './targetNames';
 
 export function describeAbilities(card: Card): string {

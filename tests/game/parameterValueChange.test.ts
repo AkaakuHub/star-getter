@@ -1,13 +1,13 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect, skillValue } from '../../src/domain/game/effects';
+import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   applyParameterValueChange,
   initializeParameterValueFactors,
   resolveEffectParameterDetails,
-} from '../../src/domain/game/parameters/parameterValueChange';
-import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
-import { fillHand, removeRandomHandCards } from '../../src/domain/game/cards/drawing';
-import { createModes } from '../../src/domain/game/live/modes';
+} from '@akaakuhub/suku-sute-core/game/parameters/parameterValueChange';
+import { disposeHandEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { fillHand, removeRandomHandCards } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import { createModes } from '@akaakuhub/suku-sute-core/game/live/modes';
 import { game } from './support/game';
 
 it('加算型の係数は今回の使用回数を含む', () => {

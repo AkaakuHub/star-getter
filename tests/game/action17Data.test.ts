@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
-import { createSkillCostChangeEffect } from '../../src/domain/game/actionTypeEffects/skillCostChange';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { createSkillCostChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/skillCostChange';
 
 it('ActionType17の条件付きコスト変更詳細を手札効果へ接続する', () => {
   const track = tracks[0];

@@ -4,9 +4,9 @@ import { tracks } from '../../src/content/tracks';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
-import { createMentalHeartInduceEffect } from '../../src/domain/game/actionTypeEffects/mentalHeartInduce';
-import { createGame } from '../../src/domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { createMentalHeartInduceEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/mentalHeartInduce';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType23はlong詳細値のint32化とパート期限のlong保持を行う', () => {
   const effect = createMentalHeartInduceEffect({

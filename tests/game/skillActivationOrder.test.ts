@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { addTokens } from '../../src/domain/game/cards/tokens';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { game, withHand } from './support/game';
 
 it('ヨットの検索を先に登録し、巻き込んだ浮き輪の舵・編成検索から先に補充する', () => {

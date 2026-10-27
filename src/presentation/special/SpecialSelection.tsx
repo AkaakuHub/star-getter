@@ -1,10 +1,10 @@
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import {
   canUseSpecial,
   isBloomSpecial,
   specialCards,
   specialCost,
-} from '../../domain/game/special';
+} from '@akaakuhub/suku-sute-core/game/special';
 import { EffectDetails } from '../cards/EffectDetails';
 import { Modal } from '../components/Modal';
 import { CardArtwork } from '../mascots/CardArtwork';

@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   activateMentalHeartInduce,
   induceMentalHearts,
-} from '../../src/domain/game/effects/mentalHeartInduce';
-import { heartCount } from '../../src/domain/game/hearts';
+} from '@akaakuhub/suku-sute-core/game/effects/mentalHeartInduce';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
 it('Action23はActionType1の値をC#のintキャストで0方向へ切り捨てる', () => {

@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createHandCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { applyEffect } from '../../src/domain/game/effects';
-import { expireHandLimitSections } from '../../src/domain/game/effects/handLimit';
-import { createGame } from '../../src/domain/game/simulation';
+import { createHandCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { expireHandLimitSections } from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType20の未対応計算種別は初回加算せず、期限時の解除通知だけ行う', () => {
   const track = tracks[0];

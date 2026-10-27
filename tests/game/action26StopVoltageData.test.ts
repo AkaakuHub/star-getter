@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createStopVoltageIncreaseEffect } from '../../src/domain/game/actionTypeEffects/stopVoltageIncrease';
-import { applyEffect } from '../../src/domain/game/effects';
-import { createGame } from '../../src/domain/game/simulation';
+import { createStopVoltageIncreaseEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/stopVoltageIncrease';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType26はlong詳細値をミリ秒float32またはパート数bigintとして保持する', () => {
   const milliseconds = createStopVoltageIncreaseEffect({

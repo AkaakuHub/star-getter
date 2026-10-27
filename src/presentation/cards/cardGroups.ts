@@ -1,4 +1,4 @@
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 
 export function cardGroups(state: GameState) {
   const active = new Set(state.deck.map((card) => card.id));

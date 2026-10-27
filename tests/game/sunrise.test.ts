@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
-import { addHearts, collectHearts } from '../../src/domain/game/hearts';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { advanceHeartBoosts } from '../../src/domain/game/live/heartBoosts';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addHearts, collectHearts } from '@akaakuhub/suku-sute-core/game/hearts';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { advanceHeartBoosts } from '@akaakuhub/suku-sute-core/game/live/heartBoosts';
 import { game, withHand } from './support/game';
 
 it('開花中の元気条件は成立し、雨100のときだけ対象限定の追加効果を付与する', () => {

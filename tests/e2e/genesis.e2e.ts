@@ -1,7 +1,7 @@
 import { expect, test } from 'vite-plus/test';
-import { durationSeconds, moodValue } from '../../src/domain/game/projection';
-import { heartCount } from '../../src/domain/game/hearts';
-import { rules } from '../../src/domain/game/model';
+import { durationSeconds, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { GameDriver } from './driver';
 
 const priority = [

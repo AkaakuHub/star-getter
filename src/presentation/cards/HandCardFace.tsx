@@ -1,4 +1,4 @@
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { CardArtwork } from '../mascots/CardArtwork';
 
 export function HandCardFace({ card, cost }: Readonly<{ card: Card; cost: number }>) {

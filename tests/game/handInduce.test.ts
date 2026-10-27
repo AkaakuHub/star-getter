@@ -1,12 +1,12 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { moodValue } from '../../src/domain/game/projection';
-import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import {
   notifyHandCardBeforeUse,
   notifyHandHeartCollect,
-} from '../../src/domain/game/cards/handInduce';
+} from '@akaakuhub/suku-sute-core/game/cards/handInduce';
 import { game, withHand } from './support/game';
 
 it('ActionType37のSetで基礎熱気レベルが上がると手札誘発を起動する', () => {

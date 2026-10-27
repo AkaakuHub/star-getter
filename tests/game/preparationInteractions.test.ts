@@ -1,21 +1,21 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { activateBloom } from '../../src/domain/game/bloom';
-import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
-import { disposeHandEffects } from '../../src/domain/game/cards/handEffects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { applyDrawAbility } from '@akaakuhub/suku-sute-core/game/cards/drawAbilities';
+import { disposeHandEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import {
   notifyHandCardBeforeUse,
   notifyHandSkillUse,
-} from '../../src/domain/game/cards/useAbilities';
-import { flushDeckActions } from '../../src/domain/game/cards/boardActions';
-import { fillHand } from '../../src/domain/game/cards/drawing';
-import { addTokens } from '../../src/domain/game/cards/tokens';
-import { applyEffect, skillValue } from '../../src/domain/game/effects';
-import { addHearts, heartCount } from '../../src/domain/game/hearts';
-import { cardCooldownTicks, moodValue, sectionAt } from '../../src/domain/game/projection';
-import type { HandUseTrigger } from '../../src/domain/game/cards/cardTypes';
+} from '@akaakuhub/suku-sute-core/game/cards/useAbilities';
+import { flushDeckActions } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
+import { fillHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
+import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
+import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { cardCooldownTicks, moodValue, sectionAt } from '@akaakuhub/suku-sute-core/game/projection';
+import type { HandUseTrigger } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
 import { tracks } from '../../src/content/tracks';
 import { game, withHand } from './support/game';
 

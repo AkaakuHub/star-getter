@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { applyMentalBarrierAdditionalBuff } from '../../src/domain/game/effects/mentalBarrierAdditionalBuff';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { applyMentalBarrierAdditionalBuff } from '@akaakuhub/suku-sute-core/game/effects/mentalBarrierAdditionalBuff';
 import { game } from './support/game';
 
 it('ActionType33は対象カードの耐久値を増幅し、対象外では消費しない', () => {

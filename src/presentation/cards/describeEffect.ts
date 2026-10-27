@@ -1,6 +1,6 @@
 import { describeCondition } from './describeCondition';
 import { tokenNames } from '../../content/labels/tokens';
-import type { Effect } from '../../domain/game/model';
+import type { Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { targetNames } from './targetNames';
 
 export const effectConditions = {

@@ -1,4 +1,4 @@
-import type { CostumeId } from '../../domain/game/model';
+import type { CostumeId } from '@akaakuhub/suku-sute-core/game/model';
 
 type Palette = Readonly<{
   fabric: string;

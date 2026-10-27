@@ -1,8 +1,8 @@
 import type { GameController } from '../../app/gameController';
 import { performers } from '../../content/performers';
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { Portrait } from '../components/Portrait';
-import { heartCount } from '../../domain/game/hearts';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { HeartCanvas } from '../hearts/HeartCanvas';
 
 export function Stage({

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { addHearts, advanceHearts, heartCount } from '../../src/domain/game/hearts';
-import { type GameState } from '../../src/domain/game/model';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addHearts, advanceHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { type GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 function game(): GameState {
   const track = tracks[0];

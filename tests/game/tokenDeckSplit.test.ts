@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import type { Card } from '../../src/domain/game/model';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game, withHand } from './support/game';
 
 function card(state: ReturnType<typeof game>, id: string): Card {

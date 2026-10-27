@@ -1,4 +1,4 @@
-import type { CostumeId, PerformerId } from '../domain/game/model';
+import type { CostumeId, PerformerId } from '@akaakuhub/suku-sute-core/game/model';
 
 type Performer = Readonly<{
   id: PerformerId;

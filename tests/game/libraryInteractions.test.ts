@@ -1,12 +1,17 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect, skillValue } from '../../src/domain/game/effects';
-import { applyDrawAbility } from '../../src/domain/game/cards/drawAbilities';
-import { cardCost } from '../../src/domain/game/cards/cost';
-import { addTokens } from '../../src/domain/game/cards/tokens';
-import { rules, type Card, type GameState, type TokenKind } from '../../src/domain/game/model';
-import { cardCooldownTicks, moodValue } from '../../src/domain/game/projection';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
+import { applyDrawAbility } from '@akaakuhub/suku-sute-core/game/cards/drawAbilities';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
+import {
+  rules,
+  type Card,
+  type GameState,
+  type TokenKind,
+} from '@akaakuhub/suku-sute-core/game/model';
+import { cardCooldownTicks, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game, withHand } from './support/game';
 
 function token(state: GameState, kind: TokenKind): Card {

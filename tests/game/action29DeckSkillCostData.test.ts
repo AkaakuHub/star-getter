@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createDeckSkillCostChangeEffect } from '../../src/domain/game/actionTypeEffects/deckSkillCostChange';
-import { createGame } from '../../src/domain/game/simulation';
+import { createDeckSkillCostChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/deckSkillCostChange';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType29はlong詳細値をint32化してデッキ対象条件を作る', () => {
   const effect = createDeckSkillCostChangeEffect({

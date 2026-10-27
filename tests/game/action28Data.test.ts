@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import type { CardSkillVariantMaster } from '../../src/domain/game/cards/cardTypes';
-import { createGame } from '../../src/domain/game/simulation';
-import { applyEffect } from '../../src/domain/game/effects';
+import type { CardSkillVariantMaster } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 
 const cardSkillVariants: readonly CardSkillVariantMaster[] = [
   {

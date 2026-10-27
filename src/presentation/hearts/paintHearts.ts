@@ -1,7 +1,7 @@
-import type { GameState } from '../../domain/game/model';
-import { heartCount } from '../../domain/game/hearts';
-import { calculateStarGatherHeartRank } from '../../domain/game/live/heartRank';
-import { projectStarGatherHeartPresentations } from '../../domain/game/live/heartPresentation';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { calculateStarGatherHeartRank } from '@akaakuhub/suku-sute-core/game/live/heartRank';
+import { projectStarGatherHeartPresentations } from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
 
 export function paintHearts(
   context: CanvasRenderingContext2D,

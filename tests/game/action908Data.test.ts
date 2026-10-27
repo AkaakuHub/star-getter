@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType908の墓地移動時点・要求数・上限と子効果IDを接続する', () => {
   const track = tracks[0];

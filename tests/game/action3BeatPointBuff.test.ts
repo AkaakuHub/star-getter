@@ -1,13 +1,13 @@
 import { expect, it } from 'vite-plus/test';
-import { beatHeartCount } from '../../src/domain/game/beat';
+import { beatHeartCount } from '@akaakuhub/suku-sute-core/game/beat';
 import { game } from './support/game';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
-import { expireBeatPointBuffSections } from '../../src/domain/game/effects/beatPointBuff';
-import { act } from '../../src/domain/game/actions';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { expireBeatPointBuffSections } from '@akaakuhub/suku-sute-core/game/effects/beatPointBuff';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 
 it('Action3の加算Buffを基礎BeatPointへ適用する', () => {
   const initial = game();

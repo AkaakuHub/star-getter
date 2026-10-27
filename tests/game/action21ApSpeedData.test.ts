@@ -1,14 +1,14 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffects/apSpeedChange';
-import { act } from '../../src/domain/game/actions';
+import { createApSpeedChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/apSpeedChange';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
-import { applyEffect } from '../../src/domain/game/effects';
-import { createGame } from '../../src/domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType21の詳細値をint32・longのC#変換順でAP時間効果へ接続する', () => {
   const track = tracks[0];

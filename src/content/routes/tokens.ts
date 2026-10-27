@@ -1,6 +1,6 @@
 import { tokenNames } from '../labels/tokens';
-import type { Card } from '../../domain/game/model';
-import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 
 const appeal = { smile: 1, pure: 1, cool: 1 };
 

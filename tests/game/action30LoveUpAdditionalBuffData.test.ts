@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createLoveUpAdditionalBuffEffect } from '../../src/domain/game/actionTypeEffects/loveUpAdditionalBuff';
-import { createGame } from '../../src/domain/game/simulation';
+import { createLoveUpAdditionalBuffEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/loveUpAdditionalBuff';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType30はlong詳細値・Mood補正・対象・期限を正確に変換する', () => {
   const effect = createLoveUpAdditionalBuffEffect({

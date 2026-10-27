@@ -1,4 +1,4 @@
-import type { CardUse } from '../../domain/game/model';
+import type { CardUse } from '@akaakuhub/suku-sute-core/game/model';
 import { handGeometry } from '../handLayout';
 
 export const cardMotionDuration = 1000;

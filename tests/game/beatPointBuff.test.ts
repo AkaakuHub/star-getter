@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { beatHeartCount } from '../../src/domain/game/beat';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { beatHeartCount } from '@akaakuhub/suku-sute-core/game/beat';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('Action47の加算は自然発生ハート数へ加算する', () => {

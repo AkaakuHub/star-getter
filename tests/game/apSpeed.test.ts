@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { apIncreaseIntervalSeconds } from '../../src/domain/game/effects/apSpeed';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { apIncreaseIntervalSeconds } from '@akaakuhub/suku-sute-core/game/effects/apSpeed';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 const speedEffect = {

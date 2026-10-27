@@ -1,10 +1,13 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
-import { applyEffect } from '../../src/domain/game/effects';
-import { notifyHandHeartCollect, notifyHandSkillUse } from '../../src/domain/game/cards/handInduce';
-import { handInducerStateKey } from '../../src/domain/game/cards/handInducer';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import {
+  notifyHandHeartCollect,
+  notifyHandSkillUse,
+} from '@akaakuhub/suku-sute-core/game/cards/handInduce';
+import { handInducerStateKey } from '@akaakuhub/suku-sute-core/game/cards/handInducer';
 import { withHand } from './support/game';
 
 it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ接続する', () => {

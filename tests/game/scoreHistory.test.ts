@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { recordScoreHistory } from '../../src/domain/game/scoreHistory';
+import { recordScoreHistory } from '@akaakuhub/suku-sute-core/game/scoreHistory';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { addHearts } from '../../src/domain/game/hearts';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addHearts } from '@akaakuhub/suku-sute-core/game/hearts';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('加点があった時刻に直前の累積値と新しい累積値を並べて階段を作る', () => {
   const first = recordScoreHistory([], { timeMilliseconds: 100, totalScore: 10n });

@@ -1,8 +1,8 @@
 import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
-import { type GameState, rules } from '../../domain/game/model';
-import { handCapacity } from '../../domain/game/cards/drawing';
+import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
+import { handCapacity } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { LiveHud } from '../live/LiveHud';
 import { liveLayout } from '../live/layout';
 import { Stage } from '../stage/Stage';

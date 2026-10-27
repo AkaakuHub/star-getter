@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { act } from '../../src/domain/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { game } from './support/game';
 
 it('ActionType32は対象カードの元気回復を増幅し、指定回数で解除する', () => {

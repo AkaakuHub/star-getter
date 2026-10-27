@@ -1,7 +1,7 @@
-import { act } from '../../src/domain/game/actions';
-import { addTokens } from '../../src/domain/game/cards/tokens';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { expect, it } from 'vite-plus/test';
-import { shuffleHand } from '../../src/domain/game/cards/drawing';
+import { shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { game, withHand } from './support/game';
 
 for (const recoverDiscard of [false, true]) {

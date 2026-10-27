@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { calculateStarGatherFlowerRank } from '../../src/domain/game/live/heartRank';
-import { collectionScore } from '../../src/domain/game/scoring';
-import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
+import { calculateStarGatherFlowerRank } from '@akaakuhub/suku-sute-core/game/live/heartRank';
+import { collectionScore } from '@akaakuhub/suku-sute-core/game/scoring';
+import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { game } from './support/game';
 
 it('未生成の超過数ではなく場の個数で回収ランクを判定する', () => {

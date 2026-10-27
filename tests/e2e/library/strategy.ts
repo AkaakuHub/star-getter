@@ -1,6 +1,6 @@
-import { type GameState, rules } from '../../../src/domain/game/model';
-import { moodValue } from '../../../src/domain/game/projection';
-import { heartCount } from '../../../src/domain/game/hearts';
+import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
+import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { GameDriver } from '../driver';
 import { expect } from 'vite-plus/test';
 

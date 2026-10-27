@@ -1,4 +1,4 @@
-import type { GameCondition } from '../../domain/game/conditions/model';
+import type { GameCondition } from '@akaakuhub/suku-sute-core/game/conditions/model';
 import { formatNumber } from '../score/formatNumber';
 
 export function describeCondition(condition: GameCondition): string {

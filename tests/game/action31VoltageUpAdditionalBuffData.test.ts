@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createVoltageUpAdditionalBuffEffect } from '../../src/domain/game/actionTypeEffects/voltageUpAdditionalBuff';
-import { createGame } from '../../src/domain/game/simulation';
+import { createVoltageUpAdditionalBuffEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/voltageUpAdditionalBuff';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType31はlong詳細値から熱気追加バフを生成する', () => {
   const effect = createVoltageUpAdditionalBuffEffect({

@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { createReshuffleEffect } from '../../src/domain/game/actionTypeEffects/reshuffle';
-import { applyEffect } from '../../src/domain/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { createReshuffleEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/reshuffle';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 it('Action13は手札を引き直し、使用カードの補充を抑止する', () => {

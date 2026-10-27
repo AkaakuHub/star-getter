@@ -1,15 +1,15 @@
-import { cardCost } from '../../src/domain/game/cards/cost';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import type { RouteId } from '../../src/content/routes';
 import { createPresetGame } from '../../src/app/createPresetGame';
 import { GameController } from '../../src/app/gameController';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
-import { cardAt, canUseCard, moodValue } from '../../src/domain/game/projection';
-import { canUseSpecial } from '../../src/domain/game/special';
-import { heartCount } from '../../src/domain/game/hearts';
-import { type GameState, type Card, rules } from '../../src/domain/game/model';
+import { cardAt, canUseCard, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { type GameState, type Card, rules } from '@akaakuhub/suku-sute-core/game/model';
 import { GameRecording, type InputRecord } from './recording/gameRecording';
 import { inputTiming, type InputTiming, type TimeRange } from './input/timing';
-import { createRangeRandom } from '../../src/domain/game/random';
+import { createRangeRandom } from '@akaakuhub/suku-sute-core/game/random';
 
 export class GameDriver {
   private readonly controller: GameController;

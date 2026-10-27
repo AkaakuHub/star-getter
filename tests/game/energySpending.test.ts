@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { spendEnergy } from '../../src/domain/game/resources';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { spendEnergy } from '@akaakuhub/suku-sute-core/game/resources';
 import { game, withHand } from './support/game';
 
 describe('エナジー消費時の回復タイマー', () => {

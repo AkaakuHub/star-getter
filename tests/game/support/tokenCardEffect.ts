@@ -1,4 +1,4 @@
-import type { TokenCardEffect } from '../../../src/domain/game/tokenRequestTypes';
+import type { TokenCardEffect } from '@akaakuhub/suku-sute-core/game/tokenRequestTypes';
 
 export function tokenCardEffect(
   resourceId: number,

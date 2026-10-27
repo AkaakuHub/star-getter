@@ -1,5 +1,5 @@
-import type { Card, Effect } from '../../domain/game/model';
-import { handCardCountEffect } from '../../domain/game/actionTypeEffects/handCardCount';
+import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 
 const hearts = [8, 12, 15, 30, 60, 90, 120, 150, 225, 300, 375] as const;
 const boosts = [2, 3, 4, 8, 16, 24, 32, 40, 60, 80, 100] as const;

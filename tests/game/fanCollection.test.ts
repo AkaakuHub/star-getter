@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { addHearts } from '../../src/domain/game/hearts';
-import { applyEffect } from '../../src/domain/game/effects';
-import { fillHand, shuffleHand } from '../../src/domain/game/cards/drawing';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addHearts } from '@akaakuhub/suku-sute-core/game/hearts';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { fillHand, shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { game, withHand } from './support/game';
 
 it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付与し、回数で消費しない', () => {

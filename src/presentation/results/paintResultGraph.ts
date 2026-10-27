@@ -1,4 +1,4 @@
-import type { GameState } from '../../domain/game/model';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { formatScore } from '../cardDescription';
 import { projectScoreGraph } from './scoreGraph';
 

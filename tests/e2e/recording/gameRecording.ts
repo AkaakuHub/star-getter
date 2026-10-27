@@ -1,8 +1,8 @@
 import { afterEach } from 'vite-plus/test';
 import type { RouteId } from '../../../src/content/routes';
-import { type GameState, rules } from '../../../src/domain/game/model';
-import { heartCount } from '../../../src/domain/game/hearts';
-import { cardCooldownTicks, moodValue } from '../../../src/domain/game/projection';
+import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { cardCooldownTicks, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { writeRecordings } from './writeRecordings';
 import type { InputTiming } from '../input/timing';
 import { assertInputTiming } from '../input/assertTiming';

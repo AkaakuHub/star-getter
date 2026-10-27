@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { completeDeckOutChecks } from '../../src/domain/game/effects/deckOutCheck';
+import { completeDeckOutChecks } from '@akaakuhub/suku-sute-core/game/effects/deckOutCheck';
 import { game } from './support/game';
 
 it('デッキアウト確認ごとに1件だけ消費してAfterMentalDown通知を記録する', () => {

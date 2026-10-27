@@ -1,11 +1,11 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { cardCost } from '../../src/domain/game/cards/cost';
-import { act } from '../../src/domain/game/actions';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { initializeHandCardStats } from '../../src/domain/game/cards/skillCostChanges';
-import { notifyHandSkillUse } from '../../src/domain/game/cards/handInduce';
-import type { GameState } from '../../src/domain/game/model';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/skillCostChanges';
+import { notifyHandSkillUse } from '@akaakuhub/suku-sute-core/game/cards/handInduce';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { game } from './support/game';
 
 it('条件1から15までのコスト変化を対応する現在値から計算する', () => {

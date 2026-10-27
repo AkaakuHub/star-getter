@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
-import { applyEffect } from '../../src/domain/game/effects';
-import { changeResource } from '../../src/domain/game/resources';
+import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
 import {
   addMentalBarrier,
   mentalDecreaseInterval,
-} from '../../src/domain/game/live/mentalBarriers';
-import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
-import { advanceTo } from '../../src/domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/live/mentalBarriers';
+import { registerProxySkill } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 describe('元気バリア', () => {

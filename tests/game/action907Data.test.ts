@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType907の対象・しきい値・子効果IDを効果誘発へ接続する', () => {
   const track = tracks[0];

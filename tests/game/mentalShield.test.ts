@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { changeResource } from '../../src/domain/game/resources';
-import { applyEffect } from '../../src/domain/game/effects';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   advanceMentalShields,
   expireMentalShieldSections,
-} from '../../src/domain/game/effects/mentalShield';
+} from '@akaakuhub/suku-sute-core/game/effects/mentalShield';
 import { game } from './support/game';
 
 it('固定耐久を追加値と乗算係数へ適用してから整数耐久にする', () => {

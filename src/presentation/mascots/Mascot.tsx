@@ -1,5 +1,5 @@
 import { Sun, Cloud, CloudRain } from 'lucide-preact';
-import type { PerformerId } from '../../domain/game/model';
+import type { PerformerId } from '@akaakuhub/suku-sute-core/game/model';
 
 const weather = {
   nova: { icon: Sun, fill: '#ffda62' },

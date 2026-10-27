@@ -2,7 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import { game } from './support/game';
 
 it('Action904のAction58子効果は手札離脱時に上限を戻す', () => {

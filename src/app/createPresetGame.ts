@@ -1,9 +1,9 @@
 import { routes, type RouteId } from '../content/routes';
 import { tracks } from '../content/tracks';
 import { scoreMultipliers } from '../content/balance';
-import { createGame } from '../domain/game/simulation';
-import type { CardSkillVariantMaster } from '../domain/game/cards/cardTypes';
-import type { GameState } from '../domain/game/model';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import type { CardSkillVariantMaster } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 
 export function createPresetGame(
   routeId: RouteId,

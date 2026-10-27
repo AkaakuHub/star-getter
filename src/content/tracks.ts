@@ -1,5 +1,5 @@
 import { standardStage } from './stages';
-import type { Track } from '../domain/game/model';
+import type { Track } from '@akaakuhub/suku-sute-core/game/model';
 import { weatherSections, weatherTimeline } from './weatherTimeline';
 import { stageTiming } from './balance';
 

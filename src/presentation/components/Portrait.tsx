@@ -1,4 +1,4 @@
-import type { PerformerId } from '../../domain/game/model';
+import type { PerformerId } from '@akaakuhub/suku-sute-core/game/model';
 import { Mascot } from '../mascots/Mascot';
 
 export function Portrait({ performer }: Readonly<{ performer: PerformerId }>) {

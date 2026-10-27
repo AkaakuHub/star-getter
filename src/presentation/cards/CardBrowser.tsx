@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { ChevronLeft } from 'lucide-preact';
-import type { Card, GameState } from '../../domain/game/model';
-import { cardCost } from '../../domain/game/cards/cost';
+import type { Card, GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { Modal } from '../components/Modal';
 import { HandCardFace } from './HandCardFace';
 import { CardPerformance } from './CardPerformance';

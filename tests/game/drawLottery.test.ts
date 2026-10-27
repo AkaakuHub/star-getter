@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { drawCandidate, drawWeight } from '../../src/domain/game/cards/drawLottery';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
-import { fillHand, fillHandToCount } from '../../src/domain/game/cards/drawing';
-import { addTokens } from '../../src/domain/game/cards/tokens';
+import { drawCandidate, drawWeight } from '@akaakuhub/suku-sute-core/game/cards/drawLottery';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { fillHand, fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { game, withHand } from './support/game';
 
 it('正の重みは累積確率で選び、0の候補は選ばない', () => {

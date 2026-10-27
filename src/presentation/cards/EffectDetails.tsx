@@ -1,5 +1,5 @@
 import { describeCondition } from './describeCondition';
-import type { Effect } from '../../domain/game/model';
+import type { Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { describeEffect, effectConditions } from './describeEffect';
 import { TierDetails } from './TierDetails';
 

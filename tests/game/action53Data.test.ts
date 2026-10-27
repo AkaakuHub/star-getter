@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType53は明示された曲・発動元・TokenCardデータでEffectを生成する', () => {
   const track = tracks[0];

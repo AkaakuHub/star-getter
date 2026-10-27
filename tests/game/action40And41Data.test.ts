@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType40/41の詳細とデッキ上限・子Effectを接続する', () => {
   const track = tracks[0];

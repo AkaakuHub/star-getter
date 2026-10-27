@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { addHearts, collectHearts } from '../../src/domain/game/hearts';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { addHearts, collectHearts } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
 function scoreUpEffect(disabledType: number, invocationType?: number) {

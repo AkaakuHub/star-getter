@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { resultShareData } from '../../src/presentation/results/shareScore';
 import { initialRoute, routeUrl } from '../../src/app/initialRoute';
-import { rules } from '../../src/domain/game/model';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 
 it('画像共有の本文に正確なスコア・ハッシュタグを含め、現在URLを保持する', () => {
   const current = 'https://example.com/play?route=kaika#live';

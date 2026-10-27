@@ -1,10 +1,10 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { addHearts, collectHearts, heartCount } from '../../src/domain/game/hearts';
-import { changeResource } from '../../src/domain/game/resources';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { addHearts, collectHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { registerProxySkill } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
 import { game } from './support/game';
 
 const conversion = {

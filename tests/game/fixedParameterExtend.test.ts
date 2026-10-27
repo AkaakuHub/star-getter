@@ -1,11 +1,11 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   advanceFixedParameterExtends,
   expireFixedParameterExtendSections,
-} from '../../src/domain/game/effects/fixedParameterExtend';
-import { changeResource } from '../../src/domain/game/resources';
-import { conditionContext } from '../../src/domain/game/conditions/gameContext';
+} from '@akaakuhub/suku-sute-core/game/effects/fixedParameterExtend';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
+import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
 import { game } from './support/game';
 
 it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {

@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { advanceAutomaticGauges } from '../../src/domain/game/automaticGauges';
-import { act } from '../../src/domain/game/actions';
-import { activateBloom } from '../../src/domain/game/bloom';
-import { applyEffect } from '../../src/domain/game/effects';
-import { advanceTo } from '../../src/domain/game/simulation';
+import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化する', () => {

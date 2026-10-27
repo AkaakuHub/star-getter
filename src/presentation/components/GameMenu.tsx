@@ -1,5 +1,5 @@
 import { routes, routeIds, type RouteId } from '../../content/routes';
-import { starGatherHeartShowLimitSettings } from '../../domain/game/live/heartPresentation';
+import { starGatherHeartShowLimitSettings } from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
 import { Modal } from './Modal';
 
 export function GameMenu({

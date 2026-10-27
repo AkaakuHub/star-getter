@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { changeResource } from '../../src/domain/game/resources';
+import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
 import { game } from './support/game';
 
 it('ActionType22のマスタリー電圧ボーナスは正の加算を蓄積し、閾値以上で付与する', () => {

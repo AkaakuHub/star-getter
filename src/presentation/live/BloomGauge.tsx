@@ -1,5 +1,5 @@
 import { Gem } from 'lucide-preact';
-import { rules } from '../../domain/game/model';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { liveLayout } from './layout';
 import { formatNumber } from '../score/formatNumber';
 

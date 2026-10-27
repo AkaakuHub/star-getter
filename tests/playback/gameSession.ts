@@ -3,7 +3,7 @@ import type { GameAudio, GameSound } from '../../src/app/gameAudio';
 import type { FrameScheduler, PlaybackClock } from '../../src/app/playbackPorts';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 class TestClock implements PlaybackClock {
   seconds = 0;

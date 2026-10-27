@@ -1,4 +1,4 @@
-import type { Card } from '../../domain/game/model';
+import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { costumePalettes } from './appearance';
 import { Mascot } from './Mascot';
 import { TokenArtwork } from './TokenArtwork';

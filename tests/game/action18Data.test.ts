@@ -1,8 +1,8 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createGame } from '../../src/domain/game/simulation';
-import { createParameterValueChangeEffect } from '../../src/domain/game/actionTypeEffects/parameterValueChange';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { createParameterValueChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/parameterValueChange';
 
 it('ActionType18の能力別詳細値変更を手札効果へ接続する', () => {
   const track = tracks[0];

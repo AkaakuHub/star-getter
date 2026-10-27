@@ -1,7 +1,7 @@
 import {
   starGatherHeartShowLimitSettings,
   resolveStarGatherHeartDrawCount,
-} from '../../domain/game/live/heartPresentation';
+} from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
 
 const storageKey = 'love-gather-heart-show-limit';
 

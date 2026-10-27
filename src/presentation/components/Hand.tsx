@@ -1,7 +1,7 @@
 import type { GameController } from '../../app/gameController';
-import type { GameState } from '../../domain/game/model';
-import { cardCost } from '../../domain/game/cards/cost';
-import { canUseCard, cardAt } from '../../domain/game/projection';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
+import { canUseCard, cardAt } from '@akaakuhub/suku-sute-core/game/projection';
 import { describeCard } from '../cardDescription';
 import { handLayout } from '../handLayout';
 import { HandCardFace } from '../cards/HandCardFace';

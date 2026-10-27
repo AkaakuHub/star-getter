@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 it('Action51はFullEnd時にNumToValueを開花強度として登録する', () => {

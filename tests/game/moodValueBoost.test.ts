@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { moodValueWithoutLimit } from '../../src/domain/game/projection';
-import { advanceTo } from '../../src/domain/game/simulation';
-import type { MoodValueBoostEffect } from '../../src/domain/game/moodValueBoostTypes';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { moodValueWithoutLimit } from '@akaakuhub/suku-sute-core/game/projection';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import type { MoodValueBoostEffect } from '@akaakuhub/suku-sute-core/game/moodValueBoostTypes';
 import { game } from './support/game';
 
 function additiveBoost(

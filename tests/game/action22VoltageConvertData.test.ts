@@ -1,12 +1,12 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { createVoltageConvertEffect } from '../../src/domain/game/actionTypeEffects/voltageConvert';
+import { createVoltageConvertEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/voltageConvert';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
-import { createGame } from '../../src/domain/game/simulation';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType22はlong詳細値をC#同様にint32へ変換して効果を作る', () => {
   const effect = createVoltageConvertEffect({

@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { evaluateCondition } from '../../src/domain/game/conditions/evaluate';
-import { conditionContext } from '../../src/domain/game/conditions/gameContext';
-import type { ConditionContext, GameCondition } from '../../src/domain/game/conditions/model';
-import { applyEffect } from '../../src/domain/game/effects';
+import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
+import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
+import type {
+  ConditionContext,
+  GameCondition,
+} from '@akaakuhub/suku-sute-core/game/conditions/model';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import { game } from './support/game';
 
 const context: ConditionContext = {

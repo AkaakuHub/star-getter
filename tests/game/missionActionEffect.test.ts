@@ -1,13 +1,13 @@
 import { expect, it } from 'vite-plus/test';
-import { createApSpeedChangeEffect } from '../../src/domain/game/actionTypeEffects/apSpeedChange';
-import { createAddVoltageEffect } from '../../src/domain/game/actionTypeEffects/addVoltage';
-import { applyEffect } from '../../src/domain/game/effects';
-import { applyApSpeedPercent } from '../../src/domain/game/effects/apSpeed';
-import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { startIngameMission } from '../../src/domain/game/ingameMissions';
-import { registerProxySkill } from '../../src/domain/game/effects/proxySkill';
+import { createApSpeedChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/apSpeedChange';
+import { createAddVoltageEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/addVoltage';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { applyApSpeedPercent } from '@akaakuhub/suku-sute-core/game/effects/apSpeed';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { startIngameMission } from '@akaakuhub/suku-sute-core/game/ingameMissions';
+import { registerProxySkill } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
 import { game } from './support/game';
-import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
+import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 
 function missionState(actionType: number, target: number) {
   const initial = game();

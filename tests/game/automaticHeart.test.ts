@@ -1,9 +1,9 @@
 import { expect, it } from 'vite-plus/test';
 import { tracks } from '../../src/content/tracks';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
-import { act } from '../../src/domain/game/actions';
-import { addHearts, heartCount } from '../../src/domain/game/hearts';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 function game(count: number) {
   const track = tracks[0];

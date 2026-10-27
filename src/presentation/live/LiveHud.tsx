@@ -1,16 +1,20 @@
 import { ResourceGauges } from './ResourceGauges';
 import { Gem, Star } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
-import { type GameState, rules } from '../../domain/game/model';
-import { durationSeconds } from '../../domain/game/projection';
+import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
+import { durationSeconds } from '@akaakuhub/suku-sute-core/game/projection';
 import { formatScore, formatTime } from '../cardDescription';
 import { StarScore } from '../score/StarScore';
 import { formatNumber } from '../score/formatNumber';
 import { liveLayout } from './layout';
 import { CardArtwork } from '../mascots/CardArtwork';
 import { MoodGraph } from './MoodGraph';
-import { heartCount } from '../../domain/game/hearts';
-import { hasAvailableSpecial, specialButtonCard, specialCost } from '../../domain/game/special';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import {
+  hasAvailableSpecial,
+  specialButtonCard,
+  specialCost,
+} from '@akaakuhub/suku-sute-core/game/special';
 
 export function LiveHud({
   controller,

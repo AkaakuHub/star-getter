@@ -1,5 +1,5 @@
 import { expect, test } from 'vite-plus/test';
-import { durationSeconds } from '../../src/domain/game/projection';
+import { durationSeconds } from '@akaakuhub/suku-sute-core/game/projection';
 import { GameDriver } from './driver';
 import {
   libraryPriority,

@@ -1,22 +1,26 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { fillHand, fillHandToCount, handCapacity } from '../../src/domain/game/cards/drawing';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import {
+  fillHand,
+  fillHandToCount,
+  handCapacity,
+} from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import {
   activateHandPermanentEffects,
   disposeHandEffects,
-} from '../../src/domain/game/cards/handEffects';
-import { applyEffect } from '../../src/domain/game/effects';
-import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
-import { advanceHandLimitEffects } from '../../src/domain/game/effects/handLimit';
-import { advanceAction52SkillBoosts } from '../../src/domain/game/effects/action52SkillBoost';
+} from '@akaakuhub/suku-sute-core/game/cards/handEffects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { advanceHandLimitEffects } from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+import { advanceAction52SkillBoosts } from '@akaakuhub/suku-sute-core/game/effects/action52SkillBoost';
 import {
   advanceHandMaxCardEffects,
   expireHandMaxCardSections,
-} from '../../src/domain/game/effects/handMaxCard';
+} from '@akaakuhub/suku-sute-core/game/effects/handMaxCard';
 
 function game() {
   const track = tracks[0];

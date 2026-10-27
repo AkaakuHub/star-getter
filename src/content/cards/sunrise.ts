@@ -1,4 +1,4 @@
-import type { Card, Effect } from '../../domain/game/model';
+import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
 
 const rainy = (effects: readonly Effect[]): Effect => ({
   kind: 'conditional',

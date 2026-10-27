@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
-import { act } from '../../src/domain/game/actions';
-import { changeResource, expireGaugeInfinities } from '../../src/domain/game/resources';
-import { voltageThreshold } from '../../src/domain/game/live/voltageLevel';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { activateBloom, finishBloom } from '../../src/domain/game/bloom';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { changeResource, expireGaugeInfinities } from '@akaakuhub/suku-sute-core/game/resources';
+import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { activateBloom, finishBloom } from '@akaakuhub/suku-sute-core/game/bloom';
 import { game } from './support/game';
 
 describe('無限ゲージ', () => {

@@ -1,12 +1,12 @@
 import { expect, test } from 'vite-plus/test';
 import { createPresetGame } from '../../src/app/createPresetGame';
-import { act } from '../../src/domain/game/actions';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { routeIds } from '../../src/content/routes';
-import type { GameState } from '../../src/domain/game/model';
-import { rules } from '../../src/domain/game/model';
-import { canUseCard, durationSeconds } from '../../src/domain/game/projection';
-import { advanceTo } from '../../src/domain/game/simulation';
-import { canUseSpecial, specialCards } from '../../src/domain/game/special';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { rules } from '@akaakuhub/suku-sute-core/game/model';
+import { canUseCard, durationSeconds } from '@akaakuhub/suku-sute-core/game/projection';
+import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { canUseSpecial, specialCards } from '@akaakuhub/suku-sute-core/game/special';
 
 test('全区間のカード使用と回収を最後まで処理する', () => {
   let state = act(createPresetGame('bloom', 1234, 100), { type: 'start' });

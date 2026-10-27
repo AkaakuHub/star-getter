@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { type GameState, rules } from '../../domain/game/model';
-import { durationSeconds, moodValue } from '../../domain/game/projection';
+import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
+import { durationSeconds, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { liveLayout } from './layout';
 import { paintMoodGraph } from './paintMoodGraph';
 

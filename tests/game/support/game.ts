@@ -1,9 +1,9 @@
 import { routes, type RouteId } from '../../../src/content/routes';
 import { tracks } from '../../../src/content/tracks';
-import { act } from '../../../src/domain/game/actions';
-import type { GameState } from '../../../src/domain/game/model';
-import { createGame } from '../../../src/domain/game/simulation';
-import { initializeHandCardStats } from '../../../src/domain/game/cards/skillCostChanges';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
+import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/skillCostChanges';
 
 export function game(route: RouteId = 'bloom', seed = 7, limit = 100): GameState {
   const track = tracks[0];

@@ -1,17 +1,17 @@
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
-import { act } from '../../src/domain/game/actions';
-import { applyEffect } from '../../src/domain/game/effects';
-import { handCardCountEffect } from '../../src/domain/game/actionTypeEffects/handCardCount';
-import { finishCardActivation } from '../../src/domain/game/cards/cardZones';
+import { act } from '@akaakuhub/suku-sute-core/game/actions';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
 import {
   advanceProxySkillPeriods,
   advanceProxySkillSections,
   advanceProxySkillUses,
-} from '../../src/domain/game/effects/proxySkill';
-import { advanceTo, createGame } from '../../src/domain/game/simulation';
-import type { ProxySkillEffect } from '../../src/domain/game/proxySkillTypes';
+} from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
+import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import type { ProxySkillEffect } from '@akaakuhub/suku-sute-core/game/proxySkillTypes';
 
 function game() {
   const track = tracks[0];

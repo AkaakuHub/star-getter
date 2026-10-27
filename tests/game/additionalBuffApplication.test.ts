@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { applyEffect } from '../../src/domain/game/effects';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
 describe('追加バフ適用条件', () => {
