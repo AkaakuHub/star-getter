@@ -36,7 +36,7 @@ it('ActionType1の詳細値をSkillHeart Effectへ接続する', () => {
   });
 });
 
-it('ActionType1のMood補正longをC#と同じfloat32に変換する', () => {
+it('ActionType1のMood補正longを参照実装と同じfloat32に変換する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');

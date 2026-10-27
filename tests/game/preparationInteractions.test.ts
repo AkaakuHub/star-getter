@@ -38,9 +38,9 @@ it('自然な空模様に雨100%はなく、準備カードの使用で最初の
 it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍空には適用しない', () => {
   const initial = game();
   const card = initial.deck.find((item) => item.id === 'rain-preparation');
-  const sayaka = initial.deck.find((item) => item.id === 'frost-echo');
-  const tsuzuri = initial.deck.find((item) => item.id === 'frost-pulse');
-  if (!card || !sayaka || !tsuzuri) throw new Error('カードがありません。');
+  const echo = initial.deck.find((item) => item.id === 'frost-echo');
+  const pulse = initial.deck.find((item) => item.id === 'frost-pulse');
+  if (!card || !echo || !pulse) throw new Error('カードがありません。');
   const state = {
     ...initial,
     hand: [],
@@ -52,8 +52,8 @@ it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍�
   };
   const drawn = applyDrawAbility(state, card);
   expect(heartCount(drawn)).toBe(563);
-  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, sayaka)).toBe(225);
-  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, tsuzuri)).toBe(100);
+  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, echo)).toBe(225);
+  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, pulse)).toBe(100);
 });
 
 it('手札中の雨の使用反応で、対応する基本カードとパズルだけの消費を減らす', () => {

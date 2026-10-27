@@ -42,7 +42,7 @@ it('Action10は数値種別1以外では補正を消費して熱気を加算し�
   expect(unchanged.action52Buffs).toHaveLength(0);
 });
 
-it('Action10の詳細値と補正値をC#のint32として扱う', () => {
+it('Action10の詳細値と補正値を参照実装のint32として扱う', () => {
   const initial = { ...game(), excitement: 500_000_000 };
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');

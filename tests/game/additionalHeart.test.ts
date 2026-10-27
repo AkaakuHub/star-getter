@@ -170,7 +170,7 @@ it('Action27の0ミリ秒期限は誘発を登録しない', () => {
   expect(advanceAdditionalHeartInducers(armed, 1 / 60).additionalHeartInducers).toHaveLength(0);
 });
 
-it('ActionType27のパート期限はC#と同じint32へ変換して減算する', () => {
+it('ActionType27のパート期限は参照実装と同じint32へ変換して減算する', () => {
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');

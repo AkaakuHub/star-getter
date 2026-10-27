@@ -25,7 +25,7 @@ it('Action48 calcType1にNumToValue・AddValue・MultiplyFactor・EffectPowerを
   expect(moodValueWithoutLimit(changed)).toBe(52);
 });
 
-it('Action48の詳細値をC#のint32へ変換してからNumToValueを計算する', () => {
+it('Action48の詳細値を参照実装のint32へ変換してからNumToValueを計算する', () => {
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');

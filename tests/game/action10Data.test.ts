@@ -34,7 +34,7 @@ it('ActionType10の詳細値を熱気加算Effectへ接続する', () => {
   });
 });
 
-it('ActionType10のMood補正longをC#と同じfloat32に変換する', () => {
+it('ActionType10のMood補正longを参照実装と同じfloat32に変換する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');

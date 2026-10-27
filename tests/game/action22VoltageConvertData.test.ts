@@ -8,7 +8,7 @@ import {
 } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
-it('ActionType22はlong詳細値をC#同様にint32へ変換して効果を作る', () => {
+it('ActionType22はlong詳細値を参照実装同様にint32へ変換して効果を作る', () => {
   const effect = createVoltageConvertEffect({
     skillEffectId: 10n,
     details: [

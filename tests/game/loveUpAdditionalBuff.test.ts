@@ -127,7 +127,7 @@ it('ActionType30の登録値にActionType52を適用し、回数を消費する'
   expect(additional.action52Buffs).toHaveLength(0);
 });
 
-it('ActionType30は小数の追加率をC#のintキャストで0方向へ切り捨てる', () => {
+it('ActionType30は小数の追加率を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');

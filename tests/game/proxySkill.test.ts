@@ -189,7 +189,7 @@ it('Proxy威力タイプ3は吸収量と目標量の比を倍率にする', () =
   expect(applications).toEqual([{ multiplier: 0.5, addValue: 0 }]);
 });
 
-it('Proxy誘発タイミング3はAPKのIsAbsorbEnd判定に従う', () => {
+it('Proxy誘発タイミング3はruntimeのIsAbsorbEnd判定に従う', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');

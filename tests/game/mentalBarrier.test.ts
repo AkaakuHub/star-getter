@@ -26,7 +26,7 @@ describe('元気バリア', () => {
     expect(active.mentalBarriers[0]?.endurance).toBe(20);
   });
 
-  it('有限耐久が0になる時はC#同様にバリアを登録しない', () => {
+  it('有限耐久が0になる時は参照実装同様にバリアを登録しない', () => {
     const active = applyEffect(game(), {
       kind: 'mental-barrier',
       barrier: 'endurance',

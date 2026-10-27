@@ -1,7 +1,7 @@
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
-import { calculateQuestLiveHeartRank } from '@akaakuhub/suku-sute-core/questLive/live/heartRank';
-import { projectQuestLiveHeartPresentations } from '@akaakuhub/suku-sute-core/questLive/live/heartPresentation';
+import { calculateLiveHeartRank } from '@akaakuhub/suku-sute-core/runtime/live/heartRank';
+import { projectLiveHeartPresentations } from '@akaakuhub/suku-sute-core/runtime/live/heartPresentation';
 
 export function paintHearts(
   context: CanvasRenderingContext2D,
@@ -11,13 +11,9 @@ export function paintHearts(
   height: number,
 ): void {
   context.clearRect(0, 0, width, height);
-  const rank = calculateQuestLiveHeartRank(
-    heartCount(state),
-    Math.floor(state.excitement / 2),
-    null,
-  );
+  const rank = calculateLiveHeartRank(heartCount(state), Math.floor(state.excitement / 2), null);
   const pixelsPerWorldUnit = height / (9.600000381469727 * 2);
-  const presentations = projectQuestLiveHeartPresentations(state.hearts.stageHearts, rank.rank);
+  const presentations = projectLiveHeartPresentations(state.hearts.stageHearts, rank.rank);
   let drawn = 0;
   for (const heart of presentations) {
     if (drawn >= state.hearts.showLimit) break;

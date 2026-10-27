@@ -111,7 +111,7 @@ describe('無限ゲージ', () => {
     expect(generated).toBe(150);
   });
 
-  it('Action23の詳細値をC#のint32へ変換する', () => {
+  it('Action23の詳細値を参照実装のint32へ変換する', () => {
     const active = applyEffect(game(), {
       kind: 'mental-heart-induce',
       num: 2_147_483_648n,

@@ -3,7 +3,7 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
-it('ActionType31は対象カードの熱気増加を増幅し、C#どおり使用回数では解除しない', () => {
+it('ActionType31は対象カードの熱気増加を増幅し、参照実装どおり使用回数では解除しない', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   const target = initial.deck.find((card) => card.id === 'rain-preparation');
@@ -87,7 +87,7 @@ it('ActionType31の追加率にActionType52を適用する', () => {
   expect(additional.action52Buffs).toHaveLength(0);
 });
 
-it('ActionType31は小数の追加率をC#のintキャストで0方向へ切り捨てる', () => {
+it('ActionType31は小数の追加率を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');

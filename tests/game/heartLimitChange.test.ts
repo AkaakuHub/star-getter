@@ -52,7 +52,7 @@ it('ActionType25の表示期限0パートは次のパート変更で解除する
   expect(expireHeartLimitBuffSections(changed).hearts.heartLimit).toBe(100);
 });
 
-it('乗算変更はC#のSkillグループ倍率式で基礎上限へ適用する', () => {
+it('乗算変更は参照実装のSkillグループ倍率式で基礎上限へ適用する', () => {
   const state = game();
   const card = state.deck[0];
   if (!card) throw new Error('きらめき上限変更の発動元カードがありません。');
@@ -186,7 +186,7 @@ it('Action49の加算・割合バフをAction25の効果へ順に適用する', 
   expect(multiplied.hearts.heartLimit).toBe(103);
 });
 
-it('Action49はC#のintキャストでBuff値を0方向に切り捨てる', () => {
+it('Action49は参照実装のintキャストでBuff値を0方向に切り捨てる', () => {
   const state = game();
   const buff = applyEffect(
     state,

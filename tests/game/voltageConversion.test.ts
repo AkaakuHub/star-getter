@@ -119,7 +119,7 @@ it('Action22は熟練度ボーナスの熱気も変換する', () => {
   expect(converted.excitement).toBe(initial.excitement + 1);
 });
 
-it('Action22の詳細値をC#のint32へ変換する', () => {
+it('Action22の詳細値を参照実装のint32へ変換する', () => {
   const source = game().deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const converted = applyEffect(game(), { ...conversion, num: 2_147_483_648 }, source);

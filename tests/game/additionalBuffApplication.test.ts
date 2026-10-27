@@ -18,7 +18,7 @@ describe('追加バフ適用条件', () => {
     expect(negative.resourceBoosts).toHaveLength(1);
   });
 
-  it('元気・熱気の小数加算をC#の整数キャストと同じく0方向へ切り捨てる', () => {
+  it('元気・熱気の小数加算を参照実装の整数キャストと同じく0方向へ切り捨てる', () => {
     const initial = { ...game(), stamina: 50, excitement: 50 };
     expect(applyEffect(initial, { kind: 'stamina', amount: -1.8 }).stamina).toBe(49);
     expect(applyEffect(initial, { kind: 'excitement', amount: 1.8 }).excitement).toBe(51);

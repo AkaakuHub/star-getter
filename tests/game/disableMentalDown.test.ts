@@ -48,7 +48,7 @@ it('ActionType34をDeactivatorで解除する', () => {
   expect(ended.disableMentalDownEffects).toHaveLength(0);
 });
 
-it('ActionType34はC# longの期限を正確に減算する', () => {
+it('ActionType34は参照実装 longの期限を正確に減算する', () => {
   const initial = game();
   const sectionCount = 9_007_199_254_740_993n;
   const protectedState = applyEffect(initial, {

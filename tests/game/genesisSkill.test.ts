@@ -40,7 +40,7 @@ it('Action51は正のGenesis値へActionType52を適用し、強いGenesisを選
   expect(stronger.bloom?.strength).toBe(5);
 });
 
-it('Action51のミリ秒・パート期限ではC#どおりGenesisを有効化せず、正値のActionType52だけを消費する', () => {
+it('Action51のミリ秒・パート期限では参照実装どおりGenesisを有効化せず、正値のActionType52だけを消費する', () => {
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
@@ -94,7 +94,7 @@ it('Action51の非FullEnd期限0は何も発動せずActionType52も消費しな
   expect(unchanged.action52Buffs).toHaveLength(1);
 });
 
-it('Action51の期限値をC#のint32へ変換してから有効性を判定する', () => {
+it('Action51の期限値を参照実装のint32へ変換してから有効性を判定する', () => {
   const initial = game('library');
   const unchanged = applyEffect(initial, {
     kind: 'genesis-skill',

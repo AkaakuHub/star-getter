@@ -99,7 +99,7 @@ it('無限耐久はダメージを全て防ぎ、ミリ秒・次パート期限�
   expect(expireMentalShieldSections(sectionShield).mentalShields).toHaveLength(0);
 });
 
-it('ActionType56の耐久値をC#のint32へ変換する', () => {
+it('ActionType56の耐久値を参照実装のint32へ変換する', () => {
   const shielded = applyEffect(game(), {
     kind: 'mental-shield',
     durabilityType: 3n,

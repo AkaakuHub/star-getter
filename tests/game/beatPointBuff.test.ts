@@ -60,7 +60,7 @@ it('Action47の正値にAction52を適用し、負値には適用しない', () 
   expect(beatHeartCount(negative)).toBe(beatHeartCount(initial) - 100);
 });
 
-it('Action47の詳細値をC#のint32とfloat32へ変換する', () => {
+it('Action47の詳細値を参照実装のint32とfloat32へ変換する', () => {
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');

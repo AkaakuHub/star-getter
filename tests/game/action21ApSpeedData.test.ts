@@ -10,7 +10,7 @@ import {
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
-it('ActionType21の詳細値をint32・longのC#変換順でAP時間効果へ接続する', () => {
+it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間効果へ接続する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const state = act(createGame(track, routes.bloom.deck, 7), { type: 'start' });

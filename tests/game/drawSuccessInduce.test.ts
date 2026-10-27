@@ -5,7 +5,7 @@ import { fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { evaluateDrawSuccessInduce } from '@akaakuhub/suku-sute-core/game/effects/drawSuccessInduce';
 import { game } from './support/game';
 
-it('ActionType901の元気割合条件はC#同様に以下で判定し、IsActiveで分岐する', () => {
+it('ActionType901の元気割合条件は参照実装同様に以下で判定し、IsActiveで分岐する', () => {
   const state = { ...game(), stamina: 40, maximumMental: 100, excitement: 100_000_000 };
   expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
   expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, false, 2n, 500_000n)).toBe(false);

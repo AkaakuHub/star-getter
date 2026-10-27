@@ -70,7 +70,7 @@ it('Action50の正値はActionType52で整数化し、回数を1回消費する'
   expect(moodValueWithoutLimit(second)).toBe(6);
 });
 
-it('Action50の詳細値をC#のint32へ変換してからNumToValueを計算する', () => {
+it('Action50の詳細値を参照実装のint32へ変換してからNumToValueを計算する', () => {
   const initial = game('library');
   const wrapped = applyEffect(
     initial,
@@ -80,7 +80,7 @@ it('Action50の詳細値をC#のint32へ変換してからNumToValueを計算す
   expect(wrapped.moodValueAdditionalBuffs[0]?.value).toBe(-214_748.359375);
 });
 
-it('Action50のMultiply2値はC#のint castと同じく0方向へ切り捨てる', () => {
+it('Action50のMultiply2値は参照実装のint castと同じく0方向へ切り捨てる', () => {
   const state = applyEffect(game('library'), additiveBoost({ calculationType: 1, num: 15_000 }));
   expect(state.moodValueAdditionalBuffs[0]?.value).toBe(1);
 });
@@ -98,7 +98,7 @@ it('Action50はint cast後に正値を判定し、0になった値でActionType5
   expect(state.action52Buffs).toHaveLength(1);
 });
 
-it('Action50の対象とTokenCardSeriesパラメーターをC#の検索条件通りに扱う', () => {
+it('Action50の対象とTokenCardSeriesパラメーターを参照実装の検索条件通りに扱う', () => {
   const initial = game('library');
   const card = initial.deck[0];
   const other = initial.deck.find((item) => item.member !== card?.member);

@@ -71,7 +71,7 @@ it('ActionType28は枚数とResourceIDの既定値を使う', () => {
   });
 });
 
-it('ActionType28はC# int32 castとAbility参照レベルを適用する', () => {
+it('ActionType28は参照実装 int32 castとAbility参照レベルを適用する', () => {
   expect(
     createTokenCardEffect({
       skillEffectId: 28n,

@@ -8,7 +8,7 @@ import { game } from './support/game';
 
 const duration = { kind: 'stage', value: 0 } as const;
 
-it('ActionType40はC#の式で基準時間とデッキ枚数補正を計算し、枚数変更後に更新する', () => {
+it('ActionType40は参照実装の式で基準時間とデッキ枚数補正を計算し、枚数変更後に更新する', () => {
   const initial = game();
   const effect = {
     kind: 'skill-cooldown',

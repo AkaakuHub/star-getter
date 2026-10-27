@@ -59,7 +59,7 @@ describe('モード切替と切替時効果', () => {
     expect(toggledOff.modes.entries.find((entry) => entry.id === 1)?.on).toBe(false);
   });
 
-  it('ActionType35のlong ModeIdをC#のint32へ変換する', () => {
+  it('ActionType35のlong ModeIdを参照実装のint32へ変換する', () => {
     const changed = applyEffect(modeGame(), {
       kind: 'mode',
       modeId: 4_294_967_297n,
@@ -176,7 +176,7 @@ describe('モード切替と切替時効果', () => {
     state = applyEffect(state, on);
     expect(state.boosts.at(-1)?.percent).toBe(4);
   });
-  it('ActionType45はC#のintキャストで誘発値を0方向へ切り捨てる', () => {
+  it('ActionType45は参照実装のintキャストで誘発値を0方向へ切り捨てる', () => {
     const initial = modeGame();
     const registered = applyEffect(initial, {
       kind: 'mode-reaction',

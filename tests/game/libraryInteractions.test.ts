@@ -277,7 +277,7 @@ it('一斉使用の追加APを全手札コストへ加え、最終コストを1�
   expect(cardCost(withoutReduction, updated)).toBe(cardCost(withoutReduction, source) + 7);
 });
 
-it('ActionType42の追加APはC#同様にint32へ変換する', () => {
+it('ActionType42の追加APは参照実装同様にint32へ変換する', () => {
   const initial = game('library');
   const source = card(initial, 'library-ensemble');
   const updated = {

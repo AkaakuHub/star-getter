@@ -7,7 +7,7 @@ import {
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game } from './support/game';
 
-it('Action23はActionType1の値をC#のintキャストで0方向へ切り捨てる', () => {
+it('Action23はActionType1の値を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const withBuff = {
     ...initial,
@@ -32,7 +32,7 @@ it('Action23はActionType1の値をC#のintキャストで0方向へ切り捨て
   expect(heartCount(induceMentalHearts(inducing, 1))).toBe(1);
 });
 
-it('Action23は解除回数をC#のint32として折り返してlong閾値と比較する', () => {
+it('Action23は解除回数を参照実装のint32として折り返してlong閾値と比較する', () => {
   const initial = game();
   const state = {
     ...initial,
@@ -53,7 +53,7 @@ it('Action23は解除回数をC#のint32として折り返してlong閾値と比
   expect(induceMentalHearts(state, 1).mentalHeartInducers).toHaveLength(0);
 });
 
-it('Action23はActionType52の値もC#のintキャストで0方向へ切り捨てる', () => {
+it('Action23はActionType52の値も参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const withBuff = applyEffect(initial, {
     kind: 'skill-boost',

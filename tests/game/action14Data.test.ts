@@ -38,7 +38,7 @@ it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する
   });
 });
 
-it('ActionType14のlong値をC#と同じfloat32に変換する', () => {
+it('ActionType14のlong値を参照実装と同じfloat32に変換する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');

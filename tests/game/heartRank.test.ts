@@ -1,5 +1,5 @@
 import { expect, it } from 'vite-plus/test';
-import { calculateQuestLiveFlowerRank } from '@akaakuhub/suku-sute-core/questLive/live/heartRank';
+import { calculateLiveFlowerRank } from '@akaakuhub/suku-sute-core/runtime/live/heartRank';
 import { collectionScore } from '@akaakuhub/suku-sute-core/game/scoring';
 import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { game } from './support/game';
@@ -20,6 +20,6 @@ it('未生成の超過数ではなく場の個数で回収ランクを判定す�
 });
 
 it('専用状態は通常の熱気とは別の閾値と専用値の平方根を使う', () => {
-  expect(calculateQuestLiveFlowerRank(130, 9)).toEqual({ rank: 2, magnification: 2.5 });
-  expect(calculateQuestLiveFlowerRank(100, 49)).toEqual({ rank: 4, magnification: 3.5 });
+  expect(calculateLiveFlowerRank(130, 9)).toEqual({ rank: 2, magnification: 2.5 });
+  expect(calculateLiveFlowerRank(100, 49)).toEqual({ rank: 4, magnification: 3.5 });
 });

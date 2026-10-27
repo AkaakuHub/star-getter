@@ -31,7 +31,7 @@ it('ActionType42は子カードのAbility894を起動する', () => {
   );
 });
 
-it('ActionType42はC#と同じ順に手札誘発を先に実行してからAbility894を評価する', () => {
+it('ActionType42は参照実装と同じ順に手札誘発を先に実行してからAbility894を評価する', () => {
   const initial = game('library');
   const source = initial.deck.find((item) => item.id === 'library-ensemble');
   const inducer = initial.deck.find((item) => item.id === 'library-pages');

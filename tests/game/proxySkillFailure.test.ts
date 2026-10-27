@@ -60,7 +60,7 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
   expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
 });
 
-it('ActionType908は墓地行き時にC#のint32 LimitNumで上限を判定する', () => {
+it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を判定する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const initial = act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {

@@ -95,7 +95,7 @@ it('Action903は子効果がないとき回収数の監視を登録しない', (
   expect(unchanged.handUseHeartCollectionCounts[`${source.id}:test-inducer`]).toBeUndefined();
 });
 
-it('Action903の回収閾値と発動上限をC#のint32へ変換する', () => {
+it('Action903の回収閾値と発動上限を参照実装のint32へ変換する', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');

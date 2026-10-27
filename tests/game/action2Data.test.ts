@@ -36,7 +36,7 @@ it('ActionType2の詳細値をSTAR上昇Effectへ接続する', () => {
   });
 });
 
-it('ActionType2のlong値をC#と同じfloat32に変換する', () => {
+it('ActionType2のlong値を参照実装と同じfloat32に変換する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');

@@ -52,7 +52,7 @@ it('ActionType7通知は割合適用後の実際のバリア耐久値を使う',
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 
-it('Proxyに吸収されたActionType7もC#のEffectAmountでミッションへ通知する', () => {
+it('Proxyに吸収されたActionType7も参照実装のEffectAmountでミッションへ通知する', () => {
   const initial = missionState(7, 50);
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
@@ -146,7 +146,7 @@ it('子効果で発動したActionType14もActionType44へ通知する', () => {
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 
-it('ActionType10は上限適用前のC# EffectAmountをミッションへ通知する', () => {
+it('ActionType10は上限適用前の参照実装 EffectAmountをミッションへ通知する', () => {
   const initial = missionState(10, 10);
   const capped = {
     ...initial,

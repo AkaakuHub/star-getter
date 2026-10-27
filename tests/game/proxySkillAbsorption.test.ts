@@ -65,7 +65,7 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(12n);
 });
 
-it('ProxyのActionType20吸収累計をC# longと同じ64bitで折り返す', () => {
+it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り返す', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -99,7 +99,7 @@ it('ProxyのActionType20吸収累計をC# longと同じ64bitで折り返す', ()
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
 });
 
-it('ActionType48の負の目標値は非絶対加算でC#と同じ下方向判定を使う', () => {
+it('ActionType48の負の目標値は非絶対加算で参照実装と同じ下方向判定を使う', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -168,7 +168,7 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(3n);
 });
 
-it('Proxyの吸収合計をC#のint64として折り返す', () => {
+it('Proxyの吸収合計を参照実装のint64として折り返す', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');

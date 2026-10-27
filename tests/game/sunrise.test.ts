@@ -105,7 +105,7 @@ it('longのきらめき増幅使用回数をbigintで1回ずつ減らす', () =>
   expect(consumed.heartBoosts[0]?.uses).toBe(uses - 1n);
 });
 
-it('きらめき増幅値をC#の整数キャストと同じく0方向へ切り捨てる', () => {
+it('きらめき増幅値を参照実装の整数キャストと同じく0方向へ切り捨てる', () => {
   const state = applyEffect(game(), { kind: 'heart-boost', percent: 12.9, uses: 2 });
   expect(state.heartBoosts[0]?.percent).toBe(12);
 });

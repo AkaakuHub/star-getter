@@ -39,7 +39,7 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
   expect(second.skillEffectActivationCounts[`${card.id}:502`]).toBe(2);
 });
 
-it('ActionType905の発動上限をC#のint32へ変換する', () => {
+it('ActionType905の発動上限を参照実装のint32へ変換する', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
@@ -56,7 +56,7 @@ it('ActionType905の発動上限をC#のint32へ変換する', () => {
   expect(second.skillEffectActivationCounts[`${card.id}:503`]).toBe(2);
 });
 
-it('使用回数誘発はC#の増加前カウントを使い、要求回数ごとに判定する', () => {
+it('使用回数誘発は参照実装の増加前カウントを使い、要求回数ごとに判定する', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
@@ -88,7 +88,7 @@ it('使用回数誘発はC#の増加前カウントを使い、要求回数ご�
   expect(thirdUse.skillEffectActivationCounts[`${card.id}:504`]).toBe(2);
 });
 
-it('ActionType906のRequireCountをC#のint32へ変換する', () => {
+it('ActionType906のRequireCountを参照実装のint32へ変換する', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
@@ -112,7 +112,7 @@ it('ActionType906のRequireCountをC#のint32へ変換する', () => {
   expect(activated.energy).toBeGreaterThan(0);
 });
 
-it('ActionType906は使用回数int32の折返し後もC#と同じ余り判定をする', () => {
+it('ActionType906は使用回数int32の折返し後も参照実装と同じ余り判定をする', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');

@@ -67,7 +67,7 @@ it('ActionType33の期限とInvocationType 0x388の期限抑止を適用する',
   ).toHaveLength(1);
 });
 
-it('ActionType33は負数と小数の追加率をC#のintキャストで0方向へ切り捨てる', () => {
+it('ActionType33は負数と小数の追加率を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
@@ -90,7 +90,7 @@ it('ActionType33は負数と小数の追加率をC#のintキャストで0方向�
   expect(percentages).toEqual([0, 0, 0, 1]);
 });
 
-it('ActionType33はC# longの期限と使用回数をfloat32・int64範囲で保持する', () => {
+it('ActionType33は参照実装 longの期限と使用回数をfloat32・int64範囲で保持する', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');

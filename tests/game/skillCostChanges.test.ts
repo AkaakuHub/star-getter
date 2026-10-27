@@ -133,7 +133,7 @@ it('Action17の条件4は最大元気に対する整数元気割合を使う', (
   expect(cardCost(changed, source) - cardCost(initial, source)).toBe(5);
 });
 
-it('Action17の条件9はC#のfloat精度に丸めたBonusScoreValueを使う', () => {
+it('Action17の条件9は参照実装のfloat精度に丸めたBonusScoreValueを使う', () => {
   const initial = {
     ...game(),
     boosts: [{ percent: 16_777_216, untilTick: 999_999 }],

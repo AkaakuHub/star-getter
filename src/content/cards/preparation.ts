@@ -15,7 +15,7 @@ export const preparationCards: readonly Card[] = [
     cost: 14,
     appeal: { smile: 3850, pure: 4250, cool: 6400 },
     beatPoint: 100,
-    collectionAbility: 'icy-kosuzu',
+    collectionAbility: 'rain-pulse',
     effects: [
       { kind: 'mood', amount: -50 },
       {

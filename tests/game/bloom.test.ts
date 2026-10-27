@@ -6,7 +6,7 @@ import {
   finishBloom,
 } from '@akaakuhub/suku-sute-core/game/bloom';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
-import { calculateQuestLiveGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/questLive/skills/genesisSkill';
+import { calculateLiveGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/runtime/skills/genesisSkill';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
@@ -21,9 +21,9 @@ function active() {
 }
 
 describe('開花の専用ゲージ', () => {
-  it('AP・元気・熱気の換算量はAPK同様に大きさを切り上げてから符号を適用する', () => {
+  it('AP・元気・熱気の換算量はruntime同様に大きさを切り上げてから符号を適用する', () => {
     expect(
-      calculateQuestLiveGenesisGaugeDelta({
+      calculateLiveGenesisGaugeDelta({
         actionType: 14,
         gaugeType: 3,
         effectValue: 1,
@@ -31,7 +31,7 @@ describe('開花の専用ゲージ', () => {
       }),
     ).toBe(8);
     expect(
-      calculateQuestLiveGenesisGaugeDelta({
+      calculateLiveGenesisGaugeDelta({
         actionType: 14,
         gaugeType: 3,
         effectValue: -1,
@@ -98,7 +98,7 @@ describe('開花の専用ゲージ', () => {
     expect(finishBloom(changed).stamina).toBe(80);
   });
 
-  it('開花終了時にC#のMental値変更通知をActionType23へ伝える', () => {
+  it('開花終了時に参照実装のMental値変更通知をActionType23へ伝える', () => {
     const initial = game();
     const source = initial.deck[0];
     if (!source) throw new Error('ActionType23の発動元カードがありません。');

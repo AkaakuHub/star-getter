@@ -15,7 +15,7 @@ const speedEffect = {
   displayTime: 0n,
 } as const;
 
-it('Action21の乗算はC#のnum換算でAP回復時間へ適用し、deactivatorで元に戻す', () => {
+it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、deactivatorで元に戻す', () => {
   const initial = {
     ...game(),
     handEffectCardIds: [],

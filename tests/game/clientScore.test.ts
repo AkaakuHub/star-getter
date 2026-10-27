@@ -5,9 +5,9 @@ import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { collectionScore } from '@akaakuhub/suku-sute-core/game/scoring';
 import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import {
-  calculateQuestLiveCardAppealValue,
-  calculateQuestLiveAddScoreMax,
-} from '@akaakuhub/suku-sute-core/questLive/live/clientScoreInput';
+  calculateLiveCardAppealValue,
+  calculateLiveAddScoreMax,
+} from '@akaakuhub/suku-sute-core/runtime/live/clientScoreInput';
 
 const ordinaryLimit = {
   additionalEnabled: false,
@@ -30,10 +30,10 @@ function game() {
 describe('スターギャザーの回収得点', () => {
   it('一致属性だけを1.5倍にし、楽曲秒数と1000で正規化する', () => {
     expect(
-      calculateQuestLiveCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
+      calculateLiveCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
     ).toBeCloseTo(0.3, 7);
     expect(
-      calculateQuestLiveCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
+      calculateLiveCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 0, 120),
     ).toBeCloseTo(0.375, 7);
   });
 
@@ -89,7 +89,7 @@ describe('スターギャザーの回収得点', () => {
   });
 
   it('1回の通常回収は本家の既定上限を適用する', () => {
-    expect(calculateQuestLiveAddScoreMax(100, [], ordinaryLimit)).toBe(2147483647n);
+    expect(calculateLiveAddScoreMax(100, [], ordinaryLimit)).toBe(2147483647n);
     const huge = { ...game(), boosts: [{ percent: 10 ** 20, untilTick: 100 }] };
     expect(collectionScore(huge, 100, false, 100)).toBe(2147483647n);
   });

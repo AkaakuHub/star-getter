@@ -121,7 +121,7 @@ it('外部解除型は指定期限で自動解除せず、Deactivatorで解除�
   ).toHaveLength(0);
 });
 
-it('負のミリ秒期限はC#同様に次の更新で停止を解除する', () => {
+it('負のミリ秒期限は参照実装同様に次の更新で停止を解除する', () => {
   const initial = game('library');
   const stopped = applyEffect(initial, {
     kind: 'stop-voltage-increase',

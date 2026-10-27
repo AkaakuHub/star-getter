@@ -74,7 +74,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
   expect(split.tokenDeckSplit?.sub.discard).not.toContain(selected.id);
 });
 
-it('ActionType43の系列IDをC#のint32へ変換してから照合する', () => {
+it('ActionType43の系列IDを参照実装のint32へ変換してから照合する', () => {
   const base = game('bloom');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');

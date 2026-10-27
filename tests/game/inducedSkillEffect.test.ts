@@ -102,7 +102,7 @@ it('ActionType7の耐久無限バリアは最大元気値をActionType41へ通�
   expect(next.moodOffset).toBe(200);
 });
 
-it('ActionType41はdeck補正上限をC#同様にint32へ変換する', () => {
+it('ActionType41はdeck補正上限を参照実装同様にint32へ変換する', () => {
   const initial = game();
   const active = applyEffect(initial, {
     ...effect,

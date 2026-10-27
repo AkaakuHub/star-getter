@@ -50,7 +50,7 @@ it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {
   expect(fixed.energy).toBe(30);
 });
 
-it('ActionType58の値をC#のint32へ変換する', () => {
+it('ActionType58の値を参照実装のint32へ変換する', () => {
   const extended = applyEffect(game(), {
     kind: 'fixed-parameter-extend',
     target: 'ap',

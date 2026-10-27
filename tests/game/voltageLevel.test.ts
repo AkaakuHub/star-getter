@@ -56,7 +56,7 @@ it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後�
   expect(set.hearts).toEqual(active.hearts);
 });
 
-it('ActionType37は開花中に熱気の差分をC#の専用ゲージ式で加算する', () => {
+it('ActionType37は開花中に熱気の差分を参照実装の専用ゲージ式で加算する', () => {
   const state = {
     ...game('bloom'),
     excitement: 100,
