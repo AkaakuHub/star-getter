@@ -27,7 +27,7 @@ function game() {
   return act(createGame(track, deck, 7), { type: 'start' });
 }
 
-describe('スターギャザーの回収得点', () => {
+describe('star-getterの回収得点', () => {
   it('一致属性だけを1.5倍にし、楽曲秒数と1000で正規化する', () => {
     expect(
       calculateLiveCardAppealValue({ smile: 12000, pure: 10000, cool: 8000 }, 1, 120),
