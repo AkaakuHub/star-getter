@@ -5,7 +5,8 @@
     "tests/**/*.test.ts",
     "vite.config.ts",
     "tests/e2e/**/*.e2e.ts",
-    "tests/e2e/vite.config.ts"
+    "tests/e2e/vite.config.ts",
+    "tests/e2e/video/browser/controller.ts"
   ],
   "project": ["src/**/*.{ts,tsx,css}", "tests/**/*.ts"]
 }

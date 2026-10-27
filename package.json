@@ -11,7 +11,8 @@
     "test": "vp test",
     "knip": "knip",
     "prepare": "lefthook install",
-    "e2e": "vp test run --config tests/e2e/vite.config.ts"
+    "e2e": "vp test run --config tests/e2e/vite.config.ts",
+    "e2e:video": "node tests/e2e/video/record.ts"
   },
   "dependencies": {
     "@akaakuhub/suku-sute-core": "file:vendor/suku-sute-core",
@@ -23,6 +24,7 @@
     "@types/node": "^24.0.0",
     "knip": "^5.83.1",
     "lefthook": "^2.1.9",
+    "playwright-core": "1.64.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vite-plus": "^1.4.0"

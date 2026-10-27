@@ -16,3 +16,10 @@ pnpm build
 ```
 
 計算コアは`vendor/suku-sute-core`を使います。
+
+動画生成にはFFmpegとChromiumが必要です。
+
+```sh
+pnpm exec playwright-core install chromium --only-shell
+pnpm e2e:video path/to/recording.json
+```

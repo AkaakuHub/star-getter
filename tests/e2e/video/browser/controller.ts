@@ -1,0 +1,68 @@
+import { GameController } from '../../../../src/app/gameController';
+import { createPresetGame } from '../../../../src/app/createPresetGame';
+import type { GamePreferences } from '../../../../src/app/gamePreferences';
+import type { RouteId } from '../../../../src/content/routes';
+import { ScenarioAudio, ScenarioClock, ScenarioFrames } from '../../playback';
+import { createAnimationClock } from './animations';
+import type { ReplaySession } from '../types';
+
+export function createGameController(
+  routeId: RouteId,
+  heartShowLimit: number,
+  preferences: GamePreferences,
+): GameController {
+  const config = window.e2eVideoConfig;
+  if (routeId !== config.route) throw new Error('録画対象のプリセットが一致しません。');
+  const clock = new ScenarioClock();
+  const frames = new ScenarioFrames();
+  const controller = new GameController(
+    createPresetGame(routeId, config.seed, heartShowLimit),
+    clock,
+    frames,
+    new ScenarioAudio(),
+    preferences.waitMode,
+  );
+  let wallTick = 0;
+  let resumeFrameDeferred = false;
+  const paint = createAnimationClock(
+    () => (controller.state.tick * 1000) / 60,
+    () => (wallTick * 1000) / 60,
+  );
+  const session: ReplaySession = {
+    async advanceTo(target) {
+      if (target < wallTick) throw new Error('操作時刻を巻き戻すことはできません。');
+      while (wallTick < target) {
+        await Promise.resolve();
+        wallTick++;
+        if (!clock.paused) {
+          clock.seconds = (controller.state.tick + 1) / 60;
+          if (!resumeFrameDeferred) frames.run((wallTick * 1000) / 60);
+        }
+        resumeFrameDeferred = false;
+      }
+    },
+    deferResumeFrame() {
+      resumeFrameDeferred = true;
+    },
+    paint,
+    snapshot() {
+      const state = controller.state;
+      return {
+        wallTick,
+        tick: state.tick,
+        score: state.score.toString(),
+        gauge: state.bloom?.progress.toString() ?? null,
+        deckSize: state.deck.length,
+        energy: state.energy,
+        heartLimit: state.hearts.heartLimit,
+        storyAmplification: state.storyAmplification,
+        lastActionTick: state.lastActionTick,
+        phase: state.phase,
+        hand: state.hand,
+        error: controller.error,
+      };
+    },
+  };
+  window.e2eVideoSession = session;
+  return controller;
+}
