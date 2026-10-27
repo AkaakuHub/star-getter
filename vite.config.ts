@@ -5,12 +5,13 @@ export default defineConfig({
   plugins: [tailwindcss()],
   build: { target: 'es2023', chunkSizeWarningLimit: 250 },
   lint: {
+    ignorePatterns: ['vendor/**'],
     options: { typeAware: true, typeCheck: true },
     rules: {
       'typescript/no-explicit-any': 'error',
       'max-lines': ['error', { max: 350, skipBlankLines: true }],
     },
   },
-  fmt: { singleQuote: true, ignorePatterns: ['pnpm-lock.yaml', 'dist/**'] },
+  fmt: { singleQuote: true, ignorePatterns: ['pnpm-lock.yaml', 'dist/**', 'vendor/**'] },
   test: { include: ['tests/**/*.test.ts'] },
 });

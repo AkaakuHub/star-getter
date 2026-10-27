@@ -23,7 +23,7 @@ it('開花中の追加SPは通常APを固定したまま専用値で支払う', 
   expect(canUseSpecial(state, 'library-ensemble')).toBe(true);
   const next = act(state, { type: 'special', cardId: 'library-ensemble' });
   expect(next.energy).toBe(0);
-  expect(next.bloom?.progress).toBe(4978n);
+  expect(next.bloom?.progress).toBe(4977n);
 });
 
 it('共鳴はセンターの通常効果と基本カードの追加効果だけを選択する', () => {

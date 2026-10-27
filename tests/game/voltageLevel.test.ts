@@ -63,10 +63,7 @@ it('ActionType37は開花中に熱気の差分をC#の専用ゲージ式で加�
     bloom: { progress: 10n, strength: 3.5, rollback: { energy: 0, stamina: 0, excitement: 100 } },
   };
   const target = voltageThreshold(10);
-  const effectValue = Math.fround(target - state.excitement);
-  const magnitude = Math.abs(effectValue);
-  const delta = Math.trunc((magnitude / Math.sqrt(magnitude)) * state.bloom.strength);
   const set = applyEffect(state, { kind: 'voltage-set', amount: target });
   expect(set.excitement).toBe(state.excitement);
-  expect(set.bloom?.progress).toBe(10n + BigInt(delta));
+  expect(set.bloom?.progress).toBe(89n);
 });

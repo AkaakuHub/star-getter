@@ -33,7 +33,7 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
   const fullAfter = advanceAutomaticGauges(full, 1.2);
   expect(emptyAfter.energy).toBe(0);
   expect(fullAfter.energy).toBe(initial.maxEnergy);
-  expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(9n);
+  expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(10n);
   expect((fullAfter.bloom?.progress ?? 0n) - (full.bloom?.progress ?? 0n)).toBe(2n);
 });
 

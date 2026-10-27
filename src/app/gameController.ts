@@ -12,7 +12,7 @@ import {
   cardCooldownTicks,
   sectionAt,
 } from '@akaakuhub/suku-sute-core/game/projection';
-import { resolveStarGatherHeartDrawCount } from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
+import { resolveQuestLiveHeartDrawCount } from '@akaakuhub/suku-sute-core/questLive/live/heartPresentation';
 import {
   advanceWaitMode,
   createWaitMode,
@@ -244,7 +244,7 @@ export class GameController {
   }
 
   setHeartShowLimit(value: number): void {
-    resolveStarGatherHeartDrawCount(0, value);
+    resolveQuestLiveHeartDrawCount(0, value);
     this.currentState = {
       ...this.currentState,
       hearts: { ...this.currentState.hearts, showLimit: value, throwLimit: value },

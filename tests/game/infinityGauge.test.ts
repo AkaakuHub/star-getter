@@ -236,10 +236,7 @@ describe('無限ゲージ', () => {
       deactivationKey: 'voltage-infinity',
     });
     expect(ended.excitement).toBe(active.excitement);
-    const effectValue = Math.fround(voltageThreshold(10) - active.excitement);
-    const magnitude = Math.abs(effectValue);
-    const delta = Math.trunc((magnitude / Math.sqrt(magnitude)) * bloom.strength);
-    expect(ended.bloom?.progress).toBe(bloom.progress + BigInt(delta));
+    expect(ended.bloom?.progress).toBe(bloom.progress + 23n);
   });
 
   it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {

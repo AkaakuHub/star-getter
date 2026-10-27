@@ -6,7 +6,7 @@ import {
   finishBloom,
 } from '@akaakuhub/suku-sute-core/game/bloom';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
-import { calculateStarGatherGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/game/live/genesisGauge';
+import { calculateQuestLiveGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/questLive/skills/genesisSkill';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
@@ -21,23 +21,23 @@ function active() {
 }
 
 describe('開花の専用ゲージ', () => {
-  it('AP・元気・熱気の換算量をC#と同じく0方向へ切り捨てる', () => {
+  it('AP・元気・熱気の換算量はAPK同様に大きさを切り上げてから符号を適用する', () => {
     expect(
-      calculateStarGatherGenesisGaugeDelta({
+      calculateQuestLiveGenesisGaugeDelta({
         actionType: 14,
         gaugeType: 3,
         effectValue: 1,
         currentGenesisEffectValue: 1,
       }),
-    ).toBe(7);
+    ).toBe(8);
     expect(
-      calculateStarGatherGenesisGaugeDelta({
+      calculateQuestLiveGenesisGaugeDelta({
         actionType: 14,
         gaugeType: 3,
         effectValue: -1,
         currentGenesisEffectValue: 1,
       }),
-    ).toBe(-7);
+    ).toBe(-8);
   });
 
   it('2³¹−1に達し、超えると符号付き32bitのオーバーフローで0へ戻る', () => {
@@ -82,17 +82,17 @@ describe('開花の専用ゲージ', () => {
     expect(changed.stats.cardsUsed).toBe(0);
   });
 
-  it('AP・元気・熱気をそれぞれの倍率で切り捨てて変換し、通常値を更新しない', () => {
+  it('AP・元気・熱気をそれぞれFloat32で換算して切り上げ、通常値を更新しない', () => {
     const state = active();
     expect(state.bloom?.progress).toBe(30n);
     let changed = changeBloomResource(state, 'energy', 9n);
-    expect(changed.bloom?.progress).toBe(51n);
+    expect(changed.bloom?.progress).toBe(52n);
     changed = changeBloomResource(changed, 'stamina', 100n);
-    expect(changed.bloom?.progress).toBe(71n);
-    changed = changeBloomResource(changed, 'excitement', 2n);
     expect(changed.bloom?.progress).toBe(72n);
+    changed = changeBloomResource(changed, 'excitement', 2n);
+    expect(changed.bloom?.progress).toBe(74n);
     changed = changeBloomResource(changed, 'energy', -4n);
-    expect(changed.bloom?.progress).toBe(58n);
+    expect(changed.bloom?.progress).toBe(59n);
     expect([changed.energy, changed.stamina, changed.excitement]).toEqual([0, 80, 40]);
     expect(finishBloom(changed).bloom).toBeNull();
     expect(finishBloom(changed).stamina).toBe(80);

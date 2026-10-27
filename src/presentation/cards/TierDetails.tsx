@@ -1,5 +1,5 @@
 import type { Effect } from '@akaakuhub/suku-sute-core/game/model';
-import { calculateSkillMoodCorrection } from '@akaakuhub/suku-sute-core/game/live/skillMood';
+import { calculateQuestLiveSkillMoodCorrection } from '@akaakuhub/suku-sute-core/questLive/live/skillMood';
 import { describeEffect, effectConditions } from './describeEffect';
 import { targetNames } from './targetNames';
 
@@ -138,6 +138,10 @@ function effectValue(effect: Effect, mood: number): string {
       return describeEffect(effect);
   }
   if ('moodBonus' in effect && effect.moodBonus)
-    value += calculateSkillMoodCorrection(effect.moodBonus.target, mood, effect.moodBonus.perPoint);
+    value += calculateQuestLiveSkillMoodCorrection(
+      effect.moodBonus.target,
+      mood,
+      effect.moodBonus.perPoint,
+    );
   return value.toLocaleString('ja-JP', { maximumFractionDigits: 3 }) + unit;
 }

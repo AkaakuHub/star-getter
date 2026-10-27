@@ -1,7 +1,5 @@
-import {
-  starGatherHeartShowLimitSettings,
-  resolveStarGatherHeartDrawCount,
-} from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
+import { starGatherHeartShowLimitSettings } from '@akaakuhub/suku-sute-core/game/live/heartPresentation';
+import { resolveQuestLiveHeartDrawCount } from '@akaakuhub/suku-sute-core/questLive/live/heartPresentation';
 
 const storageKey = 'love-gather-heart-show-limit';
 
@@ -9,11 +7,11 @@ export function readHeartShowLimit(storage: Pick<Storage, 'getItem'>): number {
   const raw = storage.getItem(storageKey);
   if (raw === null) return starGatherHeartShowLimitSettings.defaultValue;
   const value = Number(raw);
-  resolveStarGatherHeartDrawCount(0, value);
+  resolveQuestLiveHeartDrawCount(0, value);
   return value;
 }
 
 export function writeHeartShowLimit(storage: Pick<Storage, 'setItem'>, value: number): void {
-  resolveStarGatherHeartDrawCount(0, value);
+  resolveQuestLiveHeartDrawCount(0, value);
   storage.setItem(storageKey, String(value));
 }

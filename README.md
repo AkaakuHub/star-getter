@@ -9,8 +9,9 @@
 Node.js 24 LTSと[Vite+](https://viteplus.dev/)を使用します。
 
 ```sh
-vp install
-vp dev
+git submodule update --init --recursive
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 ```sh
@@ -21,6 +22,8 @@ vp build
 ```
 
 TypeScript、Preact、Canvasで構成し、Oxlint・Oxfmtを`vp check`から実行します。lefthookはcommit時に検証を、push時にbuildを実行します。
+
+計算コアは[共有リポジトリ](https://github.com/AkaakuHub/suku-sute-core)で管理します。更新時はサブモジュールのコミットを固定し、`pnpm install --force --ignore-scripts`でfile依存を更新してください。コア単体の検証は、そのディレクトリで`pnpm install --frozen-lockfile`、`pnpm check`、`pnpm test`を実行します。
 
 ## 内部計算のE2Eと操作記録
 
@@ -37,7 +40,7 @@ pnpm e2e
 - JSONには各入力の時刻・tick・カード名・カードID・手札位置と、操作前後の得点・専用値・デッキ枚数・エナジー・スター上限・貝がらの蓄積増幅・空模様・手札ごとの累計回収数と発動状況を保存します。
 - Markdownにはゲーム内のカード名で操作順を表示し、連続回収をまとめます。ファイル名の`library`はうなばら、`bloom`は開花を表します。
 
-カード効果は`src/content/cards/`、計算処理は`src/domain/game/`、編成ごとの得点倍率とゲーム時間は`src/content/balance.ts`で管理します。画面とE2Eは共通の`src/app/createPresetGame.ts`を使います。
+カード効果は`src/content/cards/`、計算処理はサブモジュール`vendor/suku-sute-core/`、編成ごとの得点倍率とゲーム時間は`src/content/balance.ts`で管理します。画面とE2Eは共通の`src/app/createPresetGame.ts`を使います。
 
 ## うなばらの操作順
 
