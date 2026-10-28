@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
 import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
-import type {
-  ConditionContext,
-  GameCondition,
-} from '@akaakuhub/suku-sute-core/game/conditions/model';
+import type { GameCondition } from '@akaakuhub/suku-sute-core/game/conditions/model';
+import {
+  type LiveConditionContext,
+  liveConditionSectionNumber,
+  liveConditionMoodValue,
+} from '@akaakuhub/suku-sute-core/runtime/live/conditionContext';
+import {
+  voltageThreshold,
+  voltageThresholds,
+} from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
   activateHandPermanentEffects,
@@ -12,19 +18,32 @@ import {
 } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import { game } from './support/game';
 
-const context: ConditionContext = {
-  heatLevel: 950,
-  mentalFraction: 0.3,
+const context: LiveConditionContext = {
+  voltage: { currentVoltage: voltageThreshold(950), timerSeconds: 0 },
+  voltageThresholds,
+  maximumVoltageLevel: 1000,
+  mental: { currentMental: 30, timerSeconds: 0, mentalDown: false },
+  maximumMental: 100,
   moodValue: -100,
-  staminaPercent: 30,
-  weather: -100,
-  partIndex: 2,
-  partNumber: 99,
-  cardCounts: { all: 95, draw: 70, discard: 17, excluded: 5 },
-  tokenSeries: [[1, 2], [2], [3]],
-  supportLevels: { 1021: 10, 1031: 20 },
-  naturalStars: 50,
-  genesisActive: false,
+  currentSection: 2,
+  feverSection: 2,
+  cardTotal: 95,
+  deckCount: 70,
+  graveyardCount: 17,
+  exclusionCount: 5,
+  tokenCardSeriesCount: (ids) =>
+    [[1, 2], [2], [3]].filter((series) => ids.some((id) => series.includes(id))).length,
+  memberFanLevelTotal: (ids) =>
+    ids.reduce(
+      (sum, id) =>
+        sum +
+        (new Map([
+          [1021, 10],
+          [1031, 20],
+        ]).get(id) ?? 0),
+      0,
+    ),
+  beatHeartValue: 50,
 };
 
 describe('カード共通の条件判定', () => {
@@ -63,8 +82,27 @@ describe('カード共通の条件判定', () => {
     { condition: { kind: 'part-from', number: 3 }, less: { kind: 'part-from', number: 4 } },
     { condition: { kind: 'part', number: 99 }, less: { kind: 'part', number: 3 } },
     ...(['all', 'draw', 'discard', 'excluded'] as const).map((zone) => ({
-      condition: { kind: 'cards' as const, zone, minimum: context.cardCounts[zone] },
-      less: { kind: 'cards' as const, zone, minimum: context.cardCounts[zone] + 1 },
+      condition: {
+        kind: 'cards' as const,
+        zone,
+        minimum: {
+          all: context.cardTotal,
+          draw: context.deckCount,
+          discard: context.graveyardCount,
+          excluded: context.exclusionCount,
+        }[zone],
+      },
+      less: {
+        kind: 'cards' as const,
+        zone,
+        minimum:
+          {
+            all: context.cardTotal,
+            draw: context.deckCount,
+            discard: context.graveyardCount,
+            excluded: context.exclusionCount,
+          }[zone] + 1,
+      },
     })),
     {
       condition: { kind: 'token-series', series: [1, 2], minimum: 2 },
@@ -88,6 +126,37 @@ describe('カード共通の条件判定', () => {
       expect(evaluateCondition(condition, context)).toBe(true);
       expect(evaluateCondition(less, context)).toBe(false);
     });
+  it('条件判定には共通のMentalとVoltageの状態をコピーせず渡す', () => {
+    const initial = game();
+    const input = conditionContext(initial);
+    expect(input.mental).toBe(initial.mental);
+    expect(input.voltage).toBe(initial.voltage);
+  });
+  it('小数を含むメンタルは整数化してからFloat32の割合で比較する', () => {
+    const initial = game();
+    const state = {
+      ...initial,
+      mental: { ...initial.mental, currentMental: 1.9 },
+      maximumMental: 3,
+    };
+    const input = conditionContext(state);
+    expect(evaluateCondition({ kind: 'mental-at-most', fraction: 0.5 }, input)).toBe(true);
+    expect(evaluateCondition({ kind: 'mental', minimumPercent: 50 }, input)).toBe(false);
+  });
+  it('開花中も偶数奇数の条件は実際の編成枚数で片側だけを実行する', () => {
+    const initial = applyEffect(game(), { kind: 'genesis', effectValue: 1 });
+    const result = applyEffect(initial, {
+      kind: 'branch',
+      condition: {
+        kind: 'card-count-parity',
+        zone: 'all',
+        parity: initial.deck.length % 2 === 0 ? 'even' : 'odd',
+      },
+      whenTrue: [{ kind: 'ap-limit', amount: 1 }],
+      whenFalse: [{ kind: 'ap-limit', amount: 2 }],
+    });
+    expect(result.ap.maxAp).toBe(initial.ap.maxAp + 1);
+  });
   it('無条件分岐は常に成立する', () => {
     expect(evaluateCondition({ kind: 'always' }, context)).toBe(true);
   });
@@ -124,7 +193,7 @@ describe('カード共通の条件判定', () => {
     const context = conditionContext(genesis);
     const result = applyEffect(genesis, {
       kind: 'branch',
-      condition: { kind: 'weather', minimum: context.weather },
+      condition: { kind: 'weather', minimum: liveConditionMoodValue(context) },
       whenTrue: [{ kind: 'ap-limit', amount: 1 }],
       whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
@@ -185,7 +254,7 @@ describe('カード共通の条件判定', () => {
         ...initial,
         tick: Math.ceil(((part.startBeat * 60) / initial.track.bpm) * 60),
       };
-      expect(conditionContext(state).partNumber).toBe(
+      expect(liveConditionSectionNumber(conditionContext(state))).toBe(
         index === climax ? 99 : index - (climax < index ? 1 : 0) + 1,
       );
     }
