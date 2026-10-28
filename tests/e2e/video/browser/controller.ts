@@ -1,22 +1,22 @@
 import { GameController } from '../../../../src/app/gameController';
-import { createPresetGame } from '../../../../src/app/createPresetGame';
+import { createConfiguredGame } from '../../../../src/app/createConfiguredGame';
 import type { GamePreferences } from '../../../../src/app/gamePreferences';
-import type { RouteId } from '../../../../src/content/routes';
+import type { GameSetup } from '../../../../src/app/setup/gameSetup';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from '../../playback';
 import { createAnimationClock } from './animations';
 import type { ReplaySession } from '../types';
 
 export function createGameController(
-  routeId: RouteId,
+  setup: GameSetup,
   heartShowLimit: number,
   preferences: GamePreferences,
 ): GameController {
   const config = window.e2eVideoConfig;
-  if (routeId !== config.route) throw new Error('録画対象のプリセットが一致しません。');
+  if (setup.presetId !== config.route) throw new Error('録画対象のプリセットが一致しません。');
   const clock = new ScenarioClock();
   const frames = new ScenarioFrames();
   const controller = new GameController(
-    createPresetGame(routeId, config.seed, heartShowLimit),
+    createConfiguredGame(setup, config.seed, heartShowLimit),
     clock,
     frames,
     new ScenarioAudio(),

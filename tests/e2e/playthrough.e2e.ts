@@ -1,5 +1,6 @@
+import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
-import { createPresetGame } from '../../src/app/createPresetGame';
+import { createConfiguredGame } from '../../src/app/createConfiguredGame';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { routeIds } from '../../src/content/routes';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
@@ -9,7 +10,7 @@ import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { canUseSpecial, specialCards } from '@akaakuhub/suku-sute-core/game/special';
 
 test('全区間のカード使用と回収を最後まで処理する', () => {
-  let state = act(createPresetGame('genesis', 1234, 100), { type: 'start' });
+  let state = act(createConfiguredGame(createPresetSetup('genesis'), 1234, 100), { type: 'start' });
   for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
     state = advanceTo(state, frame / 4);
     const cardIndex = state.hand.findIndex(
@@ -36,7 +37,9 @@ function expectOwnedOnce(state: GameState) {
 for (const routeId of routeIds) {
   for (const seed of [7, 456, 1234]) {
     test(`${routeId}を全区間循環し、カード所有と本家の得点上限を維持する（seed ${seed}）`, () => {
-      let state = act(createPresetGame(routeId, seed, 100), { type: 'start' });
+      let state = act(createConfiguredGame(createPresetSetup(routeId), seed, 100), {
+        type: 'start',
+      });
       let turn = 0;
       for (let tick = 1; tick <= durationSeconds(state) * rules.ticksPerSecond; tick++) {
         state = advanceTo(state, tick / rules.ticksPerSecond);

@@ -16,6 +16,7 @@ export function GameView({
   state,
   route,
   onReplay,
+  onSetup,
   onWaitMode,
   onAutomaticHearts,
   onMenu,
@@ -30,6 +31,7 @@ export function GameView({
   state: GameState;
   route: RouteId;
   onReplay: () => void;
+  onSetup: () => void;
   onWaitMode: () => void;
   onAutomaticHearts: () => void;
   onMenu: () => void;
@@ -124,7 +126,7 @@ export function GameView({
         </div>
       )}
       {state.phase === 'finished' && (
-        <Result state={state} route={route} onReplay={onReplay} busy={busy} />
+        <Result state={state} route={route} onReplay={onReplay} onSetup={onSetup} busy={busy} />
       )}
     </main>
   );

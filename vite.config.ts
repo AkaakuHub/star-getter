@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [tailwindcss()],
+  optimizeDeps: { exclude: ['@akaakuhub/suku-sute-core'] },
   build: { target: 'es2023', chunkSizeWarningLimit: 250 },
   lint: {
     ignorePatterns: ['vendor/**'],

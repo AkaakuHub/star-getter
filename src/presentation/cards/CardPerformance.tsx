@@ -35,6 +35,12 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <h3>アクション</h3>
           <EffectDetails effects={card.effects} />
         </section>
+        {card.special && (
+          <section>
+            <h3>共鳴（エナジー{card.special.cost}）</h3>
+            <EffectDetails effects={card.special.effects} />
+          </section>
+        )}
         {drawEffects && (
           <section>
             <h3>引いたとき</h3>

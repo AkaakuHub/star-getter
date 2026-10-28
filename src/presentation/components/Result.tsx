@@ -9,8 +9,15 @@ export function Result({
   state,
   route,
   onReplay,
+  onSetup,
   busy,
-}: Readonly<{ state: GameState; route: RouteId; onReplay: () => void; busy: boolean }>) {
+}: Readonly<{
+  state: GameState;
+  route: RouteId;
+  onReplay: () => void;
+  onSetup: () => void;
+  busy: boolean;
+}>) {
   return (
     <section className="result-panel" aria-label="ライブ結果">
       <h2>{routes[route].name}</h2>
@@ -27,6 +34,9 @@ export function Result({
         </div>
       </dl>
       <div className="result-actions">
+        <button type="button" className="button quiet" onClick={onSetup} disabled={busy}>
+          編成に戻る
+        </button>
         <ResultShareButton state={state} route={route} busy={busy} />
         <button type="button" className="button quiet" onClick={onReplay} disabled={busy}>
           <RotateCcw size={18} aria-hidden="true" />

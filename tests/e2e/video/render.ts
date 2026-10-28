@@ -40,6 +40,15 @@ export async function renderVideo(
   await page.clock.install({ time: epoch });
   await page.clock.pauseAt(epoch);
   await page.goto(url + '?route=' + (recording.route === 'library' ? 'unabara' : 'kaika'));
+  const start = await page
+    .getByRole('button', { name: 'はじめる', exact: true })
+    .evaluate((element) => {
+      element.scrollIntoView({ block: 'center', behavior: 'instant' });
+      const bounds = element.getBoundingClientRect();
+      window.e2eVideoTapLabel = '開始';
+      return { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+    });
+  await page.mouse.click(start.x, start.y);
   await page.waitForFunction(() => window.e2eVideoSession !== undefined);
   await page.clock.runFor(32);
   await page.evaluate(() => document.fonts.ready);

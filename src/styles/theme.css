@@ -12,6 +12,7 @@
 @import './effectDetails.css';
 @import './results.css';
 @import './focus.css';
+@import './setup.css';
 
 @theme {
   --color-idol-pink: #ed7297;

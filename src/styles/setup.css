@@ -1,0 +1,87 @@
+.setup-page {
+  display: grid;
+  gap: 28px;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+}
+.setup-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.setup-heading h1 {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+.setup-page h2,
+.setup-presets legend {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.setup-presets {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.setup-presets legend {
+  margin-bottom: 12px;
+}
+.setup-deck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.setup-deck-grid [aria-pressed='true'] {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.setup-card-check {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 2px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+.setup-actions {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  gap: 12px;
+  padding-block: 16px;
+  background: var(--paper);
+}
+.setup-selected {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.setup-selected li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.setup-selected li > .card-browser-card {
+  width: 60px;
+  flex-shrink: 0;
+}
+.setup-selected li > span {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.setup-order {
+  display: flex;
+  gap: 4px;
+}
+.setup-order .icon-button {
+  width: 44px;
+  min-height: 44px;
+}
+.game-menu > .button {
+  margin-bottom: 24px;
+}

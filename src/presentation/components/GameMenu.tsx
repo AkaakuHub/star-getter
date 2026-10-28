@@ -9,6 +9,7 @@ export function GameMenu({
   onRoute,
   onHeartShowLimit,
   onClose,
+  onSetup,
 }: Readonly<{
   route: RouteId;
   heartShowLimit: number;
@@ -16,9 +17,13 @@ export function GameMenu({
   onRoute: (route: RouteId) => void;
   onHeartShowLimit: (value: number) => void;
   onClose: () => void;
+  onSetup: () => void;
 }>) {
   return (
     <Modal title="設定" onClose={onClose} className="game-menu">
+      <button type="button" className="button quiet" onClick={onSetup} disabled={busy}>
+        編成に戻る
+      </button>
       <fieldset>
         <legend>プリセット</legend>
         <div className="preset-options">

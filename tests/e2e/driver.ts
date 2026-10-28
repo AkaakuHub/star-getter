@@ -1,6 +1,7 @@
+import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import type { RouteId } from '../../src/content/routes';
-import { createPresetGame } from '../../src/app/createPresetGame';
+import { createConfiguredGame } from '../../src/app/createConfiguredGame';
 import { GameController } from '../../src/app/gameController';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
 import { cardAt, canUseCard, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
@@ -36,7 +37,7 @@ export class GameDriver {
     readonly timing: InputTiming = inputTiming,
   ) {
     this.controller = new GameController(
-      createPresetGame(route, seed, 100),
+      createConfiguredGame(createPresetSetup(route), seed, 100),
       this.clock,
       this.frames,
       new ScenarioAudio(),
