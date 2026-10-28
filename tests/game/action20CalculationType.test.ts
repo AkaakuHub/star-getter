@@ -4,7 +4,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createHandCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
-import { expireHandLimitSections } from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+import { expireHandCardCountSections } from '@akaakuhub/suku-sute-core/game/effects/handCardCount';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType20の未対応計算種別は初回加算せず、期限時の解除通知だけ行う', () => {
@@ -25,11 +25,11 @@ it('ActionType20の未対応計算種別は初回加算せず、期限時の解�
   expect(active.tokenCardDeck.handTargetCounts.current).toBe(
     neutralState.tokenCardDeck.handTargetCounts.current,
   );
-  expect(active.handLimitEffects).toMatchObject([
-    { amount: 0, expirationAmount: -1, remainingSections: 1n },
+  expect(active.handCardCountEffects.effects).toMatchObject([
+    { amount: 1, duration: { kind: 'sections', remainingChanges: 1n } },
   ]);
   expect(
-    flushHandCardCountActions(expireHandLimitSections(active)).tokenCardDeck.handTargetCounts
+    flushHandCardCountActions(expireHandCardCountSections(active)).tokenCardDeck.handTargetCounts
       .current,
   ).toBe(neutralState.tokenCardDeck.handTargetCounts.current - 1);
 });

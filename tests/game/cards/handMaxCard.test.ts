@@ -10,9 +10,9 @@ import {
 } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import {
-  advanceHandMaxCardEffects,
-  expireHandMaxCardSections,
-} from '@akaakuhub/suku-sute-core/game/effects/handMaxCard';
+  advanceHandCardCountEffects,
+  expireHandCardCountSections,
+} from '@akaakuhub/suku-sute-core/game/effects/handCardCount';
 
 it('手札最大化は手札を8枚まで補充し、期限後も保持した手札を減らさない', () => {
   const initial = game();
@@ -28,8 +28,8 @@ it('手札最大化は手札を8枚まで補充し、期限後も保持した手
   });
   expect(liveCurrentHandCardInstanceIds(expanded)).toHaveLength(8);
   expect(handCapacity(expanded)).toBe(8);
-  const expired = expireHandMaxCardSections(expanded);
-  expect(expired.handMaxCardEffects).toHaveLength(0);
+  const expired = expireHandCardCountSections(expanded);
+  expect(expired.handCardCountEffects.effects).toHaveLength(0);
   expect(liveCurrentHandCardInstanceIds(expired)).toHaveLength(8);
   expect(handCapacity(expired)).toBe(4);
 });
@@ -43,8 +43,8 @@ it('重複した手札最大化は他の期限が残る間だけ継続する', (
     kind: 'hand-max-card',
     duration: { kind: 'stage' },
   });
-  const afterTimer = advanceHandMaxCardEffects(second, 0.2);
-  expect(afterTimer.handMaxCardEffects).toHaveLength(1);
+  const afterTimer = advanceHandCardCountEffects(second, 0.2);
+  expect(afterTimer.handCardCountEffects.effects).toHaveLength(1);
   expect(handCapacity(afterTimer)).toBe(8);
 });
 
@@ -57,13 +57,13 @@ it('InvocationType 0x388と0x38bは手動解除まで手札最大化を保つ', 
       invocationType,
       deactivationKey,
     });
-    const timed = advanceHandMaxCardEffects(activated, 1);
-    expect(timed.handMaxCardEffects).toHaveLength(1);
+    const timed = advanceHandCardCountEffects(activated, 1);
+    expect(timed.handCardCountEffects.effects).toHaveLength(1);
     const ended = act(timed, {
       type: 'deactivate-hand-max-card',
       deactivationKey,
     });
-    expect(ended.handMaxCardEffects).toHaveLength(0);
+    expect(ended.handCardCountEffects.effects).toHaveLength(0);
     expect(liveCurrentHandCardInstanceIds(ended)).toEqual(liveCurrentHandCardInstanceIds(timed));
   }
 });
@@ -77,8 +77,29 @@ it('最大化中の枚数変更は共通の現在目標と解除後の保存目�
   const decreased = flushHandCardCountActions(applyEffect(maximum, handCardCountEffect(-2, 3, 0n)));
   expect(decreased.tokenCardDeck.handTargetCounts.current).toBe(8);
   expect(handCapacity(decreased)).toBe(8);
-  const expired = expireHandMaxCardSections(decreased);
+  const expired = expireHandCardCountSections(decreased);
   expect(expired.tokenCardDeck.maxHandSkillActiveCount).toBe(0);
   expect(expired.tokenCardDeck.handTargetCounts.current).toBe(2);
   expect(handCapacity(expired)).toBe(3);
+});
+
+it('枚数変更と最大化の期限を一つの状態で進め、保存した目標を復元する', () => {
+  const count = flushHandCardCountActions(applyEffect(game(), handCardCountEffect(1, 1, 1000n)));
+  const maximum = applyEffect(count, {
+    kind: 'hand-max-card',
+    duration: { kind: 'milliseconds', value: 2000n },
+  });
+  expect(maximum.handCardCountEffects.effects.map((effect) => effect.kind)).toEqual([
+    'count',
+    'max',
+  ]);
+  const afterCount = flushHandCardCountActions(advanceHandCardCountEffects(maximum, 1));
+  expect(afterCount.handCardCountEffects.effects).toMatchObject([
+    { kind: 'max', duration: { kind: 'milliseconds', remainingSeconds: 1 } },
+  ]);
+  expect(afterCount.tokenCardDeck.handMaxCardSkillInfo?.targetHandCount).toBe(5);
+  expect(afterCount.tokenCardDeck.handTargetCounts.current).toBe(8);
+  const afterMaximum = advanceHandCardCountEffects(afterCount, 1);
+  expect(afterMaximum.handCardCountEffects.effects).toEqual([]);
+  expect(afterMaximum.tokenCardDeck.handTargetCounts.current).toBe(5);
 });

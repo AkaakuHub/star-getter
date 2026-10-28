@@ -7,9 +7,9 @@ import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEf
 import { absorbSkillEffect } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import {
-  advanceHandLimitEffects,
-  deactivateHandLimitEffects,
-} from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+  advanceHandCardCountEffects,
+  deactivateHandCardCountEffects,
+} from '@akaakuhub/suku-sute-core/game/effects/handCardCount';
 
 function game() {
   const track = tracks[0];
@@ -101,7 +101,7 @@ it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り�
   };
   const absorbed = applyEffect(atLongMaximum, handCardCountEffect(1, 3, 0n));
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
-  expect(absorbed.handLimitEffects).toEqual(atLongMaximum.handLimitEffects);
+  expect(absorbed.handCardCountEffects).toEqual(atLongMaximum.handCardCountEffects);
 });
 
 it('吸収した手札枚数変更は期限到達や強制解除で枚数を減らさない', () => {
@@ -129,9 +129,9 @@ it('吸収した手札枚数変更は期限到達や強制解除で枚数を減�
     { ...handCardCountEffect(1, 1, 1000n), deactivationKey: 'count' },
     source,
   );
-  expect(absorbed.handLimitEffects).toEqual(active.handLimitEffects);
-  const timed = advanceHandLimitEffects(absorbed, 1);
-  const removed = deactivateHandLimitEffects(timed, 'count');
+  expect(absorbed.handCardCountEffects).toEqual(active.handCardCountEffects);
+  const timed = advanceHandCardCountEffects(absorbed, 1);
+  const removed = deactivateHandCardCountEffects(timed, 'count');
   expect(removed.tokenCardDeck.handTargetCounts.current).toBe(
     active.tokenCardDeck.handTargetCounts.current,
   );

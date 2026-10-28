@@ -22,7 +22,7 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
 import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
-import { advanceHandLimitEffects } from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+import { advanceHandCardCountEffects } from '@akaakuhub/suku-sute-core/game/effects/handCardCount';
 import { advanceAction52SkillBoosts } from '@akaakuhub/suku-sute-core/game/effects/action52SkillBoost';
 
 function game() {
@@ -59,15 +59,15 @@ it('InvocationType 0x388と0x38bは自動期限を止め、Deactivator解除で�
         deactivationKey: `ability-${invocationType}`,
       }),
     );
-    const afterTimer = flushHandCardCountActions(advanceHandLimitEffects(state, 1));
+    const afterTimer = flushHandCardCountActions(advanceHandCardCountEffects(state, 1));
     expect(afterTimer.tokenCardDeck.handTargetCounts.current).toBe(6);
-    expect(afterTimer.handLimitEffects).toHaveLength(1);
+    expect(afterTimer.handCardCountEffects.effects).toHaveLength(1);
     const deactivated = act(afterTimer, {
       type: 'deactivate-hand-limit',
       deactivationKey: `ability-${invocationType}`,
     });
     expect(deactivated.tokenCardDeck.handTargetCounts.current).toBe(5);
-    expect(deactivated.handLimitEffects).toHaveLength(0);
+    expect(deactivated.handCardCountEffects.effects).toHaveLength(0);
   }
 });
 
@@ -85,10 +85,10 @@ it('Action904の子Action20は手札中だけ有効で、離脱時に解除す�
   );
   const active = flushHandCardCountActions(activateHandPermanentEffects(state, card));
   expect(active.tokenCardDeck.handTargetCounts.current).toBe(4);
-  expect(advanceHandLimitEffects(active, 100).tokenCardDeck.handTargetCounts.current).toBe(4);
+  expect(advanceHandCardCountEffects(active, 100).tokenCardDeck.handTargetCounts.current).toBe(4);
   const disposed = flushHandCardCountActions(disposeHandEffects(active, [card.cardInstanceId]));
   expect(disposed.tokenCardDeck.handTargetCounts.current).toBe(5);
-  expect(disposed.handLimitEffects).toHaveLength(0);
+  expect(disposed.handCardCountEffects.effects).toHaveLength(0);
 });
 
 it('Action904は通常ドローで手札へ入った時点で子効果を発動する', () => {

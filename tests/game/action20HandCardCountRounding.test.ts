@@ -3,7 +3,7 @@ import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { createHandCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
-import { applyHandLimit } from '@akaakuhub/suku-sute-core/game/effects/handLimit';
+import { applyHandCardCount } from '@akaakuhub/suku-sute-core/game/effects/handCardCount';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 function game() {
@@ -50,14 +50,16 @@ it.each([
       ],
     });
     if (effect.kind !== 'hand-limit') throw new Error('手札枚数変更ではありません。');
-    const result = applyHandLimit(state, effect, card, multiplier);
+    const result = applyHandCardCount(state, effect, card, multiplier);
     expect(result.tokenCardDeck.handTargetCounts.current).toBe(
       state.tokenCardDeck.handTargetCounts.current,
     );
     expect(result.deckActions.queue.at(-1)).toEqual({ type: 0, param1: expected });
-    expect(result.handLimitEffects.at(-1)).toMatchObject({
+    expect(result.handCardCountEffects.effects.at(-1)).toMatchObject({
+      effectId: '20003',
+      cardInstanceId: card.cardInstanceId,
       amount: expected,
-      expirationAmount: -expected | 0,
+      duration: { kind: 'full-end' },
     });
     expect(result.action52Buffs).toHaveLength(amount > 0 ? 0 : 1);
   },

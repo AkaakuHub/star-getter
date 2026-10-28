@@ -46,7 +46,10 @@ it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持
   const applied = applyEffect(game(), effect);
   expect(applied.tokenCardDeck.handTargetCounts.current).toBe(5);
   expect(applied.deckActions.queue.at(-1)).toEqual({ type: 0, param1: -1 });
-  expect(applied.handLimitEffects[0]?.remainingSections).toBe((1n << 53n) + 1n);
+  expect(applied.handCardCountEffects.effects[0]?.duration).toEqual({
+    kind: 'sections',
+    remainingChanges: (1n << 53n) + 1n,
+  });
 });
 
 it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する', () => {
@@ -144,8 +147,8 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
   expect(active.tokenCardDeck.handTargetCounts.current).toBe(
     expected.tokenCardDeck.handTargetCounts.current,
   );
-  expect(active.handLimitEffects[0]?.remainingSeconds).toBeNull();
-  expect(active.handLimitEffects[0]?.deactivationKey).toBe(
+  expect(active.handCardCountEffects.effects[0]?.duration).toEqual({ kind: 'full-end' });
+  expect(active.handCardCountEffects.effects[0]?.deactivationKey).toBe(
     `hand-permanent:${source.cardInstanceId}`,
   );
   expect(
