@@ -7,7 +7,7 @@ import { createReshuffleEffect } from '@akaakuhub/suku-sute-core/game/actionType
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { game } from './support/game';
 
-it('Action13は手札を引き直し、使用カードの補充を抑止する', () => {
+it('Action13は通常ドローを省略し、使用前と同じ枚数の手札を引き直す', () => {
   const initial = game('library');
   const sourceId = liveCurrentHandCardInstanceIds(initial)[0];
   if (!sourceId) throw new Error('使用するカードが手札にありません。');
@@ -24,7 +24,7 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
     { type: 'card', index: 0 },
   );
   expect(liveCurrentHandCardInstanceIds(used)).toHaveLength(
-    liveCurrentHandCardInstanceIds(initial).length - 1,
+    liveCurrentHandCardInstanceIds(initial).length,
   );
   expect(boardCardIds(used, liveBoardState.graveyard)).toContain(sourceId);
 });

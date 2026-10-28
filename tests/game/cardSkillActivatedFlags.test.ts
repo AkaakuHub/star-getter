@@ -58,3 +58,24 @@ it('通常の使用後は1枚だけ引き、目標枚数までまとめて引か
   expect(used.stats.cardsUsed).toBe(ready.stats.cardsUsed + 1);
   expect(liveCurrentHandCardInstanceIds(used)).toHaveLength(1);
 });
+
+it('引き直しを発動したカードは通常補充で枠を除かず、保持枚数で引き直す', () => {
+  const { ready, source } = readyHand(5);
+  const reshuffle = {
+    ...source,
+    effects: [{ kind: 'shuffle' as const, recoverDiscard: true, destination: 'draw' as const }],
+  };
+  const state = {
+    ...ready,
+    deck: ready.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? reshuffle : card,
+    ),
+    cardPool: ready.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? reshuffle : card,
+    ),
+  };
+  const used = act(state, { type: 'card', index: 0 });
+  expect(liveCurrentHandCardInstanceIds(used)).toHaveLength(5);
+  expect(used.liveHands.handCardButtonOrder).toEqual(state.liveHands.handCardButtonOrder);
+  expect(used.deckActions.queue).toEqual([]);
+});
