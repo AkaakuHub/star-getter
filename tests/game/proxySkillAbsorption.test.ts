@@ -213,7 +213,7 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
     initial,
     {
       kind: 'proxy-skill',
-      absorbLimit: 2,
+      absorbLimit: 4,
       periodType: 1,
       periodParam: 3000n,
       induceTiming: 1,
