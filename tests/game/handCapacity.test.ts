@@ -1,3 +1,4 @@
+import { liveHandCardButtonId } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { withHandTarget } from './support/game';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
@@ -208,7 +209,7 @@ it('ActionType20へ発動元対象のActionType52補正を適用して整数化�
   expect(changed.tokenCardDeck.handTargetCounts.current).toBe(9);
 });
 
-it('手札枚数を減らす効果はランダム除外後に発動元を補充しない', () => {
+it('手札枚数を1枚減らす効果は使用元だけを抜き、ほかのカードを減らさない', () => {
   const state = fillHand(game());
   const source = state.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
@@ -217,17 +218,20 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
       ...state,
       activation: {
         sourceId: source.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(state, source.cardInstanceId),
         usedCards: [source.cardInstanceId],
         hasUseAllHandSkill: false,
         handCountChanges: {},
       },
     },
-    { hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== source.cardInstanceId) },
+    { hand: liveCurrentHandCardInstanceIds(state) },
   );
   const changed = applyEffect(activated, handCardCountEffect(-1, 3, 0n), source);
   const finished = finishCardActivation(changed);
-  expect(liveCurrentHandCardInstanceIds(finished)).toHaveLength(3);
-  expect(boardCardIds(finished, liveBoardState.graveyard)).toHaveLength(2);
+  expect(liveCurrentHandCardInstanceIds(finished)).toEqual(
+    liveCurrentHandCardInstanceIds(state).filter((id) => id !== source.cardInstanceId),
+  );
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toHaveLength(1);
   expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.cardInstanceId);
 });
 
@@ -240,12 +244,13 @@ it('手札目標数より多い状態では使用元カードを補充しない'
       ...withHandTarget(state, 5),
       activation: {
         sourceId: source.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(withHandTarget(state, 5), source.cardInstanceId),
         usedCards: [source.cardInstanceId],
         hasUseAllHandSkill: false,
         handCountChanges: {},
       },
     },
-    { hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== source.cardInstanceId) },
+    { hand: liveCurrentHandCardInstanceIds(state) },
   );
   const finished = finishCardActivation(activated);
   expect(liveCurrentHandCardInstanceIds(finished)).toHaveLength(6);

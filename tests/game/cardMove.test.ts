@@ -1,3 +1,4 @@
+import { liveHandCardButtonId } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { enqueueHandShuffle } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
 import type { ProxySkillEffect } from '@akaakuhub/suku-sute-core/game/proxySkillTypes';
@@ -25,13 +26,14 @@ function activateSourceCard() {
         ...state,
         activation: {
           sourceId: card.cardInstanceId,
+          handCardButtonId: liveHandCardButtonId(state, card.cardInstanceId),
           usedCards: [card.cardInstanceId],
           hasUseAllHandSkill: false,
           handCountChanges: {},
         },
       },
       {
-        hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== card.cardInstanceId),
+        hand: liveCurrentHandCardInstanceIds(state),
         deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== card.cardInstanceId),
       },
     ),
@@ -80,6 +82,7 @@ it('全手札使用の子の除外特性は既存のProxy移動先を上書き�
       tokenCardDeck: { ...initial.tokenCardDeck, isAllHandSkill: true },
       activation: {
         sourceId: source.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(initial, source.cardInstanceId),
         usedCards: [source.cardInstanceId, child.cardInstanceId],
         hasUseAllHandSkill: true,
         handCountChanges: {},
@@ -133,6 +136,7 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
       tokenCardDeck: { ...state.tokenCardDeck, isAllHandSkill: true },
       activation: {
         sourceId: source.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(state, source.cardInstanceId),
         usedCards: [source.cardInstanceId, child.cardInstanceId],
         hasUseAllHandSkill: true,
         handCountChanges: {},

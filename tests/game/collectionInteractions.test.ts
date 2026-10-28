@@ -165,6 +165,7 @@ function preparedLibrary(): GameState {
         hearts: { ...state.hearts, heartLimit: 10_000_000 },
       },
       {
+        hand,
         deck: state.deck.map((card) => card.cardInstanceId).filter((id) => !hand.includes(id)),
         graveyard: [],
       },

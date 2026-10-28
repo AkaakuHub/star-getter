@@ -1,6 +1,7 @@
 import {
   setLiveCurrentHandCards,
   liveCurrentHandCardInstanceIds,
+  liveHandCardInstanceIds,
 } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import {
   type LiveSkillUseAtBoardState,
@@ -90,9 +91,7 @@ export function withBoardState(
     ),
     liveHands: setLiveCurrentHandCards(
       state,
-      (positions.hand ?? liveCurrentHandCardInstanceIds(state)).filter(
-        (id) => !activation?.usedCards.includes(id),
-      ),
+      positions.hand ?? liveHandCardInstanceIds(state.liveHands[state.tokenCardDeck.currentDeck]),
     ).liveHands,
   };
 }

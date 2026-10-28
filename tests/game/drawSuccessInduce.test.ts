@@ -1,3 +1,4 @@
+import { liveHandCardButtonId } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createLiveDeckDrawContextState } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { withBoardState } from './support/board';
 import { createLiveHandCardStats } from '@akaakuhub/suku-sute-core/runtime/cards/handCardStats';
@@ -95,6 +96,7 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
       handCardStats: { [card.cardInstanceId]: { ...createLiveHandCardStats(0), isActive: false } },
       activation: {
         sourceId: card.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(initial, card.cardInstanceId),
         usedCards: [card.cardInstanceId],
         hasUseAllHandSkill: false,
         handCountChanges: {},
@@ -139,6 +141,7 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
       handCardStats: { [card.cardInstanceId]: { ...createLiveHandCardStats(0), isActive: false } },
       activation: {
         sourceId: card.cardInstanceId,
+        handCardButtonId: liveHandCardButtonId(initial, card.cardInstanceId),
         usedCards: [card.cardInstanceId],
         hasUseAllHandSkill: false,
         handCountChanges: {},

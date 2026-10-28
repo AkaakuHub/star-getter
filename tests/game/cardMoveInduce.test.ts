@@ -1,3 +1,4 @@
+import { liveHandCardButtonId } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
@@ -9,18 +10,22 @@ import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZ
 import { game } from './support/game';
 
 function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
+  const prepared = withBoardState(state, {
+    hand: [...new Set([...liveCurrentHandCardInstanceIds(state), cardId])],
+  });
   return finishCardActivation(
     withBoardState(
       {
-        ...state,
+        ...prepared,
         activation: {
           sourceId: cardId,
+          handCardButtonId: liveHandCardButtonId(prepared, cardId),
           usedCards: [cardId],
           hasUseAllHandSkill: false,
           handCountChanges: {},
         },
       },
-      { hand: [...new Set([...liveCurrentHandCardInstanceIds(state), cardId])] },
+      {},
       { [cardId]: { skillUseAtBoardState: 7 as const } },
     ),
   );
@@ -43,30 +48,13 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
     },
     source,
   );
-  const moveProxyCard = (state: typeof armed) =>
-    finishCardActivation(
-      withBoardState(
-        {
-          ...state,
-          activation: {
-            sourceId: source.cardInstanceId,
-            usedCards: [source.cardInstanceId],
-            hasUseAllHandSkill: false,
-            handCountChanges: {},
-          },
-        },
-        { hand: [...new Set([...liveCurrentHandCardInstanceIds(state), source.cardInstanceId])] },
-        { [source.cardInstanceId]: { skillUseAtBoardState: 7 as const } },
-      ),
-    );
-
-  const firstMove = moveProxyCard(armed);
+  const firstMove = moveProxyCard(armed, source.cardInstanceId);
   expect(firstMove.boosts).toHaveLength(0);
   expect(firstMove.cardMoveInducers[0]?.useCount).toBe(0);
-  const secondMove = moveProxyCard(firstMove);
+  const secondMove = moveProxyCard(firstMove, source.cardInstanceId);
   expect(secondMove.boosts).toHaveLength(0);
   expect(secondMove.cardMoveInducers[0]?.useCount).toBe(0);
-  const thirdMove = moveProxyCard(secondMove);
+  const thirdMove = moveProxyCard(secondMove, source.cardInstanceId);
   expect(thirdMove.boosts).toHaveLength(0);
   expect(thirdMove.cardMoveInducers[0]?.useCount).toBe(0);
 });
@@ -94,6 +82,7 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
         ...armed,
         activation: {
           sourceId: source.cardInstanceId,
+          handCardButtonId: liveHandCardButtonId(armed, source.cardInstanceId),
           usedCards: [source.cardInstanceId],
           hasUseAllHandSkill: false,
           handCountChanges: {},
