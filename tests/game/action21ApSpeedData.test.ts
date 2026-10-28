@@ -59,8 +59,14 @@ it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間�
     displayTime,
   });
   const applied = applyEffect(state, effect);
-  expect(applied.apTimeEffects[0]?.value).toBeCloseTo(0.7, 5);
-  expect(applied.apTimeEffects[0]?.remainingSections).toBe(displayTime);
+  expect(applied.apIncreaseSpeedEffects[0]?.calculation).toEqual({
+    kind: 'multiply',
+    factor: Math.fround(0.7),
+  });
+  expect(applied.apIncreaseSpeedEffects[0]?.duration).toEqual({
+    kind: 'sections',
+    remainingChanges: displayTime,
+  });
 });
 
 it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続する', () => {
@@ -157,8 +163,8 @@ it('ActionType21のHandPermanent詳細レコードを起動し、手札離脱時
   const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('ActionType21の発動元カードがありません。');
   const activated = activateHandPermanentEffects(state, compiled);
-  expect(activated.apTimeEffects).toHaveLength(1);
-  expect(activated.apTimeEffects[0]?.remainingSeconds).toBeNull();
+  expect(activated.apIncreaseSpeedEffects).toHaveLength(1);
+  expect(activated.apIncreaseSpeedEffects[0]?.duration).toEqual({ kind: 'full-end' });
   const disposed = disposeHandEffects(activated, [compiled.cardInstanceId]);
-  expect(disposed.apTimeEffects).toHaveLength(0);
+  expect(disposed.apIncreaseSpeedEffects).toHaveLength(0);
 });

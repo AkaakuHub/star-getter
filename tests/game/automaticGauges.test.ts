@@ -45,7 +45,7 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
       moodOffset: -100,
       handEffectCardIds: ['horizon'],
       mentalProtected: true,
-      apTimeEffects: [],
+      apIncreaseSpeedEffects: [],
       track: {
         ...baseState2.track,
         stage: { ...baseState2.track.stage, apIncreaseIntervalSeconds: 1.2 },

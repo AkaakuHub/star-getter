@@ -35,7 +35,7 @@ it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、
   expect(applied.ap.timerSeconds).toBeCloseTo(initial.ap.timerSeconds * 0.7, 5);
 
   const ended = act(applied, { type: 'deactivate-ap-speed', deactivationKey: 'unused' });
-  expect(ended.apTimeEffects).toHaveLength(1);
+  expect(ended.apIncreaseSpeedEffects).toHaveLength(1);
   const keyed = applyEffect(
     initial,
     { ...speedEffect, deactivationKey: 'action21' },
@@ -95,7 +95,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
   };
   const protectedState = { ...initial, proxySkills: [absorption] };
   const absorbed = applyEffect(protectedState, speedEffect, source);
-  expect(absorbed.apTimeEffects).toHaveLength(0);
+  expect(absorbed.apIncreaseSpeedEffects).toHaveLength(0);
   expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(31n);
 });
 
@@ -121,7 +121,7 @@ it('Action21の吸収到達で即時誘発し、AP速度を変更しない', () 
   );
   const next = applyEffect(active, speedEffect, source);
   expect(next.proxySkills).toEqual([]);
-  expect(next.apTimeEffects).toEqual(initial.apTimeEffects);
+  expect(next.apIncreaseSpeedEffects).toEqual(initial.apIncreaseSpeedEffects);
   expect(next.ap.currentAp).toBe(initial.ap.currentAp + 2);
 });
 
@@ -149,7 +149,10 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
   );
   const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 2500n }, source);
   expect(changed.action52Buffs).toHaveLength(0);
-  expect(changed.apTimeEffects.at(-1)?.value).toBe(2500);
+  expect(changed.apIncreaseSpeedEffects.at(-1)?.calculation).toEqual({
+    kind: 'add',
+    milliseconds: 2500,
+  });
 });
 
 it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消費する', () => {
@@ -176,7 +179,7 @@ it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消�
   );
   const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 0n }, source);
   expect(changed.action52Buffs).toHaveLength(0);
-  expect(changed.apTimeEffects).toHaveLength(0);
+  expect(changed.apIncreaseSpeedEffects).toHaveLength(0);
 });
 
 it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持する', () => {
@@ -203,7 +206,10 @@ it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持す
     ],
   };
   const changed = applyEffect(initial, speedEffect, source);
-  expect(changed.apTimeEffects.at(-1)?.value).toBe(Math.fround(7000 / 10_000));
+  expect(changed.apIncreaseSpeedEffects.at(-1)?.calculation).toEqual({
+    kind: 'multiply',
+    factor: Math.fround(7000 / 10_000),
+  });
 });
 
 it('Action21のパート期限とミリ秒期限を解除する', () => {
@@ -218,7 +224,7 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
   if (!nextSection) throw new Error('次のパートがありません。');
   const sectionTime = (nextSection.startBeat * 60) / initial.track.bpm;
   const expiredSection = advanceTo(sectionEffect, sectionTime);
-  expect(expiredSection.apTimeEffects).toHaveLength(0);
+  expect(expiredSection.apIncreaseSpeedEffects).toHaveLength(0);
   expect(apIncreaseIntervalSeconds(expiredSection)).toBeCloseTo(
     apIncreaseIntervalSeconds(initial),
     5,
@@ -233,12 +239,12 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
     deactivationKey: 'persistent',
   });
   const afterSection = advanceTo(persistent, sectionTime);
-  expect(afterSection.apTimeEffects).toHaveLength(1);
+  expect(afterSection.apIncreaseSpeedEffects).toHaveLength(1);
   const deactivated = act(afterSection, {
     type: 'deactivate-ap-speed',
     deactivationKey: 'persistent',
   });
-  expect(deactivated.apTimeEffects).toHaveLength(0);
+  expect(deactivated.apIncreaseSpeedEffects).toHaveLength(0);
 
   const timed = applyEffect(initial, {
     ...speedEffect,
@@ -246,6 +252,6 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
     displayTimeType: 1n,
     displayTime: 250n,
   });
-  expect(timed.apTimeEffects).toHaveLength(1);
-  expect(advanceTo(timed, 0.3).apTimeEffects).toHaveLength(0);
+  expect(timed.apIncreaseSpeedEffects).toHaveLength(1);
+  expect(advanceTo(timed, 0.3).apIncreaseSpeedEffects).toHaveLength(0);
 });
