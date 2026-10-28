@@ -293,10 +293,10 @@ it('同時に登録した引き直しをまとめず全回実行し、後登録�
   state = applyEffect(state, { kind: 'shuffle', recoverDiscard: false, destination: 'discard' });
   state = applyEffect(state, { kind: 'search-unit', unit: 2, count: 4 });
   expect(state.deckActions.shuffles).toHaveLength(2);
-  expect(state.deckActions.searches).toHaveLength(4);
+  expect(state.deckBoard.skillCardSearchParams).toHaveLength(4);
   const flushed = flushDeckActions(state);
   expect(flushed.deckActions.shuffles).toHaveLength(0);
-  expect(flushed.deckActions.searches).toHaveLength(0);
+  expect(flushed.deckBoard.skillCardSearchParams).toHaveLength(0);
   expect(flushed.targetBoosts.length).toBeGreaterThan(state.targetBoosts.length);
 });
 

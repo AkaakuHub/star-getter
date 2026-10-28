@@ -76,7 +76,7 @@ it('sub先行抽選はmainの実手札数でなく保存した目標枚数を使
   expect(hand?.every((id) => result.handCardStats[id]?.isActive === false)).toBe(true);
   expect(result.ap.currentAp).toBe(base.ap.currentAp);
   expect(hand?.map((id) => result.handHeartCollectCounts[id])).toEqual([0, 0, 0, 0, 0]);
-  expect(result.deckActions.searches).toEqual([]);
+  expect(result.deckBoard.skillCardSearchParams).toEqual([]);
   expect(result.usedCard).toBeNull();
 });
 

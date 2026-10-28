@@ -61,7 +61,9 @@ it('tokenと編成の検索を後入れ先出しにして交互の対象へ引�
   const drawn = fillHandToCount(state, 4);
   const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.cardInstanceId === id));
   expect(hand.map((card) => card?.token ?? card?.unitIds[0])).toEqual([1, 'clock', 1, 'clock']);
-  expect(drawn.deckActions.searches).toHaveLength(0);
+  expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.skillCardSearchParams).toHaveLength(0);
 });
 
 it('検索先があるときは検索外の優先カードを先に引かない', () => {
@@ -112,7 +114,9 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   expect(boardCardIds(drawn, liveBoardState.graveyard)).not.toContain(story.cardInstanceId);
   expect(drawn.hand[1]).toBe('camera');
   expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[2])?.token).toBe('clock');
-  expect(drawn.deckActions.searches).toHaveLength(0);
+  expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.skillCardSearchParams).toHaveLength(0);
 });
 
 it('検索条件に一致するカードがない階層は消費し、次の階層の検索を使う', () => {
@@ -132,7 +136,9 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
   });
   const drawn = fillHandToCount(state, 1);
   expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
-  expect(drawn.deckActions.searches).toHaveLength(0);
+  expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
+  expect(drawn.deckBoard.skillCardSearchParams).toHaveLength(0);
 });
 
 it('スキル検索はアイコンではなくカードのMainEffectを照合する', () => {
@@ -173,7 +179,7 @@ it('解除キーが一致する未消費の検索指定を除去する', () => {
     deactivationKey: 'search-key',
   });
   state = act(state, { type: 'deactivate-search', deactivationKey: 'search-key' });
-  expect(state.deckActions.searches).toEqual([]);
+  expect(state.deckBoard.gradeCardSearchParams).toEqual([]);
 });
 
 it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {
