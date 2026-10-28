@@ -133,7 +133,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   const initialGauge = driver.state.genesis.currentGauge;
   const ordinary = [
     driver.state.currentAp,
-    driver.state.currentMental,
+    driver.state.mental.currentMental,
     driver.state.currentVoltage,
   ];
   const earlyBefore = driver.state.score;
@@ -151,9 +151,11 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
     }),
   );
   expect(driver.peakGauge).toBeGreaterThan(initialGauge);
-  expect([driver.state.currentAp, driver.state.currentMental, driver.state.currentVoltage]).toEqual(
-    ordinary,
-  );
+  expect([
+    driver.state.currentAp,
+    driver.state.mental.currentMental,
+    driver.state.currentVoltage,
+  ]).toEqual(ordinary);
   expect(driver.state.cardUseCounts['shadow-1']).toBeGreaterThanOrEqual(14);
   const measurementTick = driver.state.tick;
   const before = driver.state.score;

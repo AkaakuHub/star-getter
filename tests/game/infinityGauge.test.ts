@@ -73,17 +73,20 @@ describe('無限ゲージ', () => {
   });
 
   it('元気無限の開始と最終解除で元気タイマーを0へ戻す', () => {
-    const initial = { ...game(), currentMental: 42, mentalTimerSeconds: 0.4 };
+    const initial = {
+      ...game(),
+      mental: { ...game().mental, currentMental: 42, timerSeconds: 0.4 },
+    };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'mental',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(active.currentMental).toBe(100);
-    expect(active.mentalTimerSeconds).toBe(0);
-    const ended = advanceTo({ ...active, mentalTimerSeconds: 0.4 }, 0.5);
-    expect(ended.currentMental).toBe(100);
-    expect(ended.mentalTimerSeconds).toBe(0);
+    expect(active.mental.currentMental).toBe(100);
+    expect(active.mental.timerSeconds).toBe(0);
+    const ended = advanceTo({ ...active, mental: { ...active.mental, timerSeconds: 0.4 } }, 0.5);
+    expect(ended.mental.currentMental).toBe(100);
+    expect(ended.mental.timerSeconds).toBe(0);
   });
 
   it('元気上限の拡張値を元気無限開始時の誘発ハート計算へ渡す', () => {
@@ -240,7 +243,10 @@ describe('無限ゲージ', () => {
   });
 
   it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {
-    const base = { ...game('genesis'), currentMental: 42, mentalTimerSeconds: 0.4 };
+    const base = {
+      ...game('genesis'),
+      mental: { ...game('genesis').mental, currentMental: 42, timerSeconds: 0.4 },
+    };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -261,14 +267,17 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'mental-infinity',
     });
-    expect(ended.currentMental).toBe(42);
-    expect(ended.mentalTimerSeconds).toBe(0);
+    expect(ended.mental.currentMental).toBe(42);
+    expect(ended.mental.timerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
-    expect(finishGenesis(ended).currentMental).toBe(42);
+    expect(finishGenesis(ended).mental.currentMental).toBe(42);
   });
 
   it('開花中の元気無限期限切れでも元気回復誘発を起こさない', () => {
-    const base = { ...game('genesis'), currentMental: 42, mentalTimerSeconds: 0.4 };
+    const base = {
+      ...game('genesis'),
+      mental: { ...game('genesis').mental, currentMental: 42, timerSeconds: 0.4 },
+    };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -285,8 +294,8 @@ describe('無限ゲージ', () => {
     });
     const ended = expireGaugeInfinities(active, 'milliseconds', 0.5);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.currentMental).toBe(42);
-    expect(ended.mentalTimerSeconds).toBe(0);
+    expect(ended.mental.currentMental).toBe(42);
+    expect(ended.mental.timerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
   });
 
@@ -321,7 +330,7 @@ describe('無限ゲージ', () => {
       finished.hearts.stageHearts.length +
       finished.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);
     expect(finished.currentVoltage).toBe(voltageThreshold(finished.maximumVoltageLevel));
-    expect(finished.currentMental).toBe(150);
+    expect(finished.mental.currentMental).toBe(150);
     expect(generated).toBe(150);
   });
 });

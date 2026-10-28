@@ -7,7 +7,7 @@ it('開始時は901を実行せず、903/904だけ手札へ登録する', () => 
   for (const route of ['library', 'genesis'] as const) {
     const state = game(route);
     expect(heartCount(state)).toBe(0);
-    expect(state.currentMental).toBe(100);
+    expect(state.mental.currentMental).toBe(100);
     expect(state.apTimeEffects).toHaveLength(0);
     expect(state.costReductions).toEqual({});
     expect([...state.handEffectCardIds].sort()).toEqual([...state.hand].sort());

@@ -84,7 +84,7 @@ describe('元気バリア', () => {
       duration: { kind: 'stage' },
     });
     const damaged = changeResource(active, 'mental', -3n);
-    expect(damaged.currentMental).toBe(99);
+    expect(damaged.mental.currentMental).toBe(99);
     expect(damaged.mentalBarriers[0]?.currentEndurance).toBe(2);
   });
 
@@ -110,8 +110,8 @@ describe('元気バリア', () => {
       attenuation: 1,
       duration: { kind: 'stage' },
     });
-    expect(changeResource(active, 'mental', -5n).currentMental).toBe(100);
-    expect(advanceAutomaticGauges(active, 1.2).currentMental).toBe(100);
+    expect(changeResource(active, 'mental', -5n).mental.currentMental).toBe(100);
+    expect(advanceAutomaticGauges(active, 1.2).mental.currentMental).toBe(100);
   });
 
   it('自然減少は有限耐久を1ずつ使い切った後に元気へ通す', () => {
@@ -127,13 +127,13 @@ describe('元気バリア', () => {
       active,
       active.track.stage.mentalDecreaseIntervalSeconds * 2 + 0.1,
     );
-    expect(after.currentMental).toBe(99);
+    expect(after.mental.currentMental).toBe(99);
     expect(after.mentalBarriers[0]?.currentEndurance).toBe(1);
   });
 
   it('減衰型はスキル減少量を減らし、自然減少間隔と途中時間を倍率で伸ばす', () => {
     const active = applyEffect(
-      { ...game(), mentalTimerSeconds: 0.3 },
+      { ...game(), mental: { ...game().mental, timerSeconds: 0.3 } },
       {
         kind: 'mental-barrier',
         barrier: 'attenuation',
@@ -143,13 +143,13 @@ describe('元気バリア', () => {
         duration: { kind: 'stage' },
       },
     );
-    expect(active.mentalTimerSeconds).toBeCloseTo(
+    expect(active.mental.timerSeconds).toBeCloseTo(
       (mentalDecreaseInterval(active, active.track.stage.mentalDecreaseIntervalSeconds) /
         active.track.stage.mentalDecreaseIntervalSeconds) *
         0.3,
       5,
     );
-    expect(changeResource(active, 'mental', -3n).currentMental).toBe(99);
+    expect(changeResource(active, 'mental', -3n).mental.currentMental).toBe(99);
   });
 
   it('パート期限でバリアを解除する', () => {

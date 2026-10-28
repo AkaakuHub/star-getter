@@ -56,9 +56,9 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
       },
     },
     cardUseCounts: { [source.id]: 2, [other.id]: 2 },
-    currentMental: 50,
     moodOffset: 12,
     boosts: [{ percent: 20, untilTick: 999999 }],
+    mental: { ...initial.mental, currentMental: 50 },
   };
   const expected = [10, 20, 0, 5, 0, 20, 20, 10, 200, 10, 10, 120, 20, 10, 10];
   for (let index = 0; index < expected.length; index++) {
@@ -116,7 +116,11 @@ it('セクション期限のスキルコスト変化を期限後に除去する'
 });
 
 it('Action17の条件4は最大元気に対する整数元気割合を使う', () => {
-  const initial = { ...game(), maximumMental: 200, currentMental: 100 };
+  const initial = {
+    ...game(),
+    maximumMental: 200,
+    mental: { ...game().mental, currentMental: 100 },
+  };
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const changed = applyEffect(

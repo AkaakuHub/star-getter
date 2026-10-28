@@ -7,7 +7,7 @@ import { game } from './support/game';
 describe('ゲージの継続回復', () => {
   it('最大元気に対する割合を各回の元気回復量へ変換する', () => {
     const active = applyEffect(
-      { ...game(), currentMental: 40, maximumMental: 100 },
+      { ...game(), maximumMental: 100, mental: { ...game().mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
@@ -19,8 +19,8 @@ describe('ゲージの継続回復', () => {
         duration: { kind: 'milliseconds', value: 600 },
       },
     );
-    expect(active.currentMental).toBe(45);
-    expect(advanceTo(active, 0.21).currentMental).toBe(50);
+    expect(active.mental.currentMental).toBe(45);
+    expect(advanceTo(active, 0.21).mental.currentMental).toBe(50);
   });
 
   it('Action11は汎用スキル増幅と切り上げを使わず周期ごとに熱気を加算する', () => {
@@ -42,7 +42,7 @@ describe('ゲージの継続回復', () => {
   });
 
   it('元気は発動時に回復し、周期回復後に期限切れとなる', () => {
-    const initial = { ...game(), currentMental: 40 };
+    const initial = { ...game(), mental: { ...game().mental, currentMental: 40 } };
     const active = applyEffect(initial, {
       kind: 'gauge-regeneration',
       gauge: 'mental',
@@ -53,9 +53,9 @@ describe('ゲージの継続回復', () => {
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 600 },
     });
-    expect(active.currentMental).toBe(50);
+    expect(active.mental.currentMental).toBe(50);
     const afterDuration = advanceTo(active, 0.61);
-    expect(afterDuration.currentMental).toBe(80);
+    expect(afterDuration.mental.currentMental).toBe(80);
     expect(afterDuration.gaugeRegenerations).toHaveLength(0);
   });
 
@@ -78,12 +78,12 @@ describe('ゲージの継続回復', () => {
   it('継続回復は一回限りの熱気・元気追加バフを消費しない', () => {
     const initial = {
       ...game(),
-      currentMental: 40,
       currentVoltage: 40,
       resourceBoosts: [
         { target: 'mental' as const, percent: 100, uses: 1 },
         { target: 'voltage' as const, percent: 100, uses: 1 },
       ],
+      mental: { ...game().mental, currentMental: 40 },
     };
     const mental = applyEffect(initial, {
       kind: 'gauge-regeneration',
@@ -105,14 +105,14 @@ describe('ゲージの継続回復', () => {
       intervalMilliseconds: 200,
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(voltage.currentMental).toBe(50);
+    expect(voltage.mental.currentMental).toBe(50);
     expect(voltage.currentVoltage).toBe(50);
     expect(voltage.resourceBoosts).toHaveLength(2);
   });
 
   it('ハート間隔指定は回復を繰り返さず、表示期限のハートイベントで終了する', () => {
     const active = applyEffect(
-      { ...game(), currentMental: 40 },
+      { ...game(), mental: { ...game().mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
@@ -125,7 +125,7 @@ describe('ゲージの継続回復', () => {
       },
     );
     const afterFirstHeart = advanceTo(active, (2 * 60) / active.track.bpm + 1 / 60);
-    expect(afterFirstHeart.currentMental).toBe(50);
+    expect(afterFirstHeart.mental.currentMental).toBe(50);
     expect(afterFirstHeart.gaugeRegenerations).toHaveLength(1);
   });
 
@@ -147,7 +147,7 @@ describe('ゲージの継続回復', () => {
 
   it('外部解除とInvocationTypeによる自動期限抑止を処理する', () => {
     const active = applyEffect(
-      { ...game(), currentMental: 40 },
+      { ...game(), mental: { ...game().mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
@@ -171,7 +171,7 @@ describe('ゲージの継続回復', () => {
 
   it('計算種別1以外は追加バフ適用後も元気を回復しない', () => {
     const inactive = applyEffect(
-      { ...game(), currentMental: 40 },
+      { ...game(), mental: { ...game().mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
@@ -183,7 +183,7 @@ describe('ゲージの継続回復', () => {
         duration: { kind: 'milliseconds', value: 500 },
       },
     );
-    expect(inactive.currentMental).toBe(40);
+    expect(inactive.mental.currentMental).toBe(40);
     expect(inactive.gaugeRegenerations).toHaveLength(1);
   });
 

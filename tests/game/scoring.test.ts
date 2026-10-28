@@ -32,9 +32,8 @@ describe('きらめきと得点', () => {
   it('時間切れの回収は基礎得点の20%になる', () => {
     const state = {
       ...addHearts(game(), 1),
-      mentalDown: true,
-      currentMental: 0,
       currentVoltage: 100,
+      mental: { ...addHearts(game(), 1).mental, mentalDown: true, currentMental: 0 },
     };
     const normal = act(state, { type: 'collect' });
     let expired = state;

@@ -205,7 +205,7 @@ it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する'
 });
 
 it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactivatorを処理する', () => {
-  const initial = { ...unboostedGame(), currentMental: 50 };
+  const initial = { ...unboostedGame(), mental: { ...unboostedGame().mental, currentMental: 50 } };
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const recover = applyEffect(
@@ -214,10 +214,10 @@ it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactiv
     source,
   );
   const recovered = changeResource(recover, 'voltage', 5n, 'skill', source);
-  expect(recovered.currentMental).toBe(55);
+  expect(recovered.mental.currentMental).toBe(55);
 
   const barrier = applyEffect(
-    { ...initial, currentMental: 50 },
+    { ...initial, mental: { ...initial.mental, currentMental: 50 } },
     {
       ...conversion,
       destination: 'mental-barrier',

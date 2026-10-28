@@ -17,7 +17,7 @@ it('自然減少はシールドの耐久値と適用回数を消費しない', (
     applyCount: 1n,
   });
   const decreased = decreaseMentalNaturally(state);
-  expect(decreased.currentMental).toBe(state.currentMental - 1);
+  expect(decreased.mental.currentMental).toBe(state.mental.currentMental - 1);
   expect(decreased.mentalShields).toEqual(state.mentalShields);
 });
 
@@ -65,7 +65,7 @@ it('耐久を登録順に消費し、適用回数を使い切るとシールド�
     applyCount: 1n,
   });
   const blocked = changeResource(state, 'mental', -4n, 'skill');
-  expect(blocked.currentMental).toBe(100);
+  expect(blocked.mental.currentMental).toBe(100);
   expect(blocked.mentalShields).toHaveLength(0);
 });
 
@@ -85,7 +85,7 @@ it('先に登録したシールドから消費し、残りのダメージを次�
     applyCount: 0n,
   });
   const damaged = changeResource(second, 'mental', -4n, 'skill');
-  expect(damaged.currentMental).toBe(100);
+  expect(damaged.mental.currentMental).toBe(100);
   expect(damaged.mentalShields).toHaveLength(1);
   expect(damaged.mentalShields[0]?.durability).toBe(1);
 });
@@ -99,7 +99,7 @@ it('無限耐久はダメージを全て防ぎ、ミリ秒・次パート期限�
     applyCount: 0n,
   });
   const blocked = changeResource(infinite, 'mental', -30n, 'skill');
-  expect(blocked.currentMental).toBe(100);
+  expect(blocked.mental.currentMental).toBe(100);
   expect(advanceMentalShields(blocked, 0.1).mentalShields).toHaveLength(0);
 
   const sectionShield = applyEffect(game(), {
@@ -122,7 +122,7 @@ it('ActionType56の耐久値を参照実装のint32へ変換する', () => {
     applyCount: 0n,
   });
   expect(shielded.mentalShields[0]?.durability).toBe(-2_147_483_648);
-  expect(changeResource(shielded, 'mental', -10n, 'skill').currentMental).toBe(90);
+  expect(changeResource(shielded, 'mental', -10n, 'skill').mental.currentMental).toBe(90);
 });
 
 it('ActionType56は2^53超のlong詳細値を正確にint32化する', () => {

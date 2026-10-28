@@ -224,8 +224,8 @@ it('シールドはスキル由来の元気減少を防ぎ、自然減少では�
     ...game(),
     hand: [],
     handEffectCardIds: [],
-    currentMental: 100,
     targetBoosts: [],
+    mental: { ...game().mental, currentMental: 100 },
   };
   const shield = applyEffect(initial, {
     kind: 'mental-shield',
@@ -235,14 +235,17 @@ it('シールドはスキル由来の元気減少を防ぎ、自然減少では�
     applyCount: 0n,
   });
   const damaged = applyEffect(shield, { kind: 'mental', amount: -14 });
-  expect(damaged.currentMental).toBe(96);
+  expect(damaged.mental.currentMental).toBe(96);
   expect(damaged.mentalShields).toHaveLength(0);
-  const natural = advanceAutomaticGauges({ ...shield, mentalTimerSeconds: 0 }, 1.2);
-  expect(natural.currentMental).toBe(99);
+  const natural = advanceAutomaticGauges(
+    { ...shield, mental: { ...shield.mental, timerSeconds: 0 } },
+    1.2,
+  );
+  expect(natural.mental.currentMental).toBe(99);
   expect(natural.mentalShields[0]?.durability).toBe(10);
   const active = activateGenesis({ ...shield, moodOffset: -150 }, 1);
   const converted = applyEffect(active, { kind: 'mental', amount: -14 });
-  expect(converted.currentMental).toBe(100);
+  expect(converted.mental.currentMental).toBe(100);
   expect(converted.mentalShields).toHaveLength(0);
   expect(converted.genesis.currentGauge).toBe(active.genesis.currentGauge - 4);
 });
@@ -276,7 +279,6 @@ for (const [points, expected] of [
         ...initial,
         deck,
         mentalProtected: true,
-        currentMental: 0,
         currentVoltage: points,
         maximumVoltageLevel: 1500,
         hearts: {
@@ -285,6 +287,7 @@ for (const [points, expected] of [
           stageHearts: [],
           hiddenHeartBatches: [],
         },
+        mental: { ...initial.mental, currentMental: 0 },
       },
       ['frost-echo'],
     );

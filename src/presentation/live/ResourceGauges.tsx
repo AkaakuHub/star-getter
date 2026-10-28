@@ -37,13 +37,13 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         aria-label="元気"
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={Math.floor(state.currentMental)}
+        aria-valuenow={Math.floor(state.mental.currentMental)}
       >
         <BatteryMedium size={15} aria-hidden="true" />
         <div className="vertical-meter">
-          <i style={{ height: state.currentMental + '%' }} />
+          <i style={{ height: state.mental.currentMental + '%' }} />
         </div>
-        <strong>{Math.floor(state.currentMental)}</strong>
+        <strong>{Math.floor(state.mental.currentMental)}</strong>
         <span>元気</span>
       </div>
       <div

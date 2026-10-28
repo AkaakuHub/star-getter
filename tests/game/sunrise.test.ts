@@ -13,10 +13,10 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
     {
       ...initial,
       moodOffset: -100,
-      currentMental: 80,
       amplification: 100,
       targetBoosts: [],
       genesis: { ...activateGenesis(initial, 3.5).genesis, currentGauge: 1 },
+      mental: { ...initial.mental, currentMental: 80 },
     },
     ['sunrise'],
   );

@@ -19,7 +19,12 @@ it('空模様0でも20APを支払って開花し、支払後のAPを保持する
 
 it('開花中の追加SPは通常APを固定したまま専用値で支払う', () => {
   const state = activateGenesis(
-    { ...game(), currentAp: 0, currentMental: 80, currentVoltage: 655_000_001 },
+    {
+      ...game(),
+      currentAp: 0,
+      currentVoltage: 655_000_001,
+      mental: { ...game().mental, currentMental: 80 },
+    },
     3.5,
   );
   expect(state.genesis.currentGauge).toBe(5020);

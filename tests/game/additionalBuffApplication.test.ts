@@ -19,8 +19,12 @@ describe('追加バフ適用条件', () => {
   });
 
   it('元気・熱気の小数加算を参照実装の整数キャストと同じく0方向へ切り捨てる', () => {
-    const initial = { ...game(), currentMental: 50, currentVoltage: 50 };
-    expect(applyEffect(initial, { kind: 'mental', amount: -1.8 }).currentMental).toBe(49);
+    const initial = {
+      ...game(),
+      currentVoltage: 50,
+      mental: { ...game().mental, currentMental: 50 },
+    };
+    expect(applyEffect(initial, { kind: 'mental', amount: -1.8 }).mental.currentMental).toBe(49);
     expect(applyEffect(initial, { kind: 'voltage', amount: 1.8 }).currentVoltage).toBe(51);
   });
 });

@@ -50,7 +50,7 @@ export function Stage({
           {state.lastCardName}
         </div>
       )}
-      {state.mentalDown && (
+      {state.mental.mentalDown && (
         <div className="rest-notice" role="status">
           休憩中
         </div>

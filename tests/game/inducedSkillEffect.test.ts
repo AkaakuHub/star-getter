@@ -29,7 +29,12 @@ it('ActionType41は対象ActionTypeだけ親引数とデッキ補正込みのEff
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
-    { ...initial, deck: initial.deck.slice(0, 2), currentMental: 40, deckOutCount: 1 },
+    {
+      ...initial,
+      deck: initial.deck.slice(0, 2),
+      deckOutCount: 1,
+      mental: { ...initial.mental, currentMental: 40 },
+    },
     effect,
     source,
     2,
@@ -82,7 +87,11 @@ it('ActionType41はバリア登録が成立したときに耐久値を通知す�
 });
 
 it('ActionType7の耐久無限バリアは最大元気値をActionType41へ通知する', () => {
-  const initial = { ...game(), maximumMental: 200, currentMental: 200 };
+  const initial = {
+    ...game(),
+    maximumMental: 200,
+    mental: { ...game().mental, currentMental: 200 },
+  };
   const active = applyEffect(initial, {
     ...effect,
     condition: 'mental-barrier',
@@ -138,7 +147,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
-    { ...initial, currentMental: 50, deckOutCount: 1 },
+    { ...initial, deckOutCount: 1, mental: { ...initial.mental, currentMental: 50 } },
     { ...effect, effects: [{ actionType: 5, effect: { kind: 'mood', amount: 3 } }] },
     source,
   );
@@ -159,7 +168,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
     source,
   );
   const next = changeResource(proxied, 'mental', 5n, 'skill', source, applyEffect);
-  expect(next.currentMental).toBe(50);
+  expect(next.mental.currentMental).toBe(50);
   expect(next.moodOffset).toBe(0);
   expect(next.deckOutCount).toBe(1);
   expect(next.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);

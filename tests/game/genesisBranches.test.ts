@@ -12,10 +12,10 @@ function rainState(): GameState {
       ...game(),
       moodOffset: -100,
       currentVoltage: 0,
-      currentMental: 80,
       amplification: 100,
       targetBoosts: [],
       resourceBoosts: [],
+      mental: { ...game().mental, currentMental: 80 },
     },
     ['frost-echo'],
   );
@@ -31,7 +31,7 @@ it('開花中は通常値を保持したまま全段階を高い枝から順に�
   const state = activateGenesis(rainState(), 1);
   const next = applyRainSkill(state);
   expect(next.currentVoltage).toBe(0);
-  expect(next.currentMental).toBe(80);
+  expect(next.mental.currentMental).toBe(80);
   expect(next.hearts.heartLimit).toBe(58100);
   expect(next.boosts.map((boost) => boost.percent)).toEqual([
     225000, 135000, 90000, 45000, 22500, 4500,
@@ -59,7 +59,7 @@ it('開花中の50万回収は通常の元気と熱気が未達でも枝と検�
   const next = collectHearts(state);
   expect(next.stats.heartsCollected).toBe(500_000);
   expect(next.currentVoltage).toBe(0);
-  expect(next.currentMental).toBe(80);
+  expect(next.mental.currentMental).toBe(80);
   expect(next.genesis.currentGauge).toBeLessThan(1_000_000);
   expect(next.hand).not.toEqual(state.hand);
 });

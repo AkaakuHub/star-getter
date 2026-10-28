@@ -165,7 +165,7 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
         tick: state.tick + cardCooldownTicks(state),
         currentAp: 20,
         maxAp: 20,
-        mentalDown: false,
+        mental: { ...state.mental, mentalDown: false },
       },
       [source.id],
     );
@@ -174,9 +174,9 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
     expect(state.deck.some((item) => item.id === source.id)).toBe(count < 14);
   }
   expect(state.mentalProtected).toBe(true);
-  expect(state.currentMental).toBe(0);
+  expect(state.mental.currentMental).toBe(0);
   expect(state.currentVoltage).toBe(655_000_000);
-  expect(advanceTo(state, 3).mentalDown).toBe(false);
+  expect(advanceTo(state, 3).mental.mentalDown).toBe(false);
 });
 
 it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を判定してから除外する', () => {

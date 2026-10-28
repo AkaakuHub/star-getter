@@ -13,7 +13,7 @@ it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化�
   const later = advanceTo(initial, 1.2);
   expect(later.currentAp).toBe(0);
   expect(advanceTo(later, 1.2 + 1 / 60).currentAp).toBe(1);
-  expect(later.currentMental).toBe(99);
+  expect(later.mental.currentMental).toBe(99);
   expect(later.currentVoltage).toBe(2);
 });
 
@@ -54,14 +54,14 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
       currentAp: base.maxAp,
       apTimerSeconds: 0,
       voltageTimerSeconds: 0,
-      mentalTimerSeconds: 0,
+      mental: { ...base.mental, timerSeconds: 0 },
     },
     1,
   );
   const protectedState = { ...initial, mentalProtected: true };
   const normal = advanceAutomaticGauges(initial, 1.2),
     protectedAfter = advanceAutomaticGauges(protectedState, 1.2);
-  expect(normal.currentMental).toBe(initial.currentMental);
+  expect(normal.mental.currentMental).toBe(initial.mental.currentMental);
   expect(normal.currentVoltage).toBe(initial.currentVoltage);
   expect(normal.genesis.currentGauge).toBe(initial.genesis.currentGauge);
   expect(protectedAfter.genesis.currentGauge).toBe(initial.genesis.currentGauge + 2);
@@ -72,17 +72,22 @@ it('開花とActionType34の併用中は元気タイマーも進めない', () =
     kind: 'disable-mental-down',
     duration: { kind: 'stage', value: 0n },
   });
-  expect(advanceAutomaticGauges(initial, 1.2).mentalTimerSeconds).toBe(initial.mentalTimerSeconds);
+  expect(advanceAutomaticGauges(initial, 1.2).mental.timerSeconds).toBe(
+    initial.mental.timerSeconds,
+  );
 });
 
 it('休憩開始と回復完了で元気タイマーを0へ戻す', () => {
-  const initial = { ...game('library'), currentMental: 1, mentalTimerSeconds: 0.75 };
+  const initial = {
+    ...game('library'),
+    mental: { ...game('library').mental, currentMental: 1, timerSeconds: 0.75 },
+  };
   const down = advanceAutomaticGauges(initial, 5);
-  expect(down.mentalDown).toBe(true);
-  expect(down.mentalTimerSeconds).toBe(0);
+  expect(down.mental.mentalDown).toBe(true);
+  expect(down.mental.timerSeconds).toBe(0);
   const recovered = advanceAutomaticGauges(down, 5);
-  expect(recovered.mentalDown).toBe(false);
-  expect(recovered.mentalTimerSeconds).toBe(0);
+  expect(recovered.mental.mentalDown).toBe(false);
+  expect(recovered.mental.timerSeconds).toBe(0);
 });
 
 it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタイマーも停止する', () => {

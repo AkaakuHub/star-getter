@@ -195,7 +195,7 @@ export class GameDriver {
       .filter(
         (index) =>
           this.state.phase === 'playing' &&
-          !this.state.mentalDown &&
+          !this.state.mental.mentalDown &&
           (this.state.genesis.effects.length > 0 ||
             this.state.currentAp >= cardCost(this.state, cardAt(this.state, index))),
       );
@@ -341,7 +341,7 @@ export class GameDriver {
         ),
         deck: this.state.deck.length,
         currentAp: this.state.currentAp,
-        mental: this.state.currentMental,
+        mental: this.state.mental.currentMental,
         ordinaryVoltage: this.state.currentVoltage,
         mood: moodValue(this.state),
         scoreMultiplier: this.state.scoreMultiplier.toString(),

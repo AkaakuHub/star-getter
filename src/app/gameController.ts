@@ -81,7 +81,7 @@ export class GameController {
       ableUseSkill:
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
-      mentalDown: this.currentState.mentalDown,
+      mentalDown: this.currentState.mental.mentalDown,
       allSkillsCostOver: this.currentState.hand.every(
         (_, index) =>
           this.currentState.genesis.effects.length === 0 &&

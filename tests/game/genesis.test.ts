@@ -20,7 +20,7 @@ function active() {
       moodOffset: -100,
       currentAp: 0,
       currentVoltage: 40,
-      currentMental: 80,
+      mental: { ...advanceTo(game(), 12).mental, currentMental: 80 },
     },
     1,
   );
@@ -101,9 +101,11 @@ describe('開花の専用ゲージ', () => {
     expect(changed.genesis.currentGauge).toBe(74);
     changed = changeGenesisResource(changed, 'ap', -4n);
     expect(changed.genesis.currentGauge).toBe(59);
-    expect([changed.currentAp, changed.currentMental, changed.currentVoltage]).toEqual([0, 80, 40]);
+    expect([changed.currentAp, changed.mental.currentMental, changed.currentVoltage]).toEqual([
+      0, 80, 40,
+    ]);
     expect(finishGenesis(changed).genesis.effects).toHaveLength(0);
-    expect(finishGenesis(changed).currentMental).toBe(80);
+    expect(finishGenesis(changed).mental.currentMental).toBe(80);
   });
 
   it('開花終了時に参照実装のMental値変更通知をActionType23へ伝える', () => {
@@ -111,7 +113,7 @@ describe('開花の専用ゲージ', () => {
     const source = initial.deck[0];
     if (!source) throw new Error('ActionType23の発動元カードがありません。');
     const mentalHeartInducing = applyEffect(
-      activateGenesis({ ...initial, currentMental: 80 }, 1),
+      activateGenesis({ ...initial, mental: { ...initial.mental, currentMental: 80 } }, 1),
       {
         kind: 'mental-heart-induce',
         num: 10_000n,

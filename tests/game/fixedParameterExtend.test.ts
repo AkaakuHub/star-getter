@@ -120,8 +120,11 @@ it('元気上限を伸ばして回復し、比率シールドに拡張後の上�
     source,
   );
   expect(extended.maximumMental).toBe(150);
-  expect(changeResource(extended, 'mental', 100n).currentMental).toBe(150);
-  expect(conditionContext({ ...extended, currentMental: 150 }).staminaPercent).toBe(100);
+  expect(changeResource(extended, 'mental', 100n).mental.currentMental).toBe(150);
+  expect(
+    conditionContext({ ...extended, mental: { ...extended.mental, currentMental: 150 } })
+      .staminaPercent,
+  ).toBe(100);
   const shield = applyEffect(
     extended,
     {

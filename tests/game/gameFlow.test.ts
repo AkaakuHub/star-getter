@@ -23,7 +23,7 @@ describe('ライブの進行', () => {
     for (let frame = 1; frame <= 600; frame++) frequent = advanceTo(frequent, frame / 60);
     expect(frequent).toEqual(advanceTo(initial, 10));
     expect(heartCount(frequent)).toBeGreaterThan(0);
-    expect(frequent.currentMental).toBeLessThan(100);
+    expect(frequent.mental.currentMental).toBeLessThan(100);
   });
 
   it('開始前と一時停止中は時刻も資源も進めない', () => {
@@ -44,13 +44,16 @@ describe('ライブの進行', () => {
   });
 
   it('スタミナが尽きると休憩し、回復してからカードを使用できる', () => {
-    const mentalDown = advanceTo({ ...game(), currentMental: 0, currentAp: 5 }, 1);
-    expect(mentalDown.mentalDown).toBe(true);
+    const mentalDown = advanceTo(
+      { ...game(), currentAp: 5, mental: { ...game().mental, currentMental: 0 } },
+      1,
+    );
+    expect(mentalDown.mental.mentalDown).toBe(true);
     expect(heartCount(mentalDown)).toBeLessThanOrEqual(heartCount(game()));
     expect(canUseCard(mentalDown, 0)).toBe(false);
     const recovered = advanceTo(mentalDown, 11);
-    expect(recovered.mentalDown).toBe(false);
-    expect(recovered.currentMental).toBeGreaterThan(39);
+    expect(recovered.mental.mentalDown).toBe(false);
+    expect(recovered.mental.currentMental).toBeGreaterThan(39);
     expect(heartCount(recovered)).toBeGreaterThan(0);
   });
 
