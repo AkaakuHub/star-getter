@@ -3,7 +3,7 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
-import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/skillCostChanges';
+import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/handCardStats';
 import { notifyHandSkillUse } from '@akaakuhub/suku-sute-core/game/cards/handInduce';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { game } from './support/game';

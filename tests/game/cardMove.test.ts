@@ -16,7 +16,6 @@ function activateSourceCard() {
       activation: {
         sourceId: card.id,
         usedCards: [card.id],
-        handCardStatsAtUse: {},
         allHand: false,
         recoverDiscard: false,
         returnToDraw: [],

@@ -3,7 +3,7 @@ import { tracks } from '../../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
-import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/skillCostChanges';
+import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/handCardStats';
 
 export function game(route: RouteId = 'genesis', seed = 7, limit = 100): GameState {
   const track = tracks[0];

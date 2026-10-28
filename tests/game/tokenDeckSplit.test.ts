@@ -1,3 +1,4 @@
+import { shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
 import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
 import { expect, it } from 'vite-plus/test';
@@ -213,4 +214,32 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   const returned = act(updated, { type: 'switch-token-deck' });
   expect(returned.tokenDeckSplit?.active).toBe('main');
   assertCounts(returned, drawCount - 1, discardCount + 1);
+});
+
+it('停止中のサブ手札統計はメイン手札の引き直しで消えず、統合時に破棄する', () => {
+  const base = game('genesis');
+  const selected = base.deck[5];
+  if (!selected) throw new Error('対象カードがありません。');
+  const deck = base.deck.map((item) =>
+    item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
+  );
+  const initial = withHand({ ...base, deck, cardPool: deck }, [base.hand[0] ?? '', selected.id]);
+  const split = applyEffect(initial, {
+    kind: 'token-deck-split',
+    seriesIds: [42n],
+    duration: { kind: 'stage', value: 0 },
+    deactivationKey: 'statistics-split',
+  });
+  const stats = split.handCardStats[selected.id];
+  expect(stats).toBeDefined();
+  expect(stats?.isActive).toBe(false);
+  const shuffled = shuffleHand(split, { recoverDiscard: false, destination: 'discard' });
+  expect(shuffled.handCardStats[selected.id]).toBe(stats);
+  const switched = act(shuffled, { type: 'switch-token-deck' });
+  expect(switched.handCardStats[selected.id]?.isActive).toBe(true);
+  const merged = act(switched, {
+    type: 'deactivate-token-deck',
+    deactivationKey: 'statistics-split',
+  });
+  expect(merged.handCardStats[selected.id]).toBeUndefined();
 });

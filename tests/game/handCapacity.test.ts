@@ -226,7 +226,6 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
     activation: {
       sourceId: source.id,
       usedCards: [source.id],
-      handCardStatsAtUse: {},
       allHand: false,
       recoverDiscard: false,
       returnToDraw: [],
@@ -252,7 +251,6 @@ it('手札目標数より多い状態では使用元カードを補充しない'
     activation: {
       sourceId: source.id,
       usedCards: [source.id],
-      handCardStatsAtUse: {},
       allHand: false,
       recoverDiscard: false,
       returnToDraw: [],

@@ -308,7 +308,6 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
     activation: {
       sourceId: source.id,
       usedCards: [source.id, child.id],
-      handCardStatsAtUse: {},
       allHand: true,
       recoverDiscard: false,
       returnToDraw: [child.id],

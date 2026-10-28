@@ -1,3 +1,4 @@
+import { createLiveHandCardStats } from '@akaakuhub/suku-sute-core/runtime/cards/handCardStats';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
@@ -88,18 +89,10 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
   if (!card) throw new Error('検証用カードがありません。');
   const state = {
     ...initial,
+    handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
     activation: {
       sourceId: card.id,
       usedCards: [card.id],
-      handCardStatsAtUse: {
-        [card.id]: {
-          isActive: false,
-          initialSectionIndex: 0,
-          sectionCount: 0,
-          skillUseCountsByMember: {},
-          skillUseCountsByMainEffect: {},
-        },
-      },
       allHand: false,
       recoverDiscard: false,
       returnToDraw: [],
@@ -140,18 +133,10 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
   if (!card) throw new Error('検証用カードがありません。');
   const state = {
     ...initial,
+    handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
     activation: {
       sourceId: card.id,
       usedCards: [card.id],
-      handCardStatsAtUse: {
-        [card.id]: {
-          isActive: false,
-          initialSectionIndex: 0,
-          sectionCount: 0,
-          skillUseCountsByMember: {},
-          skillUseCountsByMainEffect: {},
-        },
-      },
       allHand: false,
       recoverDiscard: false,
       returnToDraw: [],
