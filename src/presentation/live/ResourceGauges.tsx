@@ -25,7 +25,11 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         <div>
           <i
             style={{
-              width: voltageProgress(state.currentVoltage, state.maximumVoltageLevel) + '%',
+              width:
+                Math.max(
+                  0,
+                  Math.min(100, voltageProgress(state.currentVoltage, state.maximumVoltageLevel)),
+                ) + '%',
             }}
           />
         </div>
