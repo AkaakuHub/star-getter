@@ -23,9 +23,9 @@ it('開花中の追加SPは通常APを固定したまま専用値で支払う', 
   const state = activateGenesis(
     {
       ...baseState2,
-      currentVoltage: 655_000_001,
       mental: { ...baseState2.mental, currentMental: 80 },
       ap: { ...baseState2.ap, currentAp: 0 },
+      voltage: { ...baseState2.voltage, currentVoltage: BigInt(655_000_001) },
     },
     3.5,
   );

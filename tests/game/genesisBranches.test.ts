@@ -7,15 +7,16 @@ import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { game, withHand } from './support/game';
 
 function rainState(): GameState {
+  const baseState = game();
   return withHand(
     {
-      ...game(),
+      ...baseState,
       moodOffset: -100,
-      currentVoltage: 0,
       amplification: 100,
       targetBoosts: [],
       resourceBoosts: [],
-      mental: { ...game().mental, currentMental: 80 },
+      mental: { ...baseState.mental, currentMental: 80 },
+      voltage: { ...baseState.voltage, currentVoltage: BigInt(0) },
     },
     ['frost-echo'],
   );
@@ -30,7 +31,7 @@ function applyRainSkill(state: GameState): GameState {
 it('開花中は通常値を保持したまま全段階を高い枝から順に発動する', () => {
   const state = activateGenesis(rainState(), 1);
   const next = applyRainSkill(state);
-  expect(next.currentVoltage).toBe(0);
+  expect(next.voltage.currentVoltage).toBe(0n);
   expect(next.mental.currentMental).toBe(80);
   expect(next.hearts.heartLimit).toBe(58100);
   expect(next.boosts.map((boost) => boost.percent)).toEqual([
@@ -39,7 +40,10 @@ it('開花中は通常値を保持したまま全段階を高い枝から順に�
 });
 
 it('通常時は熱気ゲインの後に次のroot効果の段階を再判定する', () => {
-  const state = { ...rainState(), currentVoltage: voltageThreshold(200) - 1 };
+  const state = {
+    ...rainState(),
+    voltage: { ...rainState().voltage, currentVoltage: BigInt(voltageThreshold(200) - 1n) },
+  };
   const next = applyRainSkill(state);
   expect(next.hearts.heartLimit).toBe(2600);
   expect(next.boosts.map((boost) => boost.percent)).toEqual([22500]);
@@ -58,7 +62,7 @@ it('開花中の50万回収は通常の元気と熱気が未達でも枝と検�
   );
   const next = collectHearts(state);
   expect(next.stats.heartsCollected).toBe(500_000);
-  expect(next.currentVoltage).toBe(0);
+  expect(next.voltage.currentVoltage).toBe(0n);
   expect(next.mental.currentMental).toBe(80);
   expect(next.genesis.currentGauge).toBeLessThan(1_000_000);
   expect(next.hand).not.toEqual(state.hand);

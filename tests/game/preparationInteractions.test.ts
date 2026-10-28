@@ -50,9 +50,9 @@ it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍�
     hand: [],
     handEffectCardIds: [],
     targetBoosts: [],
-    currentVoltage: 655_000_001,
     moodOffset: -150,
     hearts: { ...initial.hearts, heartLimit: 10_000_000, stageHearts: [], hiddenHeartBatches: [] },
+    voltage: { ...initial.voltage, currentVoltage: BigInt(655_000_001) },
   };
   const drawn = applyDrawAbility(state, card);
   expect(heartCount(drawn)).toBe(563);
@@ -145,8 +145,8 @@ it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適�
       deck,
       cardPool,
       maximumVoltageLevel: 1500,
-      currentVoltage: 655_000_001,
       ap: { ...initial.ap, currentAp: 0 },
+      voltage: { ...initial.voltage, currentVoltage: BigInt(655_000_001) },
     },
     [source.id],
   );
@@ -154,7 +154,7 @@ it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適�
   expect(changed.ap.currentAp).toBe(2);
   expect(changed.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
   const natural = advanceAutomaticGauges(
-    { ...state, currentVoltage: 655_000_000 },
+    { ...state, voltage: { ...state.voltage, currentVoltage: BigInt(655_000_000) } },
     state.track.stage.voltageIncreaseIntervalSeconds + 0.1,
     applyEffect,
   );
@@ -288,7 +288,6 @@ for (const [points, expected] of [
         ...initial,
         deck,
         mentalProtected: true,
-        currentVoltage: points,
         maximumVoltageLevel: 1500,
         hearts: {
           ...initial.hearts,
@@ -297,11 +296,12 @@ for (const [points, expected] of [
           hiddenHeartBatches: [],
         },
         mental: { ...initial.mental, currentMental: 0 },
+        voltage: { ...initial.voltage, currentVoltage: BigInt(points) },
       },
       ['frost-echo'],
     );
     state = act(addHearts(state, 500_000), { type: 'collect' });
-    expect(state.currentVoltage).toBe(expected);
+    expect(state.voltage.currentVoltage).toBe(BigInt(expected));
   });
 }
 

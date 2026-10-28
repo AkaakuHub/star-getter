@@ -26,7 +26,7 @@ it('一斉使用した常在カードの増幅を後続の子へ適用し、補�
     ['aurora-ensemble', 'perennial', 'horizon'],
   );
   const used = act(state, { type: 'card', index: 0 });
-  expect(used.currentVoltage).toBeGreaterThan(100_000);
+  expect(used.voltage.currentVoltage).toBeGreaterThan(100_000n);
   expect([...used.handEffectCardIds].sort()).toEqual([...used.hand].sort());
   expect(used.activation).toBeNull();
 });

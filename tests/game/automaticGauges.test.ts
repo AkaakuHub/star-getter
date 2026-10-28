@@ -26,13 +26,13 @@ it('長い更新間隔でも開花中のAP回復を1回ずつ変換し、上限�
 it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化する', () => {
   const baseState = game('library');
   const initial = { ...baseState, ap: { ...baseState.ap, currentAp: 0 } };
-  expect(advanceTo(initial, 0.58).currentVoltage).toBe(0);
-  expect(advanceTo(initial, 0.6).currentVoltage).toBe(1);
+  expect(advanceTo(initial, 0.58).voltage.currentVoltage).toBe(0n);
+  expect(advanceTo(initial, 0.6).voltage.currentVoltage).toBe(1n);
   const later = advanceTo(initial, 1.2);
   expect(later.ap.currentAp).toBe(0);
   expect(advanceTo(later, 1.2 + 1 / 60).ap.currentAp).toBe(1);
   expect(later.mental.currentMental).toBe(99);
-  expect(later.currentVoltage).toBe(2);
+  expect(later.voltage.currentVoltage).toBe(2n);
 });
 
 it('開花中も通常APが上限未満なら自然回復を専用値へ変換し、通常APを保持する', () => {
@@ -43,8 +43,8 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
     hand: ['horizon'],
     handEffectCardIds: ['horizon'],
     mentalProtected: true,
-    voltageTimerSeconds: 0,
     ap: { ...baseState2.ap, timerSeconds: 0, currentAp: 0 },
+    voltage: { ...baseState2.voltage, timerSeconds: 0 },
   };
   const empty = activateGenesis(initial, 1);
   const full = activateGenesis(
@@ -72,9 +72,9 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
       moodOffset: -100,
       hand: ['horizon'],
       handEffectCardIds: ['horizon'],
-      voltageTimerSeconds: 0,
       mental: { ...base.mental, timerSeconds: 0 },
       ap: { ...base.ap, currentAp: base.ap.maxAp, timerSeconds: 0 },
+      voltage: { ...base.voltage, timerSeconds: 0 },
     },
     1,
   );
@@ -82,7 +82,7 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   const normal = advanceAutomaticGauges(initial, 1.2),
     protectedAfter = advanceAutomaticGauges(protectedState, 1.2);
   expect(normal.mental.currentMental).toBe(initial.mental.currentMental);
-  expect(normal.currentVoltage).toBe(initial.currentVoltage);
+  expect(normal.voltage.currentVoltage).toBe(initial.voltage.currentVoltage);
   expect(normal.genesis.currentGauge).toBe(initial.genesis.currentGauge);
   expect(protectedAfter.genesis.currentGauge).toBe(initial.genesis.currentGauge + 2);
 });
@@ -129,11 +129,11 @@ it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタ
   });
   const half = advanceTo(overlapping, 0.5);
   expect(half.voltageStops).toHaveLength(1);
-  expect(half.voltageTimerSeconds).toBe(0);
+  expect(half.voltage.timerSeconds).toBe(0);
   const expired = advanceTo(half, 1 + 1 / 60);
   expect(expired.voltageStops).toHaveLength(0);
-  expect(expired.voltageTimerSeconds).toBe(0);
-  expect(advanceTo(expired, 1.6).currentVoltage).toBe(1);
+  expect(expired.voltage.timerSeconds).toBe(0);
+  expect(advanceTo(expired, 1.6).voltage.currentVoltage).toBe(1n);
 });
 
 it('パート数で指定した熱気停止は指定回数の切替まで継続する', () => {
@@ -147,10 +147,10 @@ it('パート数で指定した熱気停止は指定回数の切替まで継続�
   if (!firstSection || !secondSection) throw new Error('パートが不足しています。');
   const first = advanceTo(stops, (firstSection.startBeat * 60) / initial.track.bpm);
   expect(first.voltageStops[0]?.remainingSections).toBe(1n);
-  expect(first.currentVoltage).toBe(0);
+  expect(first.voltage.currentVoltage).toBe(0n);
   const second = advanceTo(first, (secondSection.startBeat * 60) / initial.track.bpm + 1 / 60);
   expect(second.voltageStops).toHaveLength(0);
-  expect(second.currentVoltage).toBe(0);
+  expect(second.voltage.currentVoltage).toBe(0n);
 });
 
 it('外部解除型は指定期限で自動解除せず、Deactivatorで解除する', () => {

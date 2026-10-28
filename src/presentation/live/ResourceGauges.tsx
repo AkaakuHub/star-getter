@@ -8,7 +8,7 @@ import { formatNumber } from '../score/formatNumber';
 export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
   if (state.genesis.effects.length > 0)
     return <GenesisGauge currentGauge={state.genesis.currentGauge} />;
-  const voltage = voltageLevel(state.currentVoltage, state.maximumVoltageLevel);
+  const voltage = voltageLevel(state.voltage.currentVoltage, state.maximumVoltageLevel);
   return (
     <>
       <div
@@ -28,7 +28,10 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
               width:
                 Math.max(
                   0,
-                  Math.min(100, voltageProgress(state.currentVoltage, state.maximumVoltageLevel)),
+                  Math.min(
+                    100,
+                    voltageProgress(state.voltage.currentVoltage, state.maximumVoltageLevel),
+                  ),
                 ) + '%',
             }}
           />

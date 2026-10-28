@@ -8,11 +8,11 @@ it('未生成の超過数ではなく場の個数で回収ランクを判定す�
   const initial = game();
   const state = {
     ...initial,
-    currentVoltage: voltageThreshold(1),
     cardPool: initial.cardPool.map((card) => ({
       ...card,
       appeal: { smile: 1, pure: 1, cool: 1 },
     })),
+    voltage: { ...initial.voltage, currentVoltage: BigInt(voltageThreshold(1)) },
   };
   expect(collectionScore(state, 1_000_000, true, 100)).toBeLessThan(
     collectionScore(state, 1_000_000, true, 1_000_000),

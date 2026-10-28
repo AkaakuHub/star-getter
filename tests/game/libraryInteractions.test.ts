@@ -132,7 +132,13 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
 it('手札中の対象増幅と熱気回復増幅を掛け合わせ、同じ見た目の別所属には適用しない', () => {
   let state = game();
   state = withHand(
-    { ...state, tick: 720, moodOffset: -100, currentVoltage: 0, ap: { ...state.ap, currentAp: 0 } },
+    {
+      ...state,
+      tick: 720,
+      moodOffset: -100,
+      ap: { ...state.ap, currentAp: 0 },
+      voltage: { ...state.voltage, currentVoltage: BigInt(0) },
+    },
     ['perennial'],
   );
   const effect = { kind: 'voltage', amount: 10 } as const;
@@ -146,7 +152,7 @@ it('手札中の対象増幅と熱気回復増幅を掛け合わせ、同じ見�
     condition: 'always',
   });
   const boosted = applyEffect(state, effect, card(state, 'horizon'));
-  expect(boosted.currentVoltage).toBe(220);
+  expect(boosted.voltage.currentVoltage).toBe(220n);
   expect(boosted.resourceBoosts[0]?.uses).toBe(4);
 });
 
@@ -179,7 +185,7 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
   }
   expect(state.mentalProtected).toBe(true);
   expect(state.mental.currentMental).toBe(0);
-  expect(state.currentVoltage).toBe(655_000_000);
+  expect(state.voltage.currentVoltage).toBe(655_000_000n);
   expect(advanceTo(state, 3).mental.mentalDown).toBe(false);
 });
 

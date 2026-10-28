@@ -43,7 +43,15 @@ describe('star-getterの回収得点', () => {
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), currentVoltage: 601 }, 10, false, 10)).toBe(15000n);
+    const baseState = game();
+    expect(
+      collectionScore(
+        { ...baseState, voltage: { ...baseState.voltage, currentVoltage: BigInt(601) } },
+        10,
+        false,
+        10,
+      ),
+    ).toBe(15000n);
   });
 
   it('STAR増加は加算し、開花プログレスの1.5乗を百分率で加える', () => {

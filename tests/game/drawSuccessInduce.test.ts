@@ -10,8 +10,8 @@ it('ActionType901の元気割合条件は参照実装同様に以下で判定し
   const state = {
     ...baseState,
     maximumMental: 100,
-    currentVoltage: 100_000_000,
     mental: { ...baseState.mental, currentMental: 40 },
+    voltage: { ...baseState.voltage, currentVoltage: BigInt(100_000_000) },
   };
   expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
   expect(

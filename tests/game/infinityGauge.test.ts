@@ -38,10 +38,10 @@ describe('無限ゲージ', () => {
     });
     const overlap = advanceTo(second, 0.5 + 1 / 60);
     expect(overlap.gaugeInfinities).toHaveLength(1);
-    expect(overlap.currentVoltage).toBe(second.currentVoltage);
+    expect(overlap.voltage.currentVoltage).toBe(second.voltage.currentVoltage);
     const ended = advanceTo(overlap, 1 + 1 / 60);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.currentVoltage).toBe(voltageThreshold(10));
+    expect(ended.voltage.currentVoltage).toBe(voltageThreshold(10));
   });
 
   it('Action39は無限開始時の熱気差をMasteryへ渡し、報酬を変換する', () => {
@@ -130,7 +130,11 @@ describe('無限ゲージ', () => {
   });
 
   it('期限抑止された効果はDeactivatorまで残り、解除時に最後のゲージ値へ戻す', () => {
-    const initial = { ...game(), currentVoltage: 100 };
+    const baseState = game();
+    const initial = {
+      ...baseState,
+      voltage: { ...baseState.voltage, currentVoltage: BigInt(100) },
+    };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
@@ -144,11 +148,15 @@ describe('無限ゲージ', () => {
       deactivationKey: 'voltage-infinity',
     });
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.currentVoltage).toBe(voltageThreshold(10));
+    expect(ended.voltage.currentVoltage).toBe(voltageThreshold(10));
   });
 
   it('ActionType39の電圧解除で永続電圧分岐を切り替える', () => {
-    const base = { ...game(), currentVoltage: voltageThreshold(20) };
+    const baseState2 = game();
+    const base = {
+      ...baseState2,
+      voltage: { ...baseState2.voltage, currentVoltage: BigInt(voltageThreshold(20)) },
+    };
     const source = base.deck[0];
     if (!source) throw new Error('発動元カードがありません。');
     const branch = applyEffect(
@@ -190,7 +198,7 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
-    expect(ended.currentVoltage).toBe(voltageThreshold(10));
+    expect(ended.voltage.currentVoltage).toBe(voltageThreshold(10));
     expect(ended.action52Buffs.map((buff) => buff.percent)).toEqual([20]);
     const timed = applyEffect(branch, {
       kind: 'infinity-gauge',
@@ -227,7 +235,10 @@ describe('無限ゲージ', () => {
   });
 
   it('開花中の熱気無限解除は熱気を維持してGenesis進捗へ目標差を加算する', () => {
-    const initial = { ...activateGenesis(game('genesis'), 1), currentVoltage: 100 };
+    const initial = {
+      ...activateGenesis(game('genesis'), 1),
+      voltage: { ...activateGenesis(game('genesis'), 1).voltage, currentVoltage: BigInt(100) },
+    };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
@@ -241,7 +252,7 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
-    expect(ended.currentVoltage).toBe(active.currentVoltage);
+    expect(ended.voltage.currentVoltage).toBe(active.voltage.currentVoltage);
     expect(ended.genesis.currentGauge).toBe(genesis.currentGauge + 23);
   });
 
@@ -334,7 +345,7 @@ describe('無限ゲージ', () => {
     const generated =
       finished.hearts.stageHearts.length +
       finished.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);
-    expect(finished.currentVoltage).toBe(voltageThreshold(finished.maximumVoltageLevel));
+    expect(finished.voltage.currentVoltage).toBe(voltageThreshold(finished.maximumVoltageLevel));
     expect(finished.mental.currentMental).toBe(150);
     expect(generated).toBe(150);
   });

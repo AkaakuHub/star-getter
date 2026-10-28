@@ -12,9 +12,9 @@ it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付�
       ...initial,
       targetBoosts: [],
       moodOffset: -150,
-      currentVoltage: 0,
       hearts: { ...initial.hearts, heartLimit: 1_000_000, stageHearts: [], hiddenHeartBatches: [] },
       ap: { ...initial.ap, currentAp: 0 },
+      voltage: { ...initial.voltage, currentVoltage: BigInt(0) },
     },
     ['frost-pulse'],
   );
@@ -23,7 +23,7 @@ it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付�
   state = act(addHearts(state, 1), { type: 'collect' });
   expect(state.resourceBoosts).toEqual([{ target: 'voltage', percent: 2, uses: null }]);
   state = applyEffect(state, { kind: 'voltage', amount: 100 });
-  expect(state.currentVoltage).toBe(102);
+  expect(state.voltage.currentVoltage).toBe(102n);
   expect(state.resourceBoosts[0]?.uses).toBeNull();
   state = act(addHearts(state, 300_000), { type: 'collect' });
   expect(state.resourceBoosts).toHaveLength(1);

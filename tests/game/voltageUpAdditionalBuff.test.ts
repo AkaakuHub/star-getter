@@ -30,10 +30,10 @@ it('ActionType31は対象カードの熱気増加を増幅し、参照実装ど�
     source,
   );
   const used = applyEffect(buffed, { kind: 'voltage', amount: 100 }, target);
-  expect(Number(used.currentVoltage - buffed.currentVoltage)).toBe(150);
+  expect(Number(used.voltage.currentVoltage - buffed.voltage.currentVoltage)).toBe(150);
   expect(used.voltageUpAdditionalBuffs).toHaveLength(1);
   const unmatched = applyEffect(buffed, { kind: 'voltage', amount: 100 }, source);
-  expect(Number(unmatched.currentVoltage - buffed.currentVoltage)).toBe(100);
+  expect(Number(unmatched.voltage.currentVoltage - buffed.voltage.currentVoltage)).toBe(100);
 });
 
 it('ActionType31は期限を適用し、InvocationType 0x38bでは自動期限を抑止する', () => {

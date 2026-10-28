@@ -1,6 +1,6 @@
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
-import { calculateLiveHeartRank } from '@akaakuhub/suku-sute-core/runtime/live/heartRank';
+import { projectHeartRank } from '@akaakuhub/suku-sute-core/game/live/heartRank';
 import { projectLiveHeartPresentations } from '@akaakuhub/suku-sute-core/runtime/live/heartPresentation';
 
 export function paintHearts(
@@ -11,11 +11,7 @@ export function paintHearts(
   height: number,
 ): void {
   context.clearRect(0, 0, width, height);
-  const rank = calculateLiveHeartRank(
-    heartCount(state),
-    Math.floor(state.currentVoltage / 2),
-    null,
-  );
+  const rank = projectHeartRank(state, heartCount(state));
   const pixelsPerWorldUnit = height / (9.600000381469727 * 2);
   const presentations = projectLiveHeartPresentations(state.hearts.stageHearts, rank.rank);
   let drawn = 0;

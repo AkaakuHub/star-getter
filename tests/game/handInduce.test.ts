@@ -28,11 +28,11 @@ it('ActionType37のSetで基礎熱気レベルが上がると手札誘発を起�
       ...initial,
       deck: [card],
       cardPool: [card],
-      currentVoltage: voltageThreshold(1),
+      voltage: { ...initial.voltage, currentVoltage: BigInt(voltageThreshold(1)) },
     },
     [card.id],
   );
-  const changed = applyEffect(state, { kind: 'voltage-set', amount: voltageThreshold(2) });
+  const changed = applyEffect(state, { kind: 'voltage-set', amount: Number(voltageThreshold(2)) });
   expect(changed.moodOffset).toBe(1);
   expect(changed.handUseActivationCounts[`${card.id}:test-inducer`]).toBe(1);
 });

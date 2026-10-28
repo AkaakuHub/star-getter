@@ -23,7 +23,7 @@ describe('きらめきと得点', () => {
   it('回収すると得点を得て、同じきらめきを二重回収しない', () => {
     const state = addHearts(game(), 10);
     const collected = act(state, { type: 'collect' });
-    expect(collected.score).toBeGreaterThan(0);
+    expect(collected.score).toBeGreaterThan(0n);
     expect(collected.stats.heartsCollected).toBe(10);
     expect(heartCount(collected)).toBe(0);
     expect(act(collected, { type: 'collect' })).toBe(collected);
@@ -32,8 +32,8 @@ describe('きらめきと得点', () => {
   it('時間切れの回収は基礎得点の20%になる', () => {
     const state = {
       ...addHearts(game(), 1),
-      currentVoltage: 100,
       mental: { ...addHearts(game(), 1).mental, mentalDown: true, currentMental: 0 },
+      voltage: { ...addHearts(game(), 1).voltage, currentVoltage: BigInt(100) },
     };
     const normal = act(state, { type: 'collect' });
     let expired = state;

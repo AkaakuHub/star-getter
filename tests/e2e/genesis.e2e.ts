@@ -134,7 +134,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   const ordinary = [
     driver.state.ap.currentAp,
     driver.state.mental.currentMental,
-    driver.state.currentVoltage,
+    driver.state.voltage.currentVoltage,
   ];
   const earlyBefore = driver.state.score;
   await driver.burst(2, 10);
@@ -154,7 +154,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   expect([
     driver.state.ap.currentAp,
     driver.state.mental.currentMental,
-    driver.state.currentVoltage,
+    driver.state.voltage.currentVoltage,
   ]).toEqual(ordinary);
   expect(driver.state.cardUseCounts['shadow-1']).toBeGreaterThanOrEqual(14);
   const measurementTick = driver.state.tick;

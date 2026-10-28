@@ -45,12 +45,18 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
     source,
   );
   const result = changeResource(latest, 'voltage', 10n, 'skill', source);
-  expect(result.currentVoltage).toBe(initial.currentVoltage);
+  expect(result.voltage.currentVoltage).toBe(initial.voltage.currentVoltage);
   expect(result.temporaryScoreBoosts).toEqual([
     { percent: 10, remainingSeconds: null, remainingSections: null, expireOnHeartCollect: true },
   ]);
   expect(heartCount(result)).toBe(0);
-  expect(changeResource({ ...latest, currentVoltage: 10 }, 'voltage', -10n).currentVoltage).toBe(0);
+  expect(
+    changeResource(
+      { ...latest, voltage: { ...latest.voltage, currentVoltage: BigInt(10) } },
+      'voltage',
+      -10n,
+    ).voltage.currentVoltage,
+  ).toBe(0n);
 });
 
 it('Action22で変換された熱気はActionType46の吸収対象にならない', () => {
@@ -116,7 +122,7 @@ it('Action22は熟練度ボーナスの熱気も変換する', () => {
   const active = applyEffect(initial, conversion, source);
   const converted = changeResource(active, 'voltage', 1n, 'natural', source);
   expect(heartCount(converted)).toBe(10);
-  expect(converted.currentVoltage).toBe(initial.currentVoltage + 1);
+  expect(converted.voltage.currentVoltage).toBe(initial.voltage.currentVoltage + 1n);
 });
 
 it('Action22の詳細値を参照実装のint32へ変換する', () => {
@@ -146,7 +152,7 @@ it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で�
   const converted = changeResource(active, 'voltage', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(25);
   expect(converted.voltageConversions).toHaveLength(0);
-  expect(converted.currentVoltage).toBe(initial.currentVoltage);
+  expect(converted.voltage.currentVoltage).toBe(initial.voltage.currentVoltage);
 });
 
 it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {

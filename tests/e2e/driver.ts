@@ -342,7 +342,7 @@ export class GameDriver {
         deck: this.state.deck.length,
         currentAp: this.state.ap.currentAp,
         mental: this.state.mental.currentMental,
-        ordinaryVoltage: this.state.currentVoltage,
+        currentVoltage: this.state.voltage.currentVoltage.toString(),
         mood: moodValue(this.state),
         scoreMultiplier: this.state.scoreMultiplier.toString(),
         classUses: this.state.cardUseCounts.class ?? 0,
