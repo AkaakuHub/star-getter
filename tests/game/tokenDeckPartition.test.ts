@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { switchTokenDeck } from '@akaakuhub/suku-sute-core/game/effects/tokenDeckSplit';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
   createCardDeckBoard,
@@ -117,4 +118,39 @@ it('既存のsub手札がある切替でも再読み込み通知を処理する'
   expect(result.afterDeckReloadEvents).toBe(initial.afterDeckReloadEvents + 1);
   expect(result.deckBoard.deckOutCount).toBe(0);
   expect(result.ap.currentAp).toBe(initial.ap.currentAp + 2);
+});
+
+it('切替先の能力は枚数調整前の目標を参照し、その変更後に手札を調整する', () => {
+  const base = split();
+  const variant = {
+    modeEffects: [{ kind: 'ap' as const, amount: 1 }],
+    ability893Effects: [],
+    ability894Effects: [],
+  };
+  const initial = {
+    ...base,
+    deck: base.deck.map((card) =>
+      card.cardInstanceId === 'first'
+        ? { ...card, modeAbilityChanges: { modeId: 901, off: variant, on: variant } }
+        : card,
+    ),
+  };
+  const observed: number[] = [];
+  const result = switchTokenDeck(initial, (state) => {
+    observed.push(state.tokenCardDeck.handTargetCounts.current);
+    return {
+      ...state,
+      tokenCardDeck: {
+        ...state.tokenCardDeck,
+        handTargetCounts: { ...state.tokenCardDeck.handTargetCounts, current: 3 },
+      },
+    };
+  });
+  expect(observed).toEqual([rules.handSize]);
+  expect(result.hand).toHaveLength(3);
+  expect(result.tokenCardDeck.handTargetCounts).toEqual({
+    current: 3,
+    main: rules.handSize,
+    sub: rules.handSize,
+  });
 });
