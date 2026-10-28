@@ -44,13 +44,13 @@ it('Action27のMember・SkillMainEffect・Unit条件は使用カードの値で�
   if (!card) throw new Error('追加きらめき誘発の検証カードがありません。');
   const withMainEffect = { ...card, mainEffect: 25 };
   expect(
-    matchesAdditionalHeartCondition({ kind: 'member', member: BigInt(card.member) }, card),
+    matchesAdditionalHeartCondition({ kind: 'member', member: BigInt(card.charactersId) }, card),
   ).toBe(true);
   expect(
     matchesAdditionalHeartCondition({ kind: 'main-effect', actionType: 25n }, withMainEffect),
   ).toBe(true);
-  if (card.unit !== null)
-    expect(matchesAdditionalHeartCondition({ kind: 'unit', unit: card.unit }, card)).toBe(true);
+  for (const unit of card.unitIds)
+    expect(matchesAdditionalHeartCondition({ kind: 'unit', unit }, card)).toBe(true);
 });
 
 it('Action27は発動元カード自身の使用後に誘発し、外部解除キーで停止する', () => {
@@ -65,7 +65,7 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
         ? ([
             {
               kind: 'additional-heart-induce',
-              condition: { kind: 'member', member: BigInt(source.member) },
+              condition: { kind: 'member', member: BigInt(source.charactersId) },
               apPower: 10_000n,
               heartEffect: {
                 kind: 'skill-hearts',

@@ -84,8 +84,9 @@ it('Action23はActionType52の値も参照実装のintキャストで0方向へ�
 it('Action23はActionType16のメンバー・ユニット・トークン系列対象を発動元で判定する', () => {
   const initial = game();
   const original = initial.deck[0];
-  const unit = original?.unit;
-  if (!original || unit === null || unit === undefined) throw new Error('対象カードがありません。');
+  const unit = original?.unitIds[0];
+  if (!original || (unit !== 1 && unit !== 2 && unit !== 3))
+    throw new Error('対象カードがありません。');
   const source = { ...original, tokenSeriesIds: [42] };
   const state = {
     ...initial,
@@ -93,7 +94,7 @@ it('Action23はActionType16のメンバー・ユニット・トークン系列�
     cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
   };
   const targets = [
-    { kind: 'member', member: source.member },
+    { kind: 'member', member: source.charactersId },
     { kind: 'unit', unit },
     { kind: 'card-series', seriesId: 42 },
   ] as const;

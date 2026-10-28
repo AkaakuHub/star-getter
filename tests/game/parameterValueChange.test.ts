@@ -246,7 +246,7 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
       {
         kind: 'amplify',
         percent: 300,
-        members: [source.member],
+        members: [source.charactersId],
         moodBonus: { target: 3, perPoint: 1.5 },
       },
     ],
@@ -275,7 +275,7 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
   expect(active.activeHandPermanentCardIds).toEqual([card.id]);
   expect(active.targetBoosts).toEqual([
     {
-      members: [source.member],
+      members: [source.charactersId],
       percent: 300,
       duration: 'stage',
       deactivationKey: `hand-permanent:${card.id}`,

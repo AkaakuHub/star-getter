@@ -22,7 +22,7 @@ it('ActionType31は対象カードの熱気増加を増幅し、参照実装ど�
       kind: 'voltage-up-additional-buff',
       calculation: 1n,
       num: 500_000n,
-      target: { kind: 'member', member: target.member },
+      target: { kind: 'member', member: target.charactersId },
       duration: { kind: 'milliseconds', value: 10_000n },
       disabledType: 1,
       disabledCount: 1n,

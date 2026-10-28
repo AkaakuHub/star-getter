@@ -54,7 +54,7 @@ it('初期クールタイムを音楽GenerationsIdと一致する既存トーク
     recordId: 9,
     tokenSetId: 7,
     targetMember: 1021 as const,
-    card: { ...base, member: 0 as const },
+    card: { ...base, charactersId: 0 as const },
     coolTime: 0,
     remainingCoolTime: 6,
   };
@@ -100,7 +100,7 @@ it('トークン共鳴を使うと同じTokenSetIdのクールタイムだけ開
     card: {
       ...base,
       id: '201',
-      member: 0 as const,
+      charactersId: 0 as const,
       special: { ...base.special, effects: [] },
     },
     coolTime: 12,

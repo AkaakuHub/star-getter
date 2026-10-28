@@ -74,7 +74,7 @@ it('きらめき獲得の次1回だけHeartUpを消費する', () => {
 it('きらめき増幅は対象カードだけに適用し、別対象の獲得では回数を消費しない', () => {
   const initial = game();
   const source = initial.deck[0];
-  const other = initial.deck.find((card) => card.member !== source?.member);
+  const other = initial.deck.find((card) => card.charactersId !== source?.charactersId);
   if (!source || !other) throw new Error('照合用カードがありません。');
   const clean = {
     ...initial,
@@ -85,7 +85,7 @@ it('きらめき増幅は対象カードだけに適用し、別対象の獲得�
     kind: 'heart-boost',
     percent: 100,
     uses: 1,
-    target: { kind: 'member', member: source.member },
+    target: { kind: 'member', member: source.charactersId },
   });
   const unrelated = applyEffect(active, { kind: 'hearts', amount: 10 }, other);
   expect(unrelated.hearts.stageHearts).toHaveLength(10);
@@ -125,7 +125,7 @@ it('ActionType16は整数化後にActionType52を適用し結果をint32化す�
     {
       kind: 'skill-boost',
       num: 500_000,
-      target: { kind: 'member', member: card.member },
+      target: { kind: 'member', member: card.charactersId },
       duration: { kind: 'stage', value: 0n },
       uses: null,
     },
@@ -145,7 +145,7 @@ it('ActionType16はAddValueを乗算前に加算する', () => {
       {
         kind: 'skill-boost',
         num: 500_000,
-        target: { kind: 'member', member: source.member },
+        target: { kind: 'member', member: source.charactersId },
         duration: { kind: 'stage', value: 0n },
         uses: null,
       },

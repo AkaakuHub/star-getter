@@ -101,11 +101,11 @@ it('Action50はint cast後に正値を判定し、0になった値でActionType5
 it('Action50の対象とTokenCardSeriesパラメーターを参照実装の検索条件通りに扱う', () => {
   const initial = game('library');
   const card = initial.deck[0];
-  const other = initial.deck.find((item) => item.member !== card?.member);
+  const other = initial.deck.find((item) => item.charactersId !== card?.charactersId);
   if (!card || !other) throw new Error('対象カードが足りません。');
   const targeted = applyEffect(
     initial,
-    additiveBoost({ target: { kind: 'member', member: card.member } }),
+    additiveBoost({ target: { kind: 'member', member: card.charactersId } }),
   );
   expect(moodValueWithoutLimit(applyEffect(targeted, moodChange(20_000), card))).toBe(3);
   const unmatched = applyEffect(targeted, moodChange(20_000), other);

@@ -100,8 +100,8 @@ it('共鳴の再使用は種別・メンバーを絞り、追加共鳴とトー�
   const otherExtra: Card = {
     ...extra,
     id: 'extra-other-member',
-    member: 1041,
-    unit: 2,
+    charactersId: 1041,
+    unitIds: [2],
   };
   const tokenSpecial: Card = { ...normal, id: 'token-special', token: 'story' };
   const deck = [...initial.deck, otherExtra, tokenSpecial];
@@ -124,7 +124,12 @@ it('全ての共鳴を戻すときも先頭以外の通常共鳴を対象に含�
   const normal = initial.deck.find((card) => card.id === 'library-pages');
   const extra = initial.deck.find((card) => card.id === 'library-ensemble');
   if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
-  const otherNormal: Card = { ...normal, id: 'normal-other-member', member: 1041, unit: 2 };
+  const otherNormal: Card = {
+    ...normal,
+    id: 'normal-other-member',
+    charactersId: 1041,
+    unitIds: [2],
+  };
   const deck = [...initial.deck, otherNormal];
   const state = {
     ...initial,
@@ -182,7 +187,7 @@ it('共鳴の再使用はユニットと発動元以外の対象を適用する'
   const normal = initial.deck.find((card) => card.id === 'library-pages');
   const extra = initial.deck.find((card) => card.id === 'library-ensemble');
   if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
-  const otherExtra: Card = { ...extra, id: 'extra-other-member', member: 1041, unit: 2 };
+  const otherExtra: Card = { ...extra, id: 'extra-other-member', charactersId: 1041, unitIds: [2] };
   const deck = [...initial.deck, otherExtra];
   const state = {
     ...initial,

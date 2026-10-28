@@ -17,16 +17,16 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
   const cards = [
     {
       ...source,
-      member: 1021 as const,
-      unit: 1 as const,
+      charactersId: 1021 as const,
+      unitIds: [1],
       skillIcon: 600,
       mainEffect: 800,
       style: 2,
     },
     {
       ...other,
-      member: 1030 as const,
-      unit: 2 as const,
+      charactersId: 1030 as const,
+      unitIds: [2],
       skillIcon: 700,
       mainEffect: 900,
       style: 4,
@@ -189,13 +189,13 @@ it('Action17のメンバー使用数は使用カードが手札を離れた後�
       minimum: 0,
       maximum: 100,
       conditionType: 6,
-      conditionId: used.member,
+      conditionId: used.charactersId,
     },
     source,
   );
   const afterUse = notifyHandSkillUse(withCostChange, used, applyEffect);
   expect(afterUse.hand).toEqual([source.id]);
-  expect(afterUse.handCardStats[source.id]?.skillUseCountsByMember[used.member]).toBe(1);
+  expect(afterUse.handCardStats[source.id]?.skillUseCountsByMember[used.charactersId]).toBe(1);
   expect(cardCost(afterUse, source) - cardCost(withCostChange, source)).toBe(10);
 });
 
@@ -283,7 +283,7 @@ it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変�
       num: 20_000,
       targetRange: 2,
       target: 'member',
-      targetId: target.member,
+      targetId: target.charactersId,
     },
     source,
   );

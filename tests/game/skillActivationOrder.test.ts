@@ -20,7 +20,7 @@ it('ヨットの検索を先に登録し、巻き込んだ浮き輪の舵・編�
     used.hand.map((id) => {
       const card = used.deck.find((candidate) => candidate.id === id);
       if (!card) throw new Error('補充したカードがありません。');
-      return card.token ?? card.unit;
+      return card.token ?? card.unitIds[0];
     }),
   ).toEqual([1, 'clock', 1, 'clock', 'story']);
 });

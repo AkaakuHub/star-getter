@@ -217,8 +217,8 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   expect(used.hand).not.toContain(source.id);
   expect(used.discard).toContain(source.id);
   expect(used.activation).toBeNull();
-  expect(used.lastUsedMember).toBe(source.member);
-  expect(used.lastUsedUnit).toBe(source.unit);
+  expect(used.usedCard?.charactersId).toBe(source.charactersId);
+  expect(used.usedCard?.unitIds).toEqual(source.unitIds);
 });
 
 it('ActionType42の子カードは親スキルの未確定カードを80枚条件へ含めない', () => {

@@ -81,7 +81,7 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
   if (!source || !baseUsed) throw new Error('カードがありません。');
   const used = { ...baseUsed, skillIcon: 99, mainEffect: 77 };
   const triggers: readonly HandUseTrigger[] = [
-    { kind: 'member', member: BigInt(used.member) + 9_007_199_254_740_992n },
+    { kind: 'member', member: BigInt(used.charactersId) + 9_007_199_254_740_992n },
     { kind: 'skill-main-effect', mainEffect: 77n },
     { kind: 'unit', unit: 2n },
     { kind: 'same-card' },
@@ -316,8 +316,8 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
   );
   const replaced = flushDeckActions(state);
   expect(replaced.hand).toHaveLength(2);
-  expect(replaced.lastUsedMember).toBe(source.member);
-  expect(replaced.lastUsedUnit).toBe(2);
+  expect(replaced.usedCard?.charactersId).toBe(source.charactersId);
+  expect(replaced.usedCard?.unitIds).toContain(2);
   expect(replaced.deckActions.shuffles).toHaveLength(0);
 });
 
@@ -352,7 +352,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     handLimit: 8,
     amplification: 100,
     drawContext: 'skill',
-    lastUsedUnit: 2,
+    usedCard: { charactersId: 0, unitIds: [2] },
   };
   const drawn = fillHand(state);
   expect(drawn.hand).toHaveLength(7);

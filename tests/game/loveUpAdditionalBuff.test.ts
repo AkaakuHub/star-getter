@@ -25,7 +25,7 @@ it('ActionType30は対象カードのSTAR増加を指定率で増幅し、回収
       kind: 'love-up-additional-buff',
       calculation: 1n,
       num: 500_000n,
-      target: { kind: 'member', member: target.member },
+      target: { kind: 'member', member: target.charactersId },
       duration: { kind: 'milliseconds', value: 10_000n },
       disabledType: 1,
       disabledCount: 2n,

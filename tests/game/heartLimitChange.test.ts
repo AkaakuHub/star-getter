@@ -219,7 +219,7 @@ it('Action49の対象と使用回数をAction25の発動カードで判定する
     duration: { kind: 'stage', value: 0n },
     disabledType: 1,
     disabledCount: 1n,
-    target: { kind: 'member', member: card.member },
+    target: { kind: 'member', member: card.charactersId },
   });
   const change = {
     kind: 'heart-limit-change' as const,

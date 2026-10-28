@@ -12,8 +12,8 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   const source: Card = {
     id: 'source',
     name: '発動元',
-    member: 1021,
-    unit: 1,
+    charactersId: 1021,
+    unitIds: [1],
     costume: null,
     performer: 'nova',
     appeal,
@@ -26,7 +26,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
     ...source,
     id: 'child',
     name: '子カード',
-    member: 1031,
+    charactersId: 1031,
     mainEffect: 14,
     effects: childEffects,
   };
@@ -76,7 +76,7 @@ it('子カードのコストに発動元の使用通知を先取りしない', (
       minimum: 0,
       maximum: 100,
       conditionType: 6,
-      conditionId: source.member,
+      conditionId: source.charactersId,
     },
     child,
   );

@@ -24,7 +24,11 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
               skillEffectId: 9031n,
               details: [
                 { id: 1n, detailType: 'HAND_INDUCE_TYPE', value: 1n },
-                { id: 2n, detailType: 'HAND_INDUCE_TYPE_VALUE', value: BigInt(source.member) },
+                {
+                  id: 2n,
+                  detailType: 'HAND_INDUCE_TYPE_VALUE',
+                  value: BigInt(source.charactersId),
+                },
                 { id: 3n, detailType: 'HAND_INDUCE_LIMIT_NUM', value: 2n },
               ],
               effects: [{ kind: 'mood' as const, amount: 1 }],
@@ -49,7 +53,7 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
   expect(compiled?.handInducers).toEqual([
     {
       sourceEffectId: '9031',
-      trigger: { kind: 'member', member: BigInt(source.member) },
+      trigger: { kind: 'member', member: BigInt(source.charactersId) },
       effects: [{ kind: 'mood', amount: 1 }],
       limit: 2n,
       limitMemory: 'reset',

@@ -22,7 +22,7 @@ it('ActionType33は対象カードの耐久値を増幅し、対象外では消�
       kind: 'mental-barrier-additional-buff',
       calculation: 1,
       num: 500_000n,
-      target: { kind: 'member', member: target.member },
+      target: { kind: 'member', member: target.charactersId },
       duration: { kind: 'stage', value: 0n },
       disabledType: 1,
       disabledCount: 1n,

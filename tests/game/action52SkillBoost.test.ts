@@ -132,7 +132,7 @@ it('ActionType16のハート追加バフをActionType52より先に適用する'
       kind: 'heart-boost',
       percent: 33,
       uses: 1,
-      target: { kind: 'member', member: source.member },
+      target: { kind: 'member', member: source.charactersId },
       duration: { kind: 'stage' },
     },
     source,
@@ -142,7 +142,7 @@ it('ActionType16のハート追加バフをActionType52より先に適用する'
     {
       kind: 'skill-boost',
       num: 400_000,
-      target: { kind: 'member', member: source.member },
+      target: { kind: 'member', member: source.charactersId },
       duration: { kind: 'stage', value: 0n },
       uses: null,
     },

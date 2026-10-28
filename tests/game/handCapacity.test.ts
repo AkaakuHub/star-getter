@@ -206,7 +206,7 @@ it('ActionType20へ発動元対象のActionType52補正を適用して整数化�
     {
       kind: 'skill-boost',
       num: 500_000,
-      target: { kind: 'member', member: source.member },
+      target: { kind: 'member', member: source.charactersId },
       duration: { kind: 'stage', value: 0n },
       uses: null,
     },

@@ -17,11 +17,11 @@ function setup(repeatAction: 0 | 1 | 2 = 0) {
   const state = { ...initial, deck, cardPool: deck };
   const source = state.deck[0];
   const first = state.deck[1];
-  if (!source || !first || source.member === first.member)
+  if (!source || !first || source.charactersId === first.charactersId)
     throw new Error('コンボ誘発の検証カードがありません。');
   const effect = {
     kind: 'combo-induce',
-    members: [source.member, first.member],
+    members: [source.charactersId, first.charactersId],
     apPower: 10_000n,
     repeatAction,
     duration: { kind: 'stage', value: 0 },
@@ -95,7 +95,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
   const initial = game();
   const first = initial.deck[0];
   const second = initial.deck[1];
-  if (!first || !second || first.member === second.member)
+  if (!first || !second || first.charactersId === second.charactersId)
     throw new Error('コンボ誘発の検証カードがありません。');
   const deck = initial.deck.map((card) => ({
     ...card,
@@ -119,7 +119,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     ready,
     {
       kind: 'combo-induce',
-      members: [first.member, second.member],
+      members: [first.charactersId, second.charactersId],
       apPower: 10_000n,
       repeatAction: 1,
       duration: { kind: 'stage', value: 0 },

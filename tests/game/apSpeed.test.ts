@@ -64,7 +64,10 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
   expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(0.2, 5);
 
   const boosted = applyEffect(
-    { ...initial, targetBoosts: [{ members: [source.member], percent: 100, duration: 'stage' }] },
+    {
+      ...initial,
+      targetBoosts: [{ members: [source.charactersId], percent: 100, duration: 'stage' }],
+    },
     speedEffect,
     source,
   );
@@ -107,7 +110,7 @@ it('ActionType21のcalcType1は正のrateでActionType52を消費するが値に
     {
       kind: 'skill-boost',
       num: 500_000,
-      target: { kind: 'member', member: source.member },
+      target: { kind: 'member', member: source.charactersId },
       duration: { kind: 'stage', value: 0n },
       uses: 1n,
     },
@@ -134,7 +137,7 @@ it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消�
     {
       kind: 'skill-boost',
       num: 500_000,
-      target: { kind: 'member', member: source.member },
+      target: { kind: 'member', member: source.charactersId },
       duration: { kind: 'stage', value: 0n },
       uses: 1n,
     },

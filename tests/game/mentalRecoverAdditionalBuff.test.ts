@@ -24,7 +24,7 @@ it('ActionType32は対象カードの元気回復を増幅し、指定回数で�
       kind: 'recover-mental-additional-buff',
       calculation: 1n,
       num: 1_000_000n,
-      target: { kind: 'member', member: target.member },
+      target: { kind: 'member', member: target.charactersId },
       duration: { kind: 'milliseconds', value: 10_000n },
       disabledType: 1,
       disabledCount: 1n,

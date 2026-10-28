@@ -3,14 +3,14 @@ import type { HandUseTrigger } from '@akaakuhub/suku-sute-core/game/cards/cardTy
 
 export function targetNames(members: readonly number[]): string {
   return baseCards
-    .filter((card) => members.includes(card.member))
+    .filter((card) => members.includes(card.charactersId))
     .map((card) => card.name)
     .join('・');
 }
 
 function unitCardNames(unit: number): string {
   return baseCards
-    .filter((card) => card.unit === unit)
+    .filter((card) => card.unitIds.includes(unit))
     .map((card) => card.name)
     .join('・');
 }
