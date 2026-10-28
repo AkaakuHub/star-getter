@@ -93,6 +93,32 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
   expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(30n);
 });
 
+it('Action21の吸収到達で即時誘発し、AP速度を変更しない', () => {
+  const initial = { ...game(), handEffectCardIds: [], targetBoosts: [] };
+  const source = initial.deck[0];
+  if (!source) throw new Error('発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 3,
+      periodParam: 0n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0n,
+      targets: [{ actionType: 21, targetAmount: 1 }],
+      effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
+    },
+    source,
+  );
+  const next = applyEffect(active, speedEffect, source);
+  expect(next.proxySkills).toEqual([]);
+  expect(next.apTimeEffects).toEqual(initial.apTimeEffects);
+  expect(next.ap.currentAp).toBe(initial.ap.currentAp + 2);
+});
+
 it('ActionType21のcalcType1は正のrateでActionType52を消費するが値には適用しない', () => {
   const base = game();
   const source = base.deck[0];

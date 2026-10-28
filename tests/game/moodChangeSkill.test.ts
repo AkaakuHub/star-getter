@@ -150,7 +150,7 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
       absorbLimit: 2,
       periodType: 1,
       periodParam: 3000n,
-      induceTiming: 1,
+      induceTiming: 2,
       induceCondition: 1,
       inducePowerType: 1,
       inducePowerParam: 0n,

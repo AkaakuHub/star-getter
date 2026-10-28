@@ -35,8 +35,9 @@ it('ActionType48の負の目標値は非絶対加算時に下方向で到達判�
     num: -50_000n,
     duration: { kind: 'stage', value: 0n },
   });
-  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(-5n);
-  expect(advanceProxySkillPeriods(absorbed, 0.2, applyEffect).ap.currentAp).toBeGreaterThan(
-    activeEnergy,
+  expect(absorbed.proxySkills).toEqual([]);
+  expect(absorbed.ap.currentAp).toBeGreaterThan(activeEnergy);
+  expect(advanceProxySkillPeriods(absorbed, 0.2, applyEffect).ap.currentAp).toBe(
+    absorbed.ap.currentAp,
   );
 });

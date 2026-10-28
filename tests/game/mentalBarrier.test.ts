@@ -49,7 +49,7 @@ describe('元気バリア', () => {
         absorbLimit: 1,
         periodType: 1,
         periodParam: 3000n,
-        induceTiming: 1,
+        induceTiming: 2,
         induceCondition: 1,
         inducePowerType: 1,
         inducePowerParam: 0n,

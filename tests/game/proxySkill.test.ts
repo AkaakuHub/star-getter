@@ -19,6 +19,40 @@ function game() {
   });
 }
 
+it.each([
+  { actionType: 14, effect: { kind: 'ap' as const, amount: 1 } },
+  { actionType: 20, effect: handCardCountEffect(1, 1, 0n) },
+])(
+  'Action$actionTypeの吸収到達でその場で誘発し、元の効果を適用しない',
+  ({ actionType, effect }) => {
+    const initial = game();
+    const source = initial.deck[0];
+    if (!source) throw new Error('Proxy発動元カードがありません。');
+    const active = applyEffect(
+      initial,
+      {
+        kind: 'proxy-skill',
+        absorbLimit: 1,
+        periodType: 3,
+        periodParam: 0n,
+        induceTiming: 1,
+        induceCondition: 1,
+        inducePowerType: 1,
+        inducePowerParam: 0n,
+        targets: [{ actionType, targetAmount: 1 }],
+        effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
+      },
+      source,
+    );
+    const next = applyEffect(active, effect, source);
+    expect(next.proxySkills).toEqual([]);
+    expect(next.ap.currentAp).toBe(initial.ap.currentAp + 8);
+    expect(next.tokenCardDeck.handTargetCounts.current).toBe(
+      initial.tokenCardDeck.handTargetCounts.current,
+    );
+  },
+);
+
 it('Proxyに吸収された手札数加算は目標数を変えず、期限時にも解除量を通知しない', () => {
   const initial = game();
   const source = initial.deck[0];
@@ -41,7 +75,7 @@ it('Proxyに吸収された手札数加算は目標数を変えず、期限時�
   );
   const absorbed = applyEffect(state, handCardCountEffect(1, 1, 100n));
   expect(absorbed.tokenCardDeck.handTargetCounts.current).toBe(5);
-  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(1n);
+  expect(absorbed.proxySkills).toEqual([]);
   expect(advanceTo(absorbed, 0.2).tokenCardDeck.handTargetCounts.current).toBe(5);
 });
 
@@ -80,7 +114,7 @@ it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発�
       absorbLimit: 1,
       periodType: 1,
       periodParam: 100n,
-      induceTiming: 1,
+      induceTiming: 2,
       induceCondition: 1,
       inducePowerType: 1,
       inducePowerParam: 0n,
