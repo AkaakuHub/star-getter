@@ -9,6 +9,7 @@ import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
   fillHand,
   fillHandToCount,
+  flushHandCardCountActions,
   handCapacity,
 } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import {
@@ -60,7 +61,7 @@ it('InvocationType 0x388と0x38bは自動期限を止め、Deactivator解除で�
         deactivationKey: `ability-${invocationType}`,
       }),
     );
-    const afterTimer = advanceHandLimitEffects(state, 1).state;
+    const afterTimer = advanceHandLimitEffects(state, 1);
     expect(afterTimer.tokenCardDeck.handTargetCounts.current).toBe(6);
     expect(afterTimer.handLimitEffects).toHaveLength(1);
     const deactivated = act(afterTimer, {
@@ -86,7 +87,7 @@ it('Action904の子Action20は手札中だけ有効で、離脱時に解除す�
   );
   const active = activateHandPermanentEffects(state, card);
   expect(active.tokenCardDeck.handTargetCounts.current).toBe(4);
-  expect(advanceHandLimitEffects(active, 100).state.tokenCardDeck.handTargetCounts.current).toBe(4);
+  expect(advanceHandLimitEffects(active, 100).tokenCardDeck.handTargetCounts.current).toBe(4);
   const disposed = disposeHandEffects(active, [card.cardInstanceId]);
   expect(disposed.tokenCardDeck.handTargetCounts.current).toBe(5);
   expect(disposed.handLimitEffects).toHaveLength(0);
@@ -346,4 +347,26 @@ it('最大化中の枚数変更は共通の現在目標と解除後の保存目�
   expect(expired.tokenCardDeck.maxHandSkillActiveCount).toBe(0);
   expect(expired.tokenCardDeck.handTargetCounts.current).toBe(2);
   expect(handCapacity(expired)).toBe(3);
+});
+
+it('期限終了は解除通知を待機させ、処理時に実手札から補充量を計算する', () => {
+  const base = game();
+  const source = base.deck[0];
+  if (!source) throw new Error('カードがありません。');
+  const initial = withBoardState(
+    { ...base, usedCard: source, lastUsedSkillIcon: 1, drawContext: 'skill' as const },
+    {
+      hand: base.deck.slice(0, 3).map((card) => card.cardInstanceId),
+      deck: base.deck.slice(3).map((card) => card.cardInstanceId),
+    },
+  );
+  const active = applyEffect(initial, handCardCountEffect(-3, 1, 100n));
+  const pending = advanceHandLimitEffects(active, 0.2);
+  expect(pending.tokenCardDeck.handTargetCounts.current).toBe(2);
+  expect(pending.deckActions.queue).toEqual([{ type: 1, param1: 3 }]);
+  const result = flushHandCardCountActions(pending);
+  expect(result.tokenCardDeck.handTargetCounts.current).toBe(5);
+  expect(result.hand).toHaveLength(5);
+  expect(result.usedCard).toBeNull();
+  expect(result.lastUsedSkillIcon).toBeNull();
 });

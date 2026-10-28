@@ -1,3 +1,4 @@
+import { flushHandCardCountActions } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -27,7 +28,8 @@ it('ActionType20の未対応計算種別は初回加算せず、期限時の解�
   expect(active.handLimitEffects).toMatchObject([
     { amount: 0, expirationAmount: -1, remainingSections: 1n },
   ]);
-  expect(expireHandLimitSections(active).state.tokenCardDeck.handTargetCounts.current).toBe(
-    neutralState.tokenCardDeck.handTargetCounts.current - 1,
-  );
+  expect(
+    flushHandCardCountActions(expireHandLimitSections(active)).tokenCardDeck.handTargetCounts
+      .current,
+  ).toBe(neutralState.tokenCardDeck.handTargetCounts.current - 1);
 });
