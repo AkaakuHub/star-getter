@@ -177,9 +177,23 @@ it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消�
     },
     source,
   );
-  const changed = applyEffect(boosted, { ...speedEffect, calculationType: 1, num: 0n }, source);
+  const changed = applyEffect(
+    boosted,
+    { ...speedEffect, calculationType: 1, num: 0n, deactivationKey: 'zero' },
+    source,
+  );
   expect(changed.action52Buffs).toHaveLength(0);
-  expect(changed.apIncreaseSpeedEffects).toHaveLength(0);
+  expect(changed.apIncreaseSpeedEffects).toEqual([
+    {
+      effectId: null,
+      deactivationKey: null,
+      calculation: { kind: 'add', milliseconds: 0 },
+      duration: null,
+    },
+  ]);
+  expect(
+    act(changed, { type: 'deactivate-ap-speed', deactivationKey: 'zero' }).apIncreaseSpeedEffects,
+  ).toEqual(changed.apIncreaseSpeedEffects);
 });
 
 it('Action21 calcType2は正のInfinityをsigned32最小値へ変換して倍率を求める', () => {
