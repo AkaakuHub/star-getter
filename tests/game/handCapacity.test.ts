@@ -218,8 +218,7 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
       activation: {
         sourceId: source.cardInstanceId,
         usedCards: [source.cardInstanceId],
-        allHand: false,
-        recoverDiscard: false,
+        hasUseAllHandSkill: false,
         handCountChanges: {},
       },
     },
@@ -242,8 +241,7 @@ it('手札目標数より多い状態では使用元カードを補充しない'
       activation: {
         sourceId: source.cardInstanceId,
         usedCards: [source.cardInstanceId],
-        allHand: false,
-        recoverDiscard: false,
+        hasUseAllHandSkill: false,
         handCountChanges: {},
       },
     },

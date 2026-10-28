@@ -15,8 +15,7 @@ function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
         activation: {
           sourceId: cardId,
           usedCards: [cardId],
-          allHand: false,
-          recoverDiscard: false,
+          hasUseAllHandSkill: false,
           handCountChanges: {},
         },
       },
@@ -51,8 +50,7 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
           activation: {
             sourceId: source.cardInstanceId,
             usedCards: [source.cardInstanceId],
-            allHand: false,
-            recoverDiscard: false,
+            hasUseAllHandSkill: false,
             handCountChanges: {},
           },
         },
@@ -96,8 +94,7 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
         activation: {
           sourceId: source.cardInstanceId,
           usedCards: [source.cardInstanceId],
-          allHand: false,
-          recoverDiscard: false,
+          hasUseAllHandSkill: false,
           handCountChanges: {},
         },
       },

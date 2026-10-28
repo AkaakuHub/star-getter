@@ -158,3 +158,28 @@ it('一斉使用中の子カードはActionType42の合算コストではなく�
     used.cardUses.find((item) => item.card.cardInstanceId === child.cardInstanceId)?.consumeAp,
   ).toBe(child.consumeAp);
 });
+
+it('全手札補充では使用元を保持し、使用スキルの抽選条件を引き継がない', () => {
+  const { state, source, child } = setup([{ kind: 'use-hand' }], []);
+  const parent = { ...source, skillIcon: 42 };
+  const matched: Card = {
+    ...child,
+    drawRules: [{ condition: { kind: 'icon', value: 42 }, negated: true, weight: 0 }],
+  };
+  const fresh: Card = {
+    ...child,
+    cardInstanceId: 'fresh',
+    cardDatasId: 'fresh',
+    drawRules: [{ condition: { kind: 'icon', value: 42 }, negated: false, weight: 0 }],
+  };
+  const deck = [parent, matched, fresh];
+  const ready = withHand(withBoardState({ ...state, deck, cardPool: deck }, {}), [
+    'source',
+    'child',
+  ]);
+  const used = act(ready, { type: 'card', index: 0 });
+  expect(used.hand[0]).toBe('fresh');
+  expect(used.usedCard).toBe(parent);
+  expect(used.lastUsedSkillIcon).toBeNull();
+  expect(used.tokenCardDeck.isAllHandSkill).toBe(false);
+});
