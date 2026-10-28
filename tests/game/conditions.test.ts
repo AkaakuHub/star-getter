@@ -165,17 +165,23 @@ describe('カード共通の条件判定', () => {
       false,
     );
   });
-  it('Voltage/Mental分岐はtrue側だけを実行し、他の条件は成立側だけを実行する', () => {
+  it('Voltage/Mental分岐は通常時に成立側を選び、開花中はtrue側の後にfalse側を実行する', () => {
     const initial = game();
-    const effect = {
-      kind: 'branch' as const,
-      condition: { kind: 'heat' as const, minimum: 100_000 },
-      whenTrue: [{ kind: 'ap-limit' as const, amount: 1 }],
-      whenFalse: [{ kind: 'ap-limit' as const, amount: 2 }],
-    };
-    expect(applyEffect(initial, effect).ap.maxAp).toBe(initial.ap.maxAp + 1);
     const genesis = applyEffect(initial, { kind: 'genesis', effectValue: 1 });
-    expect(applyEffect(genesis, effect).ap.maxAp).toBe(initial.ap.maxAp + 1);
+    const conditions = [
+      { kind: 'heat', minimum: 100_000 },
+      { kind: 'mental', minimumPercent: 100_000 },
+    ] as const;
+    for (const condition of conditions) {
+      const effect = {
+        kind: 'branch',
+        condition,
+        whenTrue: [{ kind: 'ap-limit', amount: 1 }],
+        whenFalse: [{ kind: 'ap-limit', amount: 2 }],
+      } as const;
+      expect(applyEffect(initial, effect).ap.maxAp).toBe(initial.ap.maxAp + 2);
+      expect(applyEffect(genesis, effect).ap.maxAp).toBe(initial.ap.maxAp + 3);
+    }
   });
   it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
     const initial = game();
