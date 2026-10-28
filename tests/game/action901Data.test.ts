@@ -1,3 +1,4 @@
+import { createLiveDeckDrawContextState } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -84,7 +85,12 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
   ];
   const initial = createGame(track, deck, 7);
   const drawState = withBoardState(
-    { ...initial, handCardStats: {}, handEffectCardIds: [], drawContext: 'idle' as const },
+    {
+      ...initial,
+      handCardStats: {},
+      handEffectCardIds: [],
+      deckDrawContext: createLiveDeckDrawContextState(3),
+    },
     { hand: [], deck: [card.cardInstanceId], graveyard: [] },
   );
   const drawn = fillHandToCount(drawState, 1);

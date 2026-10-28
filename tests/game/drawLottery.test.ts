@@ -1,3 +1,4 @@
+import { createLiveDeckDrawContextState } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -34,13 +35,22 @@ it('条件一致時だけ対象を優先し、極光は開始時の優先を持�
     if (!card) throw new Error('カードがありません。');
     return card;
   };
-  const initial = { ...state, drawContext: 'initial' as const };
+  const initial = { ...state, deckDrawContext: createLiveDeckDrawContextState(0) };
   const doll = {
     ...state,
-    drawContext: 'skill' as const,
-    usedCard: { charactersId: 1032, unitIds: [2] },
+    deckDrawContext: {
+      currentDrawType: 1 as const,
+      usedCard: { charactersId: 1032, unitIds: [2], skillMainEffect: null },
+      usedSkill: null,
+    },
   };
-  const cerise = { ...doll, usedCard: { charactersId: 1031, unitIds: [1] } };
+  const cerise = {
+    ...doll,
+    deckDrawContext: {
+      ...doll.deckDrawContext,
+      usedCard: { charactersId: 1031, unitIds: [1], skillMainEffect: null },
+    },
+  };
   expect(drawWeight(source('aurora-ensemble'), initial)).toBe(10_000);
   expect(drawWeight(source('aurora-ensemble'), doll)).toBe(-1);
   expect(drawWeight(source('library-ensemble'), initial)).toBe(0);
@@ -53,7 +63,14 @@ it('条件一致時だけ対象を優先し、極光は開始時の優先を持�
 
 it('tokenと編成の検索を後入れ先出しにして交互の対象へ引く', () => {
   let state = withHand(addTokens(game('library'), 'clock', 2), []);
-  state = { ...state, drawContext: 'skill', usedCard: { charactersId: 0, unitIds: [1] } };
+  state = {
+    ...state,
+    deckDrawContext: {
+      currentDrawType: 1 as const,
+      usedCard: { charactersId: 0, unitIds: [1], skillMainEffect: null },
+      usedSkill: null,
+    },
+  };
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   state = applyEffect(state, { kind: 'search-unit', unit: 1, count: 1 });
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
@@ -68,7 +85,14 @@ it('tokenと編成の検索を後入れ先出しにして交互の対象へ引�
 
 it('検索先があるときは検索外の優先カードを先に引かない', () => {
   let state = withHand(addTokens(game('library'), 'clock', 2), []);
-  state = { ...state, drawContext: 'skill', usedCard: { charactersId: 0, unitIds: [1] } };
+  state = {
+    ...state,
+    deckDrawContext: {
+      currentDrawType: 1 as const,
+      usedCard: { charactersId: 0, unitIds: [1], skillMainEffect: null },
+      usedSkill: null,
+    },
+  };
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   const drawn = fillHandToCount(state, 1);
   expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
@@ -79,7 +103,14 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   const story = state.deck.find((card) => card.token === 'story');
   if (!story) throw new Error('追加カードがありません。');
   state = withBoardState(
-    { ...state, drawContext: 'skill', usedCard: { charactersId: 1031, unitIds: [] } },
+    {
+      ...state,
+      deckDrawContext: {
+        currentDrawType: 1 as const,
+        usedCard: { charactersId: 1031, unitIds: [], skillMainEffect: null },
+        usedSkill: null,
+      },
+    },
     {
       deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== story.cardInstanceId),
       graveyard: [story.cardInstanceId],
@@ -121,7 +152,7 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
 
 it('検索条件に一致するカードがない階層は消費し、次の階層の検索を使う', () => {
   let state = withHand(addTokens(game('library'), 'clock', 1), []);
-  state = { ...state, drawContext: 'initial' };
+  state = { ...state, deckDrawContext: createLiveDeckDrawContextState(0) };
   state = applyEffect(state, {
     kind: 'search',
     scope: 'grade',
@@ -148,12 +179,12 @@ it('スキル検索はアイコンではなくカードのMainEffectを照合す
       ...initial,
       deck: initial.deck.map((card) =>
         card.cardInstanceId === 'camera'
-          ? { ...card, skillMainEffect: 987654, skillIcon: 1, drawRules: [] }
+          ? { ...card, skillMainEffect: 987654, skillIcon: 1, onDrawInduceEffects: [] }
           : card.cardInstanceId === 'perennial'
-            ? { ...card, skillMainEffect: 12, skillIcon: 987654, drawRules: [] }
+            ? { ...card, skillMainEffect: 12, skillIcon: 987654, onDrawInduceEffects: [] }
             : card,
       ),
-      drawContext: 'initial' as const,
+      deckDrawContext: createLiveDeckDrawContextState(0),
     },
     { deck: ['camera', 'perennial'] },
   );
@@ -185,7 +216,7 @@ it('解除キーが一致する未消費の検索指定を除去する', () => {
 it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {
   const initial = withHand(game('library'), ['class']);
   const state = withBoardState(
-    { ...initial, drawContext: 'shuffle' as const },
+    { ...initial, deckDrawContext: createLiveDeckDrawContextState(3) },
     {
       deck: ['library-ensemble'],
       graveyard: initial.deck

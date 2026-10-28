@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -74,9 +75,21 @@ export const libraryCards: readonly Card[] = [
     allHandCost: {
       reductions: [0, 20, 40, 60, 80, 100].map((minimumCards) => ({ minimumCards, amount: 10 })),
     },
-    drawRules: [
-      { condition: { kind: 'unit', value: 1 }, negated: true, weight: 0 },
-      { condition: { kind: 'unit', value: 1 }, negated: false, weight: -1 },
+    onDrawInduceEffects: [
+      createLiveOnDrawInduceEffect('library:1', {
+        probabilityType: 2,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 1,
+        conditionNotFlag: 2,
+      }),
+      createLiveOnDrawInduceEffect('library:2', {
+        probabilityType: 1,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 1,
+        conditionNotFlag: 1,
+      }),
     ],
     collectionEffects: {
       threshold: 300_000,

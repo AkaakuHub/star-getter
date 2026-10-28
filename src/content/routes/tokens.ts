@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { tokenNames } from '../labels/tokens';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -188,9 +189,21 @@ export const routeTokens: readonly Card[] = [
     appeal,
     beatPoint: 0,
     token: 'shadow',
-    drawRules: [
-      { condition: { kind: 'unit', value: 2 }, negated: true, weight: 0 },
-      { condition: { kind: 'unit', value: 2 }, negated: false, weight: -1 },
+    onDrawInduceEffects: [
+      createLiveOnDrawInduceEffect('tokens:1', {
+        probabilityType: 2,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 2,
+        conditionNotFlag: 2,
+      }),
+      createLiveOnDrawInduceEffect('tokens:2', {
+        probabilityType: 1,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 2,
+        conditionNotFlag: 1,
+      }),
     ],
     drawAbility: 'shadow',
     useAbility: 'shadow',

@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -98,7 +99,17 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
       ...card,
       drawEffects: [{ kind: 'amplify' as const, percent: 1 }],
       ...(card.token === 'shadow'
-        ? { drawRules: [{ condition: { kind: 'initial' as const }, negated: true, weight: -1 }] }
+        ? {
+            onDrawInduceEffects: [
+              createLiveOnDrawInduceEffect('handShuffle.test:1', {
+                probabilityType: 1,
+                probabilityValue: 0,
+                conditionType: 4,
+                conditionValue: 0,
+                conditionNotFlag: 2,
+              }),
+            ],
+          }
         : {}),
     }));
   state = withBoardState(
@@ -109,8 +120,11 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
       handEffectCardIds: [],
       tokenCardDeck: withHandTarget(state, 8).tokenCardDeck,
       amplification: 100,
-      drawContext: 'skill',
-      usedCard: { charactersId: 0, unitIds: [2] },
+      deckDrawContext: {
+        currentDrawType: 1 as const,
+        usedCard: { charactersId: 0, unitIds: [2], skillMainEffect: null },
+        usedSkill: null,
+      },
     },
     { hand: [], deck: deck.map((card) => card.cardInstanceId), graveyard: [] },
   );

@@ -1,3 +1,4 @@
+import { resolveLiveOnDrawInduceValues } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { collectionLimitDescription } from './collectionLimitDescription';
 import { describeEffect } from './describeEffect';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
@@ -66,24 +67,28 @@ export function describeAbilities(card: Card): string {
       break;
   }
   if (
-    card.drawRules?.some(
-      (rule) =>
-        rule.condition.kind === 'unit' &&
-        rule.condition.value === 1 &&
-        rule.negated &&
-        rule.weight === 0,
-    )
+    card.onDrawInduceEffects?.some((effect) => {
+      const rule = resolveLiveOnDrawInduceValues(effect);
+      return (
+        rule.conditionType === 5 &&
+        rule.conditionValue === 1 &&
+        rule.conditionNotFlag === 2 &&
+        rule.probabilityType === 2
+      );
+    })
   )
     text +=
       '潮の便り・空のはじまり・港の待ち合わせ・船出の合図・追い風使用後だけ山札から引くことができる。';
   if (
-    card.drawRules?.some(
-      (rule) =>
-        rule.condition.kind === 'unit' &&
-        rule.condition.value === 2 &&
-        rule.negated &&
-        rule.weight === 0,
-    ) &&
+    card.onDrawInduceEffects?.some((effect) => {
+      const rule = resolveLiveOnDrawInduceValues(effect);
+      return (
+        rule.conditionType === 5 &&
+        rule.conditionValue === 2 &&
+        rule.conditionNotFlag === 2 &&
+        rule.probabilityType === 2
+      );
+    }) &&
     card.token !== 'shadow'
   )
     text += '雨音の反響・凍空の鼓動使用後だけ山札から引くことができる。';

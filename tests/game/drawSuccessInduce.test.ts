@@ -1,3 +1,4 @@
+import { createLiveDeckDrawContextState } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { withBoardState } from './support/board';
 import { createLiveHandCardStats } from '@akaakuhub/suku-sute-core/runtime/cards/handCardStats';
 import { expect, it } from 'vite-plus/test';
@@ -71,7 +72,7 @@ it('Action901は有効な手札でもGenesisがなければMental条件を判定
       cardPool: [card],
       handCardStats: {},
       handEffectCardIds: [],
-      drawContext: 'idle' as const,
+      deckDrawContext: createLiveDeckDrawContextState(3),
       ap: { ...initial.ap, currentAp: 100 },
       mental: { ...initial.mental, currentMental: 100 },
       maximumMental: 100,

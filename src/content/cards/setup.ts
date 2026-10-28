@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 
@@ -16,9 +17,21 @@ export const setupCards: readonly Card[] = [
     consumeAp: 6,
     appeal: { smile: 4200, pure: 4200, cool: 4200 },
     beatPoint: 100,
-    drawRules: [
-      { condition: { kind: 'member', value: 1031 }, negated: true, weight: 0 },
-      { condition: { kind: 'member', value: 1031 }, negated: false, weight: -1 },
+    onDrawInduceEffects: [
+      createLiveOnDrawInduceEffect('setup:1', {
+        probabilityType: 2,
+        probabilityValue: 0,
+        conditionType: 1,
+        conditionValue: 1031,
+        conditionNotFlag: 2,
+      }),
+      createLiveOnDrawInduceEffect('setup:2', {
+        probabilityType: 1,
+        probabilityValue: 0,
+        conditionType: 1,
+        conditionValue: 1031,
+        conditionNotFlag: 1,
+      }),
     ],
     drawAbility: 'camera',
     effects: [
@@ -68,7 +81,15 @@ export const setupCards: readonly Card[] = [
     appeal: { smile: 5300, pure: 5300, cool: 5300 },
     beatPoint: 100,
     allHandCost: { reductions: [] },
-    drawRules: [{ condition: { kind: 'initial' }, negated: true, weight: -1 }],
+    onDrawInduceEffects: [
+      createLiveOnDrawInduceEffect('setup:3', {
+        probabilityType: 1,
+        probabilityValue: 0,
+        conditionType: 4,
+        conditionValue: 0,
+        conditionNotFlag: 2,
+      }),
+    ],
     beforeUseEffects: [{ kind: 'ap', amount: -99 }],
     effects: [
       { kind: 'use-hand' },

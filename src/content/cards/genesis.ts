@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
 
@@ -130,9 +131,21 @@ export const genesisCards: readonly Card[] = [
     consumeAp: 14,
     appeal: { smile: 4900, pure: 4600, cool: 7000 },
     beatPoint: 100,
-    drawRules: [
-      { condition: { kind: 'unit', value: 2 }, negated: true, weight: 0 },
-      { condition: { kind: 'unit', value: 2 }, negated: false, weight: -1 },
+    onDrawInduceEffects: [
+      createLiveOnDrawInduceEffect('genesis:1', {
+        probabilityType: 2,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 2,
+        conditionNotFlag: 2,
+      }),
+      createLiveOnDrawInduceEffect('genesis:2', {
+        probabilityType: 1,
+        probabilityValue: 0,
+        conditionType: 5,
+        conditionValue: 2,
+        conditionNotFlag: 1,
+      }),
     ],
     collectionEffects: {
       threshold: 300_000,

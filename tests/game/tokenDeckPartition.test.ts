@@ -1,3 +1,4 @@
+import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -20,7 +21,7 @@ function setup() {
     ...template,
     cardInstanceId: 'main',
     tokenCardSeriesIds: [],
-    drawRules: [],
+    onDrawInduceEffects: [],
     drawAbility: undefined,
   };
   const sub: readonly Card[] = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth'].map(
@@ -28,7 +29,15 @@ function setup() {
       ...template,
       cardInstanceId: id,
       tokenCardSeriesIds: [42],
-      drawRules: [{ condition: { kind: 'initial' }, negated: index !== 0, weight: 0 }],
+      onDrawInduceEffects: [
+        createLiveOnDrawInduceEffect('tokenDeckPartition.test:1', {
+          probabilityType: 2,
+          probabilityValue: 0,
+          conditionType: 4,
+          conditionValue: 0,
+          conditionNotFlag: index !== 0 ? 2 : 1,
+        }),
+      ],
       drawAbility: undefined,
       drawEffects: [{ kind: 'ap', amount: 9 }],
       ability893Effects: [{ kind: 'ap', amount: 7 }],
@@ -77,7 +86,7 @@ it('sub先行抽選はmainの実手札数でなく保存した目標枚数を使
   expect(result.ap.currentAp).toBe(base.ap.currentAp);
   expect(hand?.map((id) => result.handHeartCollectCounts[id])).toEqual([0, 0, 0, 0, 0]);
   expect(result.deckBoard.skillCardSearchParams).toEqual([]);
-  expect(result.usedCard).toBeNull();
+  expect(result.deckDrawContext.usedCard).toBeNull();
 });
 
 it('生成したカードの所属と現在の編成参照が同じ共通状態を使う', () => {

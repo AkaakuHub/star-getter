@@ -30,8 +30,11 @@ it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付�
   expect(state.resourceBoosts).toHaveLength(1);
   state = fillHand({
     ...shuffleHand(state, { recoverDiscard: true, destination: 'draw' }),
-    drawContext: 'skill',
-    usedCard: { charactersId: 0, unitIds: [2] },
+    deckDrawContext: {
+      currentDrawType: 1 as const,
+      usedCard: { charactersId: 0, unitIds: [2], skillMainEffect: null },
+      usedSkill: null,
+    },
   });
   expect(state.hand).toContain('frost-pulse');
   state = act(addHearts(state, 300_000), { type: 'collect' });

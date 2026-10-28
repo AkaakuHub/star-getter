@@ -260,7 +260,7 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
       deck: [card],
       cardPool: [card],
       handEffectCardIds: [],
-      drawContext: 'skill' as const,
+      deckDrawContext: { currentDrawType: 3 as const, usedCard: null, usedSkill: null },
     },
     { hand: [], deck: [card.cardInstanceId], graveyard: [] },
   );
