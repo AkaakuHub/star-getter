@@ -4,6 +4,8 @@ import { expect, test } from 'vite-plus/test';
 import { durationSeconds, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { rules } from '@akaakuhub/suku-sute-core/game/model';
+import { skillValue } from '@akaakuhub/suku-sute-core/game/effects/skillValue';
+import { applyAction52SkillBoostForCard } from '@akaakuhub/suku-sute-core/game/effects/action52SkillBoost';
 import { GameDriver } from './driver';
 
 const priority = [
@@ -18,6 +20,17 @@ const priority = [
   'camera',
   'library-ensemble',
 ];
+
+function preparedGenesisPower(driver: GameDriver): number {
+  const card = driver.state.deck.find((item) => item.cardInstanceId === 'horizon');
+  const effect = card?.special?.effects.find((item) => item.kind === 'genesis');
+  if (!card || effect?.kind !== 'genesis') throw new Error('開花の共鳴がありません。');
+  return applyAction52SkillBoostForCard(
+    driver.state,
+    card,
+    skillValue(driver.state, effect.effectValue, effect, card),
+  ).value;
+}
 
 async function activate(driver: GameDriver): Promise<number> {
   await driver.setWaitMode(true);
@@ -62,6 +75,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
         ? 0
         : Number(lastAllHand.after.gauge) - Number(lastAllHand.before.gauge);
     if (!stableCollection && allHandGain > 0 && progress + allHandGain >= target) {
+      if (driver.state.automaticHeart.enabled) await driver.toggleAutomaticHearts();
       const nextTarget = (target + rules.maxGenesisGauge) / 2;
       if (progress + allHandGain > nextTarget) {
         await driver.useFirst(['horizon', 'frost-echo', 'frost-pulse']);
@@ -117,7 +131,8 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
     );
     if (!driver.state.specialUsed.includes('library-ensemble'))
       await driver.special('library-ensemble');
-    if (driver.seconds >= (stableCollection ? 75 : 80)) await driver.special('horizon');
+    if (stableCollection ? driver.seconds >= 75 : preparedGenesisPower(driver) >= 200)
+      await driver.special('horizon');
     if (
       (stableCollection || driver.state.genesis.currentGauge < 2_050_000_000) &&
       driver.inputTick % 6 === 0
