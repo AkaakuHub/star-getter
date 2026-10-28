@@ -4,6 +4,36 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { spendAp } from '@akaakuhub/suku-sute-core/game/resources';
 import { game, withHand } from './support/game';
 
+it('APの空模様補正と追加値を倍率・EffectPowerより先に適用する', () => {
+  const state = game('library');
+  const initial = { ...state, moodOffset: 100, ap: { ...state.ap, currentAp: 0 } };
+  const after = applyEffect(
+    initial,
+    {
+      kind: 'ap',
+      amount: 2.5,
+      moodBonus: { target: 1, perPoint: 0.01 },
+    },
+    undefined,
+    2,
+    0.5,
+    1.5,
+  );
+  expect(after.ap.currentAp).toBe(12);
+});
+
+it('範囲外のAP回復量はint32へ飽和させてから通常APの上限を適用する', () => {
+  const state = game('library');
+  const after = applyEffect(
+    { ...state, ap: { ...state.ap, currentAp: 0 } },
+    {
+      kind: 'ap',
+      amount: 3000000000,
+    },
+  );
+  expect(after.ap.currentAp).toBe(state.ap.maxAp);
+});
+
 describe('エナジー消費時の回復タイマー', () => {
   it('上限で消費すると回復途中の時間を0へ戻す', () => {
     const state = game();
