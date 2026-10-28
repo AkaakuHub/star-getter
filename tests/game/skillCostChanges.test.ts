@@ -23,16 +23,16 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
       charactersId: 1021 as const,
       unitIds: [1],
       skillIcon: 600,
-      mainEffect: 800,
-      style: 2,
+      skillMainEffect: 800,
+      styleType: 2,
     },
     {
       ...other,
       charactersId: 1030 as const,
       unitIds: [2],
       skillIcon: 700,
-      mainEffect: 900,
-      style: 4,
+      skillMainEffect: 900,
+      styleType: 4,
     },
   ];
   const sourceCard = cards[0];

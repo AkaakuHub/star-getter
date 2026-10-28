@@ -19,7 +19,8 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
     performer: 'nova',
     appeal,
     beatPoint: 1,
-    mainEffect: 42,
+    skillMainEffect: 42,
+    styleType: null,
     consumeAp: 1,
     effects: sourceEffects,
   };
@@ -28,7 +29,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
     id: 'child',
     name: '子カード',
     charactersId: 1031,
-    mainEffect: 14,
+    skillMainEffect: 14,
     effects: childEffects,
   };
   const deck = [source, child];

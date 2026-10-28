@@ -11,6 +11,8 @@ export const preparationCards: readonly Card[] = [
     performer: 'lumen',
     charactersId: 1042,
     unitIds: [2],
+    skillMainEffect: null,
+    styleType: null,
     costume: 'march',
     consumeAp: 14,
     appeal: { smile: 3850, pure: 4250, cool: 6400 },

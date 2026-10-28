@@ -140,7 +140,7 @@ it('スキル検索はアイコンではなくカードのMainEffectを照合す
     {
       ...initial,
       deck: initial.deck.map((card) =>
-        card.id === 'camera' ? { ...card, mainEffect: 987654 } : card,
+        card.id === 'camera' ? { ...card, skillMainEffect: 987654 } : card,
       ),
       drawContext: 'skill' as const,
     },

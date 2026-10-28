@@ -48,7 +48,7 @@ it('Action27のMember・SkillMainEffect・Unit条件は使用カードの値で�
   const state = game();
   const card = state.deck[0];
   if (!card) throw new Error('追加きらめき誘発の検証カードがありません。');
-  const withMainEffect = { ...card, mainEffect: 25 };
+  const withMainEffect = { ...card, skillMainEffect: 25 };
   expect(
     matchesAdditionalHeartCondition({ kind: 'member', member: BigInt(card.charactersId) }, card),
   ).toBe(true);

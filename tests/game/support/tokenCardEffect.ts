@@ -4,13 +4,13 @@ export function tokenCardEffect(
   resourceId: number,
   count: bigint,
   seriesIds: readonly bigint[] = [],
-  style = 1,
+  styleType = 1,
 ): TokenCardEffect {
   return {
     kind: 'token-card',
     resourceId,
     count,
-    style,
+    styleType,
     mood: 1,
     skillSeriesId: 0,
     skillLevel: 1,

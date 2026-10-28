@@ -237,7 +237,7 @@ it.each([
       ],
     };
     const state = withHand({ ...initial, deck: [watcher], cardPool: [watcher] }, [watcher.id]);
-    const used = { ...original, id: 'used-card', skillIcon: 77, mainEffect: 12 };
+    const used = { ...original, id: 'used-card', skillIcon: 77, skillMainEffect: 12 };
     const next = notifyHandSkillUse(state, used, applyEffect);
     expect(next.moodOffset - state.moodOffset).toBe(expected);
   },

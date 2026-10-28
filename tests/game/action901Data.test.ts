@@ -53,6 +53,8 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
     performer: 'nova',
     charactersId: 1021,
     unitIds: [1],
+    skillMainEffect: null,
+    styleType: null,
     costume: 'star',
     consumeAp: 0,
     appeal: { smile: 1, pure: 1, cool: 1 },

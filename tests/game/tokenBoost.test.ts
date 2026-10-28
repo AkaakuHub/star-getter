@@ -144,7 +144,7 @@ it('ActionType28はMasterからTokenCardを生成し、系列情報を保持す�
   const generated = applyEffect(initial, tokenCardEffect(481, 2n, [42n], 2), undefined);
   const added = generated.deck.filter((card) => card.id.startsWith('token-card-positive-481-'));
   expect(added).toHaveLength(2);
-  expect(added.every((card) => card.style === 2)).toBe(true);
+  expect(added.every((card) => card.styleType === 2)).toBe(true);
   expect(added.every((card) => card.tokenCard && card.performer === null)).toBe(true);
 });
 

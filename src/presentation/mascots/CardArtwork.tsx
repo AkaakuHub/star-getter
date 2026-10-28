@@ -10,7 +10,7 @@ export function CardArtwork({ card }: Readonly<{ card: Card }>) {
       <span
         className="token-card-art"
         data-mood={card.mood}
-        data-style={card.style}
+        data-style={card.styleType}
         aria-hidden="true"
       />
     );

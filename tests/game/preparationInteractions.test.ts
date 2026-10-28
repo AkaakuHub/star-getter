@@ -86,7 +86,7 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
   const source = initial.deck.find((card) => card.id === 'rain-preparation');
   const baseUsed = initial.deck.find((card) => card.id === 'frost-echo');
   if (!source || !baseUsed) throw new Error('カードがありません。');
-  const used = { ...baseUsed, skillIcon: 99, mainEffect: 77 };
+  const used = { ...baseUsed, skillIcon: 99, skillMainEffect: 77 };
   const triggers: readonly HandUseTrigger[] = [
     { kind: 'member', member: BigInt(used.charactersId) + 9_007_199_254_740_992n },
     { kind: 'skill-main-effect', mainEffect: 77n },

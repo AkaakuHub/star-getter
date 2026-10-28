@@ -17,6 +17,8 @@ it.each([false, true])(
       performer: 'nova',
       charactersId: 1021,
       unitIds: [1],
+      skillMainEffect: null,
+      styleType: null,
       costume: null,
       appeal,
       beatPoint: 0,
