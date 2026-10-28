@@ -2,7 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
-import { int64ToFloat32 } from '@akaakuhub/suku-sute-core/game/numeric';
+import { int64ToFloat32 } from '@akaakuhub/suku-sute-core/runtime/numeric';
 
 it('ActionType2の詳細値をSTAR上昇Effectへ接続する', () => {
   const track = tracks[0];
