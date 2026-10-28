@@ -9,7 +9,7 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 it('ActionType48の負の目標値は非絶対加算時に下方向で到達判定する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  const initial = act(createGame(track, routes.bloom.deck, 7), { type: 'start' });
+  const initial = act(createGame(track, routes.genesis.deck, 7), { type: 'start' });
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
   const active = applyEffect(

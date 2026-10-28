@@ -33,13 +33,13 @@ it('ActionType26はlong詳細値をミリ秒float32またはパート数bigint�
 
 it('ActionType26詳細レコードをcreateGameから自然増加停止へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 26_001n, detailType: 'STOP_VOLTAGE_INCREASE_DISPLAY_TIME_TYPE', value: 2n },
     { id: 26_002n, detailType: 'STOP_VOLTAGE_INCREASE_DISPLAY_TIME', value: 3n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -65,7 +65,7 @@ it('ActionType26詳細レコードをcreateGameから自然増加停止へ接続
 it('ActionType26の期限0は自然増加停止要求を作らない', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲データがありません。');
-  const state = createGame(track, routes.bloom.deck, 7);
+  const state = createGame(track, routes.genesis.deck, 7);
   const card = state.deck[0];
   if (!card) throw new Error('カードがありません。');
   const effect = createStopVoltageIncreaseEffect({

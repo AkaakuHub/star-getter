@@ -12,9 +12,9 @@ import { withHand } from './support/game';
 
 it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

@@ -11,7 +11,7 @@ import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
-function game(route: 'library' | 'bloom'): GameState {
+function game(route: 'library' | 'genesis'): GameState {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   return act(createGame(track, routes[route].deck, 7, 10, routes[route].tokens), {
@@ -20,7 +20,7 @@ function game(route: 'library' | 'bloom'): GameState {
 }
 
 it('手札の回収条件は複数回の合計で成立し、自動回収の0.3秒を手動操作へ適用しない', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   let state: GameState = {
     ...initial,
     hand: ['horizon'],
@@ -41,7 +41,7 @@ it('手札の回収条件は複数回の合計で成立し、自動回収の0.3�
 });
 
 it('一度の回収で条件を大きく超えても1回だけ発動し、引き直すと回収条件が復帰する', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   let state: GameState = {
     ...initial,
     hand: ['horizon'],
@@ -62,7 +62,7 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
 });
 
 it('手札誘発は回収条件を超えるたびに発動し、指定回数で止まる', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const original = initial.deck.find((item) => !item.relay);
   if (!original) throw new Error('カードがありません。');
   const card = {
@@ -89,7 +89,7 @@ it('手札誘発は回収条件を超えるたびに発動し、指定回数で�
 });
 
 it('手札誘発の回数は離脱時に初期化し、記憶指定時は保持する', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const original = initial.deck[0];
   if (!original) throw new Error('カードがありません。');
   const resetCard = {
@@ -200,7 +200,7 @@ it('仕込んだうなばらでは手動連打の回収回数が0.3秒間隔の�
 
 for (const mood of [-100, 0, 100]) {
   it(`開花の回収特性は空模様${mood}%に応じて3000〜3750回分のきらめきを獲得する`, () => {
-    const initial = game('bloom');
+    const initial = game('genesis');
     const state = {
       ...initial,
       track: {

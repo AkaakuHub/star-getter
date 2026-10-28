@@ -45,14 +45,14 @@ it('ActionType25はlongの詳細値・対象Mood・期限を保持して計算�
 
 it('ActionType25の詳細レコードをcreateGameでハート上限効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 25_001_1n, detailType: 'CHANGE_HEART_LIMIT_CALC_TYPE', targetMood: 0, value: 1n },
     { id: 25_001_2n, detailType: 'CHANGE_HEART_LIMIT_NUM', targetMood: 0, value: 15_000n },
     { id: 25_001_3n, detailType: 'CHANGE_HEART_LIMIT_DISPLAY_TIME_TYPE', targetMood: 0, value: 3n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

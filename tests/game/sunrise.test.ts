@@ -1,3 +1,4 @@
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -15,11 +16,7 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
       currentMental: 80,
       amplification: 100,
       targetBoosts: [],
-      bloom: {
-        progress: 1n,
-        strength: 3.5,
-        rollback: { currentAp: 0, currentMental: 80, currentVoltage: 0 },
-      },
+      genesis: { ...activateGenesis(initial, 3.5).genesis, currentGauge: 1 },
     },
     ['sunrise'],
   );

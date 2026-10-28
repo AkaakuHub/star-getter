@@ -2,12 +2,12 @@ import { sunriseCard } from './cards/sunrise';
 import { preparationCards } from './cards/preparation';
 import { libraryCards } from './cards/library';
 import { setupCards } from './cards/setup';
-import { bloomCards } from './cards/bloom';
+import { genesisCards } from './cards/genesis';
 
 export const baseCards = [
   ...libraryCards,
   ...setupCards,
-  ...bloomCards,
+  ...genesisCards,
   ...preparationCards,
   sunriseCard,
 ];

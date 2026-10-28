@@ -24,7 +24,7 @@ export function HeartCanvas({ controller }: Readonly<{ controller: GameControlle
       paintHearts(
         context,
         controller.state,
-        controller.state.bloom ? sprites.flower : sprites.heart,
+        controller.state.genesis.effects.length > 0 ? sprites.flower : sprites.heart,
         width,
         height,
       );

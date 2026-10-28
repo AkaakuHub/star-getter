@@ -5,10 +5,10 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType907の対象・しきい値・子効果IDを効果誘発へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'mood' as const, amount: 2, skillEffectId: 90711n };
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

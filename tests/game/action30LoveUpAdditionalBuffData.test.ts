@@ -61,7 +61,7 @@ it('ActionType30はlong詳細値・Mood補正・対象・期限を正確に変�
 
 it('ActionType30の詳細レコードをcreateGameでSTAR追加バフへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     {
@@ -78,7 +78,7 @@ it('ActionType30の詳細レコードをcreateGameでSTAR追加バフへ接続�
       value: 3n,
     },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

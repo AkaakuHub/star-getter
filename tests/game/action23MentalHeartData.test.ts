@@ -38,14 +38,14 @@ it('ActionType23はlong詳細値のint32化とパート期限のlong保持を行
 
 it('ActionType23の詳細レコードをcreateGameで精神力連動効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 23_001_1n, detailType: 'MENTAL_HEART_INDUCE_NUM', value: 10_000n },
     { id: 23_001_2n, detailType: 'MENTAL_HEART_INDUCE_DISPLAY_TIME_TYPE', value: 3n },
     { id: 23_001_3n, detailType: 'MENTAL_HEART_INDUCE_DISPLAY_TIME', value: 0n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -67,9 +67,9 @@ it('ActionType23の詳細レコードをcreateGameで精神力連動効果へ接
 
 it('ActionType23のHandPermanentレコードは自動期限を止め、離脱時に解除する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

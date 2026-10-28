@@ -50,7 +50,7 @@ it('ActionType24は対象メンバー配列をlongのまま検証し、int32折�
 
 it('ActionType24の詳細レコードと子効果をcreateGameで接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     {
@@ -64,7 +64,7 @@ it('ActionType24の詳細レコードと子効果をcreateGameで接続する', 
     { id: 24_001_3n, detailType: 'COMBO_INDUCE_REPEAT_ACTION', value: 1n },
   ] as const;
   const childEffects = [{ kind: 'ap' as const, amount: 2 }];
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

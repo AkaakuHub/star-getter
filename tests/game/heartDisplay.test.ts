@@ -9,7 +9,7 @@ import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation
 function game(limit?: number) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  return act(createGame(track, routes.bloom.deck, 7, limit, routes.bloom.tokens), {
+  return act(createGame(track, routes.genesis.deck, 7, limit, routes.genesis.tokens), {
     type: 'start',
   });
 }

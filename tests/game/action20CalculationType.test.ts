@@ -9,7 +9,7 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 it('ActionType20の未対応計算種別は初回加算せず、期限時の解除通知だけ行う', () => {
   const track = tracks[0];
   if (!track) throw new Error('テスト用データがありません。');
-  const initial = createGame(track, routes.bloom.deck, 7);
+  const initial = createGame(track, routes.genesis.deck, 7);
   const effect = createHandCardCountEffect({
     skillEffectId: 20_010n,
     details: [

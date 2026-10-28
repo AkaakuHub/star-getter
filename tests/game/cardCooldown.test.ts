@@ -23,7 +23,7 @@ for (const enabled of [false, true]) {
 }
 
 it('開花の共鳴後も30tickに達するまで次の通常カードを発動できない', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const started = advanceTo(
     act({ ...initial, currentAp: 20 }, { type: 'special', cardId: 'horizon' }),
     1,

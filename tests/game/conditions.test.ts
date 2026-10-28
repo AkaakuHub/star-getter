@@ -24,7 +24,7 @@ const context: ConditionContext = {
   tokenSeries: [[1, 2], [2], [3]],
   supportLevels: { 1021: 10, 1031: 20 },
   naturalStars: 50,
-  bloomActive: false,
+  genesisActive: false,
 };
 
 describe('カード共通の条件判定', () => {
@@ -105,30 +105,30 @@ describe('カード共通の条件判定', () => {
       whenFalse: [{ kind: 'ap-limit' as const, amount: 2 }],
     };
     expect(applyEffect(initial, effect).maxAp).toBe(initial.maxAp + 1);
-    const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
-    expect(applyEffect(bloom, effect).maxAp).toBe(initial.maxAp + 1);
+    const genesis = applyEffect(initial, { kind: 'genesis', effectValue: 1 });
+    expect(applyEffect(genesis, effect).maxAp).toBe(initial.maxAp + 1);
   });
   it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
     const initial = game();
-    const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
-    const result = applyEffect(bloom, {
+    const genesis = applyEffect(initial, { kind: 'genesis', effectValue: 1 });
+    const result = applyEffect(genesis, {
       kind: 'branch',
       condition: { kind: 'mental-at-most', fraction: 0.5 },
       whenTrue: [{ kind: 'ap-limit', amount: 1 }],
       whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxAp).toBe(bloom.maxAp + 3);
+    expect(result.maxAp).toBe(genesis.maxAp + 3);
   });
   it('開花中も空模様分岐は両側を発動しない', () => {
-    const bloom = applyEffect(game(), { kind: 'bloom', strength: 1 });
-    const context = conditionContext(bloom);
-    const result = applyEffect(bloom, {
+    const genesis = applyEffect(game(), { kind: 'genesis', effectValue: 1 });
+    const context = conditionContext(genesis);
+    const result = applyEffect(genesis, {
       kind: 'branch',
       condition: { kind: 'weather', minimum: context.weather },
       whenTrue: [{ kind: 'ap-limit', amount: 1 }],
       whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxAp).toBe(bloom.maxAp + 1);
+    expect(result.maxAp).toBe(genesis.maxAp + 1);
   });
   it('永続分岐は条件変化時に前の子効果を解除して切り替える', () => {
     const original = game();

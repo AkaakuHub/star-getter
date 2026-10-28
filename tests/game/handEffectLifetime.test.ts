@@ -4,7 +4,7 @@ import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { game, withHand } from './support/game';
 
 it('開始時は901を実行せず、903/904だけ手札へ登録する', () => {
-  for (const route of ['library', 'bloom'] as const) {
+  for (const route of ['library', 'genesis'] as const) {
     const state = game(route);
     expect(heartCount(state)).toBe(0);
     expect(state.currentMental).toBe(100);

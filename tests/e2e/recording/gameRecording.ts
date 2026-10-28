@@ -53,7 +53,7 @@ export type InputRecord = Readonly<{
 function snapshot(state: GameState): Snapshot {
   return {
     score: state.score.toString(),
-    gauge: state.bloom?.progress.toString() ?? null,
+    gauge: state.genesis.effects.length > 0 ? state.genesis.currentGauge.toString() : null,
     deckSize: state.deck.length,
     currentAp: state.currentAp,
     hearts: heartCount(state),

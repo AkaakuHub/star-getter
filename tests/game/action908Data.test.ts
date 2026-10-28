@@ -5,10 +5,10 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('ActionType908の墓地移動時点・要求数・上限と子効果IDを接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'ap' as const, amount: 2, skillEffectId: 90811n };
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

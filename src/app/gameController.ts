@@ -84,7 +84,7 @@ export class GameController {
       mentalDown: this.currentState.mentalDown,
       allSkillsCostOver: this.currentState.hand.every(
         (_, index) =>
-          this.currentState.bloom === null &&
+          this.currentState.genesis.effects.length === 0 &&
           cardCost(this.currentState, cardAt(this.currentState, index)) >
             this.currentState.currentAp,
       ),

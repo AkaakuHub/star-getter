@@ -29,7 +29,7 @@ export function LiveHud({
 }>) {
   const special = specialButtonCard(state);
   const seconds = state.tick / rules.ticksPerSecond;
-  const CollectIcon = state.bloom ? Gem : Star;
+  const CollectIcon = state.genesis.effects.length > 0 ? Gem : Star;
   return (
     <>
       <div className="live-header">
@@ -89,7 +89,7 @@ export function LiveHud({
             ? 'カード使用待ちを解除'
             : heartCount(state) +
               '個の' +
-              (state.bloom ? '結晶' : 'きらめき') +
+              (state.genesis.effects.length > 0 ? '結晶' : 'きらめき') +
               'を回収、上限' +
               state.hearts.heartLimit +
               '個'
@@ -98,7 +98,7 @@ export function LiveHud({
         <CollectIcon
           className="heart-count-icon"
           size={18}
-          fill={state.bloom ? 'none' : 'currentColor'}
+          fill={state.genesis.effects.length > 0 ? 'none' : 'currentColor'}
           aria-hidden="true"
         />
         <strong className="heart-count-current">{formatNumber(heartCount(state))}</strong>

@@ -26,7 +26,7 @@ export class GameDriver {
   collectionAmplification = 0;
   cardActions = 0;
   specialActions = 0;
-  peakGauge = 0n;
+  peakGauge = 0;
   peakDeckSize = 0;
   peakHeartLimit = 0;
 
@@ -192,7 +192,7 @@ export class GameDriver {
         (index) =>
           this.state.phase === 'playing' &&
           !this.state.mentalDown &&
-          (this.state.bloom !== null ||
+          (this.state.genesis.effects.length > 0 ||
             this.state.currentAp >= cardCost(this.state, cardAt(this.state, index))),
       );
     for (const key of priority) {
@@ -344,8 +344,9 @@ export class GameDriver {
         classUses: this.state.cardUseCounts.class ?? 0,
         shadowUses: this.state.cardUseCounts['shadow-1'] ?? 0,
         score: this.state.score.toString(),
-        gauge: this.state.bloom?.progress.toString() ?? null,
-        bloomStrength: this.state.bloom?.strength ?? null,
+        gauge:
+          this.state.genesis.effects.length > 0 ? this.state.genesis.currentGauge.toString() : null,
+        genesisStrength: this.state.genesis.effects[0]?.effectValue ?? null,
         peakGauge: this.peakGauge.toString(),
         peakDeckSize: this.peakDeckSize,
         peakHeartLimit: this.peakHeartLimit,
@@ -357,7 +358,7 @@ export class GameDriver {
     this.recording.observe(this.state, this.elapsedTicks);
     this.peakDeckSize = Math.max(this.peakDeckSize, this.state.deck.length);
     this.peakHeartLimit = Math.max(this.peakHeartLimit, this.state.hearts.heartLimit);
-    const gauge = this.state.bloom?.progress ?? 0n;
+    const gauge = this.state.genesis.currentGauge;
     if (gauge > this.peakGauge) this.peakGauge = gauge;
   }
 }

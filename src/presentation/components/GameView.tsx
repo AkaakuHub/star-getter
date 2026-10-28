@@ -41,7 +41,10 @@ export function GameView({
   busy: boolean;
 }>) {
   return (
-    <main className={'idol-game' + (state.bloom ? ' is-blooming' : '')} aria-label="ライブ">
+    <main
+      className={'idol-game' + (state.genesis.effects.length > 0 ? ' is-genesis-active' : '')}
+      aria-label="ライブ"
+    >
       <Stage controller={controller} state={state} />
       <LiveHud controller={controller} state={state} onSpecial={onSpecial} busy={busy} />
       <nav aria-label="ライブ操作">

@@ -12,7 +12,7 @@ function card(state: ReturnType<typeof game>, id: string): Card {
 }
 
 it('指定系列を別デッキへ分け、切替後に統合する', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selectedId = base.deck[5]?.id;
   if (!selectedId) throw new Error('対象カードがありません。');
   const deck = base.deck.map((item) =>
@@ -49,7 +49,7 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
 });
 
 it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ戻す', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const cardData = { ...selected, tokenSeriesIds: [42] };
@@ -75,7 +75,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
 });
 
 it('ActionType43の系列IDを参照実装のint32へ変換してから照合する', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const state = {
@@ -97,7 +97,7 @@ it('ActionType43の系列IDを参照実装のint32へ変換してから照合す
 });
 
 it('ActionType43の分割後にデッキアウト確認を実行する', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const state = {
@@ -119,7 +119,7 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
 });
 
 it('ActionType43は空のサブデッキへの切替後にデッキアウト確認を実行する', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const split = applyEffect(
@@ -148,7 +148,7 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
 });
 
 it('期限切れでメインデッキへ戻す', () => {
-  const base = game('bloom');
+  const base = game('genesis');
   const selectedId = base.deck[5]?.id;
   if (!selectedId) throw new Error('対象カードがありません。');
   const deck = base.deck.map((item) =>

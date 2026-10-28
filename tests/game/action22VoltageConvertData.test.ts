@@ -38,7 +38,7 @@ it('ActionType22はlong詳細値を参照実装同様にint32へ変換して効�
 
 it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 22_001_1n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_TYPE', value: 2n },
@@ -46,7 +46,7 @@ it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続
     { id: 22_001_3n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_DISPLAY_TIME_TYPE', value: 1n },
     { id: 22_001_4n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_DISPLAY_TIME', value: 1000n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -68,7 +68,7 @@ it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続
 
 it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離脱時に解除する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 22_002_1n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_TYPE', value: 1n },
@@ -76,7 +76,7 @@ it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離
     { id: 22_002_3n, detailType: 'CONVERT_VOLTAGE_UP_DISPLAY_TIME_TYPE', value: 1n },
     { id: 22_002_4n, detailType: 'CONVERT_VOLTAGE_UP_DISPLAY_TIME', value: 100n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

@@ -1,3 +1,4 @@
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
@@ -13,8 +14,8 @@ const ordinaryLimit = {
   additionalEnabled: false,
   bonusScoreValue: 0,
   voltageMultiplier: 0n,
-  bloomActive: false,
-  bloomGauge: 0,
+  genesisActive: false,
+  currentGenesisGauge: 0,
 };
 
 function game() {
@@ -56,11 +57,7 @@ describe('star-getterの回収得点', () => {
       collectionScore(
         {
           ...base,
-          bloom: {
-            progress: 4n,
-            strength: 1,
-            rollback: { currentAp: 10, currentMental: 100, currentVoltage: 0 },
-          },
+          genesis: { ...activateGenesis(base, 1).genesis, currentGauge: 4 },
         },
         10,
         false,

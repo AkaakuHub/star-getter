@@ -4,7 +4,7 @@ import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { changeResource, expireGaugeInfinities } from '@akaakuhub/suku-sute-core/game/resources';
 import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
-import { activateBloom, finishBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { activateGenesis, finishGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { game } from './support/game';
 
 describe('無限ゲージ', () => {
@@ -195,33 +195,33 @@ describe('無限ゲージ', () => {
   });
 
   it('Genesis中に開始した無限ゲージの時間期限を保持し、終了後に無限状態へ移す', () => {
-    const initial = activateBloom(game('bloom'), 1);
+    const initial = activateGenesis(game('genesis'), 1);
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'ap',
       duration: { kind: 'milliseconds', value: 1000 },
     });
     expect(active.gaugeInfinities[0]?.suspended).toBe(true);
-    expect(active.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
-    const finished = finishBloom(active);
+    expect(active.genesis.currentGauge).toBe(initial.genesis.currentGauge + 500);
+    const finished = finishGenesis(active);
     expect(finished.gaugeInfinities[0]?.suspended).toBe(false);
     expect(finished.currentAp).toBe(finished.maxAp);
     expect(changeResource(finished, 'ap', -1n).currentAp).toBe(finished.currentAp);
   });
 
   it('開花中は500のGenesisゲージを加算し、期限付き無限状態を保留する', () => {
-    const initial = activateBloom(game('bloom'), 1);
+    const initial = activateGenesis(game('genesis'), 1);
     const next = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'mental',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(next.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
+    expect(next.genesis.currentGauge).toBe(initial.genesis.currentGauge + 500);
     expect(next.gaugeInfinities[0]?.suspended).toBe(true);
   });
 
   it('開花中の熱気無限解除は熱気を維持してGenesis進捗へ目標差を加算する', () => {
-    const initial = { ...activateBloom(game('bloom'), 1), currentVoltage: 100 };
+    const initial = { ...activateGenesis(game('genesis'), 1), currentVoltage: 100 };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
@@ -229,18 +229,18 @@ describe('無限ゲージ', () => {
       invocationType: 0x388,
       deactivationKey: 'voltage-infinity',
     });
-    const bloom = active.bloom;
-    if (!bloom) throw new Error('開花が発動していません。');
+    const genesis = active.genesis;
+    if (!genesis) throw new Error('開花が発動していません。');
     const ended = act(active, {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
     expect(ended.currentVoltage).toBe(active.currentVoltage);
-    expect(ended.bloom?.progress).toBe(bloom.progress + 23n);
+    expect(ended.genesis.currentGauge).toBe(genesis.currentGauge + 23);
   });
 
   it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {
-    const base = { ...game('bloom'), currentMental: 42, mentalTimerSeconds: 0.4 };
+    const base = { ...game('genesis'), currentMental: 42, mentalTimerSeconds: 0.4 };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -249,7 +249,7 @@ describe('無限ゲージ', () => {
       disabledType: 0,
       disabledValue: 0n,
     });
-    const initial = activateBloom(inducing, 1);
+    const initial = activateGenesis(inducing, 1);
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'mental',
@@ -264,11 +264,11 @@ describe('無限ゲージ', () => {
     expect(ended.currentMental).toBe(42);
     expect(ended.mentalTimerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
-    expect(finishBloom(ended).currentMental).toBe(42);
+    expect(finishGenesis(ended).currentMental).toBe(42);
   });
 
   it('開花中の元気無限期限切れでも元気回復誘発を起こさない', () => {
-    const base = { ...game('bloom'), currentMental: 42, mentalTimerSeconds: 0.4 };
+    const base = { ...game('genesis'), currentMental: 42, mentalTimerSeconds: 0.4 };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -277,7 +277,7 @@ describe('無限ゲージ', () => {
       disabledType: 0,
       disabledValue: 0n,
     });
-    const initial = activateBloom(inducing, 1);
+    const initial = activateGenesis(inducing, 1);
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'mental',
@@ -291,7 +291,7 @@ describe('無限ゲージ', () => {
   });
 
   it('Genesis中に開始した熱気と元気の無限状態を終了時に反映する', () => {
-    const base = game('bloom');
+    const base = game('genesis');
     const initial = {
       ...base,
       maximumMental: 150,
@@ -305,8 +305,8 @@ describe('無限ゲージ', () => {
       disabledType: 0,
       disabledValue: 0n,
     });
-    const blooming = activateBloom(inducing, 1);
-    const voltage = applyEffect(blooming, {
+    const genesisActive = activateGenesis(inducing, 1);
+    const voltage = applyEffect(genesisActive, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
       duration: { kind: 'milliseconds', value: 500 },
@@ -316,7 +316,7 @@ describe('無限ゲージ', () => {
       gauge: 'mental',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    const finished = finishBloom(mental);
+    const finished = finishGenesis(mental);
     const generated =
       finished.hearts.stageHearts.length +
       finished.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);

@@ -57,9 +57,9 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
 
 it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -129,9 +129,9 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
 
 it('ActionType36は系列IDに一致するMaster variantがない場合に失敗する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

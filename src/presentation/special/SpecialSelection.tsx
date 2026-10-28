@@ -1,7 +1,7 @@
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import {
   canUseSpecial,
-  isBloomSpecial,
+  isGenesisSpecial,
   specialCards,
   specialCost,
 } from '@akaakuhub/suku-sute-core/game/special';
@@ -25,7 +25,7 @@ export function SpecialSelection({
       <div className="special-options">
         {specialCards(state).map((card) => {
           const used = state.specialUsed.includes(card.id);
-          const action = isBloomSpecial(card)
+          const action = isGenesisSpecial(card)
             ? '開花を発動（エナジー' + specialCost(card) + '）'
             : 'エナジー' + specialCost(card) + 'で使用';
           return (

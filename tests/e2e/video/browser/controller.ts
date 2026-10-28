@@ -51,7 +51,7 @@ export function createGameController(
         wallTick,
         tick: state.tick,
         score: state.score.toString(),
-        gauge: state.bloom?.progress.toString() ?? null,
+        gauge: state.genesis.effects.length > 0 ? state.genesis.currentGauge.toString() : null,
         deckSize: state.deck.length,
         currentAp: state.currentAp,
         heartLimit: state.hearts.heartLimit,

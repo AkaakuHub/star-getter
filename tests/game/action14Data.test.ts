@@ -6,9 +6,9 @@ import { int64ToFloat32 } from '@akaakuhub/suku-sute-core/runtime/numeric';
 
 it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -40,11 +40,11 @@ it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する
 
 it('ActionType14のlong値を参照実装と同じfloat32に変換する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const base = (1n << 53n) + 1n;
   const mood = (1n << 54n) + (1n << 30n) + 1n;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

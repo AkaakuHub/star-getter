@@ -13,7 +13,7 @@ import {
 function game() {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  return act(createGame(track, routes.bloom.deck, 7), { type: 'start' });
+  return act(createGame(track, routes.genesis.deck, 7), { type: 'start' });
 }
 
 it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持する', () => {
@@ -50,9 +50,9 @@ it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持
 
 it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -95,9 +95,9 @@ it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する
 
 it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱時に解除する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -124,7 +124,7 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
   const compiled = state.deck.find((card) => card.id === source.id);
   if (!compiled) throw new Error('カードがありません。');
   const active = activateHandPermanentEffects(state, compiled);
-  const baseState = createGame(track, routes.bloom.deck, 7);
+  const baseState = createGame(track, routes.genesis.deck, 7);
   const baseCard = baseState.deck.find((card) => card.id === source.id);
   if (!baseCard) throw new Error('比較対象のカードがありません。');
   const expected = activateHandPermanentEffects(baseState, {
@@ -148,9 +148,9 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
 
 it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -180,9 +180,9 @@ it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接�
 
 it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -208,9 +208,9 @@ it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続
 
 it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEffectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -238,9 +238,9 @@ it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEff
 
 it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -269,9 +269,9 @@ it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ
 
 it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -300,9 +300,9 @@ it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ�
 
 it('ActionType30/31の詳細レコードはcreateGameで各追加バフへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

@@ -5,7 +5,7 @@ import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 import { initializeHandCardStats } from '@akaakuhub/suku-sute-core/game/cards/skillCostChanges';
 
-export function game(route: RouteId = 'bloom', seed = 7, limit = 100): GameState {
+export function game(route: RouteId = 'genesis', seed = 7, limit = 100): GameState {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const preset = routes[route];

@@ -38,7 +38,7 @@ const records = [
 ];
 
 it('グループからミッションを選び、達成数・報酬・次のミッションを進める', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const state = {
     ...initial,
     randomSeed: 7,
@@ -59,7 +59,7 @@ it('グループからミッションを選び、達成数・報酬・次のミ�
 });
 
 it('ActionType2以外のスキル効果ではActionType2ミッションを進めない', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const state = {
     ...initial,
     randomSeed: 7,
@@ -92,7 +92,7 @@ it('ActionType2以外のスキル効果ではActionType2ミッションを進め
 });
 
 it('カードのActionType13効果をActionType44のミッションへ通知する', () => {
-  const initial = game('bloom');
+  const initial = game('genesis');
   const id = initial.hand[0];
   if (!id) throw new Error('手札がありません。');
   const card = initial.deck.find((item) => item.id === id);

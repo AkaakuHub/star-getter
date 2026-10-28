@@ -11,7 +11,7 @@ it('Action51はFullEnd時にNumToValueを開花強度として登録する', () 
     { kind: 'genesis-skill', effectBaseNum: 35_000n, duration: { kind: 'stage', value: 0n } },
     source,
   );
-  expect(active.bloom?.strength).toBe(3.5);
+  expect(active.genesis.effects[0]?.effectValue).toBe(3.5);
 });
 
 it('Action51は正のGenesis値へActionType52を適用し、強いGenesisを選ぶ', () => {
@@ -30,14 +30,14 @@ it('Action51は正のGenesis値へActionType52を適用し、強いGenesisを選
     { kind: 'genesis-skill', effectBaseNum: 20_000n, duration: { kind: 'stage', value: 0n } },
     source,
   );
-  expect(first.bloom?.strength).toBe(3);
+  expect(first.genesis.effects[0]?.effectValue).toBe(3);
   expect(first.action52Buffs).toHaveLength(0);
   const stronger = applyEffect(
     first,
     { kind: 'genesis-skill', effectBaseNum: 50_000n, duration: { kind: 'stage', value: 0n } },
     source,
   );
-  expect(stronger.bloom?.strength).toBe(5);
+  expect(stronger.genesis.effects[0]?.effectValue).toBe(5);
 });
 
 it('Action51のミリ秒・パート期限では参照実装どおりGenesisを有効化せず、正値のActionType52だけを消費する', () => {
@@ -60,14 +60,14 @@ it('Action51のミリ秒・パート期限では参照実装どおりGenesisを�
     },
     source,
   );
-  expect(timed.bloom).toBeNull();
+  expect(timed.genesis.effects).toHaveLength(0);
   expect(timed.action52Buffs).toHaveLength(0);
   const section = applyEffect(initial, {
     kind: 'genesis-skill',
     effectBaseNum: 20_000n,
     duration: { kind: 'sections', value: 1n },
   });
-  expect(section.bloom).toBeNull();
+  expect(section.genesis.effects).toHaveLength(0);
 });
 
 it('Action51の非FullEnd期限0は何も発動せずActionType52も消費しない', () => {
@@ -90,7 +90,7 @@ it('Action51の非FullEnd期限0は何も発動せずActionType52も消費しな
     },
     source,
   );
-  expect(unchanged.bloom).toBeNull();
+  expect(unchanged.genesis.effects).toHaveLength(0);
   expect(unchanged.action52Buffs).toHaveLength(1);
 });
 

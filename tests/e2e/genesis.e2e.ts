@@ -20,7 +20,7 @@ const priority = [
 async function activate(driver: GameDriver): Promise<number> {
   await driver.setWaitMode(true);
   await driver.until(
-    (state) => state.bloom !== null,
+    (state) => state.genesis.effects.length > 0,
     async () => {
       await driver.special('library-ensemble');
       if (await driver.special('horizon')) {
@@ -40,17 +40,17 @@ async function activate(driver: GameDriver): Promise<number> {
 
 async function prepare(driver: GameDriver, stableCollection = true): Promise<void> {
   await driver.setWaitMode(true);
-  const target = (rules.maxBloomGauge * 99n) / 100n;
+  const target = (rules.maxGenesisGauge * 99) / 100;
   while (
     driver.seconds < durationSeconds(driver.state) - 2 &&
-    (driver.state.bloom?.progress ?? 0n) < target
+    driver.state.genesis.currentGauge < target
   ) {
     const shadowUses = driver.state.cardUseCounts['shadow-1'] ?? 0;
     if (!driver.state.automaticHeart.enabled) await driver.toggleAutomaticHearts();
-    const progress = driver.state.bloom?.progress ?? 0n;
-    if (!stableCollection && progress >= 2_050_000_000n) {
+    const progress = driver.state.genesis.currentGauge;
+    if (!stableCollection && progress >= 2_050_000_000) {
       const used = await driver.useFirst(
-        progress >= 2_120_000_000n
+        progress >= 2_120_000_000
           ? ['horizon', 'sunrise', 'rain-preparation', 'frost-echo']
           : ['frost-echo', 'horizon', 'sunrise', 'rain-preparation'],
       );
@@ -61,7 +61,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
             seconds: driver.seconds,
             card: used.id,
             before: progress.toString(),
-            after: driver.state.bloom?.progress.toString(),
+            after: driver.state.genesis.currentGauge.toString(),
           }),
         );
       await driver.tick();
@@ -77,7 +77,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
             ? driver.state.hand.some((id) => id.startsWith('shadow-'))
               ? ['shadow', 'frost-echo', 'sunrise', 'rain-preparation']
               : ['frost-echo', 'sunrise', 'rain-preparation', 'aurora-ensemble']
-            : !stableCollection && (driver.state.bloom?.strength ?? 0) >= 100
+            : !stableCollection && (driver.state.genesis.effects[0]?.effectValue ?? 0) >= 100
               ? ['library-ensemble', 'aurora-ensemble', ...priority]
               : driver.seconds >= 60
                 ? ['camera', ...priority]
@@ -114,7 +114,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
       await driver.special('library-ensemble');
     if (driver.seconds >= (stableCollection ? 75 : 80)) await driver.special('horizon');
     if (
-      (stableCollection || (driver.state.bloom?.progress ?? 0n) < 2_050_000_000n) &&
+      (stableCollection || driver.state.genesis.currentGauge < 2_050_000_000) &&
       driver.inputTick % 6 === 0
     )
       driver.collect();
@@ -123,13 +123,13 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
 }
 
 test('開花:共鳴→追加カード→雨→除外→引き直しで専用値を育てて手動回収する', async () => {
-  const driver = await GameDriver.create('bloom');
+  const driver = await GameDriver.create('genesis');
   driver.report('開始');
   const paidEnergy = await activate(driver);
   expect(driver.state.cardUseCounts['frost-echo'] ?? 0).toBe(0);
   expect(driver.state.cardUseCounts['rain-preparation'] ?? 0).toBe(0);
-  expect(driver.state.bloom?.rollback.currentAp).toBe(paidEnergy);
-  const initialGauge = driver.state.bloom?.progress ?? 0n;
+  expect(driver.state.genesis.rollback?.currentAp).toBe(paidEnergy);
+  const initialGauge = driver.state.genesis.currentGauge;
   const ordinary = [
     driver.state.currentAp,
     driver.state.currentMental,
@@ -159,7 +159,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   await driver.burst(2, 10);
   const preparedGain = driver.state.score - before;
   driver.report('連打2秒');
-  const plain = await GameDriver.create('bloom');
+  const plain = await GameDriver.create('genesis');
   await plain.burst(measurementTick / rules.ticksPerSecond, 10);
   const plainBefore = plain.state.score;
   await plain.burst(2, 10);
@@ -172,17 +172,17 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
     await driver.tick();
   }
   driver.report('15回毎秒で全区間終了');
-  const omitted = await GameDriver.create('bloom');
+  const omitted = await GameDriver.create('genesis');
   await omitted.finishWithCards(priority);
   omitted.report('順序を省略した連打');
   console.log(
     JSON.stringify({
-      route: 'bloom',
+      route: 'genesis',
       earlyGain: earlyGain.toString(),
       preparedGain: preparedGain.toString(),
       plainGain: plainGain.toString(),
       peakGauge: driver.peakGauge.toString(),
-      target: ((rules.maxBloomGauge * 99n) / 100n).toString(),
+      target: ((rules.maxGenesisGauge * 99) / 100).toString(),
     }),
   );
   expect(plain.state.score).toBeLessThan(100_000_000n);
@@ -193,7 +193,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
 });
 
 test('開花:カード準備を専用値上限の直前まで継続する', async () => {
-  const driver = await GameDriver.create('bloom');
+  const driver = await GameDriver.create('genesis');
   await activate(driver);
   await driver.burst(2, 10);
   await prepare(driver, false);
@@ -201,5 +201,5 @@ test('開花:カード準備を専用値上限の直前まで継続する', asyn
   await driver.burst(durationSeconds(driver.state) - driver.seconds, 15);
   driver.report('専用値準備後の15回毎秒で全区間終了');
   expect(driver.state.score).toBeGreaterThan(10n ** 16n);
-  expect(driver.peakGauge).toBeGreaterThanOrEqual((rules.maxBloomGauge * 99n) / 100n);
+  expect(driver.peakGauge).toBeGreaterThanOrEqual((rules.maxGenesisGauge * 99) / 100);
 });

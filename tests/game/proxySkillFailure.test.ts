@@ -9,7 +9,7 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻す', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  const initial = act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {
+  const initial = act(createGame(track, routes.genesis.deck, 7, 100, routes.genesis.tokens), {
     type: 'start',
   });
   const source = initial.deck[0];
@@ -63,7 +63,7 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
 it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を判定する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  const initial = act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {
+  const initial = act(createGame(track, routes.genesis.deck, 7, 100, routes.genesis.tokens), {
     type: 'start',
   });
   const source = initial.deck[0];

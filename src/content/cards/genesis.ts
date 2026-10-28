@@ -12,7 +12,7 @@ const scorePercents = [3000, 15000, 30000, 60000, 90000, 150000] as const;
 const heartLimits = [500, 2500, 5000, 10000, 15000, 25000] as const;
 const voltageGains = [2000, 10000, 20000, 40000, 80000, 200000] as const;
 const targetPercents = [20, 100, 200, 400, 800, 2000] as const;
-export const bloomCards: readonly Card[] = [
+export const genesisCards: readonly Card[] = [
   {
     id: 'horizon',
     name: '空のはじまり',
@@ -29,7 +29,7 @@ export const bloomCards: readonly Card[] = [
       cost: 20,
       extra: false,
       effects: [
-        { kind: 'bloom', strength: 3.5 },
+        { kind: 'genesis', effectValue: 3.5 },
         {
           kind: 'skill-cooldown',
           num: 6666,

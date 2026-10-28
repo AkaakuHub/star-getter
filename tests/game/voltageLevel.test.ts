@@ -1,3 +1,4 @@
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import {
@@ -57,17 +58,10 @@ it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後�
 });
 
 it('ActionType37は開花中に熱気の差分を参照実装の専用ゲージ式で加算する', () => {
-  const state = {
-    ...game('bloom'),
-    currentVoltage: 100,
-    bloom: {
-      progress: 10n,
-      strength: 3.5,
-      rollback: { currentAp: 0, currentMental: 0, currentVoltage: 100 },
-    },
-  };
+  const initial = activateGenesis({ ...game('genesis'), currentVoltage: 100 }, 3.5);
+  const state = { ...initial, genesis: { ...initial.genesis, currentGauge: 10 } };
   const target = voltageThreshold(10);
   const set = applyEffect(state, { kind: 'voltage-set', amount: target });
   expect(set.currentVoltage).toBe(state.currentVoltage);
-  expect(set.bloom?.progress).toBe(89n);
+  expect(set.genesis.currentGauge).toBe(89);
 });

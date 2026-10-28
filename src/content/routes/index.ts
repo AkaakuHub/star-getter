@@ -2,7 +2,7 @@ import { resolveDeck, defaultDeckIds } from '../cards';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { routeTokens } from './tokens';
 
-export const routeIds = ['library', 'bloom'] as const;
+export const routeIds = ['library', 'genesis'] as const;
 export type RouteId = (typeof routeIds)[number];
 type Route = Readonly<{
   id: RouteId;
@@ -26,8 +26,8 @@ export const routes: Readonly<Record<RouteId, Route>> = {
       'class',
     ]),
   },
-  bloom: {
-    id: 'bloom',
+  genesis: {
+    id: 'genesis',
     name: '開花',
     slug: 'kaika',
     tokens: routeTokens,

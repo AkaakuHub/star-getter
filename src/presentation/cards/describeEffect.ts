@@ -195,7 +195,7 @@ export function describeEffect(effect: Effect): string {
       return `${effect.duration === 'section' ? 'このパート' : 'このステージ'}中、${effect.members ? targetNames(effect.members) + 'の' : '全ての'}アクションの効果量を${effect.percent}%増幅する。増幅率は加算して適用する。`;
     case 'skill-cooldown':
       return 'このステージ中、曲の長さに応じてアクション間隔を変更する。';
-    case 'bloom':
+    case 'genesis':
       return 'このステージ中、開花を発動し、きらめきを結晶に変化させる。エナジー・熱気・元気の増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のSTARが増加する。発動時のゲージを保持し、開花中はエナジー残量に関係なくアクションを使用できる。使用時のエナジー消費もプログレスへ変換する。';
     case 'resource-boost':
       return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'voltage' ? '熱気ゲイン' : effect.target === 'attract' ? 'STAR増加' : '元気リカバー'}効果を${effect.percent}%増幅する。`;

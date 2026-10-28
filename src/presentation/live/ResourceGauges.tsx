@@ -2,11 +2,12 @@ import { BatteryMedium, Zap } from 'lucide-preact';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { voltageLevel, voltageProgress } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import { liveLayout } from './layout';
-import { BloomGauge } from './BloomGauge';
+import { GenesisGauge } from './GenesisGauge';
 import { formatNumber } from '../score/formatNumber';
 
 export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
-  if (state.bloom) return <BloomGauge progress={state.bloom.progress} />;
+  if (state.genesis.effects.length > 0)
+    return <GenesisGauge currentGauge={state.genesis.currentGauge} />;
   const voltage = voltageLevel(state.currentVoltage, state.maximumVoltageLevel);
   return (
     <>

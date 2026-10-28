@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
-import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
@@ -28,24 +28,24 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
     voltageTimerSeconds: 0,
     currentAp: 0,
   };
-  const empty = activateBloom(initial, 1);
-  const full = activateBloom({ ...initial, currentAp: initial.maxAp }, 1);
+  const empty = activateGenesis(initial, 1);
+  const full = activateGenesis({ ...initial, currentAp: initial.maxAp }, 1);
   const emptyAfter = advanceAutomaticGauges(empty, 1.2);
   const fullAfter = advanceAutomaticGauges(full, 1.2);
   expect(emptyAfter.currentAp).toBe(0);
   expect(fullAfter.currentAp).toBe(initial.maxAp);
-  expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(2n);
-  expect((fullAfter.bloom?.progress ?? 0n) - (full.bloom?.progress ?? 0n)).toBe(2n);
+  expect(emptyAfter.genesis.currentGauge - empty.genesis.currentGauge).toBe(2);
+  expect(fullAfter.genesis.currentGauge - full.genesis.currentGauge).toBe(2);
   const emptyNext = advanceAutomaticGauges(emptyAfter, 1 / 60);
   const fullNext = advanceAutomaticGauges(fullAfter, 1 / 60);
   expect(emptyNext.currentAp).toBe(0);
-  expect((emptyNext.bloom?.progress ?? 0n) - (emptyAfter.bloom?.progress ?? 0n)).toBe(8n);
-  expect(fullNext.bloom?.progress).toBe(fullAfter.bloom?.progress);
+  expect(emptyNext.genesis.currentGauge - emptyAfter.genesis.currentGauge).toBe(8);
+  expect(fullNext.genesis.currentGauge).toBe(fullAfter.genesis.currentGauge);
 });
 
 it('開花中の自然元気減少は専用値を減らし、休憩防止の付与後だけ停止する', () => {
   const base = advanceTo(game(), 12);
-  const initial = activateBloom(
+  const initial = activateGenesis(
     {
       ...base,
       moodOffset: -100,
@@ -63,8 +63,8 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
     protectedAfter = advanceAutomaticGauges(protectedState, 1.2);
   expect(normal.currentMental).toBe(initial.currentMental);
   expect(normal.currentVoltage).toBe(initial.currentVoltage);
-  expect(normal.bloom?.progress).toBe(initial.bloom?.progress);
-  expect(protectedAfter.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 2n);
+  expect(normal.genesis.currentGauge).toBe(initial.genesis.currentGauge);
+  expect(protectedAfter.genesis.currentGauge).toBe(initial.genesis.currentGauge + 2);
 });
 
 it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタイマーも停止する', () => {

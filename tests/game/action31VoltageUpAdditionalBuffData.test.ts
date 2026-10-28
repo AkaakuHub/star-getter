@@ -74,7 +74,7 @@ it('ActionType31はlong詳細値から熱気追加バフを生成する', () => 
 
 it('ActionType31の詳細レコードをcreateGameで熱気追加バフへ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     {
@@ -96,7 +96,7 @@ it('ActionType31の詳細レコードをcreateGameで熱気追加バフへ接続
       value: 3n,
     },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

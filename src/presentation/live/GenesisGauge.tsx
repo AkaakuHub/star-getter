@@ -3,28 +3,29 @@ import { rules } from '@akaakuhub/suku-sute-core/game/model';
 import { liveLayout } from './layout';
 import { formatNumber } from '../score/formatNumber';
 
-export function BloomGauge({ progress }: Readonly<{ progress: bigint }>) {
-  const value = Number(progress);
-  const maximum = Number(rules.maxBloomGauge);
-  const fill = (value / maximum) * 100;
+export function GenesisGauge({ currentGauge }: Readonly<{ currentGauge: number }>) {
+  const value = currentGauge;
+  const maximum = Number(rules.maxGenesisGauge);
+  const fill = Math.max(0, Math.min(100, (value / maximum) * 100));
   return (
     <>
-      <div className="bloom-progress" style={liveLayout.bloom} role="status">
+      <div className="genesis-progress" style={liveLayout.genesis} role="status">
         <Gem size={15} aria-hidden="true" />
         <span>開花</span>
-        <strong>{formatNumber(progress)}</strong>
-        <small>/{formatNumber(rules.maxBloomGauge)}</small>
+        <strong>{formatNumber(currentGauge)}</strong>
+        <small>/{formatNumber(rules.maxGenesisGauge)}</small>
       </div>
-      {[liveLayout.bloomLeft, liveLayout.bloomRight].map((position, index) => (
+      {[liveLayout.genesisLeft, liveLayout.genesisRight].map((position, index) => (
         <div
           key={index}
-          className="resource-gauge bloom-gauge"
+          className="resource-gauge genesis-gauge"
           style={position}
           role="progressbar"
           aria-label="開花プログレス"
           aria-valuemin={0}
           aria-valuemax={maximum}
-          aria-valuenow={value}
+          aria-valuenow={Math.max(0, value)}
+          aria-valuetext={formatNumber(value)}
         >
           <Gem size={18} aria-hidden="true" />
           <div className="vertical-meter">

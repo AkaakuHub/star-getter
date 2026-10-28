@@ -25,7 +25,7 @@ import {
 function game() {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  return act(createGame(track, routes.bloom.deck, 7, 100, routes.bloom.tokens), {
+  return act(createGame(track, routes.genesis.deck, 7, 100, routes.genesis.tokens), {
     type: 'start',
   });
 }

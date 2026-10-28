@@ -26,7 +26,7 @@ it('ActionType29はlong詳細値をint32化してデッキ対象条件を作る'
 
 it('ActionType29の詳細レコードをcreateGameでデッキコスト効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     { id: 29_001_1n, detailType: 'CHANGE_DECK_AP_NUM', value: -10n },
@@ -34,7 +34,7 @@ it('ActionType29の詳細レコードをcreateGameでデッキコスト効果へ
     { id: 29_001_3n, detailType: 'CHANGE_DECK_AP_TARGET_TYPE', value: 5n },
     { id: 29_001_4n, detailType: 'CHANGE_DECK_AP_TARGET_TYPE_ID', value: 8123n },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

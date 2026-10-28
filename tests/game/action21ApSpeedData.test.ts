@@ -13,7 +13,7 @@ import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間効果へ接続する', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
-  const state = act(createGame(track, routes.bloom.deck, 7), { type: 'start' });
+  const state = act(createGame(track, routes.genesis.deck, 7), { type: 'start' });
   const displayTime = (1n << 53n) + 1n;
   const effect = createApSpeedChangeEffect({
     skillEffectId: 10213010015n,
@@ -65,7 +65,7 @@ it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間�
 
 it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const details = [
     {
@@ -87,7 +87,7 @@ it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続す�
       value: 3n,
     },
   ] as const;
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,
@@ -109,9 +109,9 @@ it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続す�
 
 it('ActionType21のHandPermanent詳細レコードを起動し、手札離脱時に解除する', () => {
   const track = tracks[0];
-  const source = routes.bloom.deck[0];
+  const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const deck = routes.bloom.deck.map((card) =>
+  const deck = routes.genesis.deck.map((card) =>
     card.id === source.id
       ? {
           ...card,

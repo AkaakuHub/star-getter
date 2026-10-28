@@ -16,12 +16,12 @@ function game(routeId: RouteId, seed = 7): GameState {
 describe('固定プリセット', () => {
   it('1曲と用途に応じた6枚・10枚のプリセット2つを使用する', () => {
     expect(tracks).toHaveLength(1);
-    expect(routeIds).toEqual(['library', 'bloom']);
+    expect(routeIds).toEqual(['library', 'genesis']);
     expect(routes.library.deck).toHaveLength(6);
-    expect(routes.bloom.deck).toHaveLength(10);
+    expect(routes.genesis.deck).toHaveLength(10);
     for (const route of Object.values(routes)) expect(() => validateDeck(route.deck)).not.toThrow();
     expect(routes.library.deck.map((card) => card.id)).not.toEqual(
-      routes.bloom.deck.map((card) => card.id),
+      routes.genesis.deck.map((card) => card.id),
     );
   });
 

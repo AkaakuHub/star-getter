@@ -2,7 +2,7 @@ import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
-import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { applyDrawAbility } from '@akaakuhub/suku-sute-core/game/cards/drawAbilities';
 import { disposeHandEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
 import {
@@ -240,11 +240,11 @@ it('シールドは自然減少とスキル由来の元気減少を防ぐ', () =
   const natural = advanceAutomaticGauges({ ...shield, mentalTimerSeconds: 0 }, 1.2);
   expect(natural.currentMental).toBe(100);
   expect(natural.mentalShields[0]?.durability).toBe(9);
-  const active = activateBloom({ ...shield, moodOffset: -150 }, 1);
+  const active = activateGenesis({ ...shield, moodOffset: -150 }, 1);
   const converted = applyEffect(active, { kind: 'mental', amount: -14 });
   expect(converted.currentMental).toBe(100);
   expect(converted.mentalShields).toHaveLength(0);
-  expect(converted.bloom?.progress).toBe((active.bloom?.progress ?? 0n) - 4n);
+  expect(converted.genesis.currentGauge).toBe(active.genesis.currentGauge - 4);
 });
 
 it('同時に登録した引き直しをまとめず全回実行し、後登録の検索を先に4回消費する', () => {

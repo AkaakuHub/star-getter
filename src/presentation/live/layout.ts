@@ -19,7 +19,7 @@ export const liveLayout = {
   cards: { ...hudRect(44, 1526, 210, 48), width: 'auto' },
   deck: { ...hudRect(826, 1526, 210, 48), left: 'auto', right: 44 / 10.8 + '%', width: 'auto' },
   description: hudRect(120, 1768, 840, 128),
-  bloom: hudRect(148.5, 1084.5, 720, 73),
-  bloomLeft: hudRect(22.5, 1236.2, 126, 235),
-  bloomRight: hudRect(956.5, 1236.2, 126, 235),
+  genesis: hudRect(148.5, 1084.5, 720, 73),
+  genesisLeft: hudRect(22.5, 1236.2, 126, 235),
+  genesisRight: hudRect(956.5, 1236.2, 126, 235),
 };

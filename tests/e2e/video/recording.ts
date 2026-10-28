@@ -7,7 +7,7 @@ export async function readRecording(path: string): Promise<VideoRecording> {
     !value ||
     typeof value !== 'object' ||
     !('route' in value) ||
-    (value.route !== 'library' && value.route !== 'bloom') ||
+    (value.route !== 'library' && value.route !== 'genesis') ||
     !('seed' in value) ||
     !Number.isSafeInteger(value.seed) ||
     !('ticksPerSecond' in value) ||

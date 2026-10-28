@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
-  activateBloom,
-  changeBloomResource,
-  finishBloom,
-} from '@akaakuhub/suku-sute-core/game/bloom';
+  activateGenesis,
+  changeGenesisResource,
+  finishGenesis,
+} from '@akaakuhub/suku-sute-core/game/genesis';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { calculateLiveGenesisGaugeDelta } from '@akaakuhub/suku-sute-core/runtime/skills/genesisSkill';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -14,7 +14,7 @@ import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
 
 function active() {
-  return activateBloom(
+  return activateGenesis(
     {
       ...advanceTo(game(), 12),
       moodOffset: -100,
@@ -46,16 +46,16 @@ describe('開花の専用ゲージ', () => {
     ).toBe(-8);
   });
 
-  it('2³¹−1に達し、超えると符号付き32bitのオーバーフローで0へ戻る', () => {
+  it('2³¹−1を超えるとAPKの符号付き32bit加算で負数へ折り返す', () => {
     const state = active();
-    if (!state.bloom) throw new Error('開花が発動していません。');
-    const maximum = changeBloomResource(
-      { ...state, bloom: { ...state.bloom, progress: rules.maxBloomGauge - 1n } },
+    if (state.genesis.effects.length === 0) throw new Error('開花が発動していません。');
+    const maximum = changeGenesisResource(
+      { ...state, genesis: { ...state.genesis, currentGauge: rules.maxGenesisGauge - 1 } },
       'voltage',
       1n,
     );
-    expect(maximum.bloom?.progress).toBe(2_147_483_647n);
-    expect(changeBloomResource(maximum, 'voltage', 1n).bloom?.progress).toBe(0n);
+    expect(maximum.genesis.currentGauge).toBe(2_147_483_647);
+    expect(changeGenesisResource(maximum, 'voltage', 1n).genesis.currentGauge).toBe(-2_147_483_648);
   });
 
   for (const mood of [-100, -99, 0, 100]) {
@@ -71,18 +71,20 @@ describe('開花の専用ゲージ', () => {
         },
       };
       expect(canUseSpecial(state, 'horizon')).toBe(true);
-      expect(act(state, { type: 'special', cardId: 'horizon' }).bloom).not.toBeNull();
-      expect(activateBloom(state, 1).bloom).not.toBeNull();
+      expect(
+        act(state, { type: 'special', cardId: 'horizon' }).genesis.effects.length,
+      ).toBeGreaterThan(0);
+      expect(activateGenesis(state, 1).genesis.effects.length).toBeGreaterThan(0);
     });
   }
 
   it('通常カードの使用では発動せず、共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
     state = withHand({ ...state, moodOffset: -100, currentAp: 20, maxAp: 20 }, ['horizon']);
-    expect(act(state, { type: 'card', index: 0 }).bloom).toBeNull();
+    expect(act(state, { type: 'card', index: 0 }).genesis.effects).toHaveLength(0);
     expect(canUseSpecial(state, 'horizon')).toBe(true);
     const changed = act(state, { type: 'special', cardId: 'horizon' });
-    expect(changed.bloom?.strength).toBe(3.5);
+    expect(changed.genesis.effects[0]?.effectValue).toBe(3.5);
     expect(changed.currentAp).toBe(0);
     expect(changed.stats.specialsUsed).toBe(1);
     expect(changed.stats.cardsUsed).toBe(0);
@@ -90,18 +92,18 @@ describe('開花の専用ゲージ', () => {
 
   it('AP・元気・熱気をそれぞれFloat32で換算して切り上げ、通常値を更新しない', () => {
     const state = active();
-    expect(state.bloom?.progress).toBe(30n);
-    let changed = changeBloomResource(state, 'ap', 9n);
-    expect(changed.bloom?.progress).toBe(52n);
-    changed = changeBloomResource(changed, 'mental', 100n);
-    expect(changed.bloom?.progress).toBe(72n);
-    changed = changeBloomResource(changed, 'voltage', 2n);
-    expect(changed.bloom?.progress).toBe(74n);
-    changed = changeBloomResource(changed, 'ap', -4n);
-    expect(changed.bloom?.progress).toBe(59n);
+    expect(state.genesis.currentGauge).toBe(30);
+    let changed = changeGenesisResource(state, 'ap', 9n);
+    expect(changed.genesis.currentGauge).toBe(52);
+    changed = changeGenesisResource(changed, 'mental', 100n);
+    expect(changed.genesis.currentGauge).toBe(72);
+    changed = changeGenesisResource(changed, 'voltage', 2n);
+    expect(changed.genesis.currentGauge).toBe(74);
+    changed = changeGenesisResource(changed, 'ap', -4n);
+    expect(changed.genesis.currentGauge).toBe(59);
     expect([changed.currentAp, changed.currentMental, changed.currentVoltage]).toEqual([0, 80, 40]);
-    expect(finishBloom(changed).bloom).toBeNull();
-    expect(finishBloom(changed).currentMental).toBe(80);
+    expect(finishGenesis(changed).genesis.effects).toHaveLength(0);
+    expect(finishGenesis(changed).currentMental).toBe(80);
   });
 
   it('開花終了時に参照実装のMental値変更通知をActionType23へ伝える', () => {
@@ -109,7 +111,7 @@ describe('開花の専用ゲージ', () => {
     const source = initial.deck[0];
     if (!source) throw new Error('ActionType23の発動元カードがありません。');
     const mentalHeartInducing = applyEffect(
-      activateBloom({ ...initial, currentMental: 80 }, 1),
+      activateGenesis({ ...initial, currentMental: 80 }, 1),
       {
         kind: 'mental-heart-induce',
         num: 10_000n,
@@ -121,21 +123,21 @@ describe('開花の専用ゲージ', () => {
       source,
     );
     const before = heartCount(mentalHeartInducing);
-    expect(heartCount(finishBloom(mentalHeartInducing))).toBe(before + 80);
+    expect(heartCount(finishGenesis(mentalHeartInducing))).toBe(before + 80);
   });
 
   it('発動前の増幅だけが強度を増やし、発動後の増幅はすでに決まった強度を変えない', () => {
     const initial = { ...advanceTo(game(), 12), moodOffset: -100, hand: ['horizon'] };
     const prepared = applyEffect(applyEffect(initial, { kind: 'amplify', percent: 50 }), {
-      kind: 'bloom',
-      strength: 3.5,
+      kind: 'genesis',
+      effectValue: 3.5,
     });
-    const reversed = applyEffect(applyEffect(initial, { kind: 'bloom', strength: 3.5 }), {
+    const reversed = applyEffect(applyEffect(initial, { kind: 'genesis', effectValue: 3.5 }), {
       kind: 'amplify',
       percent: 50,
     });
-    expect(prepared.bloom?.strength).toBe(5.25);
-    expect(reversed.bloom?.strength).toBe(3.5);
+    expect(prepared.genesis.effects[0]?.effectValue).toBe(5.25);
+    expect(reversed.genesis.effects[0]?.effectValue).toBe(3.5);
   });
 
   it('熱気の固定値変更もFloat32の値と専用ゲージ変換を通り、通常値を上書きしない', () => {
@@ -144,6 +146,6 @@ describe('開花の専用ゲージ', () => {
     const state = active();
     const changed = applyEffect(state, { kind: 'voltage-set', amount: 655_000_001 });
     expect(changed.currentVoltage).toBe(state.currentVoltage);
-    expect(changed.bloom?.progress).toBeGreaterThan(state.bloom?.progress ?? 0n);
+    expect(changed.genesis.currentGauge).toBeGreaterThan(state.genesis.currentGauge);
   });
 });

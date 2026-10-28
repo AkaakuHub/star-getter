@@ -3,7 +3,7 @@ import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { canUseSpecial, specialCards } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
-import { activateBloom } from '@akaakuhub/suku-sute-core/game/bloom';
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { cardCooldownTicks } from '@akaakuhub/suku-sute-core/game/projection';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
@@ -13,20 +13,20 @@ it('空模様0でも20APを支払って開花し、支払後のAPを保持する
   expect(canUseSpecial(state, 'horizon')).toBe(true);
   const next = act(state, { type: 'special', cardId: 'horizon' });
   expect(next.currentAp).toBe(0);
-  expect(next.bloom?.rollback.currentAp).toBe(0);
+  expect(next.genesis.rollback?.currentAp).toBe(0);
   expect(next.specialUsed).toContain('horizon');
 });
 
 it('開花中の追加SPは通常APを固定したまま専用値で支払う', () => {
-  const state = activateBloom(
+  const state = activateGenesis(
     { ...game(), currentAp: 0, currentMental: 80, currentVoltage: 655_000_001 },
     3.5,
   );
-  expect(state.bloom?.progress).toBe(5020n);
+  expect(state.genesis.currentGauge).toBe(5020);
   expect(canUseSpecial(state, 'library-ensemble')).toBe(true);
   const next = act(state, { type: 'special', cardId: 'library-ensemble' });
   expect(next.currentAp).toBe(0);
-  expect(next.bloom?.progress).toBe(4977n);
+  expect(next.genesis.currentGauge).toBe(4977);
 });
 
 it('共鳴はセンターの通常効果と基本カードの追加効果だけを選択する', () => {
