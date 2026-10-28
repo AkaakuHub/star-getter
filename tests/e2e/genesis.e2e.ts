@@ -63,7 +63,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
     if (!stableCollection && allHandGain > 0 && progress + allHandGain >= target) {
       const nextTarget = (target + rules.maxGenesisGauge) / 2;
       if (progress + allHandGain > nextTarget) {
-        await driver.burst(0.1, 15);
+        await driver.useFirst(['horizon', 'frost-echo', 'frost-pulse']);
       } else {
         await driver.useFirst(['library-ensemble', 'aurora-ensemble']);
       }
