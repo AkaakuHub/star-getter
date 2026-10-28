@@ -1,3 +1,8 @@
+import {
+  liveHandCardInstanceIds,
+  createLiveHandState,
+  liveCurrentHandCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds, moveCardsToBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
@@ -23,19 +28,22 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
   const deck = base.deck.map((item) =>
     item.cardInstanceId === selectedId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
-  const state = withHand({ ...base, deck }, [base.hand[0] ?? '', selectedId]);
+  const state = withHand({ ...base, deck }, [
+    liveCurrentHandCardInstanceIds(base)[0] ?? '',
+    selectedId,
+  ]);
   const split = applyEffect(state, {
     kind: 'token-deck-split',
     seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
     deactivationKey: 'test-split',
   });
-  expect(split.hand).not.toContain(selectedId);
-  expect(split.tokenDeckSplit?.sub.hand.length).toBeGreaterThan(0);
+  expect(liveCurrentHandCardInstanceIds(split)).not.toContain(selectedId);
+  expect(liveHandCardInstanceIds(split.liveHands.sub).length).toBeGreaterThan(0);
   const switched = act(split, { type: 'switch-token-deck' });
   expect(switched.tokenCardDeck.currentDeck).toBe('sub');
   expect(
-    switched.hand.every((id) =>
+    liveCurrentHandCardInstanceIds(switched).every((id) =>
       switched.tokenCardDeck.tokenCardSeriesIds?.some((seriesId) =>
         card(switched, id).tokenCardSeriesIds?.includes(seriesId),
       ),
@@ -48,7 +56,7 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
       .map((item) => item.cardInstanceId)
       .filter(
         (id) =>
-          merged.hand.includes(id) ||
+          liveCurrentHandCardInstanceIds(merged).includes(id) ||
           boardCardIds(merged, liveBoardState.deck).includes(id) ||
           boardCardIds(merged, liveBoardState.graveyard).includes(id),
       ),
@@ -67,7 +75,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
         item.cardInstanceId === selected.cardInstanceId ? cardData : item,
       ),
     },
-    [base.hand[0] ?? ''],
+    [liveCurrentHandCardInstanceIds(base)[0] ?? ''],
   );
   const state = moveCardsToBoard(hand, [selected.cardInstanceId], liveBoardState.graveyard);
   expect(
@@ -80,7 +88,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
     duration: { kind: 'stage', value: 0 },
   });
   expect([
-    ...(split.tokenDeckSplit?.sub.hand ?? []),
+    ...(liveHandCardInstanceIds(split.liveHands.sub) ?? []),
     ...split.deckBoard.cards
       .filter(
         (card) =>
@@ -114,7 +122,7 @@ it('ActionType43の系列IDを参照実装のint32へ変換してから照合す
   });
   expect(split.tokenCardDeck.tokenCardSeriesIds).toEqual([42]);
   expect([
-    ...(split.tokenDeckSplit?.sub.hand ?? []),
+    ...(liveHandCardInstanceIds(split.liveHands.sub) ?? []),
     ...split.deckBoard.cards
       .filter(
         (card) =>
@@ -174,7 +182,8 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
         ...moveCardsToBoard(split, [selected.cardInstanceId], liveBoardState.extra).deckBoard,
         deckOutCount: 1,
       },
-      tokenDeckSplit: { ...emptySubDeck, sub: { hand: [] } },
+      tokenDeckSplit: emptySubDeck,
+      liveHands: { ...split.liveHands, sub: createLiveHandState<string>([]) },
     },
     { type: 'switch-token-deck' },
   );
@@ -190,7 +199,7 @@ it('期限切れでメインデッキへ戻す', () => {
   const deck = base.deck.map((item) =>
     item.cardInstanceId === selectedId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
-  const state = withHand({ ...base, deck }, [base.hand[0] ?? '']);
+  const state = withHand({ ...base, deck }, [liveCurrentHandCardInstanceIds(base)[0] ?? '']);
   const split = applyEffect(state, {
     kind: 'token-deck-split',
     seriesIds: [42n],
@@ -220,7 +229,7 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   const [discarded, ...drawPile] = subDeck;
   if (!discarded || drawPile.length < 1) throw new Error('サブデッキの山札が不足しています。');
   const state = moveCardsToBoard(split, [discarded], liveBoardState.graveyard);
-  expect(split.tokenDeckSplit?.sub.hand).toHaveLength(rules.handSize);
+  expect(liveHandCardInstanceIds(split.liveHands.sub)).toHaveLength(rules.handSize);
   const drawCount = deck.length - rules.handSize - 2;
   const discardCount = 1;
   const assertCounts = (current: typeof split, draw: number, discard: number) => {
@@ -258,7 +267,7 @@ it('停止中のサブ手札統計はメイン手札の引き直しで消えず�
     item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
   const initial = withHand({ ...base, deck, cardPool: deck }, [
-    base.hand[0] ?? '',
+    liveCurrentHandCardInstanceIds(base)[0] ?? '',
     selected.cardInstanceId,
   ]);
   const split = applyEffect(initial, {

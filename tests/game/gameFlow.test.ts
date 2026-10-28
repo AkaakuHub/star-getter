@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { describe, expect, it } from 'vite-plus/test';
 import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
 import { routes } from '../../src/content/routes';
@@ -106,7 +107,9 @@ describe('カードと編成', () => {
   it('連打によるカードの重複使用を防ぐ', () => {
     const baseState4 = game();
     const initial = { ...baseState4, ap: { ...baseState4.ap, currentAp: 20, maxAp: 20 } };
-    const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
+    const index = liveCurrentHandCardInstanceIds(initial).findIndex((_, slot) =>
+      canUseCard(initial, slot),
+    );
     const state = act(initial, { type: 'card', index });
     expect(act(state, { type: 'card', index: 1 })).toBe(state);
     expect(state.stats.cardsUsed).toBe(1);

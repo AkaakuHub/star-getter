@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
@@ -17,7 +18,7 @@ it('ヨットの検索を先に登録し、巻き込んだ浮き輪の舵・編�
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed - state.stats.cardsUsed).toBe(2);
   expect(
-    used.hand.map((id) => {
+    liveCurrentHandCardInstanceIds(used).map((id) => {
       const card = used.deck.find((candidate) => candidate.cardInstanceId === id);
       if (!card) throw new Error('補充したカードがありません。');
       return card.token ?? card.unitIds[0];

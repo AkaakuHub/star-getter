@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -10,7 +11,9 @@ it('開始時は901を実行せず、903/904だけ手札へ登録する', () => 
     expect(state.mental.currentMental).toBe(100);
     expect(state.apTimeEffects).toHaveLength(0);
     expect(state.costReductions).toEqual({});
-    expect([...state.handEffectCardIds].sort()).toEqual([...state.hand].sort());
+    expect([...state.handEffectCardIds].sort()).toEqual(
+      [...liveCurrentHandCardInstanceIds(state)].sort(),
+    );
   }
 });
 
@@ -27,7 +30,9 @@ it('一斉使用した常在カードの増幅を後続の子へ適用し、補�
   );
   const used = act(state, { type: 'card', index: 0 });
   expect(used.voltage.currentVoltage).toBeGreaterThan(100_000n);
-  expect([...used.handEffectCardIds].sort()).toEqual([...used.hand].sort());
+  expect([...used.handEffectCardIds].sort()).toEqual(
+    [...liveCurrentHandCardInstanceIds(used)].sort(),
+  );
   expect(used.activation).toBeNull();
 });
 
@@ -39,5 +44,7 @@ it('本人使用でも解除前のDOLL手札反応を実行して9APを回復す
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(1);
   expect(used.ap.currentAp).toBe(15);
-  expect([...used.handEffectCardIds].sort()).toEqual([...used.hand].sort());
+  expect([...used.handEffectCardIds].sort()).toEqual(
+    [...liveCurrentHandCardInstanceIds(used)].sort(),
+  );
 });

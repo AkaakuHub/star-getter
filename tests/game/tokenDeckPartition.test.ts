@@ -1,3 +1,8 @@
+import {
+  setLiveCurrentHandCards,
+  liveHandCardInstanceIds,
+  liveCurrentHandCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -48,7 +53,7 @@ function setup() {
     ...base,
     deck,
     cardPool: deck,
-    hand: [main.cardInstanceId],
+    liveHands: setLiveCurrentHandCards(base, [main.cardInstanceId]).liveHands,
     deckBoard: createCardDeckBoard(deck, [main.cardInstanceId]),
     tokenCardDeck: createLiveTokenCardDeckState<string>(rules.handSize),
     handEffectCardIds: [main.cardInstanceId],
@@ -78,8 +83,8 @@ it('sub先行抽選はmainの実手札数でなく保存した目標枚数を使
     seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
   });
-  const hand = result.tokenDeckSplit?.sub.hand;
-  expect(result.hand).toEqual(['main']);
+  const hand = liveHandCardInstanceIds(result.liveHands.sub);
+  expect(liveCurrentHandCardInstanceIds(result)).toEqual(['main']);
   expect(hand).toHaveLength(rules.handSize);
   expect(hand?.[0]).toBe('first');
   expect(hand?.every((id) => result.handCardStats[id]?.isActive === false)).toBe(true);
@@ -124,7 +129,7 @@ it('既存のsub手札がある切替でも再読み込み通知を処理する'
     track: { ...initial.track, afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }] },
   };
   const result = act(prepared, { type: 'switch-token-deck' });
-  expect(result.hand.length).toBeGreaterThan(0);
+  expect(liveCurrentHandCardInstanceIds(result).length).toBeGreaterThan(0);
   expect(result.afterDeckReloadEvents).toBe(initial.afterDeckReloadEvents + 1);
   expect(result.deckBoard.deckOutCount).toBe(0);
   expect(result.ap.currentAp).toBe(initial.ap.currentAp + 2);
@@ -157,7 +162,7 @@ it('切替先の能力は枚数調整前の目標を参照し、その変更後�
     };
   });
   expect(observed).toEqual([rules.handSize]);
-  expect(result.hand).toHaveLength(3);
+  expect(liveCurrentHandCardInstanceIds(result)).toHaveLength(3);
   expect(result.tokenCardDeck.handTargetCounts).toEqual({
     current: 3,
     main: rules.handSize,
@@ -170,9 +175,22 @@ it('実際の手札数変更効果とデッキ切替が同じ現在目標を参�
   const changed = applyEffect(initial, handCardCountEffect(-1, 3, 0n));
   expect(changed.tokenCardDeck.handTargetCounts.current).toBe(4);
   const sub = act(changed, { type: 'switch-token-deck' });
-  expect(sub.hand).toHaveLength(4);
+  expect(liveCurrentHandCardInstanceIds(sub)).toHaveLength(4);
   expect(sub.tokenCardDeck.handTargetCounts).toEqual({ current: 4, main: 4, sub: 5 });
   const main = act(sub, { type: 'switch-token-deck' });
-  expect(main.hand).toEqual(['main']);
+  expect(liveCurrentHandCardInstanceIds(main)).toEqual(['main']);
   expect(main.tokenCardDeck.handTargetCounts).toEqual({ current: 4, main: 4, sub: 4 });
+});
+
+it('mainとsubの手札順を保存し、逆順のsubから往復しても定義順へ戻さない', () => {
+  const initial = split();
+  const sub = act(initial, { type: 'switch-token-deck' });
+  const order = [...liveCurrentHandCardInstanceIds(sub)].reverse();
+  const reordered = setLiveCurrentHandCards(sub, order);
+  const main = act(reordered, { type: 'switch-token-deck' });
+  expect(liveCurrentHandCardInstanceIds(main)).toEqual(liveCurrentHandCardInstanceIds(initial));
+  expect(liveHandCardInstanceIds(main.liveHands.sub)).toEqual(order);
+  const returned = act(main, { type: 'switch-token-deck' });
+  expect(liveCurrentHandCardInstanceIds(returned)).toEqual(order);
+  expect(returned.liveHands.main).toEqual(main.liveHands.main);
 });

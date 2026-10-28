@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -65,7 +66,7 @@ it('開花中の50万回収は通常の元気と熱気が未達でも枝と検�
   expect(next.voltage.currentVoltage).toBe(0n);
   expect(next.mental.currentMental).toBe(80);
   expect(next.genesis.currentGauge).toBeLessThan(1_000_000);
-  expect(next.hand).not.toEqual(state.hand);
+  expect(liveCurrentHandCardInstanceIds(next)).not.toEqual(liveCurrentHandCardInstanceIds(state));
 });
 
 it('熱気増幅の対象は追加メンバーを含む同じユニット全員になる', () => {

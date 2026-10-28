@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -36,7 +37,7 @@ it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付�
       usedSkill: null,
     },
   });
-  expect(state.hand).toContain('frost-pulse');
+  expect(liveCurrentHandCardInstanceIds(state)).toContain('frost-pulse');
   state = act(addHearts(state, 300_000), { type: 'collect' });
   expect(state.resourceBoosts).toHaveLength(2);
 });

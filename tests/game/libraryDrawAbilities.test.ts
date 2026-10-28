@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyDrawAbility } from '@akaakuhub/suku-sute-core/game/cards/drawAbilities';
@@ -26,7 +27,9 @@ it('招待状自身を使用すると、生成した帆船を優先検索して�
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(1);
   expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
+    liveCurrentHandCardInstanceIds(used)
+      .slice(0, 2)
+      .map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
   ).toEqual(['ensemble', 'ensemble']);
 });
 
@@ -36,7 +39,9 @@ it('生成帆船自身を使用した後に折り紙を2回検索し、他カー
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.cardInstanceId]);
   const used = act(state, { type: 'card', index: 0 });
   expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
+    liveCurrentHandCardInstanceIds(used)
+      .slice(0, 2)
+      .map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
   ).toEqual(['story', 'story']);
 });
 

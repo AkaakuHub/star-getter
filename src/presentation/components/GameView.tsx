@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
@@ -61,7 +62,8 @@ export function GameView({
         >
           <List size={13} aria-hidden="true" />
           <span>
-            手札{state.hand.length}/{handCapacity(state)}・全{state.deck.length}/{rules.maxDeckSize}
+            手札{liveCurrentHandCardInstanceIds(state).length}/{handCapacity(state)}・全
+            {state.deck.length}/{rules.maxDeckSize}
           </span>
         </button>
         <button

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { describe, expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -19,7 +20,9 @@ function play(limit: number) {
   for (let tick = 1; tick <= 3600; tick++) {
     state = advanceTo(state, tick / 60);
     if (tick % 30 === 0) {
-      const index = state.hand.findIndex((id, slot) => Boolean(id) && canUseCard(state, slot));
+      const index = liveCurrentHandCardInstanceIds(state).findIndex(
+        (id, slot) => Boolean(id) && canUseCard(state, slot),
+      );
       if (index >= 0) state = act(state, { type: 'card', index });
     }
     if (tick % 20 === 0) state = act(state, { type: 'collect' });
@@ -27,7 +30,7 @@ function play(limit: number) {
   return {
     score: state.score,
     stats: state.stats,
-    hand: state.hand,
+    hand: liveCurrentHandCardInstanceIds(state),
     deckBoard: state.deckBoard,
     randomSeed: state.randomSeed,
   };

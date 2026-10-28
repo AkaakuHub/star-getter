@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { withBoardState } from './support/board';
@@ -195,7 +196,7 @@ it('全手札補充では使用元のMainEffectを参照し、アイコンを抽
     'child',
   ]);
   const used = act(ready, { type: 'card', index: 0 });
-  expect(used.hand[0]).toBe('child');
+  expect(liveCurrentHandCardInstanceIds(used)[0]).toBe('child');
   expect(used.deckDrawContext.usedCard).toBe(parent);
   expect(used.deckDrawContext.usedSkill).toBeNull();
   expect(used.tokenCardDeck.isAllHandSkill).toBe(false);
@@ -207,7 +208,7 @@ it('子カードの検索を全手札補充に使用し、親の完了時に使�
     [{ kind: 'search', scope: 'skill', target: { kind: 'member', member: 1031 }, count: 12 }],
   );
   const used = act(state, { type: 'card', index: 0 });
-  expect(used.hand).toContain('child');
+  expect(liveCurrentHandCardInstanceIds(used)).toContain('child');
   expect(used.deckBoard.skillCardSearchParams).toEqual([]);
   expect(used.deckActions.queue).toEqual([]);
 });
@@ -218,7 +219,7 @@ it('通常の親カードも補充終了後に使い残した検索を消す', (
     [],
   );
   const used = act(state, { type: 'card', index: 0 });
-  expect(used.hand).toContain('child');
+  expect(liveCurrentHandCardInstanceIds(used)).toContain('child');
   expect(used.deckBoard.gradeCardSearchParams).toEqual([]);
   expect(used.deckActions.queue).toEqual([]);
 });

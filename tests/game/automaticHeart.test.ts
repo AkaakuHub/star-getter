@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { tracks } from '../../src/content/tracks';
 import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
@@ -13,7 +14,7 @@ function game(count: number) {
     {
       ...state,
       hearts: { ...state.hearts, stageHearts: [], hiddenHeartBatches: [] },
-      relayUsed: [...state.hand],
+      relayUsed: [...liveCurrentHandCardInstanceIds(state)],
     },
     count,
   );

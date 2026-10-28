@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { describe, expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -14,7 +15,7 @@ function game(): GameState {
   });
   return {
     ...state,
-    relayUsed: [...state.hand],
+    relayUsed: [...liveCurrentHandCardInstanceIds(state)],
     hearts: { ...state.hearts, stageHearts: [], hiddenHeartBatches: [] },
   };
 }

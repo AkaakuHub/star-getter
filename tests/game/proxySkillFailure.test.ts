@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import {
   liveBoardState,
@@ -51,7 +52,7 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
   const inProxy = withBoardState(
     { ...active },
     {
-      hand: active.hand.filter((id) => id !== source.cardInstanceId),
+      hand: liveCurrentHandCardInstanceIds(active).filter((id) => id !== source.cardInstanceId),
       deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.cardInstanceId),
       graveyard: boardCardIds(active, liveBoardState.graveyard).filter(
         (id) => id !== source.cardInstanceId,
@@ -113,7 +114,7 @@ it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を�
   const inProxy = withBoardState(
     { ...active },
     {
-      hand: active.hand.filter((id) => id !== source.cardInstanceId),
+      hand: liveCurrentHandCardInstanceIds(active).filter((id) => id !== source.cardInstanceId),
       deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.cardInstanceId),
       graveyard: boardCardIds(active, liveBoardState.graveyard).filter(
         (id) => id !== source.cardInstanceId,

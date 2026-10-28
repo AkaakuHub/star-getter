@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import type { GameSetup } from '../../../src/app/setup/gameSetup';
 import { afterEach } from 'vite-plus/test';
 import type { RouteId } from '../../../src/content/routes';
@@ -69,7 +70,7 @@ function snapshot(state: GameState): Snapshot {
     phase: state.phase,
     lastActionTick: state.lastActionTick,
     skillCooldownTicks: cardCooldownTicks(state),
-    hand: state.hand.map((id) => {
+    hand: liveCurrentHandCardInstanceIds(state).map((id) => {
       const card = state.deck.find((candidate) => candidate.cardInstanceId === id);
       if (!card) throw new Error('記録対象の手札がありません。');
       return {

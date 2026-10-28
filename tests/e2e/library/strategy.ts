@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { canActivateHandCollectionAbility } from '@akaakuhub/suku-sute-core/game/cards/collectionAbilities';
 import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
 import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
@@ -42,7 +43,9 @@ const restartPriority = [
 ];
 
 function isPrepared(state: GameState): boolean {
-  const hand = state.deck.filter((card) => state.hand.includes(card.cardInstanceId));
+  const hand = state.deck.filter((card) =>
+    liveCurrentHandCardInstanceIds(state).includes(card.cardInstanceId),
+  );
   return (
     state.deck.length >= 95 &&
     state.hearts.heartLimit >= 500_000 &&
@@ -182,7 +185,7 @@ function isCollectionReady(state: GameState): boolean {
     state.deck.some(
       (card) =>
         card.token === 'story' &&
-        state.hand.includes(card.cardInstanceId) &&
+        liveCurrentHandCardInstanceIds(state).includes(card.cardInstanceId) &&
         canActivateHandCollectionAbility(state, card),
     )
   );
@@ -197,7 +200,7 @@ export async function playUnplanned(driver: GameDriver): Promise<void> {
     await driver.special('library-pages');
     await driver.special('library-ensemble');
     await driver.useFirst(
-      driver.state.hand.map((id) => {
+      liveCurrentHandCardInstanceIds(driver.state).map((id) => {
         const card = driver.state.deck.find((candidate) => candidate.cardInstanceId === id);
         if (!card) throw new Error('手札のカードがありません。');
         return card.token ?? card.cardInstanceId;

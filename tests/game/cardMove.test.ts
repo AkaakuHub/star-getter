@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { enqueueHandShuffle } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
 import type { ProxySkillEffect } from '@akaakuhub/suku-sute-core/game/proxySkillTypes';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
@@ -30,7 +31,7 @@ function activateSourceCard() {
         },
       },
       {
-        hand: state.hand.filter((id) => id !== card.cardInstanceId),
+        hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== card.cardInstanceId),
         deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== card.cardInstanceId),
       },
     ),
@@ -85,7 +86,7 @@ it('全手札使用の子の除外特性は既存のProxy移動先を上書き�
       },
     },
     {
-      hand: initial.hand.filter(
+      hand: liveCurrentHandCardInstanceIds(initial).filter(
         (id) => id !== source.cardInstanceId && id !== child.cardInstanceId,
       ),
       deck: boardCardIds(initial, liveBoardState.deck).filter(
@@ -138,7 +139,9 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
       },
     },
     {
-      hand: state.hand.filter((id) => id !== source.cardInstanceId && id !== child.cardInstanceId),
+      hand: liveCurrentHandCardInstanceIds(state).filter(
+        (id) => id !== source.cardInstanceId && id !== child.cardInstanceId,
+      ),
       deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== child.cardInstanceId),
     },
   );

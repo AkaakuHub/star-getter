@@ -1,3 +1,7 @@
+import {
+  setLiveCurrentHandCards,
+  liveCurrentHandCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -70,7 +74,7 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
       },
     ),
   );
-  expect(redrawn.hand).toContain('horizon');
+  expect(liveCurrentHandCardInstanceIds(redrawn)).toContain('horizon');
   expect(redrawn.relayUsed).not.toContain('horizon');
   expect(heartCount(act(addHearts(redrawn, 3_000), { type: 'collect' }))).toBeGreaterThan(0);
 });
@@ -155,7 +159,7 @@ function preparedLibrary(): GameState {
     withBoardState(
       {
         ...state,
-        hand,
+        liveHands: setLiveCurrentHandCards(state, hand).liveHands,
         handEffectCardIds: hand,
         storyAmplification: 10_000,
         hearts: { ...state.hearts, heartLimit: 10_000_000 },
@@ -173,7 +177,7 @@ it('うなばらは累積50万回収から引き直し、ドロー時のきら�
   let state = preparedLibrary();
   state = act(state, { type: 'collect' });
   expect(state.tick).toBe(0);
-  expect(state.handHeartCollectCounts[state.hand[0] ?? '']).toBe(0);
+  expect(state.handHeartCollectCounts[liveCurrentHandCardInstanceIds(state)[0] ?? '']).toBe(0);
   expect(heartCount(state)).toBeGreaterThan(500_000);
   const next = act(state, { type: 'collect' });
   expect(next.tick).toBe(state.tick);
@@ -189,12 +193,17 @@ it('上限1000万でも回収49万9999個では引き直さず、累計50万個�
     hearts: { ...prepared.hearts, stageHearts: [], hiddenHeartBatches: [] },
   };
   const below = act(addHearts(initial, 499_999), { type: 'collect' });
-  expect(below.hand).toEqual(initial.hand);
-  for (const id of initial.hand) expect(below.handHeartCollectCounts[id]).toBe(499_999);
+  expect(liveCurrentHandCardInstanceIds(below)).toEqual(liveCurrentHandCardInstanceIds(initial));
+  for (const id of liveCurrentHandCardInstanceIds(initial))
+    expect(below.handHeartCollectCounts[id]).toBe(499_999);
   const reached = act(addHearts(below, 1), { type: 'collect' });
   expect(reached.stats.heartsCollected).toBe(500_000);
-  expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
-  for (const id of initial.hand)
+  expect(
+    liveCurrentHandCardInstanceIds(reached).every(
+      (id) => !liveCurrentHandCardInstanceIds(initial).includes(id),
+    ),
+  ).toBe(true);
+  for (const id of liveCurrentHandCardInstanceIds(initial))
     expect(boardCardIds(reached, liveBoardState.graveyard)).toContain(id);
   expect(reached.hearts.heartLimit).toBe(10_000_000);
 });
@@ -203,8 +212,12 @@ it('1000万個を一度に回収しても50万個以上の条件が成立して�
   const initial = preparedLibrary();
   const reached = act(addHearts(initial, 10_000_000), { type: 'collect' });
   expect(reached.stats.heartsCollected).toBe(10_000_000);
-  expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
-  for (const id of initial.hand)
+  expect(
+    liveCurrentHandCardInstanceIds(reached).every(
+      (id) => !liveCurrentHandCardInstanceIds(initial).includes(id),
+    ),
+  ).toBe(true);
+  for (const id of liveCurrentHandCardInstanceIds(initial))
     expect(boardCardIds(reached, liveBoardState.graveyard)).toContain(id);
 });
 
@@ -217,7 +230,7 @@ it('94枚では回収50万個を満たしても供給も引き直しも発動し
   );
   expect(initial.deck).toHaveLength(94);
   const reached = act(initial, { type: 'collect' });
-  expect(reached.hand).toEqual(initial.hand);
+  expect(liveCurrentHandCardInstanceIds(reached)).toEqual(liveCurrentHandCardInstanceIds(initial));
   expect(heartCount(reached)).toBe(0);
 });
 

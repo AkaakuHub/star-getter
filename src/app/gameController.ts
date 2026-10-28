@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
@@ -73,7 +74,7 @@ export class GameController {
     if (this.currentState.phase !== 'playing' || this.waiting) return;
     this.waitState = advanceLiveWaitMode(this.waitState, {
       enabled: this.waitEnabled,
-      availableCards: this.currentState.hand.reduce(
+      availableCards: liveCurrentHandCardInstanceIds(this.currentState).reduce(
         (mask, _, index) => (canUseCard(this.currentState, index) ? mask | (1 << index) : mask),
         0,
       ),
@@ -82,7 +83,7 @@ export class GameController {
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
       mentalDown: this.currentState.mental.mentalDown,
-      allSkillsCostOver: this.currentState.hand.every(
+      allSkillsCostOver: liveCurrentHandCardInstanceIds(this.currentState).every(
         (_, index) =>
           this.currentState.genesis.effects.length === 0 &&
           cardCost(this.currentState, cardAt(this.currentState, index)) >
@@ -154,7 +155,7 @@ export class GameController {
       this.busy ||
       !Number.isInteger(index) ||
       index < 0 ||
-      index >= this.currentState.hand.length
+      index >= liveCurrentHandCardInstanceIds(this.currentState).length
     )
       return;
     if (this.currentState.phase !== 'playing' && this.currentState.phase !== 'paused') return;
@@ -171,7 +172,7 @@ export class GameController {
 
   activateSelected(): void {
     if (this.selection === null) return;
-    const index = this.currentState.hand.indexOf(this.selection);
+    const index = liveCurrentHandCardInstanceIds(this.currentState).indexOf(this.selection);
     if (index >= 0) this.tapCard(index);
   }
 
@@ -196,7 +197,10 @@ export class GameController {
       this.waitState = notifyLiveWaitModeSkillUse(this.waitState, normalSkill);
       if (wasWaiting) void this.resumeFromWait();
     }
-    if (this.selection !== null && !this.currentState.hand.includes(this.selection))
+    if (
+      this.selection !== null &&
+      !liveCurrentHandCardInstanceIds(this.currentState).includes(this.selection)
+    )
       this.selection = null;
     this.notify();
   }
@@ -305,8 +309,11 @@ export class GameController {
     if (
       !this.waiting &&
       this.waitEnabled &&
-      (next.hand.length !== this.currentState.hand.length ||
-        next.hand.some((id, index) => id !== this.currentState.hand[index]) ||
+      (liveCurrentHandCardInstanceIds(next).length !==
+        liveCurrentHandCardInstanceIds(this.currentState).length ||
+        liveCurrentHandCardInstanceIds(next).some(
+          (id, index) => id !== liveCurrentHandCardInstanceIds(this.currentState)[index],
+        ) ||
         sectionAt(next) !== sectionAt(this.currentState))
     )
       this.waitState = { ...this.waitState, kind: 'force-reserved' };

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, test } from 'vite-plus/test';
 import { GameDriver } from './driver';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -20,7 +21,7 @@ test.each([7, 456, 1234])(
         driver.state.deck.length % 2 === 1 &&
         driver.state.hearts.heartLimit === 10000000 &&
         heartCount(driver.state) >= 500000 &&
-        driver.state.hand.includes('odd-rhythm')
+        liveCurrentHandCardInstanceIds(driver.state).includes('odd-rhythm')
       ) {
         await driver.burst(90 - driver.seconds, 10);
         break;

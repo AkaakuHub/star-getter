@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
@@ -8,7 +9,7 @@ import { game } from './support/game';
 
 it('Action13は手札を引き直し、使用カードの補充を抑止する', () => {
   const initial = game('library');
-  const sourceId = initial.hand[0];
+  const sourceId = liveCurrentHandCardInstanceIds(initial)[0];
   if (!sourceId) throw new Error('使用するカードが手札にありません。');
   const deck = initial.deck.map((card) =>
     card.cardInstanceId === sourceId
@@ -22,7 +23,9 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
     { ...initial, phase: 'playing', deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
     { type: 'card', index: 0 },
   );
-  expect(used.hand).toHaveLength(initial.hand.length - 1);
+  expect(liveCurrentHandCardInstanceIds(used)).toHaveLength(
+    liveCurrentHandCardInstanceIds(initial).length - 1,
+  );
   expect(boardCardIds(used, liveBoardState.graveyard)).toContain(sourceId);
 });
 

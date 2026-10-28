@@ -1,4 +1,8 @@
 import {
+  setLiveCurrentHandCards,
+  liveCurrentHandCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
+import {
   type LiveSkillUseAtBoardState,
   liveBoardState,
   setLiveCardBoardState,
@@ -21,7 +25,7 @@ export function withBoardState(
       [...state.cardPool, ...state.deck].map((card) => [card.cardInstanceId, card]),
     ).values(),
   ];
-  const fresh = createCardDeckBoard(metadata, state.hand);
+  const fresh = createCardDeckBoard(metadata, liveCurrentHandCardInstanceIds(state));
   const oldIds = new Set(state.deckBoard.cards.map((card) => card.cardInstanceId));
   let deckBoard: GameState['deckBoard'] = {
     ...state.deckBoard,
@@ -84,6 +88,11 @@ export function withBoardState(
           entry.boardState !== liveBoardState.exclusion,
       ),
     ),
-    hand: (positions.hand ?? state.hand).filter((id) => !activation?.usedCards.includes(id)),
+    liveHands: setLiveCurrentHandCards(
+      state,
+      (positions.hand ?? liveCurrentHandCardInstanceIds(state)).filter(
+        (id) => !activation?.usedCards.includes(id),
+      ),
+    ).liveHands,
   };
 }

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { GameController } from '../../../../src/app/gameController';
 import { createConfiguredGame } from '../../../../src/app/createConfiguredGame';
 import type { GamePreferences } from '../../../../src/app/gamePreferences';
@@ -63,7 +64,7 @@ export function createGameController(
         storyAmplification: state.storyAmplification,
         lastActionTick: state.lastActionTick,
         phase: state.phase,
-        hand: state.hand,
+        hand: liveCurrentHandCardInstanceIds(state),
         error: controller.error,
       };
     },

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, test } from 'vite-plus/test';
 import {
   createPresetSetup,
@@ -28,7 +29,7 @@ test('開始処理は選択したカードと先頭のカードを共通ゲー�
   setup = moveSetupCard(setup, 'library-invitation', -1);
   const state = createConfiguredGame(setup, 7, 100);
   expect(state.deck.map((card) => card.cardDatasId)).toEqual(setup.cardDatasIds);
-  expect(state.hand[0]).toBe('library-invitation');
+  expect(liveCurrentHandCardInstanceIds(state)[0]).toBe('library-invitation');
   expect(state.scoreMultiplier).toBe(2n);
   expect(state.phase).toBe('ready');
 });

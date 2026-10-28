@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, test } from 'vite-plus/test';
@@ -47,7 +48,7 @@ test('信号旗の生成と除外で偶数→奇数→偶数を操作して、�
     true,
   );
   expect([
-    ...returned.hand,
+    ...liveCurrentHandCardInstanceIds(returned),
     ...boardCardIds(returned, liveBoardState.deck),
     ...boardCardIds(returned, liveBoardState.graveyard),
   ]).not.toContain(pennant.cardInstanceId);

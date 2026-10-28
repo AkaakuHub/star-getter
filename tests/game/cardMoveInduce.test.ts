@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -19,7 +20,7 @@ function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
           handCountChanges: {},
         },
       },
-      { hand: [...new Set([...state.hand, cardId])] },
+      { hand: [...new Set([...liveCurrentHandCardInstanceIds(state), cardId])] },
       { [cardId]: { skillUseAtBoardState: 7 as const } },
     ),
   );
@@ -54,7 +55,7 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
             handCountChanges: {},
           },
         },
-        { hand: [...new Set([...state.hand, source.cardInstanceId])] },
+        { hand: [...new Set([...liveCurrentHandCardInstanceIds(state), source.cardInstanceId])] },
         { [source.cardInstanceId]: { skillUseAtBoardState: 7 as const } },
       ),
     );
@@ -98,7 +99,7 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
           handCountChanges: {},
         },
       },
-      { hand: [...new Set([...armed.hand, source.cardInstanceId])] },
+      { hand: [...new Set([...liveCurrentHandCardInstanceIds(armed), source.cardInstanceId])] },
     ),
   );
   expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.cardInstanceId);

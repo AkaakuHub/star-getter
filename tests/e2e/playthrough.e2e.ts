@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { createPresetSetup } from '../../src/app/setup/gameSetup';
@@ -15,7 +16,7 @@ test('全区間のカード使用と回収を最後まで処理する', () => {
   let state = act(createConfiguredGame(createPresetSetup('genesis'), 1234, 100), { type: 'start' });
   for (let frame = 1; frame <= Math.ceil(durationSeconds(state) * 4); frame++) {
     state = advanceTo(state, frame / 4);
-    const cardIndex = state.hand.findIndex(
+    const cardIndex = liveCurrentHandCardInstanceIds(state).findIndex(
       (cardId, index) => Boolean(cardId) && canUseCard(state, index),
     );
     if (cardIndex >= 0) state = act(state, { type: 'card', index: cardIndex });
@@ -32,7 +33,7 @@ test('全区間のカード使用と回収を最後まで処理する', () => {
 
 function expectOwnedOnce(state: GameState) {
   const ids = [
-    ...state.hand,
+    ...liveCurrentHandCardInstanceIds(state),
     ...boardCardIds(state, liveBoardState.deck),
     ...boardCardIds(state, liveBoardState.graveyard),
   ];
@@ -51,8 +52,8 @@ for (const routeId of routeIds) {
         state = advanceTo(state, tick / rules.ticksPerSecond);
         if (tick % 24 === 0) {
           const available = Array.from(
-            { length: state.hand.length },
-            (_, offset) => (turn + offset) % state.hand.length,
+            { length: liveCurrentHandCardInstanceIds(state).length },
+            (_, offset) => (turn + offset) % liveCurrentHandCardInstanceIds(state).length,
           ).find((slot) => canUseCard(state, slot));
           if (available !== undefined) {
             state = act(state, { type: 'card', index: available });

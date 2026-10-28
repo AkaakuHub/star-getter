@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -30,7 +31,7 @@ it('期限終了は解除通知を待機させ、処理時に実手札から補�
   expect(pending.deckActions.queue).toEqual([{ type: 1, param1: 3 }]);
   const result = flushHandCardCountActions(pending);
   expect(result.tokenCardDeck.handTargetCounts.current).toBe(5);
-  expect(result.hand).toHaveLength(5);
+  expect(liveCurrentHandCardInstanceIds(result)).toHaveLength(5);
   expect(result.deckDrawContext.usedCard).toBeNull();
   expect(result.deckDrawContext.usedSkill).toBeNull();
 });

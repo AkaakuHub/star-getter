@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import {
   liveBoardState,
@@ -7,7 +8,7 @@ import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 
 export function cardGroups(state: GameState) {
   return [
-    { board: 'hand', title: '手札確認', ids: state.hand },
+    { board: 'hand', title: '手札確認', ids: liveCurrentHandCardInstanceIds(state) },
     { board: 'discard', title: '捨札確認', ids: boardCardIds(state, liveBoardState.graveyard) },
     { board: 'deck', title: '山札確認', ids: boardCardIds(state, liveBoardState.deck) },
     {

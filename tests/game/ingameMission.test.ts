@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -93,7 +94,7 @@ it('ActionType2以外のスキル効果ではActionType2ミッションを進め
 
 it('カードのActionType13効果をActionType44のミッションへ通知する', () => {
   const initial = game('genesis');
-  const id = initial.hand[0];
+  const id = liveCurrentHandCardInstanceIds(initial)[0];
   if (!id) throw new Error('手札がありません。');
   const card = initial.deck.find((item) => item.cardInstanceId === id);
   if (!card) throw new Error('カードがありません。');
@@ -133,7 +134,7 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
 
 it('一斉生成後のActionType28実生成枚数をミッションへ通知する', () => {
   const initial = game('library');
-  const sourceId = initial.hand[0];
+  const sourceId = liveCurrentHandCardInstanceIds(initial)[0];
   const source = initial.deck.find((card) => card.cardInstanceId === sourceId);
   if (!source) throw new Error('ActionType28の検証カードがありません。');
   const record = {

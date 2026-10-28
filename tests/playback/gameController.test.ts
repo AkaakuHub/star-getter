@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import {
   canUseCard,
@@ -11,9 +12,13 @@ describe('ゲーム時計とゲームの同期', () => {
   it('最初の選択ではエナジーを使わず、同じカードをもう一度選ぶと発動する', () => {
     const { controller } = session();
     const initial = controller.state;
-    const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
+    const index = liveCurrentHandCardInstanceIds(initial).findIndex((_, slot) =>
+      canUseCard(initial, slot),
+    );
     controller.tapCard(index);
-    expect(controller.selectedCard?.cardInstanceId).toBe(initial.hand[index]);
+    expect(controller.selectedCard?.cardInstanceId).toBe(
+      liveCurrentHandCardInstanceIds(initial)[index],
+    );
     expect(controller.state.ap.currentAp).toBe(initial.ap.currentAp);
     expect(controller.state.stats.cardsUsed).toBe(0);
     controller.tapCard(index);
@@ -23,11 +28,15 @@ describe('ゲーム時計とゲームの同期', () => {
 
   it('停止中はカードを確認でき、連続で選んでも発動せず再開後に発動できる', async () => {
     const { controller } = session();
-    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
+    const index = liveCurrentHandCardInstanceIds(controller.state).findIndex((_, slot) =>
+      canUseCard(controller.state, slot),
+    );
     await controller.togglePause();
     controller.tapCard(index);
     controller.tapCard(index);
-    expect(controller.selectedCard?.cardInstanceId).toBe(controller.state.hand[index]);
+    expect(controller.selectedCard?.cardInstanceId).toBe(
+      liveCurrentHandCardInstanceIds(controller.state)[index],
+    );
     expect(controller.state.stats.cardsUsed).toBe(0);
     await controller.togglePause();
     controller.activateSelected();
@@ -130,7 +139,9 @@ describe('カード使用可能時の自動停止', () => {
     expect(controller.running).toBe(false);
     expect(clock.paused).toBe(true);
     expect(frames.pending).toBe(0);
-    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
+    const index = liveCurrentHandCardInstanceIds(controller.state).findIndex((_, slot) =>
+      canUseCard(controller.state, slot),
+    );
     controller.tapCard(index);
     controller.tapCard(index);
     expect(controller.state.stats.cardsUsed).toBe(1);
@@ -142,7 +153,9 @@ describe('カード使用可能時の自動停止', () => {
   it('使用後はクールタイムと0.35秒を守り、APが変わらなくても再び停止する', async () => {
     const { controller, clock, frames } = session();
     await controller.toggleWaitMode();
-    const index = controller.state.hand.findIndex((_, slot) => canUseCard(controller.state, slot));
+    const index = liveCurrentHandCardInstanceIds(controller.state).findIndex((_, slot) =>
+      canUseCard(controller.state, slot),
+    );
     controller.command({ type: 'card', index });
     await vi.waitFor(() => expect(frames.pending).toBe(1));
     clock.seconds = 0.3;
@@ -153,7 +166,11 @@ describe('カード使用可能時の自動停止', () => {
     expect(controller.waiting).toBe(false);
     clock.seconds = cardCooldownTicks(controller.state) / rules.ticksPerSecond;
     frames.run(clock.seconds * 1000);
-    expect(controller.state.hand.some((_, slot) => canUseCard(controller.state, slot))).toBe(true);
+    expect(
+      liveCurrentHandCardInstanceIds(controller.state).some((_, slot) =>
+        canUseCard(controller.state, slot),
+      ),
+    ).toBe(true);
     expect(controller.waiting).toBe(true);
     expect(frames.pending).toBe(0);
   });
@@ -170,7 +187,9 @@ describe('カード使用可能時の自動停止', () => {
       frames.run(step * 100);
     }
     expect(controller.waiting).toBe(true);
-    const usable = controller.state.hand.map((_, slot) => canUseCard(controller.state, slot));
+    const usable = liveCurrentHandCardInstanceIds(controller.state).map((_, slot) =>
+      canUseCard(controller.state, slot),
+    );
     expect(usable.some(Boolean)).toBe(true);
     expect(usable.every(Boolean)).toBe(false);
   });
@@ -185,14 +204,14 @@ describe('カード使用可能時の自動停止', () => {
     });
     const toggled = controller.toggleWaitMode();
     expect(controller.waiting).toBe(true);
-    const unavailable = controller.state.hand.findIndex(
+    const unavailable = liveCurrentHandCardInstanceIds(controller.state).findIndex(
       (_, slot) => !canUseCard(controller.state, slot),
     );
     expect(unavailable).toBeGreaterThanOrEqual(0);
     controller.command({ type: 'card', index: unavailable });
     expect(controller.waiting).toBe(true);
     expect(controller.state.stats.cardsUsed).toBe(0);
-    const available = controller.state.hand.findIndex((_, slot) =>
+    const available = liveCurrentHandCardInstanceIds(controller.state).findIndex((_, slot) =>
       canUseCard(controller.state, slot),
     );
     controller.command({ type: 'card', index: available });

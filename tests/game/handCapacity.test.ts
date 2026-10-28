@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { withHandTarget } from './support/game';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
@@ -37,12 +38,12 @@ function game() {
 it('手札目標数の期限後に上限を戻しても保持中の手札は減らさない', () => {
   const expanded = fillHand(applyEffect(game(), handCardCountEffect(3, 2, 1n)));
   expect(handCapacity(expanded)).toBe(8);
-  expect(expanded.hand).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(expanded)).toHaveLength(8);
   const nextSection = expanded.track.sections[1];
   if (!nextSection) throw new Error('次のパートがありません。');
   const nextPart = advanceTo(expanded, (nextSection.startBeat * 60) / expanded.track.bpm);
   expect(handCapacity(nextPart)).toBe(5);
-  expect(nextPart.hand).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(nextPart)).toHaveLength(8);
 });
 
 it('ミリ秒期限の手札数変更を期限後に解除する', () => {
@@ -114,7 +115,7 @@ it('Action904は通常ドローで手札へ入った時点で子効果を発動�
 
   const drawn = fillHandToCount(state, 1);
 
-  expect(drawn.hand).toEqual([card.cardInstanceId]);
+  expect(liveCurrentHandCardInstanceIds(drawn)).toEqual([card.cardInstanceId]);
   expect(drawn.tokenCardDeck.handTargetCounts.current).toBe(
     initial.tokenCardDeck.handTargetCounts.current - 1,
   );
@@ -221,11 +222,11 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
         handCountChanges: {},
       },
     },
-    { hand: state.hand.filter((id) => id !== source.cardInstanceId) },
+    { hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== source.cardInstanceId) },
   );
   const changed = applyEffect(activated, handCardCountEffect(-1, 3, 0n), source);
   const finished = finishCardActivation(changed);
-  expect(finished.hand).toHaveLength(3);
+  expect(liveCurrentHandCardInstanceIds(finished)).toHaveLength(3);
   expect(boardCardIds(finished, liveBoardState.graveyard)).toHaveLength(2);
   expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.cardInstanceId);
 });
@@ -244,10 +245,10 @@ it('手札目標数より多い状態では使用元カードを補充しない'
         handCountChanges: {},
       },
     },
-    { hand: state.hand.filter((id) => id !== source.cardInstanceId) },
+    { hand: liveCurrentHandCardInstanceIds(state).filter((id) => id !== source.cardInstanceId) },
   );
   const finished = finishCardActivation(activated);
-  expect(finished.hand).toHaveLength(6);
+  expect(liveCurrentHandCardInstanceIds(finished)).toHaveLength(6);
   expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.cardInstanceId);
 });
 
@@ -273,27 +274,27 @@ it('手札内の減少効果を合算してから、上限を3〜8枚に制限�
     },
   );
   expect(handCapacity(compressed)).toBe(3);
-  expect(fillHand(compressed).hand).toHaveLength(3);
+  expect(liveCurrentHandCardInstanceIds(fillHand(compressed))).toHaveLength(3);
   expect(handCapacity(withHandTarget(compressed, 11))).toBe(8);
 });
 
 it('手札最大化は手札を8枚まで補充し、期限後も保持した手札を減らさない', () => {
   const initial = game();
   const shortHand = withBoardState(withHandTarget(initial, 4), {
-    hand: initial.hand.slice(0, 3),
+    hand: liveCurrentHandCardInstanceIds(initial).slice(0, 3),
     deck: initial.deck
       .map((card) => card.cardInstanceId)
-      .filter((id) => !initial.hand.slice(0, 3).includes(id)),
+      .filter((id) => !liveCurrentHandCardInstanceIds(initial).slice(0, 3).includes(id)),
   });
   const expanded = applyEffect(shortHand, {
     kind: 'hand-max-card',
     duration: { kind: 'sections', value: 1n },
   });
-  expect(expanded.hand).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(expanded)).toHaveLength(8);
   expect(handCapacity(expanded)).toBe(8);
   const expired = expireHandMaxCardSections(expanded);
   expect(expired.handMaxCardEffects).toHaveLength(0);
-  expect(expired.hand).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(expired)).toHaveLength(8);
   expect(handCapacity(expired)).toBe(4);
 });
 
@@ -327,7 +328,7 @@ it('InvocationType 0x388と0x38bは手動解除まで手札最大化を保つ', 
       deactivationKey,
     });
     expect(ended.handMaxCardEffects).toHaveLength(0);
-    expect(ended.hand).toEqual(timed.hand);
+    expect(liveCurrentHandCardInstanceIds(ended)).toEqual(liveCurrentHandCardInstanceIds(timed));
   }
 });
 

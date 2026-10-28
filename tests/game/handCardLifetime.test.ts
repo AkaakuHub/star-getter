@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -67,6 +68,8 @@ it.each([false, true])(
     const used = act(active, { type: 'card', index: 0 });
     expect(used.ap.currentAp).toBe(29);
     expect(used.action52Buffs).toHaveLength(0);
-    expect(Object.keys(used.handCardStats).sort()).toEqual([...used.hand].sort());
+    expect(Object.keys(used.handCardStats).sort()).toEqual(
+      [...liveCurrentHandCardInstanceIds(used)].sort(),
+    );
   },
 );

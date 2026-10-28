@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -37,19 +38,26 @@ it('複数の浮き輪が同時に回収効果を発動しても貝がら・舵�
   const filled = applyEffect(expanded, { kind: 'hearts', amount: 500_000 });
   const next = collectHearts(filled);
   const nextBook = next.deck.find(
-    (card) => next.hand.includes(card.cardInstanceId) && card.token === 'bookmark',
+    (card) =>
+      liveCurrentHandCardInstanceIds(next).includes(card.cardInstanceId) &&
+      card.token === 'bookmark',
   );
   expect(nextBook).toBeDefined();
   if (!nextBook) throw new Error('浮き輪を確保できませんでした。');
   expect(canActivateHandCollectionAbility(next, nextBook)).toBe(true);
   const nextStory = next.deck.find(
-    (card) => next.hand.includes(card.cardInstanceId) && card.token === 'story',
+    (card) =>
+      liveCurrentHandCardInstanceIds(next).includes(card.cardInstanceId) && card.token === 'story',
   );
   expect(nextStory).toBeDefined();
   if (!nextStory) throw new Error('貝がらを確保できませんでした。');
   expect(canActivateHandCollectionAbility(next, nextStory)).toBe(true);
   expect(
-    next.deck.some((card) => next.hand.includes(card.cardInstanceId) && card.token === 'clock'),
+    next.deck.some(
+      (card) =>
+        liveCurrentHandCardInstanceIds(next).includes(card.cardInstanceId) &&
+        card.token === 'clock',
+    ),
   ).toBe(true);
   expect(next.deckBoard.deckOutCount).toBe(base.deckBoard.deckOutCount);
   expect(next.handCollectionActivationCounts[book.cardInstanceId]).toBe(1);

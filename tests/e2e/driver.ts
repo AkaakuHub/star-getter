@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { reportDriver } from './recording/report';
 import type { GameSetup } from '../../src/app/setup/gameSetup';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
@@ -126,7 +127,7 @@ export class GameDriver {
       throw new Error('操作開始から300秒以内に手順が完了しませんでした。');
     }
     const before = this.state.stats.heartsCollected;
-    const hand = this.state.hand.join(',');
+    const hand = liveCurrentHandCardInstanceIds(this.state).join(',');
     const amplification = this.state.storyAmplification;
     if (!this.clock.paused) {
       this.clock.seconds = (this.state.tick + 1) / rules.ticksPerSecond;
@@ -134,7 +135,7 @@ export class GameDriver {
     }
     if (this.state.automaticHeart.enabled && this.state.stats.heartsCollected > before) {
       this.automaticCollections++;
-      if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
+      if (liveCurrentHandCardInstanceIds(this.state).join(',') !== hand) this.collectionRedraws++;
       this.collectionAmplification += this.state.storyAmplification - amplification;
     }
     this.observe();
@@ -144,14 +145,14 @@ export class GameDriver {
     if (this.elapsedTicks < this.nextPointerTick || this.state.phase !== 'playing') return;
     const previous = this.state;
     const before = this.state.stats.heartsCollected;
-    const hand = this.state.hand.join(',');
+    const hand = liveCurrentHandCardInstanceIds(this.state).join(',');
     const amplification = this.state.storyAmplification;
     const kind = this.controller.collectFromInput();
     this.recording.record({ kind }, previous, this.state, this.elapsedTicks);
     this.pointer();
     if (kind === 'collect') this.collections++;
     if (this.state.stats.heartsCollected > before) this.successfulCollections++;
-    if (this.state.hand.join(',') !== hand) this.collectionRedraws++;
+    if (liveCurrentHandCardInstanceIds(this.state).join(',') !== hand) this.collectionRedraws++;
     this.collectionAmplification += this.state.storyAmplification - amplification;
     this.observe();
   }
@@ -178,7 +179,7 @@ export class GameDriver {
     if (!canUseSpecial(this.state, id) || this.state.phase !== 'playing') return false;
     const before = this.state;
     this.controller.command({ type: 'special', cardId: id });
-    const handIndex = before.hand.indexOf(id);
+    const handIndex = liveCurrentHandCardInstanceIds(before).indexOf(id);
     this.recording.record(
       {
         kind: 'special',
@@ -201,7 +202,7 @@ export class GameDriver {
       this.state.phase === 'playing'
     )
       await this.tick();
-    const available = this.state.hand
+    const available = liveCurrentHandCardInstanceIds(this.state)
       .map((_, index) => index)
       .filter(
         (index) =>
@@ -225,7 +226,7 @@ export class GameDriver {
         this.elapsedTicks,
       );
       await this.think(this.timing.decisionSeconds);
-      const selectedIndex = this.state.hand.indexOf(card.cardInstanceId);
+      const selectedIndex = liveCurrentHandCardInstanceIds(this.state).indexOf(card.cardInstanceId);
       if (!canUseCard(this.state, selectedIndex)) {
         this.recording.record(
           { kind: 'card-cancel', card: reference },
@@ -249,7 +250,10 @@ export class GameDriver {
       await this.think(this.timing.confirmationSeconds);
       if (
         this.controller.selectedCard?.cardInstanceId !== card.cardInstanceId ||
-        !canUseCard(this.state, this.state.hand.indexOf(card.cardInstanceId))
+        !canUseCard(
+          this.state,
+          liveCurrentHandCardInstanceIds(this.state).indexOf(card.cardInstanceId),
+        )
       ) {
         this.recording.record(
           { kind: 'card-cancel', card: reference },
@@ -267,7 +271,7 @@ export class GameDriver {
           card: {
             instanceId: card.cardInstanceId,
             name: card.name,
-            handIndex: before.hand.indexOf(card.cardInstanceId),
+            handIndex: liveCurrentHandCardInstanceIds(before).indexOf(card.cardInstanceId),
           },
         },
         before,

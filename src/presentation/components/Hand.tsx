@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import type { GameController } from '../../app/gameController';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
@@ -15,7 +16,7 @@ export function Hand({
       aria-label="手札"
       className="pointer-events-none absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 h-[32cqw]"
     >
-      {state.hand.map((id, index) => {
+      {liveCurrentHandCardInstanceIds(state).map((id, index) => {
         const card = cardAt(state, index);
         const use = () => {
           controller.tapCard(index);
@@ -31,7 +32,7 @@ export function Hand({
             }
             style={handLayout(
               index,
-              state.hand.length,
+              liveCurrentHandCardInstanceIds(state).length,
               controller.selectedCard?.cardInstanceId === card.cardInstanceId,
             )}
             disabled={state.phase !== 'playing' && state.phase !== 'paused'}

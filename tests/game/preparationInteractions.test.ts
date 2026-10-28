@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -343,7 +344,7 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
     source,
   );
   const replaced = flushDeckActions(state);
-  expect(replaced.hand).toHaveLength(2);
+  expect(liveCurrentHandCardInstanceIds(replaced)).toHaveLength(2);
   expect(replaced.deckDrawContext.usedCard?.charactersId).toBe(source.charactersId);
   expect(replaced.deckDrawContext.usedCard?.unitIds).toContain(2);
   expect(replaced.deckActions.queue.filter((action) => action.type === 3)).toHaveLength(0);

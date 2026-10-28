@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createLiveDeckDrawContextState } from '@akaakuhub/suku-sute-core/runtime/cards/cardDraw';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
@@ -16,7 +17,7 @@ it('生成した30枚の末尾順で固定せず、各ドローで乱数を進�
   state = withHand(withHandTarget(state, 8), []);
   const first = fillHand(state);
   expect(first.randomSeed).not.toBe(state.randomSeed);
-  const stories = first.hand.filter((id) =>
+  const stories = liveCurrentHandCardInstanceIds(first).filter((id) =>
     first.deck.some((card) => card.cardInstanceId === id && card.token === 'story'),
   );
   expect(stories.length).toBeGreaterThan(0);
@@ -76,7 +77,9 @@ it('tokenと編成の検索を後入れ先出しにして交互の対象へ引�
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   state = applyEffect(state, { kind: 'search-unit', unit: 1, count: 1 });
   const drawn = fillHandToCount(state, 4);
-  const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.cardInstanceId === id));
+  const hand = liveCurrentHandCardInstanceIds(drawn).map((id) =>
+    drawn.deck.find((card) => card.cardInstanceId === id),
+  );
   expect(hand.map((card) => card?.token ?? card?.unitIds[0])).toEqual([1, 'clock', 1, 'clock']);
   expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
   expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
@@ -95,7 +98,10 @@ it('検索先があるときは検索外の優先カードを先に引かない'
   };
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   const drawn = fillHandToCount(state, 1);
-  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
+  expect(
+    drawn.deck.find((card) => card.cardInstanceId === liveCurrentHandCardInstanceIds(drawn)[0])
+      ?.token,
+  ).toBe('clock');
 });
 
 it('グレード、パート、スキルの順に検索し、グレード検索は捨て札からも引く', () => {
@@ -141,10 +147,13 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
     ),
   };
   const drawn = fillHandToCount(state, 3);
-  expect(drawn.hand[0]).toBe(story.cardInstanceId);
+  expect(liveCurrentHandCardInstanceIds(drawn)[0]).toBe(story.cardInstanceId);
   expect(boardCardIds(drawn, liveBoardState.graveyard)).not.toContain(story.cardInstanceId);
-  expect(drawn.hand[1]).toBe('camera');
-  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[2])?.token).toBe('clock');
+  expect(liveCurrentHandCardInstanceIds(drawn)[1]).toBe('camera');
+  expect(
+    drawn.deck.find((card) => card.cardInstanceId === liveCurrentHandCardInstanceIds(drawn)[2])
+      ?.token,
+  ).toBe('clock');
   expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
   expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
   expect(drawn.deckBoard.skillCardSearchParams).toHaveLength(0);
@@ -166,7 +175,10 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
     count: 1,
   });
   const drawn = fillHandToCount(state, 1);
-  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
+  expect(
+    drawn.deck.find((card) => card.cardInstanceId === liveCurrentHandCardInstanceIds(drawn)[0])
+      ?.token,
+  ).toBe('clock');
   expect(drawn.deckBoard.gradeCardSearchParams).toHaveLength(0);
   expect(drawn.deckBoard.sectionCardSearchParams).toHaveLength(0);
   expect(drawn.deckBoard.skillCardSearchParams).toHaveLength(0);
@@ -198,7 +210,7 @@ it('スキル検索はアイコンではなくカードのMainEffectを照合す
       ],
     }),
   );
-  expect(fillHandToCount(searching, 1).hand).toEqual(['camera']);
+  expect(liveCurrentHandCardInstanceIds(fillHandToCount(searching, 1))).toEqual(['camera']);
 });
 
 it('解除キーが一致する未消費の検索指定を除去する', () => {
@@ -225,8 +237,8 @@ it('山札に禁止カードしか残っていなければ捨て札を戻して�
     },
   );
   const drawn = fillHandToCount(state, 2);
-  expect(drawn.hand).toContain('aurora-ensemble');
-  expect(drawn.hand).not.toContain('library-ensemble');
+  expect(liveCurrentHandCardInstanceIds(drawn)).toContain('aurora-ensemble');
+  expect(liveCurrentHandCardInstanceIds(drawn)).not.toContain('library-ensemble');
   expect(drawn.deckBoard.deckOutCount).toBe(state.deckBoard.deckOutCount + 1);
   expect(boardCardIds(drawn, liveBoardState.graveyard)).toEqual([]);
 });

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
@@ -201,7 +202,7 @@ it('Action17のメンバー使用数は使用カードが手札を離れた後�
     source,
   );
   const afterUse = notifyHandSkillUse(withCostChange, used, applyEffect);
-  expect(afterUse.hand).toEqual([source.cardInstanceId]);
+  expect(liveCurrentHandCardInstanceIds(afterUse)).toEqual([source.cardInstanceId]);
   expect(
     afterUse.handCardStats[source.cardInstanceId]?.skillUseCountsByMember[used.charactersId],
   ).toBe(1);
@@ -282,7 +283,7 @@ it('Action17の解除キーで通常効果を解除し、InvocationType 0x388は
 it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変更する', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.cardInstanceId === 'class');
-  const targetId = initial.hand[0];
+  const targetId = liveCurrentHandCardInstanceIds(initial)[0];
   const target = initial.deck.find((card) => card.cardInstanceId === targetId);
   if (!source || !target) throw new Error('検証用カードがありません。');
   const changed = applyEffect(
@@ -300,7 +301,7 @@ it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変�
   expect(cardCost(changed, target)).toBe(cardCost(initial, target) + 2);
   const used = act(
     { ...changed, ap: { ...changed.ap, currentAp: 1000 } },
-    { type: 'card', index: initial.hand.indexOf(target.cardInstanceId) },
+    { type: 'card', index: liveCurrentHandCardInstanceIds(initial).indexOf(target.cardInstanceId) },
   );
   expect(used.onceSkillCostChanges[target.cardInstanceId]).toBeUndefined();
 });
@@ -324,7 +325,9 @@ it('ActionType29は山札上の対象カードだけに適用し、負数をActi
     source,
   );
   expect(changed.onceSkillCostChanges[target.cardInstanceId]).toBe(-4);
-  expect(changed.onceSkillCostChanges[initial.hand[0] ?? '']).toBeUndefined();
+  expect(
+    changed.onceSkillCostChanges[liveCurrentHandCardInstanceIds(initial)[0] ?? ''],
+  ).toBeUndefined();
   expect(changed.action52Buffs).toHaveLength(0);
 });
 

@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
 import { durationSeconds, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
@@ -78,7 +79,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
         : moodValue(driver.state) > -100
           ? ['rain-preparation', 'frost-echo', ...priority]
           : shadowUses < 14
-            ? driver.state.hand.some((id) => id.startsWith('shadow-'))
+            ? liveCurrentHandCardInstanceIds(driver.state).some((id) => id.startsWith('shadow-'))
               ? ['shadow', 'frost-echo', 'sunrise', 'rain-preparation']
               : ['frost-echo', 'sunrise', 'rain-preparation', 'aurora-ensemble']
             : !stableCollection && (driver.state.genesis.effects[0]?.effectValue ?? 0) >= 100
@@ -146,7 +147,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   driver.report('専用値を準備');
   console.log(
     JSON.stringify({
-      hand: driver.state.hand,
+      hand: liveCurrentHandCardInstanceIds(driver.state),
       beat: driver.state.sectionBeatHeartBonus,
       boosts: driver.state.targetBoosts.length,
       mentalProtected: driver.state.mentalProtected,

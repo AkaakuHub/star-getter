@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
@@ -21,7 +22,7 @@ for (const recoverDiscard of [false, true]) {
         },
       );
       const next = shuffleHand(initial, { recoverDiscard, destination });
-      expect(next.hand).toEqual([]);
+      expect(liveCurrentHandCardInstanceIds(next)).toEqual([]);
       expect(next.randomSeed).toBe(initial.randomSeed);
       expect(boardCardIds(next, liveBoardState.deck).includes('class')).toBe(
         destination === 'draw',
@@ -41,7 +42,7 @@ for (const recoverDiscard of [false, true]) {
       ).toEqual(
         [
           ...boardCardIds(initial, liveBoardState.deck),
-          ...initial.hand,
+          ...liveCurrentHandCardInstanceIds(initial),
           ...boardCardIds(initial, liveBoardState.graveyard),
         ].sort(),
       );
@@ -60,7 +61,7 @@ it('一斉使用内のリセットシャッフルは発動した本人を戻さ�
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed - state.stats.cardsUsed).toBe(2);
   expect(boardCardIds(used, liveBoardState.graveyard)).toContain('class');
-  expect(used.hand).not.toContain('class');
+  expect(liveCurrentHandCardInstanceIds(used)).not.toContain('class');
   expect(boardCardIds(used, liveBoardState.deck)).toContain('aurora-ensemble');
   expect(boardCardIds(used, liveBoardState.graveyard)).not.toContain('aurora-ensemble');
 });
@@ -77,7 +78,7 @@ it('一斉使用内の通常リシャッフルでは使用したカードを捨�
   expect(used.stats.cardsUsed - state.stats.cardsUsed).toBe(2);
   for (const id of ['aurora-ensemble', 'frost-echo']) {
     expect(boardCardIds(used, liveBoardState.graveyard)).toContain(id);
-    expect(used.hand).not.toContain(id);
+    expect(liveCurrentHandCardInstanceIds(used)).not.toContain(id);
     expect(boardCardIds(used, liveBoardState.deck)).not.toContain(id);
   }
 });
@@ -129,6 +130,6 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     { hand: [], deck: deck.map((card) => card.cardInstanceId), graveyard: [] },
   );
   const drawn = fillHand(state);
-  expect(drawn.hand).toHaveLength(7);
+  expect(liveCurrentHandCardInstanceIds(drawn)).toHaveLength(7);
   expect(drawn.amplification).toBe(108);
 });

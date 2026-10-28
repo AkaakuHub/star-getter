@@ -1,3 +1,4 @@
+import { setLiveCurrentHandCards } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { addLiveHandCardTargetCount } from '@akaakuhub/suku-sute-core/runtime/cards/handCardTarget';
 import { createCardDeckBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { routes, type RouteId } from '../../../src/content/routes';
@@ -22,7 +23,7 @@ export function withHand(state: GameState, hand: readonly string[]): GameState {
   return initializeHandCardStats(
     {
       ...state,
-      hand,
+      liveHands: setLiveCurrentHandCards(state, hand).liveHands,
       handEffectCardIds: hand,
       deckBoard: { ...state.deckBoard, cards: createCardDeckBoard(state.deck, hand).cards },
     },

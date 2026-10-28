@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
@@ -37,9 +38,15 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
     [clock.cardInstanceId, story.cardInstanceId],
   );
   const play = (first: Card, second: Card) => {
-    const used = act(initial, { type: 'card', index: initial.hand.indexOf(first.cardInstanceId) });
+    const used = act(initial, {
+      type: 'card',
+      index: liveCurrentHandCardInstanceIds(initial).indexOf(first.cardInstanceId),
+    });
     const state = advanceTo(used, (used.tick + cardCooldownTicks(used)) / rules.ticksPerSecond);
-    return act(state, { type: 'card', index: state.hand.indexOf(second.cardInstanceId) });
+    return act(state, {
+      type: 'card',
+      index: liveCurrentHandCardInstanceIds(state).indexOf(second.cardInstanceId),
+    });
   };
   const prepared = play(clock, story),
     reversed = play(story, clock);
@@ -138,7 +145,7 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
   expect(used.deck).toHaveLength(99);
   expect(used.deckBoard.nextCardInstanceId).toBe(beforeId);
   expect([
-    ...used.hand,
+    ...liveCurrentHandCardInstanceIds(used),
     ...boardCardIds(used, liveBoardState.deck),
     ...boardCardIds(used, liveBoardState.graveyard),
   ]).not.toContain(source.cardInstanceId);
@@ -235,7 +242,7 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   expect(used.stats.cardsUsed).toBe(3);
   expect(used.ap.currentAp).toBeGreaterThan(0);
   expect(used.ap.currentAp).toBeLessThan(used.ap.maxAp);
-  expect(used.hand).not.toContain(source.cardInstanceId);
+  expect(liveCurrentHandCardInstanceIds(used)).not.toContain(source.cardInstanceId);
   expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.cardInstanceId);
   expect(used.activation).toBeNull();
   expect(used.deckDrawContext.usedCard?.charactersId).toBe(source.charactersId);
@@ -258,7 +265,7 @@ it('ActionType42の子カードは親スキルの未確定カードを80枚条�
   expect(used.tokenGroups).toEqual([]);
   expect(used.deck.some((item) => item.cardInstanceId === source.cardInstanceId)).toBe(false);
   expect([
-    ...used.hand,
+    ...liveCurrentHandCardInstanceIds(used),
     ...boardCardIds(used, liveBoardState.deck),
     ...boardCardIds(used, liveBoardState.graveyard),
   ]).not.toContain(source.cardInstanceId);

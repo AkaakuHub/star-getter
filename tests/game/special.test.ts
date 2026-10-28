@@ -1,3 +1,4 @@
+import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
@@ -55,7 +56,7 @@ it('初回の共鳴で30枚を生成し、追加の共鳴で上限を10増やし
   const initial = { ...baseState3, ap: { ...baseState3.ap, currentAp: 10 } };
   const prepared = act(initial, { type: 'special', cardId: 'library-pages' });
   expect(prepared.ap.currentAp).toBe(7);
-  expect(prepared.hand).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(prepared)).toHaveLength(8);
   expect(prepared.deck).toHaveLength(36);
   expect(act(prepared, { type: 'special', cardId: 'library-pages' })).toBe(prepared);
   const extended = act(prepared, { type: 'special', cardId: 'library-ensemble' });
@@ -92,7 +93,7 @@ it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用
     );
   }
   expect([
-    ...state.hand,
+    ...liveCurrentHandCardInstanceIds(state),
     ...boardCardIds(state, liveBoardState.deck),
     ...boardCardIds(state, liveBoardState.graveyard),
   ]).not.toContain('class');
