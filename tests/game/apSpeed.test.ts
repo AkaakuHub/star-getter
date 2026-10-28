@@ -19,6 +19,10 @@ it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、
   const baseState = game();
   const initial = {
     ...baseState,
+    track: {
+      ...baseState.track,
+      stage: { ...baseState.track.stage, apIncreaseIntervalSeconds: 1.2 },
+    },
     handEffectCardIds: [],
     targetBoosts: [],
     amplification: 100,
@@ -27,8 +31,8 @@ it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、
   };
   const before = apIncreaseIntervalSeconds(initial);
   const applied = applyEffect(initial, speedEffect, initial.deck[0]);
-  expect(apIncreaseIntervalSeconds(applied)).toBeCloseTo(0.9, 5);
-  expect(applied.ap.timerSeconds).toBeCloseTo(initial.ap.timerSeconds * 0.75, 5);
+  expect(apIncreaseIntervalSeconds(applied)).toBeCloseTo(0.84, 5);
+  expect(applied.ap.timerSeconds).toBeCloseTo(initial.ap.timerSeconds * 0.7, 5);
 
   const ended = act(applied, { type: 'deactivate-ap-speed', deactivationKey: 'unused' });
   expect(ended.apTimeEffects).toHaveLength(1);
@@ -43,8 +47,10 @@ it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、
 });
 
 it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用する', () => {
+  const base = game();
   const initial = {
-    ...game(),
+    ...base,
+    track: { ...base.track, stage: { ...base.track.stage, apIncreaseIntervalSeconds: 1.2 } },
     handEffectCardIds: [],
     targetBoosts: [],
     amplification: 100,
@@ -61,7 +67,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     },
     source,
   );
-  expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(0.2, 5);
+  expect(apIncreaseIntervalSeconds(additive)).toBeCloseTo(1.175, 5);
 
   const boosted = applyEffect(
     {
@@ -71,7 +77,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     speedEffect,
     source,
   );
-  expect(apIncreaseIntervalSeconds(boosted)).toBeCloseTo(0.5, 5);
+  expect(apIncreaseIntervalSeconds(boosted)).toBeCloseTo(0.48, 5);
 
   const absorption = {
     id: 1,
@@ -90,7 +96,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
   const protectedState = { ...initial, proxySkills: [absorption] };
   const absorbed = applyEffect(protectedState, speedEffect, source);
   expect(absorbed.apTimeEffects).toHaveLength(0);
-  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(30n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(31n);
 });
 
 it('Action21の吸収到達で即時誘発し、AP速度を変更しない', () => {

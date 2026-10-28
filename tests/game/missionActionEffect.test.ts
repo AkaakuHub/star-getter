@@ -2,7 +2,10 @@ import { expect, it } from 'vite-plus/test';
 import { createApSpeedChangeEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/apSpeedChange';
 import { createAddVoltageEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/addVoltage';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
-import { applyApSpeedPercent } from '@akaakuhub/suku-sute-core/game/effects/apSpeed';
+import {
+  apIncreaseIntervalSeconds,
+  applyApSpeedPercent,
+} from '@akaakuhub/suku-sute-core/game/effects/apSpeed';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 import { startIngameMission } from '@akaakuhub/suku-sute-core/game/ingameMissions';
 import { registerProxySkill } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
@@ -86,7 +89,12 @@ it('Proxyに吸収されたActionType7も参照実装のEffectAmountでミッシ
 });
 
 it('ActionType21通知は実際に登録されたAP時間倍率を使う', () => {
-  const initial = missionState(21, 3000);
+  const initial = {
+    ...missionState(21, 3000),
+    handEffectCardIds: [],
+    targetBoosts: [],
+    amplification: 100,
+  };
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
   const effect = createApSpeedChangeEffect({
@@ -103,11 +111,16 @@ it('ActionType21通知は実際に登録されたAP時間倍率を使う', () =>
     ],
   });
   const changed = applyEffect(startIngameMission(initial, 21n), effect, card);
-  expect(changed.ingameMission?.cooldownSeconds).toBe(1);
+  expect(changed.ingameMission?.count).toBe(31);
+  expect(changed.ingameMission?.cooldownSeconds).toBe(0);
 });
 
 it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', () => {
-  const initial = missionState(21, 6000);
+  const base = missionState(21, 6000);
+  const initial = {
+    ...base,
+    track: { ...base.track, stage: { ...base.track.stage, apIncreaseIntervalSeconds: 1 } },
+  };
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
   const priorBuff = applyApSpeedPercent(initial, -100, 'stage');
@@ -115,7 +128,7 @@ it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', (
     skillEffectId: 22n,
     details: [
       { id: 1n, detailType: 'CHANGE_AP_INCREASE_SPEED_CALC_TYPE', targetMood: 0, value: 1n },
-      { id: 2n, detailType: 'CHANGE_AP_INCREASE_SPEED_NUM', targetMood: 0, value: -1n },
+      { id: 2n, detailType: 'CHANGE_AP_INCREASE_SPEED_NUM', targetMood: 0, value: -500n },
       {
         id: 3n,
         detailType: 'CHANGE_AP_INCREASE_SPEED_DISPLAY_TIME_TYPE',
@@ -125,7 +138,8 @@ it('ActionType21加算通知は既存Buff適用後のAP基準時間を使う', (
     ],
   });
   const changed = applyEffect(startIngameMission(priorBuff, 21n), effect, card);
-  expect(changed.ingameMission?.count).toBe(4310);
+  expect(changed.ingameMission?.count).toBe(25);
+  expect(apIncreaseIntervalSeconds(changed)).toBeCloseTo(1, 5);
   expect(changed.ingameMission?.cooldownSeconds).toBe(0);
 });
 

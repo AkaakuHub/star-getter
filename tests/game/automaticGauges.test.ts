@@ -29,9 +29,10 @@ it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化�
   const initial = { ...baseState, ap: { ...baseState.ap, currentAp: 0 } };
   expect(advanceTo(initial, 0.58).voltage.currentVoltage).toBe(0n);
   expect(advanceTo(initial, 0.6).voltage.currentVoltage).toBe(1n);
+  expect(advanceTo(initial, 1.15).ap.currentAp).toBe(0);
+  expect(advanceTo(initial, 1.16 + 1 / 60).ap.currentAp).toBe(1);
   const later = advanceTo(initial, 1.2);
-  expect(later.ap.currentAp).toBe(0);
-  expect(advanceTo(later, 1.2 + 1 / 60).ap.currentAp).toBe(1);
+  expect(later.ap.currentAp).toBe(1);
   expect(later.mental.currentMental).toBe(99);
   expect(later.voltage.currentVoltage).toBe(2n);
 });
@@ -44,6 +45,11 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
       moodOffset: -100,
       handEffectCardIds: ['horizon'],
       mentalProtected: true,
+      apTimeEffects: [],
+      track: {
+        ...baseState2.track,
+        stage: { ...baseState2.track.stage, apIncreaseIntervalSeconds: 1.2 },
+      },
       ap: { ...baseState2.ap, timerSeconds: 0, currentAp: 0 },
       voltage: { ...baseState2.voltage, timerSeconds: 0 },
     },
