@@ -93,12 +93,10 @@ it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発�
   );
   const absorbed = applyEffect(active, handCardCountEffect(1, 3, 0n), source);
   const withoutProxy = { ...absorbed, proxyAbsorptions: [] };
-  const baseline = advanceTo(withoutProxy, 0.2).currentAp;
-  const induced = advanceTo(absorbed, 0.2).currentAp;
-  const direct = advanceTo(
-    applyEffect(withoutProxy, { kind: 'ap', amount: 2 }, source),
-    0.2,
-  ).currentAp;
+  const baseline = advanceTo(withoutProxy, 0.2).ap.currentAp;
+  const induced = advanceTo(absorbed, 0.2).ap.currentAp;
+  const direct = advanceTo(applyEffect(withoutProxy, { kind: 'ap', amount: 2 }, source), 0.2).ap
+    .currentAp;
   expect(induced - baseline).toBe(direct - baseline);
 });
 
@@ -214,7 +212,7 @@ it('Proxy誘発タイミング3はruntimeのIsAbsorbEnd判定に従う', () => {
   expect(ended.proxyAbsorptions[0]?.isAbsorbEnd).toBe(true);
   const afterSection = advanceProxySkillSections(ended, applyEffect);
   expect(afterSection.proxyAbsorptions[0]?.isAbsorbEnd).toBe(true);
-  expect(afterSection.currentAp).toBe(ended.currentAp);
+  expect(afterSection.ap.currentAp).toBe(ended.ap.currentAp);
 });
 
 it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () => {

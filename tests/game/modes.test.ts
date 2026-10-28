@@ -41,7 +41,7 @@ describe('モード切替と切替時効果', () => {
     expect(applyEffect(state, on)).toEqual(state);
     state = applyEffect(applyEffect(state, off), on);
     expect(state.currentVoltage).toBe(30);
-    expect(state.maxAp).toBe(modeGame().maxAp + 1);
+    expect(state.ap.maxAp).toBe(modeGame().ap.maxAp + 1);
     expect(state.modeReactions[0]?.count).toBe(2);
   });
   it('ActionType35のModeChangeType.Alternateは現在状態を反転する', () => {
@@ -97,7 +97,7 @@ describe('モード切替と切替時効果', () => {
       modes: createModes([88]),
       hand: [card.id],
       phase: 'playing' as const,
-      currentAp: 100,
+      ap: { ...initial.ap, currentAp: 100 },
     };
     const enabled = applyEffect(state, { kind: 'mode', modeId: 88n, change: 'on' });
     expect(cardCost(state, card)).toBe(1);
@@ -145,12 +145,12 @@ describe('モード切替と切替時効果', () => {
       {
         ...on,
         phase: 'playing',
-        currentAp: 20,
         drawPile: deck.filter((item) => item.id !== card.id).map((item) => item.id),
+        ap: { ...on.ap, currentAp: 20 },
       },
       { type: 'card', index: 0 },
     );
-    expect(playing.currentAp).toBe(20 - cardCost(on, card) + 3);
+    expect(playing.ap.currentAp).toBe(20 - cardCost(on, card) + 3);
   });
   it('切替保留中は状態を変えず、解除後にFIFOで実行する', () => {
     let state = applyEffect(modeGame(), reaction);
@@ -241,7 +241,7 @@ describe('モード切替と切替時効果', () => {
     });
     state = applyEffect(state, on);
     expect(state.modes.entries.every((entry) => entry.on)).toBe(true);
-    expect(state.maxAp).toBe(modeGame().maxAp + 2);
+    expect(state.ap.maxAp).toBe(modeGame().ap.maxAp + 2);
     expect(state.modes.changing).toBe(false);
   });
   it('登録されていないモードとカード効果のID0では発動しない', () => {
@@ -261,7 +261,7 @@ describe('モード切替と切替時効果', () => {
       { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
-      { ...original, deck: cards, cardPool: cards, currentAp: 100 },
+      { ...original, deck: cards, cardPool: cards, ap: { ...original.ap, currentAp: 100 } },
       reaction,
     );
     const state = act(

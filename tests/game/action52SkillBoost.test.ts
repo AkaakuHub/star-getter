@@ -118,7 +118,7 @@ it('Action14のAP回復にもActionType52を適用して使用回数を消費す
     source,
   );
   const recovered = applyEffect(active, { kind: 'ap', amount: 10 }, source);
-  expect(recovered.currentAp).toBe(15);
+  expect(recovered.ap.currentAp).toBe(15);
   expect(recovered.action52Buffs).toHaveLength(0);
 });
 

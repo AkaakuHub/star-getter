@@ -77,7 +77,7 @@ export class GameController {
         (mask, _, index) => (canUseCard(this.currentState, index) ? mask | (1 << index) : mask),
         0,
       ),
-      skillPoint: Math.trunc(this.currentState.currentAp),
+      skillPoint: Math.trunc(this.currentState.ap.currentAp),
       ableUseSkill:
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
@@ -86,7 +86,7 @@ export class GameController {
         (_, index) =>
           this.currentState.genesis.effects.length === 0 &&
           cardCost(this.currentState, cardAt(this.currentState, index)) >
-            this.currentState.currentAp,
+            this.currentState.ap.currentAp,
       ),
       deltaTimeSeconds,
     });

@@ -56,7 +56,7 @@ function snapshot(state: GameState): Snapshot {
     score: state.score.toString(),
     gauge: state.genesis.effects.length > 0 ? state.genesis.currentGauge.toString() : null,
     deckSize: state.deck.length,
-    currentAp: state.currentAp,
+    currentAp: state.ap.currentAp,
     hearts: heartCount(state),
     heartLimit: state.hearts.heartLimit,
     storyAmplification: state.storyAmplification,

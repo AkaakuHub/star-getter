@@ -52,16 +52,16 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         role="progressbar"
         aria-label="エナジー"
         aria-valuemin={0}
-        aria-valuemax={state.maxAp}
-        aria-valuenow={Math.floor(state.currentAp)}
+        aria-valuemax={state.ap.maxAp}
+        aria-valuenow={Math.floor(state.ap.currentAp)}
       >
         <Zap size={15} aria-hidden="true" />
         <div className="vertical-meter">
-          <i style={{ height: (state.currentAp / state.maxAp) * 100 + '%' }} />
+          <i style={{ height: (state.ap.currentAp / state.ap.maxAp) * 100 + '%' }} />
         </div>
         <strong>
-          {Math.floor(state.currentAp)}
-          <small>/{state.maxAp}</small>
+          {Math.floor(state.ap.currentAp)}
+          <small>/{state.ap.maxAp}</small>
         </strong>
         <span>エナジー</span>
       </div>

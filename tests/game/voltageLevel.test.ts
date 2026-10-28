@@ -10,7 +10,8 @@ import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { game } from './support/game';
 
 it('通常上限1000を追加の共鳴で1500へ増やし、800万Pt刻みの閾値を使う', () => {
-  const initial = { ...game(), currentAp: 3 };
+  const baseState = game();
+  const initial = { ...baseState, ap: { ...baseState.ap, currentAp: 3 } };
   expect(initial.maximumVoltageLevel).toBe(1000);
   const extended = act(initial, { type: 'special', cardId: 'frost-pulse' });
   expect(extended.maximumVoltageLevel).toBe(1500);

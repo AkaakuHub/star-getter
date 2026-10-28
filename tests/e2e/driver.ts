@@ -197,7 +197,7 @@ export class GameDriver {
           this.state.phase === 'playing' &&
           !this.state.mental.mentalDown &&
           (this.state.genesis.effects.length > 0 ||
-            this.state.currentAp >= cardCost(this.state, cardAt(this.state, index))),
+            this.state.ap.currentAp >= cardCost(this.state, cardAt(this.state, index))),
       );
     for (const key of priority) {
       const index = available.find((candidate) => {
@@ -340,7 +340,7 @@ export class GameDriver {
           ]),
         ),
         deck: this.state.deck.length,
-        currentAp: this.state.currentAp,
+        currentAp: this.state.ap.currentAp,
         mental: this.state.mental.currentMental,
         ordinaryVoltage: this.state.currentVoltage,
         mood: moodValue(this.state),

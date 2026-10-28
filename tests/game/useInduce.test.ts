@@ -7,7 +7,7 @@ it('使用誘発は子効果を実行し、子効果の発動数で上限を判�
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
-  const state = { ...initial, currentAp: 0 };
+  const state = { ...initial, ap: { ...initial.ap, currentAp: 0 } };
   const effect = {
     kind: 'use-induce' as const,
     sourceEffectId: 'induce-1',
@@ -17,8 +17,8 @@ it('使用誘発は子効果を実行し、子効果の発動数で上限を判�
   };
   const first = applyEffect(state, effect, card);
   const second = applyEffect(first, effect, card);
-  expect(first.currentAp).toBeGreaterThan(0);
-  expect(second.currentAp).toBe(first.currentAp);
+  expect(first.ap.currentAp).toBeGreaterThan(0);
+  expect(second.ap.currentAp).toBe(first.ap.currentAp);
   expect(second.skillEffectActivationCounts[`${card.id}:501`]).toBe(1);
 });
 
@@ -33,9 +33,9 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
     limit: 0n,
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 502n }],
   };
-  const first = applyEffect({ ...initial, currentAp: 0 }, effect, card);
+  const first = applyEffect({ ...initial, ap: { ...initial.ap, currentAp: 0 } }, effect, card);
   const second = applyEffect(first, effect, card);
-  expect(second.currentAp).toBeGreaterThan(first.currentAp);
+  expect(second.ap.currentAp).toBeGreaterThan(first.ap.currentAp);
   expect(second.skillEffectActivationCounts[`${card.id}:502`]).toBe(2);
 });
 
@@ -50,9 +50,9 @@ it('ActionType905の発動上限を参照実装のint32へ変換する', () => {
     limit: 18_014_398_509_481_984n,
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 503n }],
   };
-  const first = applyEffect({ ...initial, currentAp: 0 }, effect, card);
+  const first = applyEffect({ ...initial, ap: { ...initial.ap, currentAp: 0 } }, effect, card);
   const second = applyEffect(first, effect, card);
-  expect(second.currentAp).toBeGreaterThan(first.currentAp);
+  expect(second.ap.currentAp).toBeGreaterThan(first.ap.currentAp);
   expect(second.skillEffectActivationCounts[`${card.id}:503`]).toBe(2);
 });
 
@@ -69,7 +69,7 @@ it('使用回数誘発は参照実装の増加前カウントを使い、要求�
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 504n }],
   };
   const firstUse = applyEffect(
-    { ...initial, currentAp: 0, skillActivationCounts: { [card.id]: 1 } },
+    { ...initial, skillActivationCounts: { [card.id]: 1 }, ap: { ...initial.ap, currentAp: 0 } },
     effect,
     card,
   );
@@ -83,8 +83,8 @@ it('使用回数誘発は参照実装の増加前カウントを使い、要求�
     effect,
     card,
   );
-  expect(secondUse.currentAp).toBe(firstUse.currentAp);
-  expect(thirdUse.currentAp).toBeGreaterThan(secondUse.currentAp);
+  expect(secondUse.ap.currentAp).toBe(firstUse.ap.currentAp);
+  expect(thirdUse.ap.currentAp).toBeGreaterThan(secondUse.ap.currentAp);
   expect(thirdUse.skillEffectActivationCounts[`${card.id}:504`]).toBe(2);
 });
 
@@ -101,15 +101,11 @@ it('ActionType906のRequireCountを参照実装のint32へ変換する', () => {
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 505n }],
   };
   const activated = applyEffect(
-    {
-      ...initial,
-      currentAp: 0,
-      skillActivationCounts: { [card.id]: 3 },
-    },
+    { ...initial, skillActivationCounts: { [card.id]: 3 }, ap: { ...initial.ap, currentAp: 0 } },
     effect,
     card,
   );
-  expect(activated.currentAp).toBeGreaterThan(0);
+  expect(activated.ap.currentAp).toBeGreaterThan(0);
 });
 
 it('ActionType906は使用回数int32の折返し後も参照実装と同じ余り判定をする', () => {
@@ -126,13 +122,13 @@ it('ActionType906は使用回数int32の折返し後も参照実装と同じ余�
   };
   const state = {
     ...initial,
-    currentAp: 0,
     skillActivationCounts: { [card.id]: -2_147_483_648 },
+    ap: { ...initial.ap, currentAp: 0 },
   };
 
   const result = applyEffect(state, effect, card);
 
-  expect(result.currentAp).toBe(0);
+  expect(result.ap.currentAp).toBe(0);
 });
 
 it('ActionType905は同じ子効果を参照する誘発元で発動上限を共有する', () => {
@@ -141,7 +137,7 @@ it('ActionType905は同じ子効果を参照する誘発元で発動上限を共
   if (!card) throw new Error('カードがありません。');
   const child = { kind: 'ap' as const, amount: 1, skillEffectId: 507n };
   const first = applyEffect(
-    { ...initial, currentAp: 0 },
+    { ...initial, ap: { ...initial.ap, currentAp: 0 } },
     {
       kind: 'use-induce',
       sourceEffectId: 'induce-shared-a',
@@ -163,8 +159,8 @@ it('ActionType905は同じ子効果を参照する誘発元で発動上限を共
     card,
   );
 
-  expect(first.currentAp).toBeGreaterThan(0);
-  expect(second.currentAp).toBe(first.currentAp);
+  expect(first.ap.currentAp).toBeGreaterThan(0);
+  expect(second.ap.currentAp).toBe(first.ap.currentAp);
   expect(second.skillEffectActivationCounts[`${card.id}:507`]).toBe(1);
 });
 
@@ -173,7 +169,11 @@ it('ActionType905は通常実行済みの子効果回数も上限判定へ使う
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
   const child = { kind: 'ap' as const, amount: 1, skillEffectId: 508n };
-  const usedNormally = applyEffect({ ...initial, currentAp: 0 }, child, card);
+  const usedNormally = applyEffect(
+    { ...initial, ap: { ...initial.ap, currentAp: 0 } },
+    child,
+    card,
+  );
   const induced = applyEffect(
     usedNormally,
     {
@@ -186,7 +186,7 @@ it('ActionType905は通常実行済みの子効果回数も上限判定へ使う
     card,
   );
 
-  expect(induced.currentAp).toBe(usedNormally.currentAp);
+  expect(induced.ap.currentAp).toBe(usedNormally.ap.currentAp);
   expect(induced.skillEffectActivationCounts[`${card.id}:508`]).toBe(1);
 });
 

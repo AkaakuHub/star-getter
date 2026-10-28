@@ -116,10 +116,11 @@ it('セクション期限のスキルコスト変化を期限後に除去する'
 });
 
 it('Action17の条件4は最大元気に対する整数元気割合を使う', () => {
+  const baseState = game();
   const initial = {
-    ...game(),
+    ...baseState,
     maximumMental: 200,
-    mental: { ...game().mental, currentMental: 100 },
+    mental: { ...baseState.mental, currentMental: 100 },
   };
   const source = initial.deck.find((card) => card.id === 'class');
   if (!source) throw new Error('発動元カードがありません。');
@@ -289,7 +290,7 @@ it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変�
   expect(changed.onceSkillCostChanges[target.id]).toBe(2);
   expect(cardCost(changed, target)).toBe(cardCost(initial, target) + 2);
   const used = act(
-    { ...changed, currentAp: 1000 },
+    { ...changed, ap: { ...changed.ap, currentAp: 1000 } },
     { type: 'card', index: initial.hand.indexOf(target.id) },
   );
   expect(used.onceSkillCostChanges[target.id]).toBeUndefined();

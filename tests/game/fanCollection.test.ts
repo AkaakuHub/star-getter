@@ -12,9 +12,9 @@ it('最低値1の30万回収で2%の熱気回復増幅を全ステージに付�
       ...initial,
       targetBoosts: [],
       moodOffset: -150,
-      currentAp: 0,
       currentVoltage: 0,
       hearts: { ...initial.hearts, heartLimit: 1_000_000, stageHearts: [], hiddenHeartBatches: [] },
+      ap: { ...initial.ap, currentAp: 0 },
     },
     ['frost-pulse'],
   );
@@ -42,34 +42,55 @@ it('共演の30万回収は最低値1の0.1APを最後に切り捨て、増幅�
   let state = withHand(
     {
       ...initial,
-      currentAp: 0,
       hearts: { ...initial.hearts, heartLimit: 1_000_000, stageHearts: [], hiddenHeartBatches: [] },
+      ap: { ...initial.ap, currentAp: 0 },
     },
     ['library-ensemble'],
   );
   state = act(addHearts(state, 300_000), { type: 'collect' });
-  expect(state.currentAp).toBe(0);
+  expect(state.ap.currentAp).toBe(0);
   state = act(addHearts(state, 300_000), { type: 'collect' });
-  expect(state.currentAp).toBe(0);
+  expect(state.ap.currentAp).toBe(0);
 });
 
 it('APは小数のまま増幅して最後に切り捨て、先に1へ切り上げない', () => {
+  const baseState = game();
   expect(
     applyEffect(
-      { ...game(), currentAp: 0, hand: [], handEffectCardIds: [], amplification: 100 },
+      {
+        ...baseState,
+        hand: [],
+        handEffectCardIds: [],
+        amplification: 100,
+        ap: { ...baseState.ap, currentAp: 0 },
+      },
       { kind: 'ap', amount: 0.1 },
-    ).currentAp,
+    ).ap.currentAp,
   ).toBe(0);
+  const baseState2 = game();
   expect(
     applyEffect(
-      { ...game(), currentAp: 0, hand: [], handEffectCardIds: [], amplification: 1100 },
+      {
+        ...baseState2,
+        hand: [],
+        handEffectCardIds: [],
+        amplification: 1100,
+        ap: { ...baseState2.ap, currentAp: 0 },
+      },
       { kind: 'ap', amount: 0.1 },
-    ).currentAp,
+    ).ap.currentAp,
   ).toBe(1);
+  const baseState3 = game();
   expect(
     applyEffect(
-      { ...game(), currentAp: 0, hand: [], handEffectCardIds: [], amplification: 150 },
+      {
+        ...baseState3,
+        hand: [],
+        handEffectCardIds: [],
+        amplification: 150,
+        ap: { ...baseState3.ap, currentAp: 0 },
+      },
       { kind: 'ap', amount: 3 },
-    ).currentAp,
+    ).ap.currentAp,
   ).toBe(4);
 });

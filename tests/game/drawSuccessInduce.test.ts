@@ -6,11 +6,12 @@ import { evaluateDrawSuccessInduce } from '@akaakuhub/suku-sute-core/game/effect
 import { game } from './support/game';
 
 it('ActionType901の元気割合条件は参照実装同様に以下で判定し、IsActiveで分岐する', () => {
+  const baseState = game();
   const state = {
-    ...game(),
+    ...baseState,
     maximumMental: 100,
     currentVoltage: 100_000_000,
-    mental: { ...game().mental, currentMental: 40 },
+    mental: { ...baseState.mental, currentMental: 40 },
   };
   expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
   expect(
@@ -65,13 +66,13 @@ it('Action901はAbility893の発火時にドロー時点のHandCardStatsを参�
     ...initial,
     deck: [card],
     cardPool: [card],
-    currentAp: 100,
     hand: [],
     handCardStats: {},
     handEffectCardIds: [],
     drawPile: [card.id],
     discard: [],
     drawContext: 'idle' as const,
+    ap: { ...initial.ap, currentAp: 100 },
   };
   const result = fillHandToCount(base, 1);
   expect(result.moodOffset).toBe(

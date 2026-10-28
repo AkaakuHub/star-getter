@@ -9,18 +9,19 @@ import { game } from './support/game';
 
 describe('無限ゲージ', () => {
   it('期限中はAPを消費できず、AP無限の解除後も現在値を維持する', () => {
-    const initial = { ...game(), currentAp: 2 };
+    const baseState = game();
+    const initial = { ...baseState, ap: { ...baseState.ap, currentAp: 2 } };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'ap',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(active.currentAp).toBe(active.maxAp);
+    expect(active.ap.currentAp).toBe(active.ap.maxAp);
     const during = advanceTo(active, 0.25);
-    expect(during.currentAp).toBe(during.maxAp);
+    expect(during.ap.currentAp).toBe(during.ap.maxAp);
     const ended = advanceTo(during, 0.5 + 1 / 60);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.currentAp).toBe(ended.maxAp);
+    expect(ended.ap.currentAp).toBe(ended.ap.maxAp);
   });
 
   it('重複する熱気無限のうち最後の期限でレベル10へ戻す', () => {
@@ -73,9 +74,10 @@ describe('無限ゲージ', () => {
   });
 
   it('元気無限の開始と最終解除で元気タイマーを0へ戻す', () => {
+    const baseState2 = game();
     const initial = {
-      ...game(),
-      mental: { ...game().mental, currentMental: 42, timerSeconds: 0.4 },
+      ...baseState2,
+      mental: { ...baseState2.mental, currentMental: 42, timerSeconds: 0.4 },
     };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
@@ -90,10 +92,11 @@ describe('無限ゲージ', () => {
   });
 
   it('元気上限の拡張値を元気無限開始時の誘発ハート計算へ渡す', () => {
+    const baseState3 = game();
     const initial = {
-      ...game(),
+      ...baseState3,
       maximumMental: 150,
-      hearts: { ...game().hearts, heartLimit: 500 },
+      hearts: { ...baseState3.hearts, heartLimit: 500 },
     };
     const inducing = applyEffect(initial, {
       kind: 'mental-heart-induce',
@@ -208,8 +211,8 @@ describe('無限ゲージ', () => {
     expect(active.genesis.currentGauge).toBe(initial.genesis.currentGauge + 500);
     const finished = finishGenesis(active);
     expect(finished.gaugeInfinities[0]?.suspended).toBe(false);
-    expect(finished.currentAp).toBe(finished.maxAp);
-    expect(changeResource(finished, 'ap', -1n).currentAp).toBe(finished.currentAp);
+    expect(finished.ap.currentAp).toBe(finished.ap.maxAp);
+    expect(changeResource(finished, 'ap', -1n).ap.currentAp).toBe(finished.ap.currentAp);
   });
 
   it('開花中は500のGenesisゲージを加算し、期限付き無限状態を保留する', () => {
@@ -243,9 +246,10 @@ describe('無限ゲージ', () => {
   });
 
   it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {
+    const baseState4 = game('genesis');
     const base = {
-      ...game('genesis'),
-      mental: { ...game('genesis').mental, currentMental: 42, timerSeconds: 0.4 },
+      ...baseState4,
+      mental: { ...baseState4.mental, currentMental: 42, timerSeconds: 0.4 },
     };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
@@ -274,9 +278,10 @@ describe('無限ゲージ', () => {
   });
 
   it('開花中の元気無限期限切れでも元気回復誘発を起こさない', () => {
+    const baseState5 = game('genesis');
     const base = {
-      ...game('genesis'),
-      mental: { ...game('genesis').mental, currentMental: 42, timerSeconds: 0.4 },
+      ...baseState5,
+      mental: { ...baseState5.mental, currentMental: 42, timerSeconds: 0.4 },
     };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',

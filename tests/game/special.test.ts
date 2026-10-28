@@ -9,28 +9,30 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 
 it('空模様0でも20APを支払って開花し、支払後のAPを保持する', () => {
-  const state = { ...game(), currentAp: 20, maxAp: 20 };
+  const baseState = game();
+  const state = { ...baseState, ap: { ...baseState.ap, currentAp: 20, maxAp: 20 } };
   expect(canUseSpecial(state, 'horizon')).toBe(true);
   const next = act(state, { type: 'special', cardId: 'horizon' });
-  expect(next.currentAp).toBe(0);
+  expect(next.ap.currentAp).toBe(0);
   expect(next.genesis.rollback?.currentAp).toBe(0);
   expect(next.specialUsed).toContain('horizon');
 });
 
 it('開花中の追加SPは通常APを固定したまま専用値で支払う', () => {
+  const baseState2 = game();
   const state = activateGenesis(
     {
-      ...game(),
-      currentAp: 0,
+      ...baseState2,
       currentVoltage: 655_000_001,
-      mental: { ...game().mental, currentMental: 80 },
+      mental: { ...baseState2.mental, currentMental: 80 },
+      ap: { ...baseState2.ap, currentAp: 0 },
     },
     3.5,
   );
   expect(state.genesis.currentGauge).toBe(5020);
   expect(canUseSpecial(state, 'library-ensemble')).toBe(true);
   const next = act(state, { type: 'special', cardId: 'library-ensemble' });
-  expect(next.currentAp).toBe(0);
+  expect(next.ap.currentAp).toBe(0);
   expect(next.genesis.currentGauge).toBe(4977);
 });
 
@@ -47,15 +49,16 @@ it('共鳴はセンターの通常効果と基本カードの追加効果だけ�
 });
 
 it('初回の共鳴で30枚を生成し、追加の共鳴で上限を10増やして通常の共鳴を復帰させる', () => {
-  const initial = { ...game('library'), currentAp: 10 };
+  const baseState3 = game('library');
+  const initial = { ...baseState3, ap: { ...baseState3.ap, currentAp: 10 } };
   const prepared = act(initial, { type: 'special', cardId: 'library-pages' });
-  expect(prepared.currentAp).toBe(7);
+  expect(prepared.ap.currentAp).toBe(7);
   expect(prepared.hand).toHaveLength(8);
   expect(prepared.deck).toHaveLength(36);
   expect(act(prepared, { type: 'special', cardId: 'library-pages' })).toBe(prepared);
   const extended = act(prepared, { type: 'special', cardId: 'library-ensemble' });
-  expect(extended.currentAp).toBe(4);
-  expect(extended.maxAp).toBe(initial.maxAp + 10);
+  expect(extended.ap.currentAp).toBe(4);
+  expect(extended.ap.maxAp).toBe(initial.ap.maxAp + 10);
   expect(extended.deck).toHaveLength(36);
   expect(extended.specialUsed).toEqual(['library-ensemble']);
   expect(canUseSpecial(extended, 'library-pages')).toBe(true);
@@ -63,18 +66,22 @@ it('初回の共鳴で30枚を生成し、追加の共鳴で上限を10増やし
 });
 
 it('停止中も性能画面で使用条件を確認できるが、使用操作は進行中だけ受け付ける', () => {
-  const paused = act({ ...game('library'), currentAp: 10 }, { type: 'pause' });
+  const baseState4 = game('library');
+  const paused = act({ ...baseState4, ap: { ...baseState4.ap, currentAp: 10 } }, { type: 'pause' });
   expect(canUseSpecial(paused, 'library-pages')).toBe(true);
   expect(act(paused, { type: 'special', cardId: 'library-pages' })).toBe(paused);
-  expect(canUseSpecial({ ...paused, currentAp: 2 }, 'library-pages')).toBe(false);
+  expect(canUseSpecial({ ...paused, ap: { ...paused.ap, currentAp: 2 } }, 'library-pages')).toBe(
+    false,
+  );
 });
 
 it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用済みのまま維持する', () => {
   let state: GameState = { ...game('library'), specialUsed: ['library-pages', 'library-ensemble'] };
   for (let count = 1; count <= 3; count++) {
-    state = withHand({ ...state, currentAp: 20, tick: state.tick + cardCooldownTicks(state) }, [
-      'class',
-    ]);
+    state = withHand(
+      { ...state, tick: state.tick + cardCooldownTicks(state), ap: { ...state.ap, currentAp: 20 } },
+      ['class'],
+    );
     state = act(state, { type: 'card', index: 0 });
     expect(state.cardUseCounts.class).toBe(count);
     expect(state.deck.some((card) => card.id === 'class')).toBe(count < 3);

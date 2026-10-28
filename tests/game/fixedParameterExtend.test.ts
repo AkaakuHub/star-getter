@@ -23,7 +23,7 @@ it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {
     },
     source,
   );
-  expect(added.maxAp).toBe(Math.min(100, initial.maxAp + 10));
+  expect(added.ap.maxAp).toBe(Math.min(100, initial.ap.maxAp + 10));
   const multiplied = applyEffect(
     added,
     {
@@ -35,9 +35,9 @@ it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {
     },
     source,
   );
-  expect(multiplied.maxAp).toBe(Math.min(100, (initial.maxAp + 10) * 2));
+  expect(multiplied.ap.maxAp).toBe(Math.min(100, (initial.ap.maxAp + 10) * 2));
   const fixed = applyEffect(
-    { ...multiplied, currentAp: 100 },
+    { ...multiplied, ap: { ...multiplied.ap, currentAp: 100 } },
     {
       kind: 'fixed-parameter-extend',
       target: 'ap',
@@ -46,8 +46,8 @@ it('AP上限へ加算・乗算・固定値を登録順に適用する', () => {
       duration: { kind: 'stage' },
     },
   );
-  expect(fixed.maxAp).toBe(30);
-  expect(fixed.currentAp).toBe(30);
+  expect(fixed.ap.maxAp).toBe(30);
+  expect(fixed.ap.currentAp).toBe(30);
 });
 
 it('ActionType58の値を参照実装のint32へ変換する', () => {
@@ -87,8 +87,8 @@ it('期限終了後にAP上限を元へ戻す', () => {
     },
     source,
   );
-  expect(timed.maxAp).toBe(Math.min(100, initial.maxAp + 10));
-  expect(advanceFixedParameterExtends(timed, 0.1).maxAp).toBe(initial.maxAp);
+  expect(timed.ap.maxAp).toBe(Math.min(100, initial.ap.maxAp + 10));
+  expect(advanceFixedParameterExtends(timed, 0.1).ap.maxAp).toBe(initial.ap.maxAp);
 
   const sectionTimed = applyEffect(
     initial,
@@ -101,7 +101,7 @@ it('期限終了後にAP上限を元へ戻す', () => {
     },
     source,
   );
-  expect(expireFixedParameterExtendSections(sectionTimed).maxAp).toBe(initial.maxAp);
+  expect(expireFixedParameterExtendSections(sectionTimed).ap.maxAp).toBe(initial.ap.maxAp);
 });
 
 it('元気上限を伸ばして回復し、比率シールドに拡張後の上限を使う', () => {

@@ -30,10 +30,10 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
   let initial = addTokens(addTokens(game('library'), 'clock', 1), 'story', 1);
   const clock = token(initial, 'clock'),
     story = token(initial, 'story');
-  initial = withHand({ ...initial, moodOffset: 50, currentAp: 20, maxAp: 20 }, [
-    clock.id,
-    story.id,
-  ]);
+  initial = withHand(
+    { ...initial, moodOffset: 50, ap: { ...initial.ap, currentAp: 20, maxAp: 20 } },
+    [clock.id, story.id],
+  );
   const play = (first: Card, second: Card) => {
     const used = act(initial, { type: 'card', index: initial.hand.indexOf(first.id) });
     const state = advanceTo(used, (used.tick + cardCooldownTicks(used)) / rules.ticksPerSecond);
@@ -83,7 +83,7 @@ for (const count of [79, 80]) {
     let state = game('library');
     state = addTokens(state, 'story', count - state.deck.length);
     const source = card(state, 'library-ensemble');
-    state = withHand({ ...state, currentAp: 1 }, [source.id]);
+    state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id]);
     const used = act(state, { type: 'card', index: 0 });
     expect(used.stats.cardsUsed).toBe(1);
     expect(used.deck.some((item) => item.id === source.id)).toBe(true);
@@ -103,7 +103,11 @@ it('共演の一斉使用は元の手札を順に使用し、子カードの生�
   const ensemble = token(state, 'ensemble'),
     clock = token(state, 'clock'),
     story = token(state, 'story');
-  state = withHand({ ...state, currentAp: 20, maxAp: 20 }, [ensemble.id, clock.id, story.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 20, maxAp: 20 } }, [
+    ensemble.id,
+    clock.id,
+    story.id,
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(3);
   expect(used.cardUses.map((use) => use.card.id)).toEqual([ensemble.id, clock.id, story.id]);
@@ -117,7 +121,7 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
   state = addTokens(state, 'story', 100 - state.deck.length);
   const source = token(state, 'bookmark');
   const beforeId = state.nextTokenId;
-  state = withHand({ ...state, currentAp: 10 }, [source.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 10 } }, [source.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.deck).toHaveLength(99);
   expect(used.nextTokenId).toBe(beforeId);
@@ -127,9 +131,10 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
 
 it('手札中の対象増幅と熱気回復増幅を掛け合わせ、同じ見た目の別所属には適用しない', () => {
   let state = game();
-  state = withHand({ ...state, tick: 720, moodOffset: -100, currentAp: 0, currentVoltage: 0 }, [
-    'perennial',
-  ]);
+  state = withHand(
+    { ...state, tick: 720, moodOffset: -100, currentVoltage: 0, ap: { ...state.ap, currentAp: 0 } },
+    ['perennial'],
+  );
   const effect = { kind: 'voltage', amount: 10 } as const;
   expect(skillValue(state, 10, effect, card(state, 'horizon'))).toBe(55);
   expect(skillValue(state, 10, effect, card(state, 'camera'))).toBe(10);
@@ -163,9 +168,8 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
       {
         ...state,
         tick: state.tick + cardCooldownTicks(state),
-        currentAp: 20,
-        maxAp: 20,
         mental: { ...state.mental, mentalDown: false },
+        ap: { ...state.ap, currentAp: 20, maxAp: 20 },
       },
       [source.id],
     );
@@ -184,7 +188,7 @@ it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を�
   state = addTokens(state, 'bookmark', 80 - state.deck.length);
   const source = card(state, 'library-ensemble'),
     story = token(state, 'story');
-  state = withHand({ ...state, currentAp: 1 }, [source.id, story.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id, story.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(used.deck).toHaveLength(88);
@@ -195,15 +199,15 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   let state = addTokens(game('library'), 'bookmark', 20);
   const source = card(state, 'aurora-ensemble'),
     bookmark = token(state, 'bookmark');
-  state = withHand({ ...state, currentAp: 20, maxAp: 20 }, [
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 20, maxAp: 20 } }, [
     source.id,
     'library-ensemble',
     bookmark.id,
   ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(3);
-  expect(used.currentAp).toBeGreaterThan(0);
-  expect(used.currentAp).toBeLessThan(used.maxAp);
+  expect(used.ap.currentAp).toBeGreaterThan(0);
+  expect(used.ap.currentAp).toBeLessThan(used.ap.maxAp);
   expect(used.hand).not.toContain(source.id);
   expect(used.discard).toContain(source.id);
   expect(used.activation).toBeNull();
@@ -215,7 +219,10 @@ it('ActionType42の子カードは親スキルの追加カード確定後に80�
   let state = addTokens(game('library'), 'ensemble', 1);
   state = addTokens(state, 'story', 79 - state.deck.length);
   const source = token(state, 'ensemble');
-  state = withHand({ ...state, currentAp: 1 }, [source.id, 'library-ensemble']);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [
+    source.id,
+    'library-ensemble',
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(used.deck).toHaveLength(93);
@@ -268,7 +275,13 @@ it('一斉使用の追加APを全手札コストへ加え、最終コストを1�
     .slice(0, 2)
     .map(({ id }) => id);
   const state = withHand(
-    { ...initial, deck, cardPool: deck, currentAp: 100, costReductions: { [source.id]: 1000 } },
+    {
+      ...initial,
+      deck,
+      cardPool: deck,
+      costReductions: { [source.id]: 1000 },
+      ap: { ...initial.ap, currentAp: 100 },
+    },
     [source.id, ...otherIds],
   );
   expect(cardCost(state, updated)).toBe(1);
@@ -287,7 +300,10 @@ it('ActionType42の追加APは参照実装同様にint32へ変換する', () => 
     ),
   };
   const deck = initial.deck.map((item) => (item.id === source.id ? updated : item));
-  const state = withHand({ ...initial, deck, cardPool: deck, currentAp: 100 }, [source.id]);
+  const state = withHand(
+    { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
+    [source.id],
+  );
   expect(cardCost(state, updated)).toBe(1);
 });
 
@@ -308,13 +324,15 @@ it('一斉使用中の子カードはActionType42の合算コストではなく�
   );
   expect(cardCost(state, child)).toBeGreaterThan(child.cost);
   expect(cardCost(state, child, true)).toBe(child.cost);
-  const used = act({ ...state, currentAp: 100 }, { type: 'card', index: 0 });
+  const used = act({ ...state, ap: { ...state.ap, currentAp: 100 } }, { type: 'card', index: 0 });
   expect(used.cardUses.find((item) => item.card.id === child.id)?.cost).toBe(child.cost);
 });
 
 it('招待状自身を使用すると、生成した帆船を優先検索して補充する', () => {
   const initial = game('library');
-  const state = withHand({ ...initial, currentAp: 10 }, ['library-invitation']);
+  const state = withHand({ ...initial, ap: { ...initial.ap, currentAp: 10 } }, [
+    'library-invitation',
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(1);
   expect(
@@ -325,7 +343,7 @@ it('招待状自身を使用すると、生成した帆船を優先検索して�
 it('生成帆船自身を使用した後に折り紙を2回検索し、他カードの使用では検索しない', () => {
   let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 2);
   const source = token(state, 'ensemble');
-  state = withHand({ ...state, currentAp: 1 }, [source.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(
     used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),

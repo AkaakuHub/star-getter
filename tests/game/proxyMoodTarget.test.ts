@@ -28,7 +28,7 @@ it('ActionType48の負の目標値は非絶対加算時に下方向で到達判�
     },
     source,
   );
-  const activeEnergy = active.currentAp;
+  const activeEnergy = active.ap.currentAp;
   const absorbed = applyEffect(active, {
     kind: 'mood-change-skill',
     calculationType: 1,
@@ -36,7 +36,7 @@ it('ActionType48の負の目標値は非絶対加算時に下方向で到達判�
     duration: { kind: 'stage', value: 0n },
   });
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-5n);
-  expect(advanceProxySkillPeriods(absorbed, 0.2, applyEffect).currentAp).toBeGreaterThan(
+  expect(advanceProxySkillPeriods(absorbed, 0.2, applyEffect).ap.currentAp).toBeGreaterThan(
     activeEnergy,
   );
 });

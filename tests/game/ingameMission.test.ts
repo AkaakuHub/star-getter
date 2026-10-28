@@ -119,13 +119,13 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   const state = {
     ...initial,
     randomSeed: 7,
-    currentAp: initial.maxAp,
     deck,
     cardPool: initial.cardPool.map((item) => (item.id === id ? updatedCard : item)),
     track: {
       ...initial.track,
       ingameMissionGroups: [{ id: 9, records: [record] }],
     },
+    ap: { ...initial.ap, currentAp: initial.ap.maxAp },
   };
   const used = act(state, { type: 'card', index: 0 });
   expect(used.ingameMission?.cooldownSeconds).toBe(1);
@@ -155,13 +155,13 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   const state = {
     ...initial,
     randomSeed: 7,
-    currentAp: initial.maxAp,
     deck,
     cardPool: initial.cardPool.map((item) => (item.id === source.id ? card : item)),
     track: {
       ...initial.track,
       ingameMissionGroups: [{ id: 28, records: [record] }],
     },
+    ap: { ...initial.ap, currentAp: initial.ap.maxAp },
   };
   const started = applyEffect(state, { kind: 'ingame-mission', groupId: 28n });
   const used = act(started, { type: 'card', index: 0 });

@@ -72,5 +72,5 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
   ).toBeUndefined();
   const secondHeart = notifyHandHeartCollect(firstHeart, 1, applyEffect);
   expect(secondHeart.handUseActivationCounts[handInducerStateKey(source.id, '9032')]).toBe(1);
-  expect(secondHeart.currentAp).toBe(memberTriggered.currentAp + 1);
+  expect(secondHeart.ap.currentAp).toBe(memberTriggered.ap.currentAp + 1);
 });

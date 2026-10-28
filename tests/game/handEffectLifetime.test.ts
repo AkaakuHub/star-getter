@@ -19,10 +19,9 @@ it('一斉使用した常在カードの増幅を後続の子へ適用し、補�
   const state = withHand(
     {
       ...initial,
-      currentAp: 20,
-      maxAp: 20,
       moodOffset: -150,
       costReductions: Object.fromEntries(initial.deck.map((card) => [card.id, 100])),
+      ap: { ...initial.ap, currentAp: 20, maxAp: 20 },
     },
     ['aurora-ensemble', 'perennial', 'horizon'],
   );
@@ -33,9 +32,12 @@ it('一斉使用した常在カードの増幅を後続の子へ適用し、補�
 });
 
 it('本人使用でも解除前のDOLL手札反応を実行して9APを回復する', () => {
-  const state = withHand({ ...game(), currentAp: 20, maxAp: 20 }, ['frost-echo']);
+  const baseState = game();
+  const state = withHand({ ...baseState, ap: { ...baseState.ap, currentAp: 20, maxAp: 20 } }, [
+    'frost-echo',
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(1);
-  expect(used.currentAp).toBe(15);
+  expect(used.ap.currentAp).toBe(15);
   expect([...used.handEffectCardIds].sort()).toEqual([...used.hand].sort());
 });

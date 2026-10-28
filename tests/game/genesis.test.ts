@@ -14,13 +14,14 @@ import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
 
 function active() {
+  const baseState = advanceTo(game(), 12);
   return activateGenesis(
     {
-      ...advanceTo(game(), 12),
+      ...baseState,
       moodOffset: -100,
-      currentAp: 0,
       currentVoltage: 40,
-      mental: { ...advanceTo(game(), 12).mental, currentMental: 80 },
+      mental: { ...baseState.mental, currentMental: 80 },
+      ap: { ...baseState.ap, currentAp: 0 },
     },
     1,
   );
@@ -63,12 +64,11 @@ describe('開花の専用ゲージ', () => {
       const initial = game();
       const state = {
         ...initial,
-        currentAp: 20,
-        maxAp: 20,
         track: {
           ...initial.track,
           moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
         },
+        ap: { ...initial.ap, currentAp: 20, maxAp: 20 },
       };
       expect(canUseSpecial(state, 'horizon')).toBe(true);
       expect(
@@ -80,12 +80,15 @@ describe('開花の専用ゲージ', () => {
 
   it('通常カードの使用では発動せず、共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
-    state = withHand({ ...state, moodOffset: -100, currentAp: 20, maxAp: 20 }, ['horizon']);
+    state = withHand(
+      { ...state, moodOffset: -100, ap: { ...state.ap, currentAp: 20, maxAp: 20 } },
+      ['horizon'],
+    );
     expect(act(state, { type: 'card', index: 0 }).genesis.effects).toHaveLength(0);
     expect(canUseSpecial(state, 'horizon')).toBe(true);
     const changed = act(state, { type: 'special', cardId: 'horizon' });
     expect(changed.genesis.effects[0]?.effectValue).toBe(3.5);
-    expect(changed.currentAp).toBe(0);
+    expect(changed.ap.currentAp).toBe(0);
     expect(changed.stats.specialsUsed).toBe(1);
     expect(changed.stats.cardsUsed).toBe(0);
   });
@@ -101,7 +104,7 @@ describe('開花の専用ゲージ', () => {
     expect(changed.genesis.currentGauge).toBe(74);
     changed = changeGenesisResource(changed, 'ap', -4n);
     expect(changed.genesis.currentGauge).toBe(59);
-    expect([changed.currentAp, changed.mental.currentMental, changed.currentVoltage]).toEqual([
+    expect([changed.ap.currentAp, changed.mental.currentMental, changed.currentVoltage]).toEqual([
       0, 80, 40,
     ]);
     expect(finishGenesis(changed).genesis.effects).toHaveLength(0);

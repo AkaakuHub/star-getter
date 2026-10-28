@@ -14,7 +14,7 @@ describe('ゲーム時計とゲームの同期', () => {
     const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
     controller.tapCard(index);
     expect(controller.selectedCard?.id).toBe(initial.hand[index]);
-    expect(controller.state.currentAp).toBe(initial.currentAp);
+    expect(controller.state.ap.currentAp).toBe(initial.ap.currentAp);
     expect(controller.state.stats.cardsUsed).toBe(0);
     controller.tapCard(index);
     expect(controller.selectedCard).toBe(null);

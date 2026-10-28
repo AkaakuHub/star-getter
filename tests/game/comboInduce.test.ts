@@ -44,7 +44,7 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   expect(complete.comboInducer?.phase).toBe('activating');
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(heartCount(activated)).toBe(4);
-  expect(activated.currentAp).toBe(4);
+  expect(activated.ap.currentAp).toBe(4);
   expect(activated.deckOutCount).toBe(0);
   expect(activated.comboInducer?.phase).toBe('resetting');
   const queued = notifyComboSkillPoint(activated, source, 3);
@@ -70,7 +70,7 @@ it('ActionType24の子効果はCheckDeckOutを1回だけ通知する', () => {
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(activated.deckOutCount).toBe(2);
   expect(activated.afterMentalDownEvents).toBe(1);
-  expect(activated.currentAp).toBe(configured.currentAp + 2);
+  expect(activated.ap.currentAp).toBe(configured.ap.currentAp + 2);
 });
 
 it('ActionType24はlong積をfloat32へ直接変換する', () => {
@@ -113,7 +113,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     drawPile: deck
       .filter((card) => card.id !== first.id && card.id !== second.id)
       .map((card) => card.id),
-    currentAp: 100,
+    ap: { ...initial.ap, currentAp: 100 },
   };
   const armed = activateComboInduce(
     ready,

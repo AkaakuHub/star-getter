@@ -16,18 +16,19 @@ const speedEffect = {
 } as const;
 
 it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、deactivatorで元に戻す', () => {
+  const baseState = game();
   const initial = {
-    ...game(),
+    ...baseState,
     handEffectCardIds: [],
     targetBoosts: [],
     amplification: 100,
     storyAmplification: 0,
-    apTimerSeconds: 0.3,
+    ap: { ...baseState.ap, timerSeconds: 0.3 },
   };
   const before = apIncreaseIntervalSeconds(initial);
   const applied = applyEffect(initial, speedEffect, initial.deck[0]);
   expect(apIncreaseIntervalSeconds(applied)).toBeCloseTo(0.9, 5);
-  expect(applied.apTimerSeconds).toBeCloseTo(initial.apTimerSeconds * 0.75, 5);
+  expect(applied.ap.timerSeconds).toBeCloseTo(initial.ap.timerSeconds * 0.75, 5);
 
   const ended = act(applied, { type: 'deactivate-ap-speed', deactivationKey: 'unused' });
   expect(ended.apTimeEffects).toHaveLength(1);
@@ -38,7 +39,7 @@ it('Action21の乗算は参照実装のnum換算でAP回復時間へ適用し、
   );
   const deactivated = act(keyed, { type: 'deactivate-ap-speed', deactivationKey: 'action21' });
   expect(apIncreaseIntervalSeconds(deactivated)).toBeCloseTo(before, 5);
-  expect(deactivated.apTimerSeconds).toBeCloseTo(initial.apTimerSeconds, 5);
+  expect(deactivated.ap.timerSeconds).toBeCloseTo(initial.ap.timerSeconds, 5);
 });
 
 it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用する', () => {

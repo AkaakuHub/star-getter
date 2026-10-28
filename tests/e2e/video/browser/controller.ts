@@ -58,7 +58,7 @@ export function createGameController(
         score: state.score.toString(),
         gauge: state.genesis.effects.length > 0 ? state.genesis.currentGauge.toString() : null,
         deckSize: state.deck.length,
-        currentAp: state.currentAp,
+        currentAp: state.ap.currentAp,
         heartLimit: state.hearts.heartLimit,
         storyAmplification: state.storyAmplification,
         lastActionTick: state.lastActionTick,

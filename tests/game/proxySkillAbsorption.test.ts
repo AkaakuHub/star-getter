@@ -61,7 +61,7 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
     source,
   );
   const absorbed = applyEffect(active, { kind: 'ap', amount: 3 }, source);
-  expect(absorbed.currentAp).toBe(active.currentAp);
+  expect(absorbed.ap.currentAp).toBe(active.ap.currentAp);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(12n);
 });
 

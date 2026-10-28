@@ -73,7 +73,13 @@ export function session(currentAp = 10) {
   const frames = new TestFrames();
   const audio = new TestAudio();
   const controller = new GameController(
-    { ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens), currentAp },
+    {
+      ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens),
+      ap: {
+        ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens).ap,
+        currentAp: currentAp,
+      },
+    },
     clock,
     frames,
     audio,

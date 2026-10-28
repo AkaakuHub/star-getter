@@ -5,40 +5,61 @@ import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
+import { apIncreaseIntervalSeconds } from '@akaakuhub/suku-sute-core/game/effects/apSpeed';
+
+it('長い更新間隔でも開花中のAP回復を1回ずつ変換し、上限で回復分を失わない', () => {
+  const base = game('library');
+  const initial = activateGenesis(
+    {
+      ...base,
+      ap: { ...base.ap, currentAp: 19 },
+      mentalProtected: true,
+      track: { ...base.track, stage: { ...base.track.stage, voltageIncreaseIntervalSeconds: 100 } },
+    },
+    1,
+  );
+  const after = advanceAutomaticGauges(initial, apIncreaseIntervalSeconds(initial) * 4.5);
+  expect(after.ap.currentAp).toBe(19);
+  expect(after.genesis.currentGauge).toBe(initial.genesis.currentGauge + 32);
+});
 
 it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化する', () => {
-  const initial = { ...game('library'), currentAp: 0 };
+  const baseState = game('library');
+  const initial = { ...baseState, ap: { ...baseState.ap, currentAp: 0 } };
   expect(advanceTo(initial, 0.58).currentVoltage).toBe(0);
   expect(advanceTo(initial, 0.6).currentVoltage).toBe(1);
   const later = advanceTo(initial, 1.2);
-  expect(later.currentAp).toBe(0);
-  expect(advanceTo(later, 1.2 + 1 / 60).currentAp).toBe(1);
+  expect(later.ap.currentAp).toBe(0);
+  expect(advanceTo(later, 1.2 + 1 / 60).ap.currentAp).toBe(1);
   expect(later.mental.currentMental).toBe(99);
   expect(later.currentVoltage).toBe(2);
 });
 
 it('開花中も通常APが上限未満なら自然回復を専用値へ変換し、通常APを保持する', () => {
+  const baseState2 = advanceTo(game(), 12);
   const initial = {
-    ...advanceTo(game(), 12),
+    ...baseState2,
     moodOffset: -100,
     hand: ['horizon'],
     handEffectCardIds: ['horizon'],
     mentalProtected: true,
-    apTimerSeconds: 0,
     voltageTimerSeconds: 0,
-    currentAp: 0,
+    ap: { ...baseState2.ap, timerSeconds: 0, currentAp: 0 },
   };
   const empty = activateGenesis(initial, 1);
-  const full = activateGenesis({ ...initial, currentAp: initial.maxAp }, 1);
+  const full = activateGenesis(
+    { ...initial, ap: { ...initial.ap, currentAp: initial.ap.maxAp } },
+    1,
+  );
   const emptyAfter = advanceAutomaticGauges(empty, 1.2);
   const fullAfter = advanceAutomaticGauges(full, 1.2);
-  expect(emptyAfter.currentAp).toBe(0);
-  expect(fullAfter.currentAp).toBe(initial.maxAp);
+  expect(emptyAfter.ap.currentAp).toBe(0);
+  expect(fullAfter.ap.currentAp).toBe(initial.ap.maxAp);
   expect(emptyAfter.genesis.currentGauge - empty.genesis.currentGauge).toBe(2);
   expect(fullAfter.genesis.currentGauge - full.genesis.currentGauge).toBe(2);
   const emptyNext = advanceAutomaticGauges(emptyAfter, 1 / 60);
   const fullNext = advanceAutomaticGauges(fullAfter, 1 / 60);
-  expect(emptyNext.currentAp).toBe(0);
+  expect(emptyNext.ap.currentAp).toBe(0);
   expect(emptyNext.genesis.currentGauge - emptyAfter.genesis.currentGauge).toBe(8);
   expect(fullNext.genesis.currentGauge).toBe(fullAfter.genesis.currentGauge);
 });
@@ -51,10 +72,9 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
       moodOffset: -100,
       hand: ['horizon'],
       handEffectCardIds: ['horizon'],
-      currentAp: base.maxAp,
-      apTimerSeconds: 0,
       voltageTimerSeconds: 0,
       mental: { ...base.mental, timerSeconds: 0 },
+      ap: { ...base.ap, currentAp: base.ap.maxAp, timerSeconds: 0 },
     },
     1,
   );
@@ -78,9 +98,10 @@ it('開花とActionType34の併用中は元気タイマーも進めない', () =
 });
 
 it('休憩開始と回復完了で元気タイマーを0へ戻す', () => {
+  const baseState3 = game('library');
   const initial = {
-    ...game('library'),
-    mental: { ...game('library').mental, currentMental: 1, timerSeconds: 0.75 },
+    ...baseState3,
+    mental: { ...baseState3.mental, currentMental: 1, timerSeconds: 0.75 },
   };
   const down = advanceAutomaticGauges(initial, 5);
   expect(down.mental.mentalDown).toBe(true);

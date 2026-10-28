@@ -115,7 +115,7 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
   });
   expect(split.deckOutCount).toBe(0);
   expect(split.afterMentalDownEvents).toBe(state.afterMentalDownEvents + 1);
-  expect(split.currentAp).toBe(state.currentAp + 2);
+  expect(split.ap.currentAp).toBe(state.ap.currentAp + 2);
 });
 
 it('ActionType43は空のサブデッキへの切替後にデッキアウト確認を実行する', () => {
@@ -144,7 +144,7 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
   );
   expect(switched.deckOutCount).toBe(0);
   expect(switched.afterMentalDownEvents).toBe(split.afterMentalDownEvents + 1);
-  expect(switched.currentAp).toBe(split.currentAp + 2);
+  expect(switched.ap.currentAp).toBe(split.ap.currentAp + 2);
 });
 
 it('期限切れでメインデッキへ戻す', () => {

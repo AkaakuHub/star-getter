@@ -104,9 +104,9 @@ describe('カード共通の条件判定', () => {
       whenTrue: [{ kind: 'ap-limit' as const, amount: 1 }],
       whenFalse: [{ kind: 'ap-limit' as const, amount: 2 }],
     };
-    expect(applyEffect(initial, effect).maxAp).toBe(initial.maxAp + 1);
+    expect(applyEffect(initial, effect).ap.maxAp).toBe(initial.ap.maxAp + 1);
     const genesis = applyEffect(initial, { kind: 'genesis', effectValue: 1 });
-    expect(applyEffect(genesis, effect).maxAp).toBe(initial.maxAp + 1);
+    expect(applyEffect(genesis, effect).ap.maxAp).toBe(initial.ap.maxAp + 1);
   });
   it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
     const initial = game();
@@ -117,7 +117,7 @@ describe('カード共通の条件判定', () => {
       whenTrue: [{ kind: 'ap-limit', amount: 1 }],
       whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxAp).toBe(genesis.maxAp + 3);
+    expect(result.ap.maxAp).toBe(genesis.ap.maxAp + 3);
   });
   it('開花中も空模様分岐は両側を発動しない', () => {
     const genesis = applyEffect(game(), { kind: 'genesis', effectValue: 1 });
@@ -128,7 +128,7 @@ describe('カード共通の条件判定', () => {
       whenTrue: [{ kind: 'ap-limit', amount: 1 }],
       whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxAp).toBe(genesis.maxAp + 1);
+    expect(result.ap.maxAp).toBe(genesis.ap.maxAp + 1);
   });
   it('永続分岐は条件変化時に前の子効果を解除して切り替える', () => {
     const original = game();

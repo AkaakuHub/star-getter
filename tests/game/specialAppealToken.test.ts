@@ -123,8 +123,8 @@ it('トークン共鳴を使うと同じTokenSetIdのクールタイムだけ開
   };
   const ready = {
     ...state,
-    currentAp: 20,
     specialAppealTokens: [token, sameGenerationOtherSet, otherGeneration],
+    ap: { ...state.ap, currentAp: 20 },
   };
   expect(canUseSpecial(ready, '201')).toBe(true);
   const used = act(ready, { type: 'special', cardId: '201' });

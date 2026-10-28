@@ -132,7 +132,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   expect(driver.state.genesis.rollback?.currentAp).toBe(paidEnergy);
   const initialGauge = driver.state.genesis.currentGauge;
   const ordinary = [
-    driver.state.currentAp,
+    driver.state.ap.currentAp,
     driver.state.mental.currentMental,
     driver.state.currentVoltage,
   ];
@@ -152,7 +152,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   );
   expect(driver.peakGauge).toBeGreaterThan(initialGauge);
   expect([
-    driver.state.currentAp,
+    driver.state.ap.currentAp,
     driver.state.mental.currentMental,
     driver.state.currentVoltage,
   ]).toEqual(ordinary);

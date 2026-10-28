@@ -24,7 +24,11 @@ it('自然な空模様に雨100%はなく、準備カードの使用で最初の
   let state = game();
   for (const expected of [-50, -100]) {
     state = withHand(
-      { ...state, currentAp: 20, maxAp: 20, tick: state.tick + cardCooldownTicks(state) },
+      {
+        ...state,
+        tick: state.tick + cardCooldownTicks(state),
+        ap: { ...state.ap, currentAp: 20, maxAp: 20 },
+      },
       ['rain-preparation'],
     );
     state = act(state, { type: 'card', index: 0 });
@@ -98,7 +102,9 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
     };
     const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
     const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
-    const state = withHand({ ...initial, deck, cardPool, currentAp: 0 }, [source.id]);
+    const state = withHand({ ...initial, deck, cardPool, ap: { ...initial.ap, currentAp: 0 } }, [
+      source.id,
+    ]);
     const currentUsed = trigger.kind === 'same-card' ? handCard : used;
     const first =
       trigger.kind === 'same-card'
@@ -108,8 +114,8 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
       trigger.kind === 'same-card'
         ? notifyHandCardBeforeUse(first, currentUsed, 2, applyEffect)
         : notifyHandSkillUse(first, currentUsed, applyEffect);
-    expect(first.currentAp).toBe(1);
-    expect(second.currentAp).toBe(1);
+    expect(first.ap.currentAp).toBe(1);
+    expect(second.ap.currentAp).toBe(1);
     expect(second.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(1);
     expect(
       disposeHandEffects(second, [source.id]).handUseActivationCounts[`${source.id}:test-inducer`],
@@ -138,14 +144,14 @@ it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適�
       ...initial,
       deck,
       cardPool,
-      currentAp: 0,
       maximumVoltageLevel: 1500,
       currentVoltage: 655_000_001,
+      ap: { ...initial.ap, currentAp: 0 },
     },
     [source.id],
   );
   const changed = applyEffect(state, { kind: 'voltage', amount: 16_000_000 });
-  expect(changed.currentAp).toBe(2);
+  expect(changed.ap.currentAp).toBe(2);
   expect(changed.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
   const natural = advanceAutomaticGauges(
     { ...state, currentVoltage: 655_000_000 },
@@ -172,7 +178,9 @@ it('パート切替時に手札誘発を一度実行する', () => {
   };
   const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
   const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
-  const state = withHand({ ...initial, deck, cardPool, currentAp: 0 }, [source.id]);
+  const state = withHand({ ...initial, deck, cardPool, ap: { ...initial.ap, currentAp: 0 } }, [
+    source.id,
+  ]);
   const changed = advanceTo(state, 25);
   expect(sectionAt(changed)).not.toBe(sectionAt(state));
   expect(changed.moodOffset).toBe(1);
@@ -220,12 +228,13 @@ it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', (
 });
 
 it('シールドはスキル由来の元気減少を防ぎ、自然減少では耐久値を消費しない', () => {
+  const baseState = game();
   const initial = {
-    ...game(),
+    ...baseState,
     hand: [],
     handEffectCardIds: [],
     targetBoosts: [],
-    mental: { ...game().mental, currentMental: 100 },
+    mental: { ...baseState.mental, currentMental: 100 },
   };
   const shield = applyEffect(initial, {
     kind: 'mental-shield',

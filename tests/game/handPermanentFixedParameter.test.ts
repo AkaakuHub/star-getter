@@ -33,8 +33,8 @@ it('Action904のAction58子効果は手札離脱時に上限を戻す', () => {
 
   const active = activateHandPermanentEffects(state, card);
 
-  expect(active.maxAp).toBe(initial.maxAp + 10);
+  expect(active.ap.maxAp).toBe(initial.ap.maxAp + 10);
   const disposed = disposeHandEffects(active, [card.id]);
-  expect(disposed.maxAp).toBe(initial.maxAp);
+  expect(disposed.ap.maxAp).toBe(initial.ap.maxAp);
   expect(disposed.fixedParameterExtends).toHaveLength(0);
 });

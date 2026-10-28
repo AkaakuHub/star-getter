@@ -37,15 +37,21 @@ describe('ライブの進行', () => {
   });
 
   it('エネルギーが回復し、上限を超えない', () => {
-    const empty = { ...game(), currentAp: 0 };
-    expect(advanceTo(empty, 0.5).currentAp).toBe(0);
-    expect(advanceTo(empty, 1.3).currentAp).toBe(1);
-    expect(advanceTo(empty, 30).currentAp).toBe(empty.maxAp);
+    const baseState = game();
+    const empty = { ...baseState, ap: { ...baseState.ap, currentAp: 0 } };
+    expect(advanceTo(empty, 0.5).ap.currentAp).toBe(0);
+    expect(advanceTo(empty, 1.3).ap.currentAp).toBe(1);
+    expect(advanceTo(empty, 30).ap.currentAp).toBe(empty.ap.maxAp);
   });
 
   it('スタミナが尽きると休憩し、回復してからカードを使用できる', () => {
+    const baseState2 = game();
     const mentalDown = advanceTo(
-      { ...game(), currentAp: 5, mental: { ...game().mental, currentMental: 0 } },
+      {
+        ...baseState2,
+        mental: { ...baseState2.mental, currentMental: 0 },
+        ap: { ...baseState2.ap, currentAp: 5 },
+      },
       1,
     );
     expect(mentalDown.mental.mentalDown).toBe(true);
@@ -89,7 +95,8 @@ describe('カードと編成', () => {
   });
 
   it('費用を払えないカードと範囲外の入力は状態を変更しない', () => {
-    const state = { ...game(), currentAp: 0 };
+    const baseState3 = game();
+    const state = { ...baseState3, ap: { ...baseState3.ap, currentAp: 0 } };
     expect(act(state, { type: 'card', index: 0 })).toBe(state);
     expect(act(state, { type: 'card', index: -1 })).toBe(state);
     expect(act(state, { type: 'card', index: 1.5 })).toBe(state);
@@ -97,7 +104,8 @@ describe('カードと編成', () => {
   });
 
   it('連打によるカードの重複使用を防ぐ', () => {
-    const initial = { ...game(), currentAp: 20, maxAp: 20 };
+    const baseState4 = game();
+    const initial = { ...baseState4, ap: { ...baseState4.ap, currentAp: 20, maxAp: 20 } };
     const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
     const state = act(initial, { type: 'card', index });
     expect(act(state, { type: 'card', index: 1 })).toBe(state);

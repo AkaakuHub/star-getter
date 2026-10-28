@@ -17,7 +17,7 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
       : card,
   );
   const used = act(
-    { ...initial, phase: 'playing', currentAp: 100, deck, cardPool: deck },
+    { ...initial, phase: 'playing', deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
     { type: 'card', index: 0 },
   );
   expect(used.hand).toHaveLength(initial.hand.length - 1);

@@ -207,11 +207,11 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
       ...initial,
       deck: [card],
       cardPool: [card],
-      currentAp: initial.maxAp,
       lastActionTick: -1_000_000,
+      ap: { ...initial.ap, currentAp: initial.ap.maxAp },
     },
     [card.id],
   );
   const next = act(state, { type: 'card', index: 0 });
-  expect(next.currentAp).toBe(initial.maxAp - card.cost + 1);
+  expect(next.ap.currentAp).toBe(initial.ap.maxAp - card.cost + 1);
 });

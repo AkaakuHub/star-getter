@@ -114,7 +114,7 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
     },
     card,
   );
-  expect(result.currentAp).toBe(7);
+  expect(result.ap.currentAp).toBe(7);
 });
 
 it('詳細値へ係数を掛けた結果をruntimeと同じく正の無限大方向へ丸める', () => {
