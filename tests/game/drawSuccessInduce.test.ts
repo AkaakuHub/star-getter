@@ -2,48 +2,48 @@ import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
 import { fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
-import { evaluateDrawSuccessInduce } from '@akaakuhub/suku-sute-core/game/effects/drawSuccessInduce';
+import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
+import { isLiveDrawSuccessConditionSatisfied } from '@akaakuhub/suku-sute-core/runtime/skills/drawSuccessCondition';
 import { game } from './support/game';
 
-it('ActionType901の元気割合条件は参照実装同様に以下で判定し、IsActiveで分岐する', () => {
-  const baseState = game();
+it('ActionType901は実際のMentalとGenesis状態で判定する', () => {
+  const initial = game();
   const state = {
-    ...baseState,
+    ...initial,
     maximumMental: 100,
-    mental: { ...baseState.mental, currentMental: 40 },
-    voltage: { ...baseState.voltage, currentVoltage: BigInt(100_000_000) },
+    mental: { ...initial.mental, currentMental: 80 },
+    voltage: { ...initial.voltage, currentVoltage: 100_000_000n },
   };
-  expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
+  const mentalCondition = { branchType: 2n, branchValue: 500_000n };
   expect(
-    evaluateDrawSuccessInduce(
-      { ...state, mental: { ...state.mental, currentMental: 80 } },
-      false,
-      2n,
-      500_000n,
+    isLiveDrawSuccessConditionSatisfied(mentalCondition, conditionContext(state), state.genesis),
+  ).toBe(false);
+  const low = { ...state, mental: { ...state.mental, currentMental: 40 } };
+  expect(
+    isLiveDrawSuccessConditionSatisfied(mentalCondition, conditionContext(low), low.genesis),
+  ).toBe(true);
+  const genesis = applyEffect(state, { kind: 'genesis', effectValue: 1 });
+  expect(
+    isLiveDrawSuccessConditionSatisfied(
+      mentalCondition,
+      conditionContext(genesis),
+      genesis.genesis,
     ),
+  ).toBe(true);
+  const voltageCondition = { branchType: 5n, branchValue: 0n };
+  expect(
+    isLiveDrawSuccessConditionSatisfied(voltageCondition, conditionContext(state), state.genesis),
   ).toBe(false);
   expect(
-    evaluateDrawSuccessInduce(
-      { ...state, mental: { ...state.mental, currentMental: 50 } },
-      false,
-      2n,
-      500_000n,
+    isLiveDrawSuccessConditionSatisfied(
+      voltageCondition,
+      conditionContext(genesis),
+      genesis.genesis,
     ),
   ).toBe(true);
-  expect(
-    evaluateDrawSuccessInduce(
-      { ...state, mental: { ...state.mental, currentMental: 80 } },
-      true,
-      2n,
-      500_000n,
-    ),
-  ).toBe(true);
-  expect(evaluateDrawSuccessInduce(state, false, 5n, 0n)).toBe(false);
-  expect(evaluateDrawSuccessInduce(state, true, 5n, 0n)).toBe(true);
-  expect(evaluateDrawSuccessInduce(state, true, 2n + 4_294_967_296n, 500_000n)).toBe(true);
 });
 
-it('Action901はAbility893の発火時にドロー時点のHandCardStatsを参照する', () => {
+it('Action901は有効な手札でもGenesisがなければMental条件を判定する', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('検証用カードがありません。');
@@ -73,10 +73,12 @@ it('Action901はAbility893の発火時にドロー時点のHandCardStatsを参�
     discard: [],
     drawContext: 'idle' as const,
     ap: { ...initial.ap, currentAp: 100 },
+    mental: { ...initial.mental, currentMental: 100 },
+    maximumMental: 100,
   };
   const result = fillHandToCount(base, 1);
   expect(result.moodOffset).toBe(
-    applyEffect(base, card.ability893Effects[0].whenTrue[0], card).moodOffset,
+    applyEffect(base, card.ability893Effects[0].whenFalse[0], card).moodOffset,
   );
 });
 
