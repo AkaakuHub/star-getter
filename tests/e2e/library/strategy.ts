@@ -148,17 +148,14 @@ async function maintainLoop(driver: GameDriver): Promise<void> {
 export async function amplifyAndWiden(driver: GameDriver): Promise<void> {
   const initialAmplification = driver.state.storyAmplification;
   await driver.until(
-    (state) =>
-      driver.collectionRedraws >= 5 &&
-      state.storyAmplification >= 250_000 &&
-      state.storyAmplification > initialAmplification,
+    (state) => driver.collectionRedraws >= 5 && state.storyAmplification > initialAmplification,
     () => maintainLoop(driver),
   );
   driver.report('回収リドローを反復し舵のドローで増幅');
   await driver.until(
-    (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 95,
+    (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 100,
     async () => {
-      if (driver.state.deck.length < 95) {
+      if (driver.state.deck.length < 100) {
         await restoreDeck(driver);
       } else {
         await driver.useFirst([
@@ -187,13 +184,14 @@ export async function armAutomaticCollection(driver: GameDriver): Promise<void> 
   await driver.until(
     (state) =>
       isPrepared(state) &&
+      state.deck.length >= 100 &&
       state.deck.some(
         (card) =>
           card.token === 'story' &&
           state.hand.includes(card.id) &&
           !state.relayUsed.includes(card.id),
       ),
-    () => maintainLoop(driver),
+    () => (driver.state.deck.length < 100 ? restoreDeck(driver) : maintainLoop(driver)),
   );
 }
 
