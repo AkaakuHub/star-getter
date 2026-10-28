@@ -10,7 +10,7 @@ import {
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
-it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間効果へ接続する', () => {
+it('ActionType21は種別をint32へ変換しnumと期限はsigned64のまま扱う', () => {
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const state = act(createGame(track, routes.genesis.deck, 7), { type: 'start' });
@@ -61,7 +61,7 @@ it('ActionType21の詳細値をint32・longの参照実装変換順でAP時間�
   const applied = applyEffect(state, effect);
   expect(applied.apIncreaseSpeedEffects[0]?.calculation).toEqual({
     kind: 'multiply',
-    factor: Math.fround(0.7),
+    factor: 429497.4375,
   });
   expect(applied.apIncreaseSpeedEffects[0]?.duration).toEqual({
     kind: 'sections',

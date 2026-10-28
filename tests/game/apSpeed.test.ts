@@ -182,7 +182,7 @@ it('ActionType21のcalcType1は効果値0でも正のrateでActionType52を消�
   expect(changed.apIncreaseSpeedEffects).toHaveLength(0);
 });
 
-it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持する', () => {
+it('Action21 calcType2は正のInfinityをsigned32最小値へ変換して倍率を求める', () => {
   const base = game();
   const source = base.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
@@ -208,7 +208,7 @@ it('Action21 calcType2はSkillBoostの正のInfinity時に元のrateを保持す
   const changed = applyEffect(initial, speedEffect, source);
   expect(changed.apIncreaseSpeedEffects.at(-1)?.calculation).toEqual({
     kind: 'multiply',
-    factor: Math.fround(7000 / 10_000),
+    factor: 214749.359375,
   });
 });
 
@@ -254,4 +254,21 @@ it('Action21のパート期限とミリ秒期限を解除する', () => {
   });
   expect(timed.apIncreaseSpeedEffects).toHaveLength(1);
   expect(advanceTo(timed, 0.3).apIncreaseSpeedEffects).toHaveLength(0);
+});
+
+it('Action21は小数の補正値を切り捨てずAPKと同じ切り上げで倍率へ変換する', () => {
+  const base = game();
+  const card = base.deck[0];
+  if (!card) throw new Error('発動元カードがありません。');
+  const initial = {
+    ...base,
+    handEffectCardIds: [],
+    amplification: 100,
+    targetBoosts: [{ members: [card.charactersId], percent: 10, duration: 'stage' as const }],
+  };
+  const changed = applyEffect(initial, { ...speedEffect, num: 9999n }, card);
+  expect(changed.apIncreaseSpeedEffects.at(-1)?.calculation).toEqual({
+    kind: 'multiply',
+    factor: Math.fround(0.9998),
+  });
 });
