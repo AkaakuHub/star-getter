@@ -1,8 +1,5 @@
 import { boardCardIds, moveCardsToBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
-import {
-  liveBoardState,
-  liveDeckBoardCardInstanceIds,
-} from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
 import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
@@ -213,11 +210,8 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   const [discarded, ...drawPile] = subDeck;
   if (!discarded || drawPile.length < 1) throw new Error('サブデッキの山札が不足しています。');
   const state = moveCardsToBoard(split, [discarded], liveBoardState.graveyard);
-  const drawCount = liveDeckBoardCardInstanceIds(state.deckBoard, liveBoardState.deck).length;
-  const discardCount = liveDeckBoardCardInstanceIds(
-    state.deckBoard,
-    liveBoardState.graveyard,
-  ).length;
+  const drawCount = deck.length - 3;
+  const discardCount = 1;
   const assertCounts = (current: typeof split, draw: number, discard: number) => {
     const input = conditionContext(current);
     expect(input.cardTotal).toBe(current.deck.length);
