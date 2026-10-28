@@ -13,6 +13,20 @@
   font-size: 1.6rem;
   font-weight: 900;
 }
+.setup-page > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-block: 8px;
+  background: var(--paper);
+}
+.setup-catalog-card {
+  display: grid;
+  gap: 8px;
+}
+.setup-catalog-card > .button {
+  padding-inline: 4px;
+}
 .setup-page h2,
 .setup-presets legend {
   font-size: 1.1rem;

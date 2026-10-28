@@ -72,19 +72,28 @@ export function DeckEditor({
         <h2>カード一覧</h2>
         <div className="setup-deck-grid">
           {baseCards.map((card) => (
-            <button
-              key={card.id}
-              type="button"
-              className={'card-browser-card color-' + card.performer}
-              aria-label={card.name}
-              aria-pressed={setup.cardIds.includes(card.id)}
-              onClick={() => onChange(toggleSetupCard(setup, card.id))}
-            >
-              <HandCardFace card={card} cost={card.cost} />
-              {setup.cardIds.includes(card.id) && (
-                <Check className="setup-card-check" size={22} aria-hidden="true" />
-              )}
-            </button>
+            <div key={card.id} className="setup-catalog-card">
+              <button
+                type="button"
+                className={'card-browser-card color-' + card.performer}
+                aria-label={card.name}
+                aria-pressed={setup.cardIds.includes(card.id)}
+                onClick={() => onChange(toggleSetupCard(setup, card.id))}
+              >
+                <HandCardFace card={card} cost={card.cost} />
+                {setup.cardIds.includes(card.id) && (
+                  <Check className="setup-card-check" size={22} aria-hidden="true" />
+                )}
+              </button>
+              <button
+                type="button"
+                className="button quiet"
+                aria-label={card.name + 'の性能を見る'}
+                onClick={() => onCard(card)}
+              >
+                性能を見る
+              </button>
+            </div>
           ))}
         </div>
       </section>
