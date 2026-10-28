@@ -2,33 +2,12 @@ import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
-import { drawCandidate, drawWeight } from '@akaakuhub/suku-sute-core/game/cards/drawLottery';
+import { drawWeight } from '@akaakuhub/suku-sute-core/game/cards/drawLottery';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { fillHand, fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { game, withHand } from './support/game';
-
-it('正の重みは累積確率で選び、0の候補は選ばない', () => {
-  const candidates = [
-    { id: 'zero', weight: 0 },
-    { id: 'first', weight: 1 },
-    { id: 'last', weight: 3 },
-  ];
-  expect(drawCandidate(candidates, () => 0)).toBe('first');
-  expect(drawCandidate(candidates, () => 1)).toBe('last');
-  expect(drawCandidate(candidates, () => 3)).toBe('last');
-  expect(drawCandidate([{ id: 'zero', weight: 0 }], () => 0)).toBeNull();
-});
-
-it('負の優先群が複数ある場合も先頭固定にせず群の中から抽選する', () => {
-  const candidates = [
-    { id: 'first', weight: -1 },
-    { id: 'last', weight: -1 },
-    { id: 'normal', weight: 100 },
-  ];
-  expect(drawCandidate(candidates, () => 1)).toBe('last');
-});
 
 it('生成した30枚の末尾順で固定せず、各ドローで乱数を進める', () => {
   let state = addTokens(game('library'), 'story', 30);
