@@ -8,14 +8,15 @@ function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
   return finishCardActivation({
     ...state,
     hand: [...new Set([...state.hand, cardId])],
-    skillUseDestinations: { ...state.skillUseDestinations, [cardId]: 'proxy' },
+    cardSkillUseStates: {
+      ...state.cardSkillUseStates,
+      [cardId]: { skillUseAtBoardState: 7 as const },
+    },
     activation: {
       sourceId: cardId,
       usedCards: [cardId],
       allHand: false,
       recoverDiscard: false,
-      returnToDraw: [],
-      excluded: [],
       handCountChanges: {},
     },
   });
@@ -42,14 +43,15 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
     finishCardActivation({
       ...state,
       hand: [...new Set([...state.hand, source.id])],
-      skillUseDestinations: { ...state.skillUseDestinations, [source.id]: 'proxy' },
+      cardSkillUseStates: {
+        ...state.cardSkillUseStates,
+        [source.id]: { skillUseAtBoardState: 7 as const },
+      },
       activation: {
         sourceId: source.id,
         usedCards: [source.id],
         allHand: false,
         recoverDiscard: false,
-        returnToDraw: [],
-        excluded: [],
         handCountChanges: {},
       },
     });
@@ -90,8 +92,6 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
       usedCards: [source.id],
       allHand: false,
       recoverDiscard: false,
-      returnToDraw: [],
-      excluded: [],
       handCountChanges: {},
     },
   });
@@ -166,7 +166,7 @@ it('ActionType908の上限は通常実行済みの子効果回数も含める', 
   const inProxy = {
     ...armed,
     proxyCards: [source.id],
-    skillUseDestinations: {},
+    cardSkillUseStates: armed.cardSkillUseStates,
   };
 
   const moved = induceCardMoves(inProxy, new Set([source.id]), applyEffect);

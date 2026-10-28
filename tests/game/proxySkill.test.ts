@@ -1,3 +1,4 @@
+import { enqueueHandShuffle } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -310,12 +311,12 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
       usedCards: [source.id, child.id],
       allHand: true,
       recoverDiscard: false,
-      returnToDraw: [child.id],
-      excluded: [],
       handCountChanges: {},
     },
   };
-  const finished = finishCardActivation(activated);
+  const finished = finishCardActivation(
+    enqueueHandShuffle(activated, { recoverDiscard: false, destination: 'draw' }, source.id),
+  );
   expect(finished.proxyCards).toEqual([source.id, child.id]);
   expect(finished.drawPile).not.toContain(child.id);
   expect(finished.discard).not.toContain(source.id);

@@ -266,7 +266,15 @@ describe('モード切替と切替時効果', () => {
       { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
-      { ...original, deck: cards, cardPool: cards, ap: { ...original.ap, currentAp: 100 } },
+      {
+        ...original,
+        deck: cards,
+        cardPool: cards,
+        cardSkillUseStates: Object.fromEntries(
+          cards.map((card) => [card.id, { skillUseAtBoardState: 3 as const }]),
+        ),
+        ap: { ...original.ap, currentAp: 100 },
+      },
       reaction,
     );
     const state = act(

@@ -95,8 +95,6 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
       usedCards: [card.id],
       allHand: false,
       recoverDiscard: false,
-      returnToDraw: [],
-      excluded: [],
       handCountChanges: {},
     },
   };
@@ -139,8 +137,6 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
       usedCards: [card.id],
       allHand: false,
       recoverDiscard: false,
-      returnToDraw: [],
-      excluded: [],
       handCountChanges: {},
     },
   };

@@ -48,9 +48,10 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
     drawPile: active.drawPile.filter((id) => id !== source.id),
     discard: active.discard.filter((id) => id !== source.id),
     proxyCards: [...active.proxyCards, source.id],
-    skillUseDestinations: Object.fromEntries(
-      Object.entries(active.skillUseDestinations).filter(([id]) => id !== source.id),
-    ),
+    cardSkillUseStates: {
+      ...active.cardSkillUseStates,
+      [source.id]: { skillUseAtBoardState: 3 as const },
+    },
   };
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
   expect(expired.proxyAbsorptions).toHaveLength(0);
@@ -103,9 +104,10 @@ it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を�
     drawPile: active.drawPile.filter((id) => id !== source.id),
     discard: active.discard.filter((id) => id !== source.id),
     proxyCards: [...active.proxyCards, source.id],
-    skillUseDestinations: Object.fromEntries(
-      Object.entries(active.skillUseDestinations).filter(([id]) => id !== source.id),
-    ),
+    cardSkillUseStates: {
+      ...active.cardSkillUseStates,
+      [source.id]: { skillUseAtBoardState: 3 as const },
+    },
   };
 
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);

@@ -45,6 +45,10 @@ it.each([false, true])(
         ...base,
         deck,
         cardPool: deck,
+        cardSkillUseStates: {
+          source: { skillUseAtBoardState: 3 },
+          drawn: { skillUseAtBoardState: 3 },
+        },
         handCardStats: {},
         activeHandPermanentCardIds: [],
         action52Buffs: [],
