@@ -33,7 +33,7 @@ it('Proxyに吸収された手札数加算は目標数を変えず、期限時�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
@@ -41,7 +41,7 @@ it('Proxyに吸収された手札数加算は目標数を変えず、期限時�
   );
   const absorbed = applyEffect(state, handCardCountEffect(1, 1, 100n));
   expect(absorbed.tokenCardDeck.handTargetCounts.current).toBe(5);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(1n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(1n);
   expect(advanceTo(absorbed, 0.2).tokenCardDeck.handTargetCounts.current).toBe(5);
 });
 
@@ -59,14 +59,14 @@ it('時間期限のProxy吸収を期限後に解除する', () => {
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
     source,
   );
-  expect(active.proxyAbsorptions).toHaveLength(1);
-  expect(advanceTo(active, 0.2).proxyAbsorptions).toHaveLength(0);
+  expect(active.proxySkills).toHaveLength(1);
+  expect(advanceTo(active, 0.2).proxySkills).toHaveLength(0);
 });
 
 it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発する', () => {
@@ -83,14 +83,14 @@ it('Proxyは対象量へ到達して期限を迎えると対象効果を誘発�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
     },
     source,
   );
   const absorbed = applyEffect(active, handCardCountEffect(1, 3, 0n), source);
-  const withoutProxy = { ...absorbed, proxyAbsorptions: [] };
+  const withoutProxy = { ...absorbed, proxySkills: [] };
   const baseline = advanceTo(withoutProxy, 0.2).ap.currentAp;
   const induced = advanceTo(absorbed, 0.2).ap.currentAp;
   const direct = advanceTo(applyEffect(withoutProxy, { kind: 'ap', amount: 2 }, source), 0.2).ap
@@ -112,17 +112,17 @@ it('Proxy威力タイプ2は吸収量を加算してから倍率を適用する'
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 2,
-      inducePowerParam: 5000,
+      inducePowerParam: 5000n,
       targets: [{ actionType: 14, targetAmount: 1 }],
       effects: [{ actionType: 14, effect: { kind: 'ap', amount: 3 } }],
     },
     source,
   );
-  const absorption = active.proxyAbsorptions[0];
+  const absorption = active.proxySkills[0];
   if (!absorption) throw new Error('Proxy吸収状態がありません。');
   const absorbed = {
     ...active,
-    proxyAbsorptions: [
+    proxySkills: [
       {
         ...absorption,
         effects: absorption.effects.map((effect) => ({ ...effect, totalAmount: 1n })),
@@ -139,7 +139,7 @@ it('Proxy威力タイプ2は吸収量を加算してから倍率を適用する'
     },
   );
   expect(applications).toEqual([{ multiplier: 0.5, addValue: 1 }]);
-  expect(expired.proxyAbsorptions).toHaveLength(0);
+  expect(expired.proxySkills).toHaveLength(0);
 });
 
 it('Proxy威力タイプ3は吸収量と目標量の比を倍率にする', () => {
@@ -156,17 +156,17 @@ it('Proxy威力タイプ3は吸収量と目標量の比を倍率にする', () =
       induceTiming: 2,
       induceCondition: 1,
       inducePowerType: 3,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 14, targetAmount: 2 }],
       effects: [{ actionType: 14, effect: { kind: 'ap', amount: 3 } }],
     },
     source,
   );
-  const absorption = active.proxyAbsorptions[0];
+  const absorption = active.proxySkills[0];
   if (!absorption) throw new Error('Proxy吸収状態がありません。');
   const partiallyAbsorbed = {
     ...active,
-    proxyAbsorptions: [
+    proxySkills: [
       {
         ...absorption,
         effects: absorption.effects.map((effect) => ({ ...effect, totalAmount: 1n })),
@@ -199,7 +199,7 @@ it('Proxy誘発タイミング3はruntimeのIsAbsorbEnd判定に従う', () => {
       induceTiming: 3,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
     },
@@ -207,9 +207,9 @@ it('Proxy誘発タイミング3はruntimeのIsAbsorbEnd判定に従う', () => {
   );
   const absorbed = applyEffect(active, handCardCountEffect(1, 3, 0n), source);
   const ended = advanceProxySkillPeriods(absorbed, 0.2, applyEffect);
-  expect(ended.proxyAbsorptions[0]?.isAbsorbEnd).toBe(true);
+  expect(ended.proxySkills[0]?.isAbsorbEnd).toBe(true);
   const afterSection = advanceProxySkillSections(ended, applyEffect);
-  expect(afterSection.proxyAbsorptions[0]?.isAbsorbEnd).toBe(true);
+  expect(afterSection.proxySkills[0]?.isAbsorbEnd).toBe(true);
   expect(afterSection.ap.currentAp).toBe(ended.ap.currentAp);
 });
 
@@ -227,7 +227,7 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
@@ -243,17 +243,17 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
     source,
   );
-  const first = unlimited.proxyAbsorptions[0];
+  const first = unlimited.proxySkills[0];
   if (!first) throw new Error('Proxy吸収状態がありません。');
   const reached = {
     ...unlimited,
-    proxyAbsorptions: unlimited.proxyAbsorptions.map((absorption, index) =>
+    proxySkills: unlimited.proxySkills.map((absorption, index) =>
       index === 0
         ? {
             ...absorption,
@@ -263,19 +263,16 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
     ),
   };
   const forced = applyEffect(reached, { kind: 'proxy-skill-forced-activation', targetType: 4n });
-  expect(forced.proxyAbsorptions.map((absorption) => absorption.isAbsorbEnd)).toEqual([
-    true,
-    false,
-  ]);
+  expect(forced.proxySkills.map((absorption) => absorption.isAbsorbEnd)).toEqual([true, false]);
   const forcedUnlimited = applyEffect(reached, {
     kind: 'proxy-skill-forced-activation',
     targetType: 9_007_203_549_708_291n,
   });
-  expect(forcedUnlimited.proxyAbsorptions.map((absorption) => absorption.isAbsorbEnd)).toEqual([
+  expect(forcedUnlimited.proxySkills.map((absorption) => absorption.isAbsorbEnd)).toEqual([
     false,
     true,
   ]);
-  expect(advanceTo(forced, 1).proxyAbsorptions).toHaveLength(2);
+  expect(advanceTo(forced, 1).proxySkills).toHaveLength(2);
 });
 
 it('スキル使用回数と消費APを使うProxy期限を個別に進める', () => {
@@ -289,17 +286,17 @@ it('スキル使用回数と消費APを使うProxy期限を個別に進める', 
     induceTiming: 1 as const,
     induceCondition: 1 as const,
     inducePowerType: 1 as const,
-    inducePowerParam: 0,
+    inducePowerParam: 0n,
     targets: [{ actionType: 20, targetAmount: 1 }],
     effects: [],
   };
   const uses = applyEffect(initial, { ...periodEffect, periodType: 4 as const }, source);
   const costs = applyEffect(uses, { ...periodEffect, periodType: 5 as const }, source);
   const afterUse = advanceProxySkillUses(costs, 'other-card', 2, applyEffect);
-  expect(afterUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([2n, 1n]);
+  expect(afterUse.proxySkills.map((item) => item.remainingPeriod)).toEqual([2n, 1n]);
   const afterSecondUse = advanceProxySkillUses(afterUse, 'other-card', 2, applyEffect);
-  expect(afterSecondUse.proxyAbsorptions.map((item) => item.remainingPeriod)).toEqual([1n]);
+  expect(afterSecondUse.proxySkills.map((item) => item.remainingPeriod)).toEqual([1n]);
   expect(
-    advanceProxySkillUses(afterSecondUse, 'other-card', 2, applyEffect).proxyAbsorptions,
+    advanceProxySkillUses(afterSecondUse, 'other-card', 2, applyEffect).proxySkills,
   ).toHaveLength(0);
 });

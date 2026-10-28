@@ -165,7 +165,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 5, targetAmount: 10 }],
       effects: [],
     },
@@ -175,7 +175,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
   expect(next.mental.currentMental).toBe(50);
   expect(next.moodOffset).toBe(0);
   expect(next.deckBoard.deckOutCount).toBe(1);
-  expect(next.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+  expect(next.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
 });
 
 it('ActionType41はミリ秒期限とDeactivator解除を適用する', () => {

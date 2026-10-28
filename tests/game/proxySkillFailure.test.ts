@@ -43,7 +43,7 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
@@ -65,7 +65,7 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
     { [source.cardInstanceId]: { skillUseAtBoardState: 3 as const } },
   );
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
-  expect(expired.proxyAbsorptions).toHaveLength(0);
+  expect(expired.proxySkills).toHaveLength(0);
   expect(liveDeckBoardCardInstanceIds(expired.deckBoard, liveBoardState.proxy)).not.toContain(
     source.cardInstanceId,
   );
@@ -105,7 +105,7 @@ it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },

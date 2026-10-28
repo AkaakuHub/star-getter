@@ -40,7 +40,7 @@ it('ActionType46は各詳細値と解決済みの吸収・誘発Effectを接続�
     induceTiming: 1,
     induceCondition: 2,
     inducePowerType: 3,
-    inducePowerParam: Math.fround(16_777_217),
+    inducePowerParam: 16_777_217n,
     targets: [{ actionType: 2, targetAmount: -2_147_483_648 }],
     effects,
   });
@@ -64,7 +64,7 @@ it('ActionType46は必須の吸収配列がない場合に不正として扱う'
   ).toThrow('Proxyスキルの吸収対象が正しくありません。');
 });
 
-it('ActionType46 long値を保持し、longからfloat32へ直接変換する', () => {
+it('ActionType46の期限値と誘発パラメーターをlongとして保持する', () => {
   const longValue = (1n << 54n) + (1n << 30n) + 1n;
   const effect = createProxySkillEffect({
     skillEffectId: 46n,
@@ -87,7 +87,7 @@ it('ActionType46 long値を保持し、longからfloat32へ直接変換する', 
       { id: 3n, detailType: 'PROXY_SKILL_INDUCE_POWER_PARAM', value: longValue },
     ],
   });
-  expect(effect).toMatchObject({ periodParam: longValue, inducePowerParam: 2 ** 54 + 2 ** 31 });
+  expect(effect).toMatchObject({ periodParam: longValue, inducePowerParam: longValue });
 });
 
 it('ActionType46のスキル回数期限はlongの精度を保ったまま減る', () => {
@@ -105,12 +105,12 @@ it('ActionType46のスキル回数期限はlongの精度を保ったまま減る
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
     source,
   );
   const advanced = advanceProxySkillUses(active, 'other-card', 1, applyEffect);
-  expect(advanced.proxyAbsorptions[0]?.remainingPeriod).toBe(periodParam - 1n);
+  expect(advanced.proxySkills[0]?.remainingPeriod).toBe(periodParam - 1n);
 });

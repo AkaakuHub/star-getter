@@ -38,7 +38,7 @@ describe('元気バリア', () => {
     expect(active.mentalBarriers).toHaveLength(0);
   });
 
-  it('ActionType7のProxyへ整数耐久値を渡し、吸収時にバリアを登録しない', () => {
+  it('ActionType7を整数耐久値として吸収し、上限到達後はバリアを登録する', () => {
     const initial = game();
     const source = initial.deck[0];
     if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -52,7 +52,7 @@ describe('元気バリア', () => {
         induceTiming: 1,
         induceCondition: 1,
         inducePowerType: 1,
-        inducePowerParam: 0,
+        inducePowerParam: 0n,
         targets: [{ actionType: 7, targetAmount: 5 }],
         effects: [],
       },
@@ -68,10 +68,10 @@ describe('元気バリア', () => {
     } as const;
     const first = addMentalBarrier(active, barrier, 5.8, 0);
     expect(first.mentalBarriers).toHaveLength(0);
-    expect(first.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+    expect(first.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
     const afterLimit = addMentalBarrier(first, barrier, 3, 0);
-    expect(afterLimit.mentalBarriers).toHaveLength(0);
-    expect(afterLimit.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+    expect(afterLimit.mentalBarriers).toMatchObject([{ kind: 'endurance', endurance: 3 }]);
+    expect(afterLimit.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
   });
 
   it('耐久型は指定量まで元気減少を吸収し、超過分を通す', () => {

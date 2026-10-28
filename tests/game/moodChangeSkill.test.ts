@@ -153,7 +153,7 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 48, targetAmount: 5 }],
       effects: [],
     },
@@ -170,7 +170,7 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
     source,
   );
   expect(positive.moodSkillBuffs).toHaveLength(0);
-  expect(positive.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
+  expect(positive.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
   const negativeCondition = applyEffect(
     proxy,
     {
@@ -182,7 +182,7 @@ it('Action48はProxyに実際の気分値差分を渡し、calcType2の非正判
     source,
   );
   expect(negativeCondition.moodSkillBuffs).toHaveLength(1);
-  expect(negativeCondition.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
+  expect(negativeCondition.proxySkills[0]?.effects[0]?.totalAmount).toBe(0n);
 });
 
 it('Action48は秒・パート期限、期限抑止、外部解除を反映する', () => {

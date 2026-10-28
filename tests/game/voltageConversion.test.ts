@@ -74,7 +74,7 @@ it('Action22で変換された熱気はActionType46の吸収対象にならな�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 10, targetAmount: 10 }],
       effects: [],
     },
@@ -82,7 +82,7 @@ it('Action22で変換された熱気はActionType46の吸収対象にならな�
   );
   const result = changeResource(proxied, 'voltage', 10n, 'skill', source);
   expect(heartCount(result)).toBe(10);
-  expect(result.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
+  expect(result.proxySkills[0]?.effects[0]?.totalAmount).toBe(0n);
 });
 
 it('Action22のLove出力はActionType30追加Buffを適用して使用回数を消費する', () => {

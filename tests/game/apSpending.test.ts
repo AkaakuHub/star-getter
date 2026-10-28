@@ -86,13 +86,13 @@ describe('エナジー消費時の回復タイマー', () => {
         induceTiming: 1,
         induceCondition: 1,
         inducePowerType: 1,
-        inducePowerParam: 0,
+        inducePowerParam: 0n,
         targets: [{ actionType: 14, targetAmount: 3 }],
         effects: [],
       },
       source,
     );
-    expect(spendAp(active, 0).proxyAbsorptions).toBe(active.proxyAbsorptions);
+    expect(spendAp(active, 0).proxySkills).toBe(active.proxySkills);
   });
   it('上限で消費すると回復途中の時間を0へ戻す', () => {
     const state = game();

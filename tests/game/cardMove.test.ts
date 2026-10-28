@@ -120,7 +120,7 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
     induceTiming: 1,
     induceCondition: 1,
     inducePowerType: 1,
-    inducePowerParam: 0,
+    inducePowerParam: 0n,
     targets: [{ actionType: 20, targetAmount: 1 }],
     effects: [],
   };

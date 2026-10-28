@@ -75,7 +75,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
 
   const absorption = {
     id: 1,
-    sourceId: source.cardInstanceId,
+    cardInstanceId: source.cardInstanceId,
     hasAbsorbLimit: false,
     isAbsoluteAdd: false,
     periodType: 3 as const,
@@ -84,14 +84,14 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     induceTiming: 1 as const,
     induceCondition: 1 as const,
     inducePowerType: 1 as const,
-    inducePowerParam: 0,
+    inducePowerParam: 0n,
     inducedEffects: [],
     effects: [{ actionType: 21, targetAmount: 50n, totalAmount: 0n }],
   };
-  const protectedState = { ...initial, proxyAbsorptions: [absorption] };
+  const protectedState = { ...initial, proxySkills: [absorption] };
   const absorbed = applyEffect(protectedState, speedEffect, source);
   expect(absorbed.apTimeEffects).toHaveLength(0);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(30n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(30n);
 });
 
 it('ActionType21のcalcType1は正のrateでActionType52を消費するが値には適用しない', () => {

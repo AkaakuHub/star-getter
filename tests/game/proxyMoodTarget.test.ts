@@ -22,7 +22,7 @@ it('ActionType48の負の目標値は非絶対加算時に下方向で到達判�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 48, targetAmount: -3 }],
       effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
     },
@@ -35,7 +35,7 @@ it('ActionType48の負の目標値は非絶対加算時に下方向で到達判�
     num: -50_000n,
     duration: { kind: 'stage', value: 0n },
   });
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-5n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(-5n);
   expect(advanceProxySkillPeriods(absorbed, 0.2, applyEffect).ap.currentAp).toBeGreaterThan(
     activeEnergy,
   );

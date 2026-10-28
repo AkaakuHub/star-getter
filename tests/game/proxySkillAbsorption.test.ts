@@ -19,6 +19,38 @@ function game() {
   });
 }
 
+it('終了済みProxyはAction20の加算と期限登録を止めない', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('Proxy発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 1,
+      periodType: 1,
+      periodParam: 3000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0n,
+      targets: [{ actionType: 20, targetAmount: 1 }],
+      effects: [],
+    },
+    source,
+  );
+  const ended = {
+    ...active,
+    amplification: 100,
+    handEffectCardIds: [],
+    proxySkills: active.proxySkills.map((skill) => ({ ...skill, isAbsorbEnd: true })),
+  };
+  const used = applyEffect(ended, handCardCountEffect(1, 1, 1000n), source);
+  expect(used.proxySkills[0]?.effects[0]?.totalAmount).toBe(0n);
+  expect(used.deckActions.queue.at(-1)).toEqual({ type: 0, param1: 1 });
+  expect(used.handCardCountEffects.effects).toHaveLength(1);
+});
+
 it('ProxyはActionType2のスコア増加を吸収して登録を止める', () => {
   const initial = game();
   const source = initial.deck[0];
@@ -33,7 +65,7 @@ it('ProxyはActionType2のスコア増加を吸収して登録を止める', () 
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 2, targetAmount: 5 }],
       effects: [],
     },
@@ -41,7 +73,7 @@ it('ProxyはActionType2のスコア増加を吸収して登録を止める', () 
   );
   const absorbed = applyEffect(active, { kind: 'boost', multiplier: 1.05 }, source);
   expect(absorbed.boosts).toHaveLength(0);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(20n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(20n);
 });
 
 it('ProxyはActionType14のエナジー回復をゲージへ反映しない', () => {
@@ -58,7 +90,7 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 14, targetAmount: 3 }],
       effects: [],
     },
@@ -66,7 +98,7 @@ it('ProxyはActionType14のエナジー回復をゲージへ反映しない', ()
   );
   const absorbed = applyEffect(active, { kind: 'ap', amount: 3 }, source);
   expect(absorbed.ap.currentAp).toBe(active.ap.currentAp);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(12n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(12n);
 });
 
 it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り返す', () => {
@@ -83,7 +115,7 @@ it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
@@ -91,7 +123,7 @@ it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り�
   );
   const atLongMaximum = {
     ...active,
-    proxyAbsorptions: active.proxyAbsorptions.map((absorption) => ({
+    proxySkills: active.proxySkills.map((absorption) => ({
       ...absorption,
       effects: absorption.effects.map((effect) => ({
         ...effect,
@@ -100,7 +132,7 @@ it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り�
     })),
   };
   const absorbed = applyEffect(atLongMaximum, handCardCountEffect(1, 3, 0n));
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
   expect(absorbed.handCardCountEffects).toEqual(atLongMaximum.handCardCountEffects);
 });
 
@@ -118,7 +150,7 @@ it('吸収した手札枚数変更は期限到達や強制解除で枚数を減�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
       effects: [],
     },
@@ -152,7 +184,7 @@ it('ActionType48の負の目標値は非絶対加算で参照実装と同じ下�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 48, targetAmount: -3 }],
       effects: [],
     },
@@ -170,7 +202,7 @@ it('ActionType48の負の目標値は非絶対加算で参照実装と同じ下�
   );
 
   expect(absorbed.moodSkillBuffs).toHaveLength(0);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-3n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(-3n);
 });
 
 it('Proxyの絶対加算では負のActionType48変化を正数として吸収する', () => {
@@ -187,7 +219,7 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 48, targetAmount: 3 }],
       effects: [],
     },
@@ -204,7 +236,7 @@ it('Proxyの絶対加算では負のActionType48変化を正数として吸収�
     source,
   );
   expect(absorbed.moodSkillBuffs).toHaveLength(0);
-  expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(3n);
+  expect(absorbed.proxySkills[0]?.effects[0]?.totalAmount).toBe(3n);
 });
 
 it('Proxyの吸収合計を参照実装のint64として折り返す', () => {
@@ -221,17 +253,17 @@ it('Proxyの吸収合計を参照実装のint64として折り返す', () => {
       induceTiming: 1,
       induceCondition: 1,
       inducePowerType: 1,
-      inducePowerParam: 0,
+      inducePowerParam: 0n,
       targets: [{ actionType: 14, targetAmount: 1 }],
       effects: [],
     },
     source,
   );
-  const absorption = active.proxyAbsorptions[0];
+  const absorption = active.proxySkills[0];
   if (!absorption) throw new Error('Proxyが登録されていません。');
   const nearLimit = {
     ...active,
-    proxyAbsorptions: [
+    proxySkills: [
       {
         ...absorption,
         effects: [{ ...absorption.effects[0]!, totalAmount: 9_223_372_036_854_775_800n }],
@@ -239,7 +271,5 @@ it('Proxyの吸収合計を参照実装のint64として折り返す', () => {
     ],
   };
   const wrapped = absorbSkillEffect(nearLimit, 14, 10n);
-  expect(wrapped.state.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(
-    -9_223_372_036_854_775_806n,
-  );
+  expect(wrapped.state.proxySkills[0]?.effects[0]?.totalAmount).toBe(-9_223_372_036_854_775_806n);
 });
