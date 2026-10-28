@@ -6,7 +6,7 @@ import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/eva
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
-import type { Card } from '@akaakuhub/suku-sute-core/game/model';
+import { rules, type Card } from '@akaakuhub/suku-sute-core/game/model';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game, withHand } from './support/game';
 
@@ -33,10 +33,10 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
   expect(split.hand).not.toContain(selectedId);
   expect(split.tokenDeckSplit?.sub.hand.length).toBeGreaterThan(0);
   const switched = act(split, { type: 'switch-token-deck' });
-  expect(switched.tokenDeckSplit?.active).toBe('sub');
+  expect(switched.tokenCardDeck.currentDeck).toBe('sub');
   expect(
     switched.hand.every((id) =>
-      switched.tokenDeckSplit?.seriesIds?.some((seriesId) =>
+      switched.tokenCardDeck.tokenCardSeriesIds?.some((seriesId) =>
         card(switched, id).tokenCardSeriesIds?.includes(seriesId),
       ),
     ),
@@ -85,7 +85,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
       .filter(
         (card) =>
           card.boardState === 1 &&
-          split.tokenDeckSplit?.subDeckCardInstanceIds.includes(card.cardInstanceId),
+          split.tokenCardDeck.subDeckCardInstanceIds?.includes(card.cardInstanceId),
       )
       .map((card) => card.cardInstanceId),
   ]).toContain(selected.cardInstanceId);
@@ -112,14 +112,14 @@ it('ActionType43の系列IDを参照実装のint32へ変換してから照合す
     seriesIds: [4_294_967_338n],
     duration: { kind: 'stage', value: 0 },
   });
-  expect(split.tokenDeckSplit?.seriesIds).toEqual([42]);
+  expect(split.tokenCardDeck.tokenCardSeriesIds).toEqual([42]);
   expect([
     ...(split.tokenDeckSplit?.sub.hand ?? []),
     ...split.deckBoard.cards
       .filter(
         (card) =>
           card.boardState === 1 &&
-          split.tokenDeckSplit?.subDeckCardInstanceIds.includes(card.cardInstanceId),
+          split.tokenCardDeck.subDeckCardInstanceIds?.includes(card.cardInstanceId),
       )
       .map((card) => card.cardInstanceId),
   ]).toContain(selected.cardInstanceId);
@@ -212,18 +212,16 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
     seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
   });
-  const splitState = split.tokenDeckSplit;
-  if (!splitState) throw new Error('分割状態がありません。');
+  const subDeckIds = split.tokenCardDeck.subDeckCardInstanceIds;
+  if (subDeckIds === null) throw new Error('分割状態がありません。');
   const subDeck = split.deckBoard.cards
-    .filter(
-      (card) =>
-        card.boardState === 1 && splitState.subDeckCardInstanceIds.includes(card.cardInstanceId),
-    )
+    .filter((card) => card.boardState === 1 && subDeckIds.includes(card.cardInstanceId))
     .map((card) => card.cardInstanceId);
   const [discarded, ...drawPile] = subDeck;
   if (!discarded || drawPile.length < 1) throw new Error('サブデッキの山札が不足しています。');
   const state = moveCardsToBoard(split, [discarded], liveBoardState.graveyard);
-  const drawCount = deck.length - 3;
+  expect(split.tokenDeckSplit?.sub.hand).toHaveLength(rules.handSize);
+  const drawCount = deck.length - rules.handSize - 2;
   const discardCount = 1;
   const assertCounts = (current: typeof split, draw: number, discard: number) => {
     const input = conditionContext(current);
@@ -241,14 +239,14 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   };
   assertCounts(state, drawCount, discardCount);
   const switched = act(state, { type: 'switch-token-deck' });
-  expect(switched.tokenDeckSplit?.active).toBe('sub');
+  expect(switched.tokenCardDeck.currentDeck).toBe('sub');
   assertCounts(switched, drawCount, discardCount);
   const [moved] = boardCardIds(switched, liveBoardState.deck);
   if (!moved) throw new Error('移動する山札のカードがありません。');
   const updated = moveCardsToBoard(switched, [moved], liveBoardState.graveyard);
   assertCounts(updated, drawCount - 1, discardCount + 1);
   const returned = act(updated, { type: 'switch-token-deck' });
-  expect(returned.tokenDeckSplit?.active).toBe('main');
+  expect(returned.tokenCardDeck.currentDeck).toBe('main');
   assertCounts(returned, drawCount - 1, discardCount + 1);
 });
 
