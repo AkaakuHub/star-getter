@@ -58,7 +58,7 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
     deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
     cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
     handEffectCardIds: [source.id],
-    deckOutCount: 2,
+    deckBoard: { ...initial.deckBoard, deckOutCount: 2 },
   };
   let next = notifyHandHeartCollect(state, 2, applyEffect);
   expect(next.moodOffset).toBe(0);
@@ -68,7 +68,7 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
   expect(next.moodOffset).toBe(2);
   expect(next.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
   expect(next.handUseHeartCollectionCounts[`${source.id}:test-inducer`]).toBe(4);
-  expect(next.deckOutCount).toBe(0);
+  expect(next.deckBoard.deckOutCount).toBe(0);
 });
 
 it('Action903は子効果がないとき回収数の監視を登録しない', () => {

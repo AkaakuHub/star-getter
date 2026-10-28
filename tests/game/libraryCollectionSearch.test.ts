@@ -44,6 +44,6 @@ it('複数の浮き輪が同時に回収効果を発動しても貝がら・舵�
   expect(next.deck.some((card) => next.hand.includes(card.id) && card.token === 'clock')).toBe(
     true,
   );
-  expect(next.deckOutCount).toBe(base.deckOutCount);
+  expect(next.deckBoard.deckOutCount).toBe(base.deckBoard.deckOutCount);
   expect(next.handCollectionActivationCounts[book.id]).toBe(1);
 });

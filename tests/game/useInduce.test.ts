@@ -196,7 +196,7 @@ it('Action907は子効果のCheckDeckOutを実行する', () => {
   if (!source) throw new Error('発動元カードがありません。');
   const state = {
     ...initial,
-    deckOutCount: 1,
+    deckBoard: { ...initial.deckBoard, deckOutCount: 1 },
     mentalBarriers: [
       {
         kind: 'endurance' as const,
@@ -220,5 +220,5 @@ it('Action907は子効果のCheckDeckOutを実行する', () => {
     ],
   };
   const activated = refreshEffectInducers(state, applyEffect);
-  expect(activated.deckOutCount).toBe(0);
+  expect(activated.deckBoard.deckOutCount).toBe(0);
 });

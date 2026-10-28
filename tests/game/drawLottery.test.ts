@@ -202,6 +202,6 @@ it('山札に禁止カードしか残っていなければ捨て札を戻して�
   const drawn = fillHandToCount(state, 2);
   expect(drawn.hand).toContain('aurora-ensemble');
   expect(drawn.hand).not.toContain('library-ensemble');
-  expect(drawn.deckOutCount).toBe(state.deckOutCount + 1);
+  expect(drawn.deckBoard.deckOutCount).toBe(state.deckBoard.deckOutCount + 1);
   expect(boardCardIds(drawn, liveBoardState.graveyard)).toEqual([]);
 });

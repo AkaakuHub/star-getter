@@ -32,7 +32,7 @@ it('ActionType41は対象ActionTypeだけ親引数とデッキ補正込みのEff
     {
       ...initial,
       deck: initial.deck.slice(0, 2),
-      deckOutCount: 1,
+      deckBoard: { ...initial.deckBoard, deckOutCount: 1 },
       mental: { ...initial.mental, currentMental: 40 },
     },
     effect,
@@ -44,7 +44,7 @@ it('ActionType41は対象ActionTypeだけ親引数とデッキ補正込みのEff
   expect(next.moodOffset).toBe(603);
   const zeroEvent = changeResource(active, 'mental', 0n, 'skill', source, applyEffect);
   expect(zeroEvent.moodOffset).toBe(3);
-  expect(zeroEvent.deckOutCount).toBe(0);
+  expect(zeroEvent.deckBoard.deckOutCount).toBe(0);
 });
 
 it('ActionType41は負のイベントを無視し、電圧上昇を対応する条件へ渡す', () => {
@@ -147,7 +147,11 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
-    { ...initial, deckOutCount: 1, mental: { ...initial.mental, currentMental: 50 } },
+    {
+      ...initial,
+      deckBoard: { ...initial.deckBoard, deckOutCount: 1 },
+      mental: { ...initial.mental, currentMental: 50 },
+    },
     { ...effect, effects: [{ actionType: 5, effect: { kind: 'mood', amount: 3 } }] },
     source,
   );
@@ -170,7 +174,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
   const next = changeResource(proxied, 'mental', 5n, 'skill', source, applyEffect);
   expect(next.mental.currentMental).toBe(50);
   expect(next.moodOffset).toBe(0);
-  expect(next.deckOutCount).toBe(1);
+  expect(next.deckBoard.deckOutCount).toBe(1);
   expect(next.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);
 });
 

@@ -203,15 +203,15 @@ describe('モード切替と切替時効果', () => {
       }),
     ).toBe(state);
   });
-  it('ActionType45は子EffectごとにCheckDeckOutを1回通知する', () => {
+  it('ActionType45のCheckDeckOutは蓄積した再読み込みをすべて通知する', () => {
     const initial = modeGame();
     let state = applyEffect(
       {
         ...initial,
-        deckOutCount: 2,
+        deckBoard: { ...initial.deckBoard, deckOutCount: 2 },
         track: {
           ...initial.track,
-          afterMentalDownEffects: [{ kind: 'voltage', amount: 5 }],
+          afterDeckReloadEffects: [{ kind: 'voltage', amount: 5 }],
         },
       },
       {
@@ -223,9 +223,9 @@ describe('モード切替と切替時効果', () => {
       },
     );
     state = applyEffect(state, on);
-    expect(state.deckOutCount).toBe(1);
-    expect(state.afterMentalDownEvents).toBe(1);
-    expect(state.voltage.currentVoltage).toBe(5n);
+    expect(state.deckBoard.deckOutCount).toBe(0);
+    expect(state.afterDeckReloadEvents).toBe(2);
+    expect(state.voltage.currentVoltage).toBe(10n);
   });
   it('切替時効果による別モードの切替を同じキューで処理する', () => {
     let state = applyEffect(modeGame(), {

@@ -128,16 +128,16 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
     deck: base.deck.map((item) =>
       item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
     ),
-    deckOutCount: 1,
-    track: { ...base.track, afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }] },
+    deckBoard: { ...base.deckBoard, deckOutCount: 1 },
+    track: { ...base.track, afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }] },
   };
   const split = applyEffect(state, {
     kind: 'token-deck-split',
     seriesIds: [42n],
     duration: { kind: 'stage', value: 0 },
   });
-  expect(split.deckOutCount).toBe(0);
-  expect(split.afterMentalDownEvents).toBe(state.afterMentalDownEvents + 1);
+  expect(split.deckBoard.deckOutCount).toBe(0);
+  expect(split.afterDeckReloadEvents).toBe(state.afterDeckReloadEvents + 1);
   expect(split.ap.currentAp).toBe(state.ap.currentAp + 2);
 });
 
@@ -151,7 +151,7 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
       deck: base.deck.map((item) =>
         item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
       ),
-      track: { ...base.track, afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }] },
+      track: { ...base.track, afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }] },
     },
     { kind: 'token-deck-split', seriesIds: [42n], duration: { kind: 'stage', value: 0 } },
   );
@@ -160,13 +160,16 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
   const switched = act(
     {
       ...moveCardsToBoard(split, [selected.id], liveBoardState.extra),
-      deckOutCount: 1,
+      deckBoard: {
+        ...moveCardsToBoard(split, [selected.id], liveBoardState.extra).deckBoard,
+        deckOutCount: 1,
+      },
       tokenDeckSplit: { ...emptySubDeck, sub: { hand: [] } },
     },
     { type: 'switch-token-deck' },
   );
-  expect(switched.deckOutCount).toBe(0);
-  expect(switched.afterMentalDownEvents).toBe(split.afterMentalDownEvents + 1);
+  expect(switched.deckBoard.deckOutCount).toBe(0);
+  expect(switched.afterDeckReloadEvents).toBe(split.afterDeckReloadEvents + 1);
   expect(switched.ap.currentAp).toBe(split.ap.currentAp + 2);
 });
 

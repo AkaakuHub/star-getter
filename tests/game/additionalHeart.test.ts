@@ -33,9 +33,14 @@ it('一致したスキル使用APからEffectPowerを求め、登録したAction
     },
     source,
   );
-  const usedState = induceAdditionalHearts({ ...armed, deckOutCount: 1 }, used, 2, applyEffect);
+  const usedState = induceAdditionalHearts(
+    { ...armed, deckBoard: { ...armed.deckBoard, deckOutCount: 1 } },
+    used,
+    2,
+    applyEffect,
+  );
   expect(heartCount(usedState)).toBe(3);
-  expect(usedState.deckOutCount).toBe(0);
+  expect(usedState.deckBoard.deckOutCount).toBe(0);
   expect(usedState.additionalHeartInducers).toHaveLength(1);
 });
 

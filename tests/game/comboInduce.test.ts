@@ -40,13 +40,13 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   const one = notifyComboSkillPoint(state, source, 1);
   const complete = {
     ...notifyComboSkillPoint(one, first, 2),
-    deckOutCount: 2,
+    deckBoard: { ...state.deckBoard, deckOutCount: 2 },
   };
   expect(complete.comboInducer?.phase).toBe('activating');
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(heartCount(activated)).toBe(4);
   expect(activated.ap.currentAp).toBe(4);
-  expect(activated.deckOutCount).toBe(0);
+  expect(activated.deckBoard.deckOutCount).toBe(0);
   expect(activated.comboInducer?.phase).toBe('resetting');
   const queued = notifyComboSkillPoint(activated, source, 3);
   const reset = advanceComboInducer(queued, 1, applyEffect);
@@ -54,24 +54,24 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   expect(reset.comboInducer?.members.map((member) => member.ap)).toEqual([3, null]);
 });
 
-it('ActionType24の子効果はCheckDeckOutを1回だけ通知する', () => {
+it('ActionType24のCheckDeckOutは蓄積した再読み込みをすべて通知する', () => {
   const { state, source, first } = setup();
   const inducer = state.comboInducer;
   if (!inducer) throw new Error('コンボ誘発が有効ではありません。');
   const configured = {
     ...state,
-    deckOutCount: 3,
+    deckBoard: { ...state.deckBoard, deckOutCount: 3 },
     track: {
       ...state.track,
-      afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }],
+      afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }],
     },
     comboInducer: { ...inducer, effects: [{ kind: 'mood' as const, amount: 1 }] },
   };
   const complete = notifyComboSkillPoint(notifyComboSkillPoint(configured, source, 1), first, 1);
   const activated = advanceComboInducer(complete, 1, applyEffect);
-  expect(activated.deckOutCount).toBe(2);
-  expect(activated.afterMentalDownEvents).toBe(1);
-  expect(activated.ap.currentAp).toBe(configured.ap.currentAp + 2);
+  expect(activated.deckBoard.deckOutCount).toBe(0);
+  expect(activated.afterDeckReloadEvents).toBe(3);
+  expect(activated.ap.currentAp).toBe(configured.ap.currentAp + 6);
 });
 
 it('ActionType24はlong積をfloat32へ直接変換する', () => {
