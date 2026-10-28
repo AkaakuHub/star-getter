@@ -1,10 +1,25 @@
 import { tokenNames } from '../labels/tokens';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
+import { whenDeckParity } from '../cards/parity';
 
 const appeal = { smile: 1, pure: 1, cool: 1 };
 
 export const routeTokens: readonly Card[] = [
+  {
+    id: 'pennant',
+    name: tokenNames.pennant,
+    performer: 'tetra',
+    member: 0,
+    unit: null,
+    costume: 'sailor',
+    cost: 0,
+    appeal,
+    beatPoint: 0,
+    token: 'pennant',
+    exhausts: true,
+    effects: [whenDeckParity('odd', [{ kind: 'ap', amount: 10 }])],
+  },
   {
     id: 'ensemble',
     name: tokenNames.ensemble,

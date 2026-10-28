@@ -1,5 +1,5 @@
 import { describeCondition } from './describeCondition';
-import { tokenNames } from '../../content/labels/tokens';
+import { tokenName } from '../../content/labels/tokens';
 import type { Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { targetNames } from './targetNames';
 
@@ -42,7 +42,7 @@ export function describeEffect(effect: Effect): string {
       return '対象カードの元気バリア耐久値を増幅する。';
 
     case 'tokens': {
-      return `「${tokenNames[effect.token]}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
+      return `「${tokenName(effect.token)}」を${effect.count}枚、山札に追加する。${effect.token === 'shadow' ? '追加されたカードは14回使用後に除外される。' : '追加されたカードは使用後に除外される。'}`;
     }
     case 'token-card':
       return `指定カードを${effect.count}枚、山札に追加する。`;
@@ -61,7 +61,7 @@ export function describeEffect(effect: Effect): string {
     case 'heart-limit':
       return `このステージ中、きらめき上限を${effect.amount}個増加する。`;
     case 'search-token':
-      return `次の${effect.count}回、「${tokenNames[effect.token]}」を優先して引く。`;
+      return `次の${effect.count}回、「${tokenName(effect.token)}」を優先して引く。`;
     case 'search-unit':
       return `次の${effect.count}回、対象の編成のカードを優先して引く。`;
     case 'search':

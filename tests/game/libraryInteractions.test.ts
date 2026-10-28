@@ -8,13 +8,13 @@ import {
   rules,
   type Card,
   type GameState,
-  type TokenKind,
+  type TokenId,
 } from '@akaakuhub/suku-sute-core/game/model';
 import { cardCooldownTicks, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game, withHand } from './support/game';
 
-function token(state: GameState, kind: TokenKind): Card {
+function token(state: GameState, kind: TokenId): Card {
   const card = state.deck.find((item) => item.token === kind);
   if (!card) throw new Error('追加カードがありません。');
   return card;

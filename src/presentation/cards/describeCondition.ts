@@ -29,8 +29,11 @@ export function describeCondition(condition: GameCondition): string {
       return `パート${condition.number}以降`;
     case 'part':
       return condition.number === 99 ? '山場' : `パート${condition.number}`;
-    case 'cards': {
+    case 'cards':
+    case 'card-count-parity': {
       const zones = { all: '編成', draw: '山札', discard: '捨て札', excluded: '除外済みのカード' };
+      if (condition.kind === 'card-count-parity')
+        return `${zones[condition.zone]}が${condition.parity === 'even' ? '偶数' : '奇数'}枚`;
       return `${zones[condition.zone]}が${formatNumber(condition.minimum)}枚以上`;
     }
     case 'token-series':

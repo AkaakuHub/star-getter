@@ -231,7 +231,7 @@ it('ActionType28は各加算バフ後にfloat32へ戻す', () => {
   const state = { ...initial, tokenBoosts };
   const result = boostTokenRequests(
     state,
-    [{ template: { kind: 'token-kind', token: 'story' }, count: 16_777_216 }],
+    [{ template: { kind: 'token-id', token: 'story' }, count: 16_777_216 }],
     null,
     false,
   );
