@@ -14,8 +14,8 @@ export function createGameController(
   const config = window.e2eVideoConfig;
   if (
     setup.presetId !== config.setup.presetId ||
-    setup.cardIds.length !== config.setup.cardIds.length ||
-    setup.cardIds.some((id, index) => id !== config.setup.cardIds[index])
+    setup.cardDatasIds.length !== config.setup.cardDatasIds.length ||
+    setup.cardDatasIds.some((id, index) => id !== config.setup.cardDatasIds[index])
   )
     throw new Error('録画対象の編成または並び順が一致しません。');
   const clock = new ScenarioClock();

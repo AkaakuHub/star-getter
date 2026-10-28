@@ -62,7 +62,12 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
   const redrawn = fillHand(
     withBoardState(
       { ...shuffleHand(state, { recoverDiscard: true, destination: 'draw' }) },
-      { deck: ['horizon', ...state.deck.map((card) => card.id).filter((id) => id !== 'horizon')] },
+      {
+        deck: [
+          'horizon',
+          ...state.deck.map((card) => card.cardInstanceId).filter((id) => id !== 'horizon'),
+        ],
+      },
     ),
   );
   expect(redrawn.hand).toContain('horizon');
@@ -85,18 +90,18 @@ it('手札誘発は回収条件を超えるたびに発動し、指定回数で�
   const state: GameState = withBoardState(
     {
       ...initial,
-      deck: initial.deck.map((item) => (item.id === card.id ? card : item)),
-      handHeartCollectCounts: { [card.id]: 0 },
+      deck: initial.deck.map((item) => (item.cardInstanceId === card.cardInstanceId ? card : item)),
+      handHeartCollectCounts: { [card.cardInstanceId]: 0 },
     },
-    { hand: [card.id] },
+    { hand: [card.cardInstanceId] },
   );
   const first = advanceHandCollectionAbilities(state, 10);
-  expect(first.activated.map((item) => item.id)).toEqual([card.id]);
+  expect(first.activated.map((item) => item.cardInstanceId)).toEqual([card.cardInstanceId]);
   const second = advanceHandCollectionAbilities(first.state, 10);
-  expect(second.activated.map((item) => item.id)).toEqual([card.id]);
+  expect(second.activated.map((item) => item.cardInstanceId)).toEqual([card.cardInstanceId]);
   const third = advanceHandCollectionAbilities(second.state, 10);
   expect(third.activated).toHaveLength(0);
-  expect(second.state.handCollectionActivationCounts[card.id]).toBe(2);
+  expect(second.state.handCollectionActivationCounts[card.cardInstanceId]).toBe(2);
 });
 
 it('手札誘発の回数は離脱時に初期化し、記憶指定時は保持する', () => {
@@ -117,11 +122,23 @@ it('手札誘発の回数は離脱時に初期化し、記憶指定時は保持�
   };
   const state = {
     ...initial,
-    deck: [resetCard, { ...retainCard, id: `${retainCard.id}-retain` }, ...initial.deck.slice(1)],
-    handCollectionActivationCounts: { [resetCard.id]: 1, [`${retainCard.id}-retain`]: 2 },
+    deck: [
+      resetCard,
+      { ...retainCard, cardInstanceId: `${retainCard.cardInstanceId}-retain` },
+      ...initial.deck.slice(1),
+    ],
+    handCollectionActivationCounts: {
+      [resetCard.cardInstanceId]: 1,
+      [`${retainCard.cardInstanceId}-retain`]: 2,
+    },
   };
-  const next = disposeHandEffects(state, [resetCard.id, `${retainCard.id}-retain`]);
-  expect(next.handCollectionActivationCounts).toEqual({ [`${retainCard.id}-retain`]: 2 });
+  const next = disposeHandEffects(state, [
+    resetCard.cardInstanceId,
+    `${retainCard.cardInstanceId}-retain`,
+  ]);
+  expect(next.handCollectionActivationCounts).toEqual({
+    [`${retainCard.cardInstanceId}-retain`]: 2,
+  });
 });
 
 function preparedLibrary(): GameState {
@@ -133,7 +150,7 @@ function preparedLibrary(): GameState {
   const bookmark = state.deck.find((card) => card.token === 'bookmark');
   const stories = state.deck.filter((card) => card.token === 'story').slice(0, 4);
   if (!bookmark) throw new Error('追加カードがありません。');
-  const hand = [bookmark.id, ...stories.map((card) => card.id)];
+  const hand = [bookmark.cardInstanceId, ...stories.map((card) => card.cardInstanceId)];
   return addHearts(
     withBoardState(
       {
@@ -143,7 +160,10 @@ function preparedLibrary(): GameState {
         storyAmplification: 10_000,
         hearts: { ...state.hearts, heartLimit: 10_000_000 },
       },
-      { deck: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)), graveyard: [] },
+      {
+        deck: state.deck.map((card) => card.cardInstanceId).filter((id) => !hand.includes(id)),
+        graveyard: [],
+      },
     ),
     500_000,
   );
@@ -192,7 +212,7 @@ it('94枚では回収50万個を満たしても供給も引き直しも発動し
   const prepared = preparedLibrary();
   const removed = boardCardIds(prepared, liveBoardState.deck).slice(0, prepared.deck.length - 94);
   const initial = withBoardState(
-    { ...prepared, deck: prepared.deck.filter((card) => !removed.includes(card.id)) },
+    { ...prepared, deck: prepared.deck.filter((card) => !removed.includes(card.cardInstanceId)) },
     { deck: boardCardIds(prepared, liveBoardState.deck).filter((id) => !removed.includes(id)) },
   );
   expect(initial.deck).toHaveLength(94);

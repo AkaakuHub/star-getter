@@ -3,7 +3,7 @@ import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEf
 
 export const setupCards: readonly Card[] = [
   {
-    id: 'camera',
+    cardInstanceId: 'camera',
     cardDatasId: 'camera',
     name: '灯台の光',
     performer: 'nova',
@@ -31,7 +31,7 @@ export const setupCards: readonly Card[] = [
     ],
   },
   {
-    id: 'class',
+    cardInstanceId: 'class',
     cardDatasId: 'class',
     name: '乗船の準備',
     performer: 'nova',
@@ -52,7 +52,7 @@ export const setupCards: readonly Card[] = [
     ],
   },
   {
-    id: 'aurora-ensemble',
+    cardInstanceId: 'aurora-ensemble',
     cardDatasId: 'aurora-ensemble',
     name: '追い風',
     performer: 'tetra',

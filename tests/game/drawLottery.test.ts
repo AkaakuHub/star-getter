@@ -15,21 +15,21 @@ it('生成した30枚の末尾順で固定せず、各ドローで乱数を進�
   const first = fillHand(state);
   expect(first.randomSeed).not.toBe(state.randomSeed);
   const stories = first.hand.filter((id) =>
-    first.deck.some((card) => card.id === id && card.token === 'story'),
+    first.deck.some((card) => card.cardInstanceId === id && card.token === 'story'),
   );
   expect(stories.length).toBeGreaterThan(0);
   expect(stories).not.toEqual(
     state.deck
       .filter((card) => card.token === 'story')
       .slice(0, stories.length)
-      .map((card) => card.id),
+      .map((card) => card.cardInstanceId),
   );
 });
 
 it('条件一致時だけ対象を優先し、極光は開始時の優先を持たない', () => {
   const state = game();
   const source = (id: string) => {
-    const card = state.deck.find((item) => item.id === id);
+    const card = state.deck.find((item) => item.cardInstanceId === id);
     if (!card) throw new Error('カードがありません。');
     return card;
   };
@@ -58,7 +58,7 @@ it('tokenと編成の検索を後入れ先出しにして交互の対象へ引�
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   state = applyEffect(state, { kind: 'search-unit', unit: 1, count: 1 });
   const drawn = fillHandToCount(state, 4);
-  const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.id === id));
+  const hand = drawn.hand.map((id) => drawn.deck.find((card) => card.cardInstanceId === id));
   expect(hand.map((card) => card?.token ?? card?.unitIds[0])).toEqual([1, 'clock', 1, 'clock']);
   expect(drawn.deckActions.searches).toHaveLength(0);
 });
@@ -68,7 +68,7 @@ it('検索先があるときは検索外の優先カードを先に引かない'
   state = { ...state, drawContext: 'skill', usedCard: { charactersId: 0, unitIds: [1] } };
   state = applyEffect(state, { kind: 'search-token', token: 'clock', count: 1 });
   const drawn = fillHandToCount(state, 1);
-  expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
+  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
 });
 
 it('グレード、パート、スキルの順に検索し、グレード検索は捨て札からも引く', () => {
@@ -78,8 +78,8 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   state = withBoardState(
     { ...state, drawContext: 'skill', usedCard: { charactersId: 1031, unitIds: [] } },
     {
-      deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== story.id),
-      graveyard: [story.id],
+      deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== story.cardInstanceId),
+      graveyard: [story.cardInstanceId],
     },
   );
   state = applyEffect(state, {
@@ -103,14 +103,14 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   state = {
     ...state,
     deck: state.deck.map((card) =>
-      card.id === story.id ? { ...card, tokenSeriesIds: [42] } : card,
+      card.cardInstanceId === story.cardInstanceId ? { ...card, tokenSeriesIds: [42] } : card,
     ),
   };
   const drawn = fillHandToCount(state, 3);
-  expect(drawn.hand[0]).toBe(story.id);
-  expect(boardCardIds(drawn, liveBoardState.graveyard)).not.toContain(story.id);
+  expect(drawn.hand[0]).toBe(story.cardInstanceId);
+  expect(boardCardIds(drawn, liveBoardState.graveyard)).not.toContain(story.cardInstanceId);
   expect(drawn.hand[1]).toBe('camera');
-  expect(drawn.deck.find((card) => card.id === drawn.hand[2])?.token).toBe('clock');
+  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[2])?.token).toBe('clock');
   expect(drawn.deckActions.searches).toHaveLength(0);
 });
 
@@ -130,7 +130,7 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
     count: 1,
   });
   const drawn = fillHandToCount(state, 1);
-  expect(drawn.deck.find((card) => card.id === drawn.hand[0])?.token).toBe('clock');
+  expect(drawn.deck.find((card) => card.cardInstanceId === drawn.hand[0])?.token).toBe('clock');
   expect(drawn.deckActions.searches).toHaveLength(0);
 });
 
@@ -140,7 +140,7 @@ it('スキル検索はアイコンではなくカードのMainEffectを照合す
     {
       ...initial,
       deck: initial.deck.map((card) =>
-        card.id === 'camera' ? { ...card, skillMainEffect: 987654 } : card,
+        card.cardInstanceId === 'camera' ? { ...card, skillMainEffect: 987654 } : card,
       ),
       drawContext: 'skill' as const,
     },
@@ -174,8 +174,8 @@ it('山札に禁止カードしか残っていなければ捨て札を戻して�
     {
       deck: ['library-ensemble'],
       graveyard: initial.deck
-        .filter((card) => !['class', 'library-ensemble'].includes(card.id))
-        .map((card) => card.id),
+        .filter((card) => !['class', 'library-ensemble'].includes(card.cardInstanceId))
+        .map((card) => card.cardInstanceId),
     },
   );
   const drawn = fillHandToCount(state, 2);

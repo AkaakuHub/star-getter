@@ -76,7 +76,7 @@ it('Action901は有効な手札でもGenesisがなければMental条件を判定
       mental: { ...initial.mental, currentMental: 100 },
       maximumMental: 100,
     },
-    { hand: [], deck: [card.id], graveyard: [] },
+    { hand: [], deck: [card.cardInstanceId], graveyard: [] },
   );
   const result = fillHandToCount(base, 1);
   expect(result.moodOffset).toBe(
@@ -91,10 +91,10 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
   const state = withBoardState(
     {
       ...initial,
-      handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
+      handCardStats: { [card.cardInstanceId]: { ...createLiveHandCardStats(0), isActive: false } },
       activation: {
-        sourceId: card.id,
-        usedCards: [card.id],
+        sourceId: card.cardInstanceId,
+        usedCards: [card.cardInstanceId],
         allHand: false,
         recoverDiscard: false,
         handCountChanges: {},
@@ -136,10 +136,10 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
   const state = withBoardState(
     {
       ...initial,
-      handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
+      handCardStats: { [card.cardInstanceId]: { ...createLiveHandCardStats(0), isActive: false } },
       activation: {
-        sourceId: card.id,
-        usedCards: [card.id],
+        sourceId: card.cardInstanceId,
+        usedCards: [card.cardInstanceId],
         allHand: false,
         recoverDiscard: false,
         handCountChanges: {},

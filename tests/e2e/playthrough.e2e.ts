@@ -19,8 +19,8 @@ test('全区間のカード使用と回収を最後まで処理する', () => {
       (cardId, index) => Boolean(cardId) && canUseCard(state, index),
     );
     if (cardIndex >= 0) state = act(state, { type: 'card', index: cardIndex });
-    const special = specialCards(state).find((card) => canUseSpecial(state, card.id));
-    if (special) state = act(state, { type: 'special', cardId: special.id });
+    const special = specialCards(state).find((card) => canUseSpecial(state, card.cardInstanceId));
+    if (special) state = act(state, { type: 'special', cardId: special.cardInstanceId });
     if (frame % 12 === 0) state = act(state, { type: 'collect' });
   }
   expect(state.phase).toBe('finished');
@@ -37,7 +37,7 @@ function expectOwnedOnce(state: GameState) {
     ...boardCardIds(state, liveBoardState.graveyard),
   ];
   expect(new Set(ids).size).toBe(ids.length);
-  expect([...ids].sort()).toEqual(state.deck.map((card) => card.id).sort());
+  expect([...ids].sort()).toEqual(state.deck.map((card) => card.cardInstanceId).sort());
 }
 
 for (const routeId of routeIds) {
@@ -61,8 +61,10 @@ for (const routeId of routeIds) {
           }
         }
         if (tick % 20 === 0) state = act(state, { type: 'collect' });
-        const special = specialCards(state).find((card) => canUseSpecial(state, card.id));
-        if (special) state = act(state, { type: 'special', cardId: special.id });
+        const special = specialCards(state).find((card) =>
+          canUseSpecial(state, card.cardInstanceId),
+        );
+        if (special) state = act(state, { type: 'special', cardId: special.cardInstanceId });
       }
       expect(state.phase).toBe('finished');
       expect(state.score).toBeGreaterThan(0n);

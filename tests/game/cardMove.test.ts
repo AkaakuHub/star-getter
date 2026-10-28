@@ -23,16 +23,16 @@ function activateSourceCard() {
       {
         ...state,
         activation: {
-          sourceId: card.id,
-          usedCards: [card.id],
+          sourceId: card.cardInstanceId,
+          usedCards: [card.cardInstanceId],
           allHand: false,
           recoverDiscard: false,
           handCountChanges: {},
         },
       },
       {
-        hand: state.hand.filter((id) => id !== card.id),
-        deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== card.id),
+        hand: state.hand.filter((id) => id !== card.cardInstanceId),
+        deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== card.cardInstanceId),
       },
     ),
   };
@@ -42,27 +42,31 @@ it('Action19で使用後に発動元カードを山札へ戻し、指定を消�
   const { card, state } = activateSourceCard();
   const moved = applyEffect(state, { kind: 'card-move', destination: 'deck' }, card);
   const finished = finishCardActivation(moved);
-  expect(finished.deck.some((item) => item.id === card.id)).toBe(true);
-  expect(boardCardIds(finished, liveBoardState.deck)).toContain(card.id);
-  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(card.id);
-  expect(cardSkillUseState(finished, card.id)).toMatchObject({ skillUseAtBoardState: 3 });
+  expect(finished.deck.some((item) => item.cardInstanceId === card.cardInstanceId)).toBe(true);
+  expect(boardCardIds(finished, liveBoardState.deck)).toContain(card.cardInstanceId);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(card.cardInstanceId);
+  expect(cardSkillUseState(finished, card.cardInstanceId)).toMatchObject({
+    skillUseAtBoardState: 3,
+  });
 });
 
 it('Action19で使用後に発動元カードを除外する', () => {
   const { card, state } = activateSourceCard();
   const moved = applyEffect(state, { kind: 'card-move', destination: 'exclusion' }, card);
   const finished = finishCardActivation(moved);
-  expect(finished.deck.some((item) => item.id === card.id)).toBe(false);
-  expect(boardCardIds(finished, liveBoardState.deck)).not.toContain(card.id);
-  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(card.id);
+  expect(finished.deck.some((item) => item.cardInstanceId === card.cardInstanceId)).toBe(false);
+  expect(boardCardIds(finished, liveBoardState.deck)).not.toContain(card.cardInstanceId);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(card.cardInstanceId);
 });
 
 it('Action19は既に除外先へ設定した移動先を山札へ上書きしない', () => {
   const { card, state } = activateSourceCard();
   const excluded = applyEffect(state, { kind: 'card-move', destination: 'exclusion' }, card);
   const moved = applyEffect(excluded, { kind: 'card-move', destination: 'deck' }, card);
-  expect(cardSkillUseState(moved, card.id)).toMatchObject({ skillUseAtBoardState: 4 });
-  expect(finishCardActivation(moved).deck.some((item) => item.id === card.id)).toBe(false);
+  expect(cardSkillUseState(moved, card.cardInstanceId)).toMatchObject({ skillUseAtBoardState: 4 });
+  expect(
+    finishCardActivation(moved).deck.some((item) => item.cardInstanceId === card.cardInstanceId),
+  ).toBe(false);
 });
 
 it('全手札使用の子の除外特性は既存のProxy移動先を上書きしない', () => {
@@ -74,28 +78,32 @@ it('全手札使用の子の除外特性は既存のProxy移動先を上書き�
     {
       ...initial,
       activation: {
-        sourceId: source.id,
-        usedCards: [source.id, child.id],
+        sourceId: source.cardInstanceId,
+        usedCards: [source.cardInstanceId, child.cardInstanceId],
         allHand: true,
         recoverDiscard: false,
         handCountChanges: {},
       },
     },
     {
-      hand: initial.hand.filter((id) => id !== source.id && id !== child.id),
+      hand: initial.hand.filter(
+        (id) => id !== source.cardInstanceId && id !== child.cardInstanceId,
+      ),
       deck: boardCardIds(initial, liveBoardState.deck).filter(
-        (id) => id !== source.id && id !== child.id,
+        (id) => id !== source.cardInstanceId && id !== child.cardInstanceId,
       ),
     },
-    { [child.id]: { skillUseAtBoardState: 7 as const } },
+    { [child.cardInstanceId]: { skillUseAtBoardState: 7 as const } },
   );
   const used = applyUseAbility(state, { ...child, exhausts: true });
   const finished = finishCardActivation(used);
-  expect(finished.deck.some((card) => card.id === child.id)).toBe(true);
+  expect(finished.deck.some((card) => card.cardInstanceId === child.cardInstanceId)).toBe(true);
   expect(liveDeckBoardCardInstanceIds(finished.deckBoard, liveBoardState.proxy)).toContain(
-    child.id,
+    child.cardInstanceId,
   );
-  expect(cardSkillUseState(finished, child.id)).toMatchObject({ skillUseAtBoardState: 3 });
+  expect(cardSkillUseState(finished, child.cardInstanceId)).toMatchObject({
+    skillUseAtBoardState: 3,
+  });
 });
 
 it('ProxyはAction19の移動先より優先され、一斉引き直しで山札へ戻らない', () => {
@@ -123,26 +131,30 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
     {
       ...state,
       activation: {
-        sourceId: source.id,
-        usedCards: [source.id, child.id],
+        sourceId: source.cardInstanceId,
+        usedCards: [source.cardInstanceId, child.cardInstanceId],
         allHand: true,
         recoverDiscard: false,
         handCountChanges: {},
       },
     },
     {
-      hand: state.hand.filter((id) => id !== source.id && id !== child.id),
-      deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== child.id),
+      hand: state.hand.filter((id) => id !== source.cardInstanceId && id !== child.cardInstanceId),
+      deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== child.cardInstanceId),
     },
   );
   const finished = finishCardActivation(
-    enqueueHandShuffle(activated, { recoverDiscard: false, destination: 'draw' }, source.id),
+    enqueueHandShuffle(
+      activated,
+      { recoverDiscard: false, destination: 'draw' },
+      source.cardInstanceId,
+    ),
   );
   expect(liveDeckBoardCardInstanceIds(finished.deckBoard, liveBoardState.proxy)).toEqual([
-    source.id,
-    child.id,
+    source.cardInstanceId,
+    child.cardInstanceId,
   ]);
-  expect(boardCardIds(finished, liveBoardState.deck)).not.toContain(child.id);
-  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(source.id);
-  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(child.id);
+  expect(boardCardIds(finished, liveBoardState.deck)).not.toContain(child.cardInstanceId);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(source.cardInstanceId);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).not.toContain(child.cardInstanceId);
 });

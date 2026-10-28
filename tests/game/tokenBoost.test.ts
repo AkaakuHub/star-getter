@@ -14,7 +14,7 @@ import { tokenCardEffect } from './support/tokenCardEffect';
 
 it('追加カードの増幅は元指定枚数を超えて配分せず、同一スキル中は使用回数を一度だけ消費する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('カードがありません。');
   const boosted = applyEffect(
     initial,
@@ -28,10 +28,10 @@ it('追加カードの増幅は元指定枚数を超えて配分せず、同一�
     },
     source,
   );
-  let state = beginTokenGeneration(boosted, source.id);
-  state = requestTokens(state, 'story', 2, source.id, [42]);
-  state = requestTokens(state, 'clock', 2, source.id, [42]);
-  const finished = finishTokenGeneration(state, source.id).state;
+  let state = beginTokenGeneration(boosted, source.cardInstanceId);
+  state = requestTokens(state, 'story', 2, source.cardInstanceId, [42]);
+  state = requestTokens(state, 'clock', 2, source.cardInstanceId, [42]);
+  const finished = finishTokenGeneration(state, source.cardInstanceId).state;
   expect(finished.deck.filter((card) => card.token === 'story')).toHaveLength(2);
   expect(finished.deck.filter((card) => card.token === 'clock')).toHaveLength(2);
   expect(finished.tokenBoosts).toHaveLength(0);
@@ -39,7 +39,7 @@ it('追加カードの増幅は元指定枚数を超えて配分せず、同一�
 
 it('追加カードの増幅は対象カードと生成効果のシリーズ指定が一致したときだけ消費する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('カードがありません。');
   const boosted = applyEffect(
     initial,
@@ -53,16 +53,16 @@ it('追加カードの増幅は対象カードと生成効果のシリーズ指�
     },
     source,
   );
-  const unmatched = requestTokens(boosted, 'story', 1, source.id, [11]);
+  const unmatched = requestTokens(boosted, 'story', 1, source.cardInstanceId, [11]);
   expect(unmatched.tokenBoosts[0]?.remainingUses).toBe(2n);
-  const matched = requestTokens(unmatched, 'story', 1, source.id, [42]);
+  const matched = requestTokens(unmatched, 'story', 1, source.cardInstanceId, [42]);
   expect(matched.tokenBoosts[0]?.remainingUses).toBe(1n);
   expect(matched.deck.filter((card) => card.token === 'story')).toHaveLength(4);
 });
 
 it('ActionType38は負の計算値をバフとして登録しない', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const boosted = applyEffect(
     initial,
@@ -75,7 +75,7 @@ it('ActionType38は負の計算値をバフとして登録しない', () => {
     source,
   );
   expect(boosted.tokenBoosts).toHaveLength(0);
-  const generated = requestTokens(boosted, 'story', 2, source.id);
+  const generated = requestTokens(boosted, 'story', 2, source.cardInstanceId);
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(2);
 });
 
@@ -115,12 +115,12 @@ it('追加カードの増幅は時間またはパート期限で解除する', (
 
 it('カードの追加シリーズを対象とする増幅は生成元のシリーズで判定する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('カードがありません。');
   const state = {
     ...initial,
     cardPool: initial.cardPool.map((card) =>
-      card.id === source.id ? { ...card, tokenSeriesIds: [7] } : card,
+      card.cardInstanceId === source.cardInstanceId ? { ...card, tokenSeriesIds: [7] } : card,
     ),
   };
   const boosted = applyEffect(
@@ -134,7 +134,7 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
     },
     source,
   );
-  const generated = requestTokens(boosted, 'story', 2, source.id);
+  const generated = requestTokens(boosted, 'story', 2, source.cardInstanceId);
   expect(generated.deck.filter((card) => card.token === 'story')).toHaveLength(4);
   expect(generated.tokenBoosts).toHaveLength(0);
 });
@@ -142,7 +142,9 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
 it('ActionType28はMasterからTokenCardを生成し、系列情報を保持する', () => {
   const initial = game('library');
   const generated = applyEffect(initial, tokenCardEffect(481, 2n, [42n], 2), undefined);
-  const added = generated.deck.filter((card) => card.id.startsWith('token-card-positive-481-'));
+  const added = generated.deck.filter((card) =>
+    card.cardInstanceId.startsWith('token-card-positive-481-'),
+  );
   expect(added).toHaveLength(2);
   expect(added.every((card) => card.styleType === 2)).toBe(true);
   expect(added.every((card) => card.tokenCard && card.performer === null)).toBe(true);
@@ -154,22 +156,26 @@ it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成で�
   if (!source) throw new Error('カードがありません。');
   const state = withBoardState(
     { ...initial, deck: [source], cardPool: [source], tokenCatalog: [], tokenGroups: [] },
-    { deck: [source.id], hand: [] },
+    { deck: [source.cardInstanceId], hand: [] },
   );
   const count = (1n << 32n) + 1n;
   const ordinary = applyEffect(state, tokenCardEffect(481, count), source);
   expect(ordinary.deck).toHaveLength(1);
 
   const grouped = finishTokenGeneration(
-    applyEffect(beginTokenGeneration(state, source.id), tokenCardEffect(481, count), source),
-    source.id,
+    applyEffect(
+      beginTokenGeneration(state, source.cardInstanceId),
+      tokenCardEffect(481, count),
+      source,
+    ),
+    source.cardInstanceId,
   ).state;
   expect(grouped.deck).toHaveLength(2);
 });
 
 it('ActionType28はActionType52を消費せず、生成数を変えない', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const boosted = applyEffect(
     initial,
@@ -190,7 +196,7 @@ it('ActionType28はActionType52を消費せず、生成数を変えない', () =
 
 it('ActionType28は同一スキル内で指定カードを増幅後に交互追加する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const boosted = applyEffect(
     initial,
@@ -204,12 +210,12 @@ it('ActionType28は同一スキル内で指定カードを増幅後に交互追�
     },
     source,
   );
-  let state = beginTokenGeneration(boosted, source.id);
+  let state = beginTokenGeneration(boosted, source.cardInstanceId);
   state = applyEffect(state, tokenCardEffect(481, 2n, [42n]), source);
-  state = finishTokenGeneration(state, source.id).state;
-  expect(state.deck.filter((card) => card.id.startsWith('token-card-positive-481-'))).toHaveLength(
-    2,
-  );
+  state = finishTokenGeneration(state, source.cardInstanceId).state;
+  expect(
+    state.deck.filter((card) => card.cardInstanceId.startsWith('token-card-positive-481-')),
+  ).toHaveLength(2);
   expect(state.tokenBoosts).toHaveLength(0);
 });
 
@@ -236,7 +242,7 @@ it('ActionType28は各加算バフ後にfloat32へ戻す', () => {
 
 it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocationTypeを反映する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const skillBoost = applyEffect(
     initial,
@@ -269,7 +275,7 @@ it('ActionType38は登録時にActionType52を適用し、DeactivatorとInvocati
 
 it('ActionType38は詳細値をint32へ変換し、0以下なら登録しない', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const effect = {
     kind: 'token-boost',
@@ -284,7 +290,7 @@ it('ActionType38は詳細値をint32へ変換し、0以下なら登録しない'
 
 it('ActionType38はlong詳細値をfloat32へ変換してからNumToValueを適用する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const wrapped = applyEffect(
     initial,

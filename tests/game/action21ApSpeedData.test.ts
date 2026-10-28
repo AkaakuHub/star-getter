@@ -88,7 +88,7 @@ it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続す�
     },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -102,7 +102,9 @@ it('ActionType21の詳細レコードをcreateGameでAP時間効果へ接続す�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'ap-speed-change');
   expect(effect).toEqual(createApSpeedChangeEffect({ skillEffectId: 21_001n, details }));
 });
@@ -112,7 +114,7 @@ it('ActionType21のHandPermanent詳細レコードを起動し、手札離脱時
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -152,11 +154,11 @@ it('ActionType21のHandPermanent詳細レコードを起動し、手札離脱時
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('ActionType21の発動元カードがありません。');
   const activated = activateHandPermanentEffects(state, compiled);
   expect(activated.apTimeEffects).toHaveLength(1);
   expect(activated.apTimeEffects[0]?.remainingSeconds).toBeNull();
-  const disposed = disposeHandEffects(activated, [compiled.id]);
+  const disposed = disposeHandEffects(activated, [compiled.cardInstanceId]);
   expect(disposed.apTimeEffects).toHaveLength(0);
 });

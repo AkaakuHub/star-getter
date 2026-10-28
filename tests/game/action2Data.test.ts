@@ -9,7 +9,7 @@ it('ActionType2の詳細値をSTAR上昇Effectへ接続する', () => {
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -27,7 +27,9 @@ it('ActionType2の詳細値をSTAR上昇Effectへ接続する', () => {
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'skill-score-up')).toMatchObject({
     kind: 'skill-score-up',
     calculation: 1,
@@ -43,7 +45,7 @@ it('ActionType2のlong値を参照実装と同じfloat32に変換する', () => 
   const base = (1n << 53n) + 1n;
   const mood = (1n << 54n) + (1n << 30n) + 1n;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -67,7 +69,7 @@ it('ActionType2のlong値を参照実装と同じfloat32に変換する', () => 
       : card,
   );
   const effect = createGame(track, deck, 7)
-    .deck.find((card) => card.id === source.id)
+    .deck.find((card) => card.cardInstanceId === source.cardInstanceId)
     ?.effects.find((item) => item.kind === 'skill-score-up');
   expect(effect).toMatchObject({
     amount: int64ToFloat32(base),

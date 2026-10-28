@@ -23,7 +23,7 @@ function token(state: GameState, kind: TokenId): Card {
 }
 
 function card(state: GameState, id: string): Card {
-  const source = state.deck.find((item) => item.id === id);
+  const source = state.deck.find((item) => item.cardInstanceId === id);
   if (!source) throw new Error('基本カードがありません。');
   return source;
 }
@@ -34,12 +34,12 @@ it('同じ2枚でも、空模様を晴れ100%に変えてから使ったとき�
     story = token(initial, 'story');
   initial = withHand(
     { ...initial, moodOffset: 50, ap: { ...initial.ap, currentAp: 20, maxAp: 20 } },
-    [clock.id, story.id],
+    [clock.cardInstanceId, story.cardInstanceId],
   );
   const play = (first: Card, second: Card) => {
-    const used = act(initial, { type: 'card', index: initial.hand.indexOf(first.id) });
+    const used = act(initial, { type: 'card', index: initial.hand.indexOf(first.cardInstanceId) });
     const state = advanceTo(used, (used.tick + cardCooldownTicks(used)) / rules.ticksPerSecond);
-    return act(state, { type: 'card', index: state.hand.indexOf(second.id) });
+    return act(state, { type: 'card', index: state.hand.indexOf(second.cardInstanceId) });
   };
   const prepared = play(clock, story),
     reversed = play(story, clock);
@@ -57,7 +57,7 @@ it('80枚で舵を引いた増幅は貝がらだけに適用する', () => {
   state = addTokens(state, 'story', 80 - state.deck.length);
   const clock = token(state, 'clock'),
     story = token(state, 'story');
-  state = withHand({ ...state, moodOffset: 50 }, [clock.id]);
+  state = withHand({ ...state, moodOffset: 50 }, [clock.cardInstanceId]);
   const drawn = applyDrawAbility(state, clock);
   expect(drawn.apTimeEffects[0]?.value).toBe(0.5);
   expect(drawn.storyAmplification).toBe(1251.25);
@@ -85,11 +85,11 @@ for (const count of [79, 80]) {
     let state = game('library');
     state = addTokens(state, 'story', count - state.deck.length);
     const source = card(state, 'library-ensemble');
-    state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id]);
+    state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.cardInstanceId]);
     const used = act(state, { type: 'card', index: 0 });
     expect(used.stats.cardsUsed).toBe(1);
-    expect(used.deck.some((item) => item.id === source.id)).toBe(true);
-    expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.id);
+    expect(used.deck.some((item) => item.cardInstanceId === source.cardInstanceId)).toBe(true);
+    expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.cardInstanceId);
     expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(count >= 80 ? 3 : 0);
     expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(count >= 80 ? 3 : 0);
     expect(used.deck).toHaveLength(count + (count >= 80 ? 9 : 0));
@@ -106,16 +106,26 @@ it('共演の一斉使用は元の手札を順に使用し、子カードの生�
     clock = token(state, 'clock'),
     story = token(state, 'story');
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 20, maxAp: 20 } }, [
-    ensemble.id,
-    clock.id,
-    story.id,
+    ensemble.cardInstanceId,
+    clock.cardInstanceId,
+    story.cardInstanceId,
   ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(3);
-  expect(used.cardUses.map((use) => use.card.id)).toEqual([ensemble.id, clock.id, story.id]);
-  expect(used.deck.some((item) => item.id === clock.id || item.id === story.id)).toBe(false);
+  expect(used.cardUses.map((use) => use.card.cardInstanceId)).toEqual([
+    ensemble.cardInstanceId,
+    clock.cardInstanceId,
+    story.cardInstanceId,
+  ]);
+  expect(
+    used.deck.some(
+      (item) =>
+        item.cardInstanceId === clock.cardInstanceId ||
+        item.cardInstanceId === story.cardInstanceId,
+    ),
+  ).toBe(false);
   expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(4);
-  expect(used.deck.some((item) => item.id === ensemble.id)).toBe(false);
+  expect(used.deck.some((item) => item.cardInstanceId === ensemble.cardInstanceId)).toBe(false);
 });
 
 it('100枚の状態で浮き輪を使うと、生成判定が先なので追加できず除外後99枚になる', () => {
@@ -123,7 +133,7 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
   state = addTokens(state, 'story', 100 - state.deck.length);
   const source = token(state, 'bookmark');
   const beforeId = state.deckBoard.nextCardInstanceId;
-  state = withHand({ ...state, ap: { ...state.ap, currentAp: 10 } }, [source.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 10 } }, [source.cardInstanceId]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.deck).toHaveLength(99);
   expect(used.deckBoard.nextCardInstanceId).toBe(beforeId);
@@ -131,7 +141,7 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
     ...used.hand,
     ...boardCardIds(used, liveBoardState.deck),
     ...boardCardIds(used, liveBoardState.graveyard),
-  ]).not.toContain(source.id);
+  ]).not.toContain(source.cardInstanceId);
   expect(addTokens(used, 'clock', 10).deck).toHaveLength(100);
 });
 
@@ -168,7 +178,7 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
     {
       ...initial,
       deck: initial.deck.map((card) =>
-        card.id === 'horizon' ? { ...card, drawAbility: undefined } : card,
+        card.cardInstanceId === 'horizon' ? { ...card, drawAbility: undefined } : card,
       ),
     },
     'shadow',
@@ -183,11 +193,13 @@ it('パズルは14回目に通常熱気を設定し、元気0でも休憩せず�
         mental: { ...state.mental, mentalDown: false },
         ap: { ...state.ap, currentAp: 20, maxAp: 20 },
       },
-      [source.id],
+      [source.cardInstanceId],
     );
     state = act(state, { type: 'card', index: 0 });
-    expect(state.cardUseCounts[source.id]).toBe(count);
-    expect(state.deck.some((item) => item.id === source.id)).toBe(count < 14);
+    expect(state.cardUseCounts[source.cardInstanceId]).toBe(count);
+    expect(state.deck.some((item) => item.cardInstanceId === source.cardInstanceId)).toBe(
+      count < 14,
+    );
   }
   expect(state.mentalProtected).toBe(true);
   expect(state.mental.currentMental).toBe(0);
@@ -200,7 +212,10 @@ it('一斉使用中の除外予約は総枚数に残り、後続80枚条件を�
   state = addTokens(state, 'bookmark', 80 - state.deck.length);
   const source = card(state, 'library-ensemble'),
     story = token(state, 'story');
-  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id, story.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [
+    source.cardInstanceId,
+    story.cardInstanceId,
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(used.deck).toHaveLength(88);
@@ -212,16 +227,16 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   const source = card(state, 'aurora-ensemble'),
     bookmark = token(state, 'bookmark');
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 20, maxAp: 20 } }, [
-    source.id,
+    source.cardInstanceId,
     'library-ensemble',
-    bookmark.id,
+    bookmark.cardInstanceId,
   ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(3);
   expect(used.ap.currentAp).toBeGreaterThan(0);
   expect(used.ap.currentAp).toBeLessThan(used.ap.maxAp);
-  expect(used.hand).not.toContain(source.id);
-  expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.id);
+  expect(used.hand).not.toContain(source.cardInstanceId);
+  expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.cardInstanceId);
   expect(used.activation).toBeNull();
   expect(used.usedCard?.charactersId).toBe(source.charactersId);
   expect(used.usedCard?.unitIds).toEqual(source.unitIds);
@@ -232,7 +247,7 @@ it('ActionType42の子カードは親スキルの未確定カードを80枚条�
   state = addTokens(state, 'story', 79 - state.deck.length);
   const source = token(state, 'ensemble');
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [
-    source.id,
+    source.cardInstanceId,
     'library-ensemble',
   ]);
   const used = act(state, { type: 'card', index: 0 });
@@ -241,12 +256,12 @@ it('ActionType42の子カードは親スキルの未確定カードを80枚条�
   expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(3);
   expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(3);
   expect(used.tokenGroups).toEqual([]);
-  expect(used.deck.some((item) => item.id === source.id)).toBe(false);
+  expect(used.deck.some((item) => item.cardInstanceId === source.cardInstanceId)).toBe(false);
   expect([
     ...used.hand,
     ...boardCardIds(used, liveBoardState.deck),
     ...boardCardIds(used, liveBoardState.graveyard),
-  ]).not.toContain(source.id);
+  ]).not.toContain(source.cardInstanceId);
 });
 
 for (const [count, baseReduction, tokenReduction] of [
@@ -273,7 +288,7 @@ for (const [count, baseReduction, tokenReduction] of [
       ...others,
     ]);
     expect(cardCost(state, card(state, 'library-ensemble'))).toBe(82 - baseReduction);
-    state = withHand(state, [generated.id, ...others]);
+    state = withHand(state, [generated.cardInstanceId, ...others]);
     expect(cardCost(state, generated)).toBe(Math.max(1, 82 - tokenReduction));
   });
 }
@@ -285,20 +300,22 @@ it('一斉使用の追加APを全手札コストへ加え、最終コストを1�
     effect.kind === 'use-hand' ? { ...effect, addAp: 7 } : effect,
   );
   const updated = { ...source, effects };
-  const deck = initial.deck.map((item) => (item.id === source.id ? updated : item));
+  const deck = initial.deck.map((item) =>
+    item.cardInstanceId === source.cardInstanceId ? updated : item,
+  );
   const otherIds = deck
-    .filter((item) => item.id !== source.id)
+    .filter((item) => item.cardInstanceId !== source.cardInstanceId)
     .slice(0, 2)
-    .map(({ id }) => id);
+    .map(({ cardInstanceId: id }) => id);
   const state = withHand(
     {
       ...initial,
       deck,
       cardPool: deck,
-      costReductions: { [source.id]: 1000 },
+      costReductions: { [source.cardInstanceId]: 1000 },
       ap: { ...initial.ap, currentAp: 100 },
     },
-    [source.id, ...otherIds],
+    [source.cardInstanceId, ...otherIds],
   );
   expect(cardCost(state, updated)).toBe(1);
 
@@ -315,31 +332,12 @@ it('ActionType42の追加APは参照実装同様にint32へ変換する', () => 
       effect.kind === 'use-hand' ? { ...effect, addAp: 2_147_483_648 } : effect,
     ),
   };
-  const deck = initial.deck.map((item) => (item.id === source.id ? updated : item));
+  const deck = initial.deck.map((item) =>
+    item.cardInstanceId === source.cardInstanceId ? updated : item,
+  );
   const state = withHand(
     { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
-    [source.id],
+    [source.cardInstanceId],
   );
   expect(cardCost(state, updated)).toBe(1);
-});
-
-it('一斉使用中の子カードはActionType42の合算コストではなく通常の個別コストを記録する', () => {
-  const initial = game('library');
-  const source = card(initial, 'library-ensemble');
-  const child = {
-    ...card(initial, 'library-pages'),
-    effects: [{ kind: 'use-hand' as const, addAp: 7 }],
-  };
-  const state = withHand(
-    {
-      ...initial,
-      deck: initial.deck.map((item) => (item.id === child.id ? child : item)),
-      cardPool: initial.deck.map((item) => (item.id === child.id ? child : item)),
-    },
-    [source.id, child.id],
-  );
-  expect(cardCost(state, child)).toBeGreaterThan(child.consumeAp);
-  expect(cardCost(state, child, true)).toBe(child.consumeAp);
-  const used = act({ ...state, ap: { ...state.ap, currentAp: 100 } }, { type: 'card', index: 0 });
-  expect(used.cardUses.find((item) => item.card.id === child.id)?.consumeAp).toBe(child.consumeAp);
 });

@@ -11,7 +11,7 @@ for (const waitMode of [false, true]) {
       () => Promise.resolve(),
     );
     await driver.setWaitMode(waitMode);
-    expect((await driver.useFirst(['class']))?.id).toBe('class');
+    expect((await driver.useFirst(['class']))?.cardInstanceId).toBe('class');
     expect(await driver.special('library-pages')).toBe(true);
     const inspection = driver.inputs.find((row) => row.input.kind === 'card-inspect');
     const selection = driver.inputs.find((row) => row.input.kind === 'card-select');
@@ -34,7 +34,7 @@ test('操作時間:使用間隔中に次の手札を確認し、発動時は本�
     (state) => state.hand.some((id, index) => id === 'class' && canUseCard(state, index)),
     () => Promise.resolve(),
   );
-  expect((await driver.useFirst(['class']))?.id).toBe('class');
+  expect((await driver.useFirst(['class']))?.cardInstanceId).toBe('class');
   const first = driver.inputs.findLast((row) => row.input.kind === 'card');
   const count = driver.inputs.length;
   expect(await driver.useFirst(['library-invitation', 'library-pages', 'camera'])).toBeDefined();

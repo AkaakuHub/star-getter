@@ -1,3 +1,4 @@
+import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -11,7 +12,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   const appeal = base.deck[0]?.appeal;
   if (!appeal) throw new Error('確認用カードがありません。');
   const source: Card = {
-    id: 'source',
+    cardInstanceId: 'source',
     cardDatasId: 'source',
     name: '発動元',
     charactersId: 1021,
@@ -27,7 +28,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   };
   const child: Card = {
     ...source,
-    id: 'child',
+    cardInstanceId: 'child',
     cardDatasId: 'child',
     name: '子カード',
     charactersId: 1031,
@@ -41,7 +42,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
       {},
       { ['source']: { skillUseAtBoardState: 3 }, ['child']: { skillUseAtBoardState: 3 } },
     ),
-    [source.id, child.id],
+    [source.cardInstanceId, child.cardInstanceId],
   );
   return { state, source, child };
 }
@@ -60,7 +61,7 @@ it('全手札使用の効果位置で子カードを発動し、その後の効�
   );
   expect(moodValue(state)).toBe(0);
   const used = act(state, { type: 'card', index: 0 });
-  expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source', 'child']);
+  expect(used.cardUses.map((entry) => entry.card.cardInstanceId)).toEqual(['source', 'child']);
   expect(moodValue(used)).toBe(12);
 });
 
@@ -79,14 +80,16 @@ it('子カードのコストに発動元の使用通知を先取りしない', (
     child,
   );
   const used = act(changed, { type: 'card', index: 0 });
-  expect(used.cardUses.find((entry) => entry.card.id === child.id)?.consumeAp).toBe(1);
+  expect(
+    used.cardUses.find((entry) => entry.card.cardInstanceId === child.cardInstanceId)?.consumeAp,
+  ).toBe(1);
 });
 
 it('全手札使用の子に全手札使用があっても各カードを1回ずつ発動する', () => {
   const { state, child } = setup([{ kind: 'use-hand' }], [{ kind: 'use-hand' }]);
   const last: Card = {
     ...child,
-    id: 'last',
+    cardInstanceId: 'last',
     cardDatasId: 'last',
     name: '最後のカード',
     effects: [{ kind: 'mood', amount: 1 }],
@@ -101,7 +104,11 @@ it('全手札使用の子に全手札使用があっても各カードを1回ず
     ['source', 'child', 'last'],
   );
   const used = act(ready, { type: 'card', index: 0 });
-  expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source', 'child', 'last']);
+  expect(used.cardUses.map((entry) => entry.card.cardInstanceId)).toEqual([
+    'source',
+    'child',
+    'last',
+  ]);
   expect(moodValue(used)).toBe(1);
 });
 
@@ -118,6 +125,35 @@ it('分岐先にある全手札使用は初期状態では無効で他の手札�
     [{ kind: 'mood', amount: 1 }],
   );
   const used = act(state, { type: 'card', index: 0 });
-  expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source']);
+  expect(used.cardUses.map((entry) => entry.card.cardInstanceId)).toEqual(['source']);
   expect(moodValue(used)).toBe(0);
+});
+
+it('一斉使用中の子カードはActionType42の合算コストではなく通常の個別コストを記録する', () => {
+  const initial = game('library');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-ensemble');
+  const template = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
+  if (!source || !template) throw new Error('確認用カードがありません。');
+  const child = {
+    ...template,
+    effects: [{ kind: 'use-hand' as const, addAp: 7 }],
+  };
+  const state = withHand(
+    {
+      ...initial,
+      deck: initial.deck.map((item) =>
+        item.cardInstanceId === child.cardInstanceId ? child : item,
+      ),
+      cardPool: initial.deck.map((item) =>
+        item.cardInstanceId === child.cardInstanceId ? child : item,
+      ),
+    },
+    [source.cardInstanceId, child.cardInstanceId],
+  );
+  expect(cardCost(state, child)).toBeGreaterThan(child.consumeAp);
+  expect(cardCost(state, child, true)).toBe(child.consumeAp);
+  const used = act({ ...state, ap: { ...state.ap, currentAp: 100 } }, { type: 'card', index: 0 });
+  expect(
+    used.cardUses.find((item) => item.card.cardInstanceId === child.cardInstanceId)?.consumeAp,
+  ).toBe(child.consumeAp);
 });

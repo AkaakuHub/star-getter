@@ -4,7 +4,7 @@ import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEf
 
 export const libraryCards: readonly Card[] = [
   {
-    id: 'library-pages',
+    cardInstanceId: 'library-pages',
     cardDatasId: 'library-pages',
     name: '潮の便り',
     performer: 'nova',
@@ -39,7 +39,7 @@ export const libraryCards: readonly Card[] = [
     ],
   },
   {
-    id: 'library-invitation',
+    cardInstanceId: 'library-invitation',
     cardDatasId: 'library-invitation',
     name: '港の待ち合わせ',
     performer: 'tetra',
@@ -56,7 +56,7 @@ export const libraryCards: readonly Card[] = [
     effects: [{ kind: 'tokens', token: 'ensemble', count: 3 }],
   },
   {
-    id: 'library-ensemble',
+    cardInstanceId: 'library-ensemble',
     cardDatasId: 'library-ensemble',
     name: '船出の合図',
     performer: 'tetra',

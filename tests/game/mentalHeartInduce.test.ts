@@ -90,8 +90,12 @@ it('Action23はActionType16のメンバー・ユニット・トークン系列�
   const source = { ...original, tokenSeriesIds: [42] };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? source : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? source : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? source : card,
+    ),
   };
   const targets = [
     { kind: 'member', member: source.charactersId },

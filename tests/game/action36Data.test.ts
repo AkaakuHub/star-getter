@@ -60,7 +60,7 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -110,7 +110,7 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
       : card,
   );
   const state = createGame(track, deck, 7, undefined, undefined, cardSkillVariants);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   expect(compiled?.modeIds).toContain(100);
   expect(compiled?.modeIds).toContain(101);
   expect(compiled?.modeParameterChanges?.modeId).toBe(100);
@@ -132,7 +132,7 @@ it('ActionType36は系列IDに一致するMaster variantがない場合に失敗
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [

@@ -47,7 +47,7 @@ it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続
     { id: 22_001_4n, detailType: 'CONVERT_VOLTAGE_UP_CONVERT_DISPLAY_TIME', value: 1000n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -61,7 +61,9 @@ it('ActionType22の詳細レコードをcreateGameで電圧変換効果へ接続
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'voltage-convert');
   expect(effect).toEqual(createVoltageConvertEffect({ skillEffectId: 22_001n, details }));
 });
@@ -77,7 +79,7 @@ it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離
     { id: 22_002_4n, detailType: 'CONVERT_VOLTAGE_UP_DISPLAY_TIME', value: 100n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -92,10 +94,12 @@ it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('ActionType22の発動元カードがありません。');
   const activated = activateHandPermanentEffects(state, compiled);
   expect(activated.voltageConversions).toHaveLength(1);
   expect(activated.voltageConversions[0]?.remainingSeconds).toBeNull();
-  expect(disposeHandEffects(activated, [compiled.id]).voltageConversions).toHaveLength(0);
+  expect(disposeHandEffects(activated, [compiled.cardInstanceId]).voltageConversions).toHaveLength(
+    0,
+  );
 });

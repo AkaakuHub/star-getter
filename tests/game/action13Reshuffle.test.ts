@@ -11,7 +11,7 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
   const sourceId = initial.hand[0];
   if (!sourceId) throw new Error('使用するカードが手札にありません。');
   const deck = initial.deck.map((card) =>
-    card.id === sourceId
+    card.cardInstanceId === sourceId
       ? {
           ...card,
           effects: [{ kind: 'reshuffle-skill' as const, recoveryType: 1n, stashType: 1n }],

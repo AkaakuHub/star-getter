@@ -65,9 +65,9 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
   if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');
   const deck = initial.deck.map((card) => ({
     ...card,
-    consumeAp: card.id === source.id ? 1 : card.consumeAp,
+    consumeAp: card.cardInstanceId === source.cardInstanceId ? 1 : card.consumeAp,
     effects:
-      card.id === source.id
+      card.cardInstanceId === source.cardInstanceId
         ? ([
             {
               kind: 'additional-heart-induce',
@@ -87,13 +87,15 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
         : ([{ kind: 'hearts', amount: 0 }] as const),
     passive: {},
   }));
-  const sourceCard = deck.find((card) => card.id === source.id);
+  const sourceCard = deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!sourceCard) throw new Error('追加きらめき誘発カードが編成にありません。');
   const state = withBoardState(
     { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
     {
-      hand: [source.id],
-      deck: deck.filter((card) => card.id !== source.id).map((card) => card.id),
+      hand: [source.cardInstanceId],
+      deck: deck
+        .filter((card) => card.cardInstanceId !== source.cardInstanceId)
+        .map((card) => card.cardInstanceId),
     },
   );
   const used = act(state, { type: 'card', index: 0 });

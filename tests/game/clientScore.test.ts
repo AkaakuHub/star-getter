@@ -1,6 +1,6 @@
 import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { describe, expect, it } from 'vite-plus/test';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
 import { tracks } from '../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { collectionScore } from '@akaakuhub/suku-sute-core/game/scoring';
@@ -21,7 +21,7 @@ const ordinaryLimit = {
 function game() {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  const deck = resolveDeck(defaultDeckIds).map((card) => ({
+  const deck = resolveDeck(defaultDeckCardDatasIds).map((card) => ({
     ...card,
     appeal: { smile: 125, pure: 125, cool: 125 },
   }));
@@ -102,6 +102,9 @@ describe('star-getterの回収得点', () => {
 
 it('基本カードを除外しても開始時の基礎アピールを変えない', () => {
   const initial = game();
-  const excluded = { ...initial, deck: initial.deck.filter((card) => card.id !== 'class') };
+  const excluded = {
+    ...initial,
+    deck: initial.deck.filter((card) => card.cardInstanceId !== 'class'),
+  };
   expect(collectionScore(excluded, 10, false, 10)).toBe(collectionScore(initial, 10, false, 10));
 });

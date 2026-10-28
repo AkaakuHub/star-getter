@@ -4,7 +4,7 @@ import { game } from './support/game';
 
 it('ActionType38はActionType52適用後のfloat値を保持する', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const skillBoost = applyEffect(
     initial,

@@ -19,7 +19,7 @@ it('使用誘発は子効果を実行し、子効果の発動数で上限を判�
   const second = applyEffect(first, effect, card);
   expect(first.ap.currentAp).toBeGreaterThan(0);
   expect(second.ap.currentAp).toBe(first.ap.currentAp);
-  expect(second.skillEffectActivationCounts[`${card.id}:501`]).toBe(1);
+  expect(second.skillEffectActivationCounts[`${card.cardInstanceId}:501`]).toBe(1);
 });
 
 it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
@@ -36,7 +36,7 @@ it('上限0の使用誘発は発動ごとに子効果を実行する', () => {
   const first = applyEffect({ ...initial, ap: { ...initial.ap, currentAp: 0 } }, effect, card);
   const second = applyEffect(first, effect, card);
   expect(second.ap.currentAp).toBeGreaterThan(first.ap.currentAp);
-  expect(second.skillEffectActivationCounts[`${card.id}:502`]).toBe(2);
+  expect(second.skillEffectActivationCounts[`${card.cardInstanceId}:502`]).toBe(2);
 });
 
 it('ActionType905の発動上限を参照実装のint32へ変換する', () => {
@@ -53,7 +53,7 @@ it('ActionType905の発動上限を参照実装のint32へ変換する', () => {
   const first = applyEffect({ ...initial, ap: { ...initial.ap, currentAp: 0 } }, effect, card);
   const second = applyEffect(first, effect, card);
   expect(second.ap.currentAp).toBeGreaterThan(first.ap.currentAp);
-  expect(second.skillEffectActivationCounts[`${card.id}:503`]).toBe(2);
+  expect(second.skillEffectActivationCounts[`${card.cardInstanceId}:503`]).toBe(2);
 });
 
 it('使用回数誘発は参照実装の増加前カウントを使い、要求回数ごとに判定する', () => {
@@ -69,23 +69,27 @@ it('使用回数誘発は参照実装の増加前カウントを使い、要求�
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 504n }],
   };
   const firstUse = applyEffect(
-    { ...initial, skillActivationCounts: { [card.id]: 1 }, ap: { ...initial.ap, currentAp: 0 } },
+    {
+      ...initial,
+      skillActivationCounts: { [card.cardInstanceId]: 1 },
+      ap: { ...initial.ap, currentAp: 0 },
+    },
     effect,
     card,
   );
   const secondUse = applyEffect(
-    { ...firstUse, skillActivationCounts: { [card.id]: 2 } },
+    { ...firstUse, skillActivationCounts: { [card.cardInstanceId]: 2 } },
     effect,
     card,
   );
   const thirdUse = applyEffect(
-    { ...secondUse, skillActivationCounts: { [card.id]: 3 } },
+    { ...secondUse, skillActivationCounts: { [card.cardInstanceId]: 3 } },
     effect,
     card,
   );
   expect(secondUse.ap.currentAp).toBe(firstUse.ap.currentAp);
   expect(thirdUse.ap.currentAp).toBeGreaterThan(secondUse.ap.currentAp);
-  expect(thirdUse.skillEffectActivationCounts[`${card.id}:504`]).toBe(2);
+  expect(thirdUse.skillEffectActivationCounts[`${card.cardInstanceId}:504`]).toBe(2);
 });
 
 it('ActionType906のRequireCountを参照実装のint32へ変換する', () => {
@@ -101,7 +105,11 @@ it('ActionType906のRequireCountを参照実装のint32へ変換する', () => {
     effects: [{ kind: 'ap' as const, amount: 1, skillEffectId: 505n }],
   };
   const activated = applyEffect(
-    { ...initial, skillActivationCounts: { [card.id]: 3 }, ap: { ...initial.ap, currentAp: 0 } },
+    {
+      ...initial,
+      skillActivationCounts: { [card.cardInstanceId]: 3 },
+      ap: { ...initial.ap, currentAp: 0 },
+    },
     effect,
     card,
   );
@@ -122,7 +130,7 @@ it('ActionType906は使用回数int32の折返し後も参照実装と同じ余�
   };
   const state = {
     ...initial,
-    skillActivationCounts: { [card.id]: -2_147_483_648 },
+    skillActivationCounts: { [card.cardInstanceId]: -2_147_483_648 },
     ap: { ...initial.ap, currentAp: 0 },
   };
 
@@ -161,7 +169,7 @@ it('ActionType905は同じ子効果を参照する誘発元で発動上限を共
 
   expect(first.ap.currentAp).toBeGreaterThan(0);
   expect(second.ap.currentAp).toBe(first.ap.currentAp);
-  expect(second.skillEffectActivationCounts[`${card.id}:507`]).toBe(1);
+  expect(second.skillEffectActivationCounts[`${card.cardInstanceId}:507`]).toBe(1);
 });
 
 it('ActionType905は通常実行済みの子効果回数も上限判定へ使う', () => {
@@ -187,7 +195,7 @@ it('ActionType905は通常実行済みの子効果回数も上限判定へ使う
   );
 
   expect(induced.ap.currentAp).toBe(usedNormally.ap.currentAp);
-  expect(induced.skillEffectActivationCounts[`${card.id}:508`]).toBe(1);
+  expect(induced.skillEffectActivationCounts[`${card.cardInstanceId}:508`]).toBe(1);
 });
 
 it('Action907は子効果のCheckDeckOutを実行する', () => {
@@ -209,8 +217,8 @@ it('Action907は子効果のCheckDeckOutを実行する', () => {
     ],
     effectInducers: [
       {
-        sourceCardId: source.id,
-        sourceEffectId: `${source.id}:effect-induce`,
+        sourceCardId: source.cardInstanceId,
+        sourceEffectId: `${source.cardInstanceId}:effect-induce`,
         target: 'mental-barrier' as const,
         threshold: { kind: 'none' as const, value: 0 },
         effects: [{ kind: 'ap' as const, amount: 1 }],

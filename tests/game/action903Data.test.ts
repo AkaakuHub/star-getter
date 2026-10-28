@@ -15,7 +15,7 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -49,7 +49,7 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   expect(compiled?.handInducers).toEqual([
     {
       sourceEffectId: '9031',
@@ -67,14 +67,18 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
     },
   ]);
   if (!compiled) throw new Error('手札誘発カードがありません。');
-  const initial = withHand(state, [source.id]);
+  const initial = withHand(state, [source.cardInstanceId]);
   const memberTriggered = notifyHandSkillUse(initial, compiled, applyEffect);
-  expect(memberTriggered.handUseActivationCounts[handInducerStateKey(source.id, '9031')]).toBe(1);
+  expect(
+    memberTriggered.handUseActivationCounts[handInducerStateKey(source.cardInstanceId, '9031')],
+  ).toBe(1);
   const firstHeart = notifyHandHeartCollect(memberTriggered, 1, applyEffect);
   expect(
-    firstHeart.handUseActivationCounts[handInducerStateKey(source.id, '9032')],
+    firstHeart.handUseActivationCounts[handInducerStateKey(source.cardInstanceId, '9032')],
   ).toBeUndefined();
   const secondHeart = notifyHandHeartCollect(firstHeart, 1, applyEffect);
-  expect(secondHeart.handUseActivationCounts[handInducerStateKey(source.id, '9032')]).toBe(1);
+  expect(
+    secondHeart.handUseActivationCounts[handInducerStateKey(source.cardInstanceId, '9032')],
+  ).toBe(1);
   expect(secondHeart.ap.currentAp).toBe(memberTriggered.ap.currentAp + 1);
 });

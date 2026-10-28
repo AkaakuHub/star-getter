@@ -8,7 +8,7 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -78,7 +78,9 @@ it('ActionType27/45/46の詳細と子EffectをcreateGameへ接続する', () => 
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const additionalHeart = compiled?.effects.find((item) => item.kind === 'additional-heart-induce');
   expect(additionalHeart).toMatchObject({
     heartEffect: {

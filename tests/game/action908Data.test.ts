@@ -9,7 +9,7 @@ it('ActionType908の墓地移動時点・要求数・上限と子効果IDを接�
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'ap' as const, amount: 2, skillEffectId: 90811n };
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -29,7 +29,9 @@ it('ActionType908の墓地移動時点・要求数・上限と子効果IDを接�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((effect) => effect.kind === 'card-move-induce')).toEqual({
     kind: 'card-move-induce',
     sourceEffectId: '90810',

@@ -9,7 +9,7 @@ it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -30,7 +30,9 @@ it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'ap')).toEqual({
     kind: 'ap',
     amount: 2.5,
@@ -45,7 +47,7 @@ it('ActionType14のlong値を参照実装と同じfloat32に変換する', () =>
   const base = (1n << 53n) + 1n;
   const mood = (1n << 54n) + (1n << 30n) + 1n;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -67,7 +69,7 @@ it('ActionType14のlong値を参照実装と同じfloat32に変換する', () =>
       : card,
   );
   const effect = createGame(track, deck, 7)
-    .deck.find((card) => card.id === source.id)
+    .deck.find((card) => card.cardInstanceId === source.cardInstanceId)
     ?.effects.find((item) => item.kind === 'ap');
   expect(effect).toMatchObject({
     amount: Math.fround(int64ToFloat32(base) / 10_000),

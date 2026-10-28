@@ -46,7 +46,7 @@ it('80枚以上で手札にある貝がらと浮き輪の増幅は晴れ補正�
   const bookmark = state.deck.find((card) => card.token === 'bookmark');
   const clock = state.deck.find((card) => card.token === 'clock');
   if (!story || !bookmark || !clock) throw new Error('追加カードがありません。');
-  const held = withHand(state, [story.id, bookmark.id]);
+  const held = withHand(state, [story.cardInstanceId, bookmark.cardInstanceId]);
   const effect = { kind: 'heart-limit', amount: 100 } as const;
   expect(skillValue(held, 100, effect, story)).toBe(3103);
   expect(skillValue(held, 100, effect, clock)).toBe(100);

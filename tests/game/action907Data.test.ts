@@ -9,7 +9,7 @@ it('ActionType907の対象・しきい値・子効果IDを効果誘発へ接続�
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'mood' as const, amount: 2, skillEffectId: 90711n };
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -29,7 +29,9 @@ it('ActionType907の対象・しきい値・子効果IDを効果誘発へ接続�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((effect) => effect.kind === 'effect-induce')).toEqual({
     kind: 'effect-induce',
     sourceEffectId: '90710',

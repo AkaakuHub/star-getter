@@ -57,11 +57,15 @@ it('Action3の手札永続Buffは手札離脱時に解除され、パート期�
   const permanentCard = { ...source, handPermanentEffects: [effect] };
   const withPermanentCard = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? permanentCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? permanentCard : card)),
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? permanentCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? permanentCard : card,
+    ),
   };
   const active = activateHandPermanentEffects(withPermanentCard, permanentCard);
-  expect(active.beatPointBuffs[0]?.deactivationKey).toBe(`hand-permanent:${source.id}`);
+  expect(active.beatPointBuffs[0]?.deactivationKey).toBe(`hand-permanent:${source.cardInstanceId}`);
   expect(expireBeatPointBuffSections(active).beatPointBuffs[0]?.remainingSections).toBe(1);
-  expect(disposeHandEffects(active, [source.id]).beatPointBuffs).toHaveLength(0);
+  expect(disposeHandEffects(active, [source.cardInstanceId]).beatPointBuffs).toHaveLength(0);
 });

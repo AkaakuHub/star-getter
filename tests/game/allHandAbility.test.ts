@@ -6,8 +6,8 @@ import { game, withHand } from './support/game';
 
 it('ActionType42は子カードのAbility894を起動する', () => {
   const initial = game('library');
-  const source = initial.deck.find((item) => item.id === 'library-ensemble');
-  const child = initial.deck.find((item) => item.id === 'library-pages');
+  const source = initial.deck.find((item) => item.cardInstanceId === 'library-ensemble');
+  const child = initial.deck.find((item) => item.cardInstanceId === 'library-pages');
   if (!source || !child) throw new Error('確認対象のカードがありません。');
   const updatedSource = {
     ...source,
@@ -20,11 +20,15 @@ it('ActionType42は子カードのAbility894を起動する', () => {
     ability894Effects: [{ kind: 'tokens' as const, token: 'story' as const, count: 1 }],
   };
   const deck = initial.deck.map((item) =>
-    item.id === source.id ? updatedSource : item.id === child.id ? updatedChild : item,
+    item.cardInstanceId === source.cardInstanceId
+      ? updatedSource
+      : item.cardInstanceId === child.cardInstanceId
+        ? updatedChild
+        : item,
   );
   const state = withHand(
     { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
-    [source.id, child.id],
+    [source.cardInstanceId, child.cardInstanceId],
   );
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
@@ -36,8 +40,8 @@ it('ActionType42は子カードのAbility894を起動する', () => {
 
 it('ActionType42は参照実装と同じ順に手札誘発を先に実行してからAbility894を評価する', () => {
   const initial = game('library');
-  const source = initial.deck.find((item) => item.id === 'library-ensemble');
-  const inducer = initial.deck.find((item) => item.id === 'library-pages');
+  const source = initial.deck.find((item) => item.cardInstanceId === 'library-ensemble');
+  const inducer = initial.deck.find((item) => item.cardInstanceId === 'library-pages');
   if (!source || !inducer) throw new Error('確認対象のカードがありません。');
   const updatedSource = {
     ...source,
@@ -63,17 +67,21 @@ it('ActionType42は参照実装と同じ順に手札誘発を先に実行して�
     ],
   };
   const deck = initial.deck.map((item) =>
-    item.id === source.id ? updatedSource : item.id === inducer.id ? updatedInducer : item,
+    item.cardInstanceId === source.cardInstanceId
+      ? updatedSource
+      : item.cardInstanceId === inducer.cardInstanceId
+        ? updatedInducer
+        : item,
   );
   const state = withHand(
     {
       ...initial,
       deck,
       cardPool: deck,
-      handEffectCardIds: [inducer.id],
+      handEffectCardIds: [inducer.cardInstanceId],
       ap: { ...initial.ap, currentAp: 100 },
     },
-    [source.id, inducer.id],
+    [source.cardInstanceId, inducer.cardInstanceId],
   );
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);

@@ -9,7 +9,7 @@ it('ActionType904の子効果IDを手札永続効果へ接続する', () => {
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'ap' as const, amount: 2 };
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -22,6 +22,8 @@ it('ActionType904の子効果IDを手札永続効果へ接続する', () => {
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.handPermanentEffects).toEqual([{ ...child, skillEffectId: 90411n }]);
 });

@@ -13,7 +13,7 @@ import { game } from './support/game';
 
 it('加算型の係数は今回の使用回数を含む', () => {
   const state = game();
-  const card = state.deck.find((item) => item.id === 'class');
+  const card = state.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const updated = applyParameterValueChange(state, card, {
     kind: 'parameter-value-change',
@@ -28,10 +28,10 @@ it('加算型の係数は今回の使用回数を含む', () => {
 
 it('倍率配列は発動回数で選択し、最終要素を超えて使わない', () => {
   const state = game();
-  const card = state.deck.find((item) => item.id === 'class');
+  const card = state.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const updated = applyParameterValueChange(
-    { ...state, parameterValueChangeCounts: { [card.id]: { 'change-param': 1 } } },
+    { ...state, parameterValueChangeCounts: { [card.cardInstanceId]: { 'change-param': 1 } } },
     card,
     {
       kind: 'parameter-value-change',
@@ -48,7 +48,7 @@ it('倍率配列は発動回数で選択し、最終要素を超えて使わな�
 
 it('ファンレベル型は指定メンバーだけを合算する', () => {
   const state = game();
-  const card = state.deck.find((item) => item.id === 'class');
+  const card = state.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const updated = applyParameterValueChange(
     { ...state, supportLevels: { 1021: 20, 1030: 100 } },
@@ -68,7 +68,7 @@ it('ファンレベル型は指定メンバーだけを合算する', () => {
 
 it('カード生成時にResetSkillEffect相当の基礎係数を登録する', () => {
   const state = game();
-  const source = state.deck.find((item) => item.id === 'class');
+  const source = state.deck.find((item) => item.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const effect = {
     kind: 'parameter-value-change',
@@ -81,16 +81,16 @@ it('カード生成時にResetSkillEffect相当の基礎係数を登録する', 
   const card = { ...source, effects: [effect] };
   const prepared = {
     ...state,
-    deck: state.deck.map((item) => (item.id === source.id ? card : item)),
+    deck: state.deck.map((item) => (item.cardInstanceId === source.cardInstanceId ? card : item)),
   };
   const initialized = initializeParameterValueFactors(prepared);
   expect(initialized.parameterValueFactors[0]?.factor).toBe(1.25);
-  expect(initialized.parameterValueChangeCounts[source.id]?.['change-param']).toBe(0);
+  expect(initialized.parameterValueChangeCounts[source.cardInstanceId]?.['change-param']).toBe(0);
 });
 
 it('詳細ID係数を通常の効果値へ適用する', () => {
   const initial = game();
-  const card = initial.deck.find((item) => item.id === 'class');
+  const card = initial.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const changed = applyParameterValueChange(initial, card, {
     kind: 'parameter-value-change',
@@ -120,7 +120,7 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
 
 it('詳細値へ係数を掛けた結果をruntimeと同じく正の無限大方向へ丸める', () => {
   const initial = game();
-  const card = initial.deck.find((item) => item.id === 'class');
+  const card = initial.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const changed = applyParameterValueChange(initial, card, {
     kind: 'parameter-value-change',
@@ -149,7 +149,7 @@ it('詳細値へ係数を掛けた結果をruntimeと同じく正の無限大方
 
 it('amount以外の詳細値も効果実行前に補正する', () => {
   const initial = game();
-  const card = initial.deck.find((item) => item.id === 'class');
+  const card = initial.deck.find((item) => item.cardInstanceId === 'class');
   if (!card) throw new Error('検証用カードがありません。');
   const changed = applyParameterValueChange(initial, card, {
     kind: 'parameter-value-change',
@@ -179,7 +179,7 @@ it('amount以外の詳細値も効果実行前に補正する', () => {
 
 it('モード変更で前の能力を解除し、新しい能力の詳細値変更を発動する', () => {
   const initial = game();
-  const source = initial.deck.find((item) => item.id === 'class');
+  const source = initial.deck.find((item) => item.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const card = {
     ...source,
@@ -209,28 +209,30 @@ it('モード変更で前の能力を解除し、新しい能力の詳細値変�
   } as const;
   const prepared = initializeParameterValueFactors({
     ...initial,
-    deck: initial.deck.map((item) => (item.id === card.id ? card : item)),
-    cardPool: initial.cardPool.map((item) => (item.id === card.id ? card : item)),
+    deck: initial.deck.map((item) => (item.cardInstanceId === card.cardInstanceId ? card : item)),
+    cardPool: initial.cardPool.map((item) =>
+      item.cardInstanceId === card.cardInstanceId ? card : item,
+    ),
     modes: createModes([8]),
-    handEffectCardIds: [...initial.handEffectCardIds, card.id],
+    handEffectCardIds: [...initial.handEffectCardIds, card.cardInstanceId],
   });
   const enabled = applyEffect(prepared, { kind: 'mode', modeId: 8n, change: 'on' }, card);
   expect(enabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-on-change');
-  const leftHand = disposeHandEffects(enabled, [card.id]);
+  const leftHand = disposeHandEffects(enabled, [card.cardInstanceId]);
   expect(leftHand.parameterValueFactors).toHaveLength(0);
   expect(leftHand.activeModeParameterChanges).toHaveLength(0);
   const disabled = applyEffect(enabled, { kind: 'mode', modeId: 8n, change: 'off' }, card);
   expect(disabled.parameterValueFactors[0]?.sourceEffectId).toBe('mode-off-change');
-  expect(disabled.parameterValueChangeCounts[card.id]?.['mode-on-change']).toBe(1);
-  expect(disabled.parameterValueChangeCounts[card.id]?.['mode-off-change']).toBe(1);
+  expect(disabled.parameterValueChangeCounts[card.cardInstanceId]?.['mode-on-change']).toBe(1);
+  expect(disabled.parameterValueChangeCounts[card.cardInstanceId]?.['mode-off-change']).toBe(1);
   expect(disabled.activeModeParameterChanges).toEqual([
-    { cardId: card.id, modeId: 8, isOn: false },
+    { cardId: card.cardInstanceId, modeId: 8, isOn: false },
   ]);
 });
 
 it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除する', () => {
   const initial = game();
-  const source = initial.deck.find((item) => item.id === 'class');
+  const source = initial.deck.find((item) => item.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const effect = {
     kind: 'parameter-value-change',
@@ -260,26 +262,26 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
       handEffectCardIds: [],
       drawContext: 'skill' as const,
     },
-    { hand: [], deck: [card.id], graveyard: [] },
+    { hand: [], deck: [card.cardInstanceId], graveyard: [] },
   );
   const unrelated = applyParameterValueChange(state, card, {
     ...effect,
     sourceEffectId: 'unrelated-change',
   });
-  const inactiveLeft = disposeHandEffects(unrelated, [card.id]);
+  const inactiveLeft = disposeHandEffects(unrelated, [card.cardInstanceId]);
   expect(
     inactiveLeft.parameterValueFactors.some(
       (factor) => factor.sourceEffectId === 'unrelated-change',
     ),
   ).toBe(true);
   const active = fillHand(state);
-  expect(active.activeHandPermanentCardIds).toEqual([card.id]);
+  expect(active.activeHandPermanentCardIds).toEqual([card.cardInstanceId]);
   expect(active.targetBoosts).toEqual([
     {
       members: [source.charactersId],
       percent: 300,
       duration: 'stage',
-      deactivationKey: `hand-permanent:${card.id}`,
+      deactivationKey: `hand-permanent:${card.cardInstanceId}`,
     },
   ]);
   expect(skillValue(active, 100, { kind: 'ap', amount: 100 }, card)).toBe(400);

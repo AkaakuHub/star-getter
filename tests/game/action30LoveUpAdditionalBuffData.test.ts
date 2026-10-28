@@ -79,7 +79,7 @@ it('ActionType30の詳細レコードをcreateGameでSTAR追加バフへ接続�
     },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -93,7 +93,9 @@ it('ActionType30の詳細レコードをcreateGameでSTAR追加バフへ接続�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'love-up-additional-buff');
   expect(effect).toEqual(createLoveUpAdditionalBuffEffect({ skillEffectId: 30_001n, details }));
 });

@@ -53,16 +53,16 @@ export function StartScreen({
           </fieldset>
           <section aria-label="編成">
             <div className="setup-heading">
-              <h2>編成{setup.cardIds.length}枚</h2>
+              <h2>編成{setup.cardDatasIds.length}枚</h2>
               <button className="button quiet" type="button" onClick={() => setEditing(true)}>
                 <Layers size={18} aria-hidden="true" />
                 編成する
               </button>
             </div>
             <div className="setup-deck-grid">
-              {resolveDeck(setup.cardIds).map((card) => (
+              {resolveDeck(setup.cardDatasIds).map((card) => (
                 <button
-                  key={card.id}
+                  key={card.cardDatasId}
                   className={'card-browser-card color-' + card.performer}
                   type="button"
                   aria-label={card.name + 'の性能を確認'}

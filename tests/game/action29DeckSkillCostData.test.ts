@@ -35,7 +35,7 @@ it('ActionType29の詳細レコードをcreateGameでデッキコスト効果へ
     { id: 29_001_4n, detailType: 'CHANGE_DECK_AP_TARGET_TYPE_ID', value: 8123n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -49,7 +49,9 @@ it('ActionType29の詳細レコードをcreateGameでデッキコスト効果へ
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'deck-skill-cost-change');
   expect(effect).toEqual(createDeckSkillCostChangeEffect({ skillEffectId: 29_001n, details }));
 });

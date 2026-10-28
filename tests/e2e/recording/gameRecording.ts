@@ -61,7 +61,8 @@ function snapshot(state: GameState): Snapshot {
     heartLimit: state.hearts.heartLimit,
     storyAmplification: state.storyAmplification,
     storyUses: state.cardPool.reduce(
-      (count, card) => count + (card.token === 'story' ? (state.cardUseCounts[card.id] ?? 0) : 0),
+      (count, card) =>
+        count + (card.token === 'story' ? (state.cardUseCounts[card.cardInstanceId] ?? 0) : 0),
       0,
     ),
     mood: moodValue(state),
@@ -69,7 +70,7 @@ function snapshot(state: GameState): Snapshot {
     lastActionTick: state.lastActionTick,
     skillCooldownTicks: cardCooldownTicks(state),
     hand: state.hand.map((id) => {
-      const card = state.deck.find((candidate) => candidate.id === id);
+      const card = state.deck.find((candidate) => candidate.cardInstanceId === id);
       if (!card) throw new Error('記録対象の手札がありません。');
       return {
         instanceId: id,

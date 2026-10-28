@@ -40,7 +40,7 @@ export function CardBrowser({
               <div className="card-browser-cards">
                 {cards.map((card) => (
                   <button
-                    key={card.id}
+                    key={card.cardInstanceId}
                     type="button"
                     className={'card-browser-card color-' + card.performer}
                     onClick={() => setSelected(card)}

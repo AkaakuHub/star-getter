@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -79,19 +79,19 @@ describe('ライブの進行', () => {
   it('不正な時刻や区間設定を拒否する', () => {
     expect(() => advanceTo(game(), Number.NaN)).toThrow();
     const invalid: Track = { ...game().track, sections: [] };
-    expect(() => createGame(invalid, resolveDeck(defaultDeckIds), 7)).toThrow();
+    expect(() => createGame(invalid, resolveDeck(defaultDeckCardDatasIds), 7)).toThrow();
   });
 });
 
 describe('カードと編成', () => {
   it('3〜100枚の重複しない編成を受け入れる', () => {
     const track = game().track;
-    expect(() => createGame(track, resolveDeck(defaultDeckIds.slice(1)), 7)).not.toThrow();
-    expect(() => createGame(track, resolveDeck(defaultDeckIds.slice(0, 2)), 7)).toThrow();
+    expect(() => createGame(track, resolveDeck(defaultDeckCardDatasIds.slice(1)), 7)).not.toThrow();
+    expect(() => createGame(track, resolveDeck(defaultDeckCardDatasIds.slice(0, 2)), 7)).toThrow();
     expect(() =>
       createGame(track, resolveDeck(Array.from({ length: 8 }, () => 'horizon')), 7),
     ).toThrow();
-    expect(() => createGame(track, resolveDeck(defaultDeckIds), 0)).toThrow();
+    expect(() => createGame(track, resolveDeck(defaultDeckCardDatasIds), 0)).toThrow();
   });
 
   it('費用を払えないカードと範囲外の入力は状態を変更しない', () => {

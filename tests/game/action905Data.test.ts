@@ -9,7 +9,7 @@ it('ActionType905の回数上限と子効果IDを使用誘発へ接続する', (
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const child = { kind: 'mood' as const, amount: 2, skillEffectId: 90511n };
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -27,7 +27,9 @@ it('ActionType905の回数上限と子効果IDを使用誘発へ接続する', (
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((effect) => effect.kind === 'use-induce')).toEqual({
     kind: 'use-induce',
     sourceEffectId: '90510',

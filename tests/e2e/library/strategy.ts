@@ -42,7 +42,7 @@ const restartPriority = [
 ];
 
 function isPrepared(state: GameState): boolean {
-  const hand = state.deck.filter((card) => state.hand.includes(card.id));
+  const hand = state.deck.filter((card) => state.hand.includes(card.cardInstanceId));
   return (
     state.deck.length >= 95 &&
     state.hearts.heartLimit >= 500_000 &&
@@ -182,7 +182,7 @@ function isCollectionReady(state: GameState): boolean {
     state.deck.some(
       (card) =>
         card.token === 'story' &&
-        state.hand.includes(card.id) &&
+        state.hand.includes(card.cardInstanceId) &&
         canActivateHandCollectionAbility(state, card),
     )
   );
@@ -198,9 +198,9 @@ export async function playUnplanned(driver: GameDriver): Promise<void> {
     await driver.special('library-ensemble');
     await driver.useFirst(
       driver.state.hand.map((id) => {
-        const card = driver.state.deck.find((candidate) => candidate.id === id);
+        const card = driver.state.deck.find((candidate) => candidate.cardInstanceId === id);
         if (!card) throw new Error('手札のカードがありません。');
-        return card.token ?? card.id;
+        return card.token ?? card.cardInstanceId;
       }),
     );
     if (driver.inputTick % 6 === 0) driver.collect();

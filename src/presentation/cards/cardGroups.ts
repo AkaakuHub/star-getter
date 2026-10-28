@@ -17,6 +17,10 @@ export function cardGroups(state: GameState) {
     },
   ].map(({ board, title, ids }) => {
     const members = new Set(ids);
-    return { board, title, cards: state.cardPool.filter((card) => members.has(card.id)) };
+    return {
+      board,
+      title,
+      cards: state.cardPool.filter((card) => members.has(card.cardInstanceId)),
+    };
   });
 }

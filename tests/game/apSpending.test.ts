@@ -15,7 +15,7 @@ it('AP無限中は最大APを超えるカードと共鳴を使用できる', () 
     {
       ...state,
       deck: state.deck.map((card) =>
-        card.id === source.id
+        card.cardInstanceId === source.cardInstanceId
           ? {
               ...card,
               consumeAp: state.ap.maxAp + 10,
@@ -24,19 +24,21 @@ it('AP無限中は最大APを超えるカードと共鳴を使用できる', () 
           : card,
       ),
     },
-    [source.id],
+    [source.cardInstanceId],
   );
   expect(canUseCard(costly, 0)).toBe(false);
-  expect(canUseSpecial(costly, source.id)).toBe(false);
+  expect(canUseSpecial(costly, source.cardInstanceId)).toBe(false);
   const active = applyEffect(costly, {
     kind: 'infinity-gauge',
     gauge: 'ap',
     duration: { kind: 'stage', value: 0 },
   });
   expect(canUseCard(active, 0)).toBe(true);
-  expect(canUseSpecial(active, source.id)).toBe(true);
+  expect(canUseSpecial(active, source.cardInstanceId)).toBe(true);
   expect(act(active, { type: 'card', index: 0 }).stats.cardsUsed).toBeGreaterThan(0);
-  expect(act(active, { type: 'special', cardId: source.id }).stats.specialsUsed).toBe(1);
+  expect(act(active, { type: 'special', cardId: source.cardInstanceId }).stats.specialsUsed).toBe(
+    1,
+  );
 });
 
 it('APの空模様補正と追加値を倍率・EffectPowerより先に適用する', () => {

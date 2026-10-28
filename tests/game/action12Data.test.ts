@@ -8,7 +8,7 @@ it('ActionType12の条件と子Effectを分岐Effectへ接続する', () => {
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -23,7 +23,9 @@ it('ActionType12の条件と子Effectを分岐Effectへ接続する', () => {
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'branch')).toMatchObject({
     kind: 'branch',
     condition: { kind: 'heat', minimum: 50 },

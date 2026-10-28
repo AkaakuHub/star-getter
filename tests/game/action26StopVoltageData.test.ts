@@ -40,7 +40,7 @@ it('ActionType26詳細レコードをcreateGameから自然増加停止へ接続
     { id: 26_002n, detailType: 'STOP_VOLTAGE_INCREASE_DISPLAY_TIME', value: 3n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -55,7 +55,7 @@ it('ActionType26詳細レコードをcreateGameから自然増加停止へ接続
       : card,
   );
   const compiled = createGame(track, deck, 7);
-  const card = compiled.deck.find((item) => item.id === source.id);
+  const card = compiled.deck.find((item) => item.cardInstanceId === source.cardInstanceId);
   const effect = card?.effects.find((item) => item.kind === 'stop-voltage-increase');
   expect(effect).toEqual(createStopVoltageIncreaseEffect({ skillEffectId: 26_000n, details }));
   if (!card || !effect) throw new Error('ActionType26の効果が生成されませんでした。');

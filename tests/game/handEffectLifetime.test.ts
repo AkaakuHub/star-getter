@@ -20,7 +20,7 @@ it('一斉使用した常在カードの増幅を後続の子へ適用し、補�
     {
       ...initial,
       moodOffset: -150,
-      costReductions: Object.fromEntries(initial.deck.map((card) => [card.id, 100])),
+      costReductions: Object.fromEntries(initial.deck.map((card) => [card.cardInstanceId, 100])),
       ap: { ...initial.ap, currentAp: 20, maxAp: 20 },
     },
     ['aurora-ensemble', 'perennial', 'horizon'],

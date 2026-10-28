@@ -14,8 +14,8 @@ it('盤面の初期化はinstanceの識別子と定義IDを別々に保持する
   const base = game('library');
   const template = base.deck[0];
   if (!template) throw new Error('カードがありません。');
-  const card = { ...template, id: 'physical-card', cardDatasId: 'authored-card' };
-  const board = createCardDeckBoard([card], [card.id]);
+  const card = { ...template, cardInstanceId: 'physical-card', cardDatasId: 'authored-card' };
+  const board = createCardDeckBoard([card], [card.cardInstanceId]);
   expect(board.cards).toEqual([
     {
       cardInstanceId: 'physical-card',
@@ -32,7 +32,7 @@ it('同じ定義から生成したカードは定義IDを維持し、個別に�
     ...base,
     tokenCatalog: base.tokenCatalog.map((card) =>
       card.token === 'story'
-        ? { ...card, id: 'story-template', cardDatasId: 'authored-story' }
+        ? { ...card, cardInstanceId: 'story-template', cardDatasId: 'authored-story' }
         : card,
     ),
   };
@@ -41,20 +41,22 @@ it('同じ定義から生成したカードは定義IDを維持し、個別に�
   const first = cards[0];
   const second = cards[1];
   if (!first || !second) throw new Error('追加カードがありません。');
-  expect(first.id).not.toBe(second.id);
+  expect(first.cardInstanceId).not.toBe(second.cardInstanceId);
   expect(cards.map((card) => card.cardDatasId)).toEqual(['authored-story', 'authored-story']);
-  const moved = moveCardsToBoard(generated, [first.id], liveBoardState.exclusion);
+  const moved = moveCardsToBoard(generated, [first.cardInstanceId], liveBoardState.exclusion);
   expect(
-    moved.deckBoard.cards.filter((card) => cards.some((item) => item.id === card.cardInstanceId)),
+    moved.deckBoard.cards.filter((card) =>
+      cards.some((item) => item.cardInstanceId === card.cardInstanceId),
+    ),
   ).toEqual([
     {
-      cardInstanceId: first.id,
+      cardInstanceId: first.cardInstanceId,
       cardDatasId: 'authored-story',
       boardState: liveBoardState.exclusion,
       skillUseAtBoardState: liveBoardState.graveyard,
     },
     {
-      cardInstanceId: second.id,
+      cardInstanceId: second.cardInstanceId,
       cardDatasId: 'authored-story',
       boardState: liveBoardState.deck,
       skillUseAtBoardState: liveBoardState.graveyard,
@@ -62,7 +64,9 @@ it('同じ定義から生成したカードは定義IDを維持し、個別に�
   ]);
   const regenerated = addTokens(moved, 'story', 1);
   expect(regenerated.deck.at(-1)?.cardDatasId).toBe('authored-story');
-  expect(new Set(regenerated.deck.map((card) => card.id)).size).toBe(regenerated.deck.length);
+  expect(new Set(regenerated.deck.map((card) => card.cardInstanceId)).size).toBe(
+    regenerated.deck.length,
+  );
   expect(regenerated.deckBoard.cards.at(-1)?.cardDatasId).toBe('authored-story');
 });
 
@@ -74,10 +78,14 @@ it.each([1, 2])('複数ユニットのカードを手札条件14の所属%sへ�
   const state = withBoardState(
     {
       ...initial,
-      deck: initial.deck.map((card) => (card.id === source.id ? source : card)),
-      cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
+      deck: initial.deck.map((card) =>
+        card.cardInstanceId === source.cardInstanceId ? source : card,
+      ),
+      cardPool: initial.cardPool.map((card) =>
+        card.cardInstanceId === source.cardInstanceId ? source : card,
+      ),
     },
-    { hand: [source.id] },
+    { hand: [source.cardInstanceId] },
   );
   const changed = applyEffect(
     state,

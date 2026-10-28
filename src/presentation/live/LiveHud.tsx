@@ -66,7 +66,9 @@ export function LiveHud({
         >
           <CardArtwork card={special} />
           <span className="special-cost">
-            {state.specialUsed.includes(special.id) ? '使用済み' : '共鳴 ' + specialCost(special)}
+            {state.specialUsed.includes(special.cardInstanceId)
+              ? '使用済み'
+              : '共鳴 ' + specialCost(special)}
           </span>
         </button>
       )}

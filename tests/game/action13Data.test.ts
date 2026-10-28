@@ -8,7 +8,7 @@ it('ActionType13の詳細値を引き直しEffectへ接続する', () => {
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -25,7 +25,9 @@ it('ActionType13の詳細値を引き直しEffectへ接続する', () => {
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'reshuffle-skill')).toMatchObject({
     kind: 'reshuffle-skill',
     recoveryType: 1n,
@@ -38,7 +40,7 @@ it('ActionType13の回収・戻し先種別はlong比較し、int32へ折り返�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -55,7 +57,9 @@ it('ActionType13の回収・戻し先種別はlong比較し、int32へ折り返�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'reshuffle-skill')).toMatchObject({
     kind: 'reshuffle-skill',
     recoveryType: (1n << 32n) + 1n,

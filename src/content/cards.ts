@@ -1,7 +1,7 @@
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { baseCards } from './baseCards';
 
-export const defaultDeckIds = [
+export const defaultDeckCardDatasIds = [
   'horizon',
   'library-ensemble',
   'frost-echo',
@@ -14,9 +14,9 @@ export const defaultDeckIds = [
   'class',
 ];
 
-export function resolveDeck(ids: readonly string[]): readonly Card[] {
-  return ids.map((id) => {
-    const card = baseCards.find((item) => item.id === id);
+export function resolveDeck(cardDatasIds: readonly string[]): readonly Card[] {
+  return cardDatasIds.map((cardDatasId) => {
+    const card = baseCards.find((item) => item.cardDatasId === cardDatasId);
     if (!card) throw new Error('編成のカードがありません。');
     return card;
   });

@@ -31,11 +31,11 @@ it('ActionType37のSetで基礎熱気レベルが上がると手札誘発を起�
       cardPool: [card],
       voltage: { ...initial.voltage, currentVoltage: BigInt(voltageThreshold(1)) },
     },
-    [card.id],
+    [card.cardInstanceId],
   );
   const changed = applyEffect(state, { kind: 'voltage-set', amount: Number(voltageThreshold(2)) });
   expect(changed.moodOffset).toBe(1);
-  expect(changed.handUseActivationCounts[`${card.id}:test-inducer`]).toBe(1);
+  expect(changed.handUseActivationCounts[`${card.cardInstanceId}:test-inducer`]).toBe(1);
 });
 
 it('Action903は回収数を合算し、閾値ごとに子効果を上限回数まで発動する', () => {
@@ -55,9 +55,13 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
   };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
-    handEffectCardIds: [source.id],
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    handEffectCardIds: [source.cardInstanceId],
     deckBoard: { ...initial.deckBoard, deckOutCount: 2 },
   };
   let next = notifyHandHeartCollect(state, 2, applyEffect);
@@ -66,8 +70,8 @@ it('Action903は回収数を合算し、閾値ごとに子効果を上限回数�
   next = notifyHandHeartCollect(next, 3, applyEffect);
   next = notifyHandHeartCollect(next, 4, applyEffect);
   expect(next.moodOffset).toBe(2);
-  expect(next.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
-  expect(next.handUseHeartCollectionCounts[`${source.id}:test-inducer`]).toBe(4);
+  expect(next.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`]).toBe(2);
+  expect(next.handUseHeartCollectionCounts[`${source.cardInstanceId}:test-inducer`]).toBe(4);
   expect(next.deckBoard.deckOutCount).toBe(0);
 });
 
@@ -87,13 +91,21 @@ it('Action903は子効果がないとき回収数の監視を登録しない', (
   };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
-    handEffectCardIds: [source.id],
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    handEffectCardIds: [source.cardInstanceId],
   };
   const unchanged = notifyHandHeartCollect(state, 1, applyEffect);
-  expect(unchanged.handUseActivationCounts[`${source.id}:test-inducer`]).toBeUndefined();
-  expect(unchanged.handUseHeartCollectionCounts[`${source.id}:test-inducer`]).toBeUndefined();
+  expect(
+    unchanged.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`],
+  ).toBeUndefined();
+  expect(
+    unchanged.handUseHeartCollectionCounts[`${source.cardInstanceId}:test-inducer`],
+  ).toBeUndefined();
 });
 
 it('Action903の回収閾値と発動上限を参照実装のint32へ変換する', () => {
@@ -113,14 +125,18 @@ it('Action903の回収閾値と発動上限を参照実装のint32へ変換す�
   };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
-    handEffectCardIds: [source.id],
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    handEffectCardIds: [source.cardInstanceId],
   };
   const first = notifyHandHeartCollect(state, 1, applyEffect);
   const second = notifyHandHeartCollect(first, 1, applyEffect);
   expect(second.moodOffset).toBe(2);
-  expect(second.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
+  expect(second.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`]).toBe(2);
 });
 
 it('Action903は2^53超のlong閾値と発動上限をint32へ正確に変換する', () => {
@@ -140,15 +156,19 @@ it('Action903は2^53超のlong閾値と発動上限をint32へ正確に変換す
   };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
-    handEffectCardIds: [source.id],
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    handEffectCardIds: [source.cardInstanceId],
   };
   const first = notifyHandHeartCollect(state, 1, applyEffect);
   const second = notifyHandHeartCollect(first, 1, applyEffect);
   expect(first.moodOffset).toBe(1);
   expect(second.moodOffset).toBe(1);
-  expect(second.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(1);
+  expect(second.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`]).toBe(1);
 });
 
 it('Action903のUSEは発動前に発動元かつSkillType2の使用だけ反映する', () => {
@@ -167,17 +187,23 @@ it('Action903のUSEは発動前に発動元かつSkillType2の使用だけ反映
   };
   const state = {
     ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? handCard : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? handCard : card)),
-    handEffectCardIds: [source.id],
+    deck: initial.deck.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    cardPool: initial.cardPool.map((card) =>
+      card.cardInstanceId === source.cardInstanceId ? handCard : card,
+    ),
+    handEffectCardIds: [source.cardInstanceId],
   };
   const skillTypeOne = notifyHandCardBeforeUse(state, handCard, 1, applyEffect);
-  expect(skillTypeOne.handUseActivationCounts[`${source.id}:test-inducer`]).toBeUndefined();
+  expect(
+    skillTypeOne.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`],
+  ).toBeUndefined();
   const skillTypeTwo = notifyHandCardBeforeUse(state, handCard, 2, applyEffect);
   expect(skillTypeTwo.moodOffset).toBe(
     applyEffect(state, { kind: 'mood', amount: 1 }, handCard).moodOffset,
   );
-  expect(skillTypeTwo.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(1);
+  expect(skillTypeTwo.handUseActivationCounts[`${source.cardInstanceId}:test-inducer`]).toBe(1);
 });
 
 it('Action903のUSE子効果はSkillType2の本体効果より先に適用する', () => {
@@ -211,7 +237,7 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
       lastActionTick: -1_000_000,
       ap: { ...initial.ap, currentAp: initial.ap.maxAp },
     },
-    [card.id],
+    [card.cardInstanceId],
   );
   const next = act(state, { type: 'card', index: 0 });
   expect(next.ap.currentAp).toBe(initial.ap.maxAp - card.consumeAp + 1);
@@ -236,8 +262,10 @@ it.each([
         },
       ],
     };
-    const state = withHand({ ...initial, deck: [watcher], cardPool: [watcher] }, [watcher.id]);
-    const used = { ...original, id: 'used-card', skillIcon: 77, skillMainEffect: 12 };
+    const state = withHand({ ...initial, deck: [watcher], cardPool: [watcher] }, [
+      watcher.cardInstanceId,
+    ]);
+    const used = { ...original, cardInstanceId: 'used-card', skillIcon: 77, skillMainEffect: 12 };
     const next = notifyHandSkillUse(state, used, applyEffect);
     expect(next.moodOffset - state.moodOffset).toBe(expected);
   },

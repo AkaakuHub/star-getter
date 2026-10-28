@@ -6,7 +6,7 @@ const boosts = [2, 3, 4, 8, 16, 24, 32, 40, 60, 80, 100] as const;
 
 export const preparationCards: readonly Card[] = [
   {
-    id: 'rain-preparation',
+    cardInstanceId: 'rain-preparation',
     cardDatasId: 'rain-preparation',
     name: '雨の準備',
     performer: 'lumen',

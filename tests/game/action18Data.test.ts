@@ -9,7 +9,7 @@ it('ActionType18の能力別詳細値変更を手札効果へ接続する', () =
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -34,7 +34,9 @@ it('ActionType18の能力別詳細値変更を手札効果へ接続する', () =
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(
     compiled?.handPermanentEffects?.find((item) => item.kind === 'parameter-value-change'),
   ).toEqual({

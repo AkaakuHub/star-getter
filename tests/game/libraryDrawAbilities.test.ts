@@ -13,7 +13,7 @@ function token(state: GameState, kind: TokenId): Card {
 }
 
 function card(state: GameState, id: string): Card {
-  const card = state.deck.find((item) => item.id === id);
+  const card = state.deck.find((item) => item.cardInstanceId === id);
   if (!card) throw new Error('基本カードがありません。');
   return card;
 }
@@ -26,17 +26,17 @@ it('招待状自身を使用すると、生成した帆船を優先検索して�
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(1);
   expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),
+    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
   ).toEqual(['ensemble', 'ensemble']);
 });
 
 it('生成帆船自身を使用した後に折り紙を2回検索し、他カードの使用では検索しない', () => {
   let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 2);
   const source = token(state, 'ensemble');
-  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id]);
+  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.cardInstanceId]);
   const used = act(state, { type: 'card', index: 0 });
   expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),
+    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
   ).toEqual(['story', 'story']);
 });
 

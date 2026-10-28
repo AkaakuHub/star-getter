@@ -8,7 +8,7 @@ it('ActionType34/35/37〜39/42〜44の詳細レコードを各Effectへ接続す
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -64,7 +64,9 @@ it('ActionType34/35/37〜39/42〜44の詳細レコードを各Effectへ接続す
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.some((item) => item.kind === 'disable-mental-down')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'mode')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'voltage-set')).toBe(true);

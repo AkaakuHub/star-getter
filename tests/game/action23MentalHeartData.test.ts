@@ -46,7 +46,7 @@ it('ActionType23の詳細レコードをcreateGameで精神力連動効果へ接
     { id: 23_001_3n, detailType: 'MENTAL_HEART_INDUCE_DISPLAY_TIME', value: 0n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -60,7 +60,9 @@ it('ActionType23の詳細レコードをcreateGameで精神力連動効果へ接
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'mental-heart-induce');
   expect(effect).toEqual(createMentalHeartInduceEffect({ skillEffectId: 23_001n, details }));
 });
@@ -70,7 +72,7 @@ it('ActionType23のHandPermanentレコードは自動期限を止め、離脱時
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -101,9 +103,11 @@ it('ActionType23のHandPermanentレコードは自動期限を止め、離脱時
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('ActionType23の発動元カードがありません。');
   const activated = activateHandPermanentEffects(state, compiled);
   expect(activated.mentalHeartInducers[0]?.remainingSeconds).toBeNull();
-  expect(disposeHandEffects(activated, [compiled.id]).mentalHeartInducers).toHaveLength(0);
+  expect(disposeHandEffects(activated, [compiled.cardInstanceId]).mentalHeartInducers).toHaveLength(
+    0,
+  );
 });

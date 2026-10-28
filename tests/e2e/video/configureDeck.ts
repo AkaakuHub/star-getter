@@ -14,7 +14,7 @@ export async function configureDeck(page: Page, setup: GameSetup): Promise<void>
   await click(page, page.getByRole('button', { name: '編成する', exact: true }));
   const remove = page.getByRole('button', { name: /を外す$/ });
   while ((await remove.count()) > 0) await click(page, remove.first());
-  for (const id of setup.cardIds)
+  for (const id of setup.cardDatasIds)
     await click(page, page.locator(`[data-card-id="${id}"][aria-pressed]`));
   await click(page, page.getByRole('button', { name: '戻る', exact: true }));
 }

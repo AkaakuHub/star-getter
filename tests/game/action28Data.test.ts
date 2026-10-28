@@ -37,7 +37,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -78,7 +78,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
       : card,
   );
   const state = createGame(track, deck, 7, undefined, [], cardSkillVariants);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   const effect = compiled?.effects.find((item) => item.kind === 'token-card');
   expect(effect).toMatchObject({
     kind: 'token-card',

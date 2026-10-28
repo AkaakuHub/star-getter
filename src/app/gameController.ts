@@ -145,7 +145,7 @@ export class GameController {
   }
 
   get selectedCard(): Card | null {
-    return this.currentState.deck.find((card) => card.id === this.selection) ?? null;
+    return this.currentState.deck.find((card) => card.cardInstanceId === this.selection) ?? null;
   }
 
   tapCard(index: number): void {
@@ -160,11 +160,11 @@ export class GameController {
     if (this.currentState.phase !== 'playing' && this.currentState.phase !== 'paused') return;
     if (this.currentState.phase === 'playing' && this.advance().phase === 'finished') return;
     const card = cardAt(this.currentState, index);
-    if (this.selection === card.id && canUseCard(this.currentState, index)) {
+    if (this.selection === card.cardInstanceId && canUseCard(this.currentState, index)) {
       this.selection = null;
       this.command({ type: 'card', index });
     } else {
-      this.selection = card.id;
+      this.selection = card.cardInstanceId;
       this.notify();
     }
   }

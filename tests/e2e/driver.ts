@@ -160,7 +160,7 @@ export class GameDriver {
     if (!canUseSpecial(this.state, id)) return false;
     await this.think(this.timing.decisionSeconds);
     if (!canUseSpecial(this.state, id) || this.state.phase !== 'playing') return false;
-    const card = this.state.deck.find((candidate) => candidate.id === id);
+    const card = this.state.deck.find((candidate) => candidate.cardInstanceId === id);
     if (!card) throw new Error('共鳴のカードがありません。');
     const reference = { instanceId: id, name: card.name, handIndex: null };
     const opened = this.state;
@@ -213,11 +213,11 @@ export class GameDriver {
     for (const key of priority) {
       const index = available.find((candidate) => {
         const card = cardAt(this.state, candidate);
-        return (card.token ?? card.id) === key;
+        return (card.token ?? card.cardInstanceId) === key;
       });
       if (index === undefined) continue;
       const card = cardAt(this.state, index);
-      const reference = { instanceId: card.id, name: card.name, handIndex: index };
+      const reference = { instanceId: card.cardInstanceId, name: card.name, handIndex: index };
       this.recording.record(
         { kind: 'card-inspect', card: reference },
         this.state,
@@ -225,7 +225,7 @@ export class GameDriver {
         this.elapsedTicks,
       );
       await this.think(this.timing.decisionSeconds);
-      const selectedIndex = this.state.hand.indexOf(card.id);
+      const selectedIndex = this.state.hand.indexOf(card.cardInstanceId);
       if (!canUseCard(this.state, selectedIndex)) {
         this.recording.record(
           { kind: 'card-cancel', card: reference },
@@ -236,7 +236,7 @@ export class GameDriver {
         return undefined;
       }
       const selected = this.state;
-      if (this.controller.selectedCard?.id !== card.id) {
+      if (this.controller.selectedCard?.cardInstanceId !== card.cardInstanceId) {
         this.controller.tapCard(selectedIndex);
         this.recording.record(
           { kind: 'card-select', card: { ...reference, handIndex: selectedIndex } },
@@ -248,8 +248,8 @@ export class GameDriver {
       }
       await this.think(this.timing.confirmationSeconds);
       if (
-        this.controller.selectedCard?.id !== card.id ||
-        !canUseCard(this.state, this.state.hand.indexOf(card.id))
+        this.controller.selectedCard?.cardInstanceId !== card.cardInstanceId ||
+        !canUseCard(this.state, this.state.hand.indexOf(card.cardInstanceId))
       ) {
         this.recording.record(
           { kind: 'card-cancel', card: reference },
@@ -264,7 +264,11 @@ export class GameDriver {
       this.recording.record(
         {
           kind: 'card',
-          card: { instanceId: card.id, name: card.name, handIndex: before.hand.indexOf(card.id) },
+          card: {
+            instanceId: card.cardInstanceId,
+            name: card.name,
+            handIndex: before.hand.indexOf(card.cardInstanceId),
+          },
         },
         before,
         this.state,

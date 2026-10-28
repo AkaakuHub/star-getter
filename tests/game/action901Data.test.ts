@@ -12,7 +12,7 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -31,7 +31,9 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.ability893Effects?.[0]).toEqual({
     kind: 'draw-success-induce',
     sourceEffectId: '901',
@@ -48,7 +50,7 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
   const track = tracks[0];
   if (!track) throw new Error('楽曲がありません。');
   const card: Card = {
-    id: 'action-901',
+    cardInstanceId: 'action-901',
     cardDatasId: 'action-901',
     name: 'ActionType901',
     performer: 'nova',
@@ -76,13 +78,13 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
   };
   const deck = [
     card,
-    { ...card, id: 'action-901-b', actionEffects: [] },
-    { ...card, id: 'action-901-c', actionEffects: [] },
+    { ...card, cardInstanceId: 'action-901-b', actionEffects: [] },
+    { ...card, cardInstanceId: 'action-901-c', actionEffects: [] },
   ];
   const initial = createGame(track, deck, 7);
   const drawState = withBoardState(
     { ...initial, handCardStats: {}, handEffectCardIds: [], drawContext: 'idle' as const },
-    { hand: [], deck: [card.id], graveyard: [] },
+    { hand: [], deck: [card.cardInstanceId], graveyard: [] },
   );
   const drawn = fillHandToCount(drawState, 1);
   expect(drawn.moodOffset - initial.moodOffset).toBe(10);

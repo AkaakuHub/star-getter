@@ -65,7 +65,7 @@ it('ActionType24の詳細レコードと子効果をcreateGameで接続する', 
   ] as const;
   const childEffects = [{ kind: 'ap' as const, amount: 2 }];
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -80,7 +80,9 @@ it('ActionType24の詳細レコードと子効果をcreateGameで接続する', 
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'combo-induce');
   expect(effect).toEqual(
     createComboInduceEffect({ skillEffectId: 24_001n, details, effects: childEffects }),

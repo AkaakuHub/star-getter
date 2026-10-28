@@ -8,7 +8,7 @@ test.each([7, 456, 1234])(
     const driver = await GameDriver.create(
       {
         presetId: 'genesis',
-        cardIds: ['signal-maker', 'even-rhythm', 'odd-rhythm', 'camera', 'class', 'perennial'],
+        cardDatasIds: ['signal-maker', 'even-rhythm', 'odd-rhythm', 'camera', 'class', 'perennial'],
       },
       seed,
     );
@@ -28,7 +28,7 @@ test.each([7, 456, 1234])(
       const target = cycle[step];
       if (!target) throw new Error('次に使うカードがありません。');
       const used = await driver.useFirst([target, 'class', 'camera', 'perennial']);
-      if (used && (used.token ?? used.id) === target) {
+      if (used && (used.token ?? used.cardInstanceId) === target) {
         step = (step + 1) % cycle.length;
         if (step === 0) completedCycles++;
       }

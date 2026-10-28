@@ -17,7 +17,9 @@ export function withBoardState(
   targets: Readonly<Record<string, LiveSkillUseAtBoardState>> = {},
 ): GameState {
   const metadata = [
-    ...new Map([...state.cardPool, ...state.deck].map((card) => [card.id, card])).values(),
+    ...new Map(
+      [...state.cardPool, ...state.deck].map((card) => [card.cardInstanceId, card]),
+    ).values(),
   ];
   const fresh = createCardDeckBoard(metadata, state.hand);
   const oldIds = new Set(state.deckBoard.cards.map((card) => card.cardInstanceId));
@@ -29,8 +31,8 @@ export function withBoardState(
     ],
   };
   const active = new Set(currentDeckCardIds(state));
-  const metadataIds = new Set(metadata.map((card) => card.id));
-  const deckIds = new Set(state.deck.map((card) => card.id));
+  const metadataIds = new Set(metadata.map((card) => card.cardInstanceId));
+  const deckIds = new Set(state.deck.map((card) => card.cardInstanceId));
   deckBoard = {
     ...deckBoard,
     cards: deckBoard.cards
@@ -78,7 +80,8 @@ export function withBoardState(
     deck: metadata.filter((card) =>
       deckBoard.cards.some(
         (entry) =>
-          entry.cardInstanceId === card.id && entry.boardState !== liveBoardState.exclusion,
+          entry.cardInstanceId === card.cardInstanceId &&
+          entry.boardState !== liveBoardState.exclusion,
       ),
     ),
     hand: (positions.hand ?? state.hand).filter((id) => !activation?.usedCards.includes(id)),

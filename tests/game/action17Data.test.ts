@@ -9,7 +9,7 @@ it('ActionType17の条件付きコスト変更詳細を手札効果へ接続す�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -32,7 +32,9 @@ it('ActionType17の条件付きコスト変更詳細を手札効果へ接続す�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.handPermanentEffects?.find((item) => item.kind === 'skill-cost-change')).toEqual(
     {
       kind: 'skill-cost-change',

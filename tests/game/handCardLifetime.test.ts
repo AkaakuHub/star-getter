@@ -12,7 +12,7 @@ it.each([false, true])(
     const appeal = base.deck[0]?.appeal;
     if (!appeal) throw new Error('確認用カードがありません。');
     const source: Card = {
-      id: 'source',
+      cardInstanceId: 'source',
       cardDatasId: 'source',
       name: '使用元',
       performer: 'nova',
@@ -37,7 +37,7 @@ it.each([false, true])(
     };
     const drawn: Card = {
       ...source,
-      id: 'drawn',
+      cardInstanceId: 'drawn',
       cardDatasId: 'drawn',
       name: '補充',
       handPermanentEffects: [],
@@ -59,7 +59,7 @@ it.each([false, true])(
         {},
         { ['source']: { skillUseAtBoardState: 3 }, ['drawn']: { skillUseAtBoardState: 3 } },
       ),
-      [source.id],
+      [source.cardInstanceId],
     );
     const active = activateHandPermanentEffects(hand, source);
     expect(active.action52Buffs).toHaveLength(1);

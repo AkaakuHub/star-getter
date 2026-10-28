@@ -75,7 +75,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
 
   const absorption = {
     id: 1,
-    sourceId: source.id,
+    sourceId: source.cardInstanceId,
     hasAbsorbLimit: false,
     isAbsoluteAdd: false,
     periodType: 3 as const,

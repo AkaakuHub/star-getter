@@ -51,19 +51,24 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
   const inProxy = withBoardState(
     { ...active },
     {
-      hand: active.hand.filter((id) => id !== source.id),
-      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.id),
-      graveyard: boardCardIds(active, liveBoardState.graveyard).filter((id) => id !== source.id),
-      proxy: [...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy), source.id],
+      hand: active.hand.filter((id) => id !== source.cardInstanceId),
+      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.cardInstanceId),
+      graveyard: boardCardIds(active, liveBoardState.graveyard).filter(
+        (id) => id !== source.cardInstanceId,
+      ),
+      proxy: [
+        ...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy),
+        source.cardInstanceId,
+      ],
     },
-    { [source.id]: { skillUseAtBoardState: 3 as const } },
+    { [source.cardInstanceId]: { skillUseAtBoardState: 3 as const } },
   );
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
   expect(expired.proxyAbsorptions).toHaveLength(0);
   expect(liveDeckBoardCardInstanceIds(expired.deckBoard, liveBoardState.proxy)).not.toContain(
-    source.id,
+    source.cardInstanceId,
   );
-  expect(boardCardIds(expired, liveBoardState.graveyard)).toContain(source.id);
+  expect(boardCardIds(expired, liveBoardState.graveyard)).toContain(source.cardInstanceId);
   expect(expired.boosts).toHaveLength(inProxy.boosts.length + 1);
   expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
 });
@@ -108,12 +113,17 @@ it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を�
   const inProxy = withBoardState(
     { ...active },
     {
-      hand: active.hand.filter((id) => id !== source.id),
-      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.id),
-      graveyard: boardCardIds(active, liveBoardState.graveyard).filter((id) => id !== source.id),
-      proxy: [...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy), source.id],
+      hand: active.hand.filter((id) => id !== source.cardInstanceId),
+      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.cardInstanceId),
+      graveyard: boardCardIds(active, liveBoardState.graveyard).filter(
+        (id) => id !== source.cardInstanceId,
+      ),
+      proxy: [
+        ...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy),
+        source.cardInstanceId,
+      ],
     },
-    { [source.id]: { skillUseAtBoardState: 3 as const } },
+    { [source.cardInstanceId]: { skillUseAtBoardState: 3 as const } },
   );
 
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);

@@ -39,11 +39,11 @@ it('開花中の追加SPは通常APを固定したまま専用値で支払う', 
 });
 
 it('共鳴はセンターの通常効果と基本カードの追加効果だけを選択する', () => {
-  expect(specialCards(game('library')).map((card) => card.id)).toEqual([
+  expect(specialCards(game('library')).map((card) => card.cardInstanceId)).toEqual([
     'library-pages',
     'library-ensemble',
   ]);
-  expect(specialCards(game()).map((card) => card.id)).toEqual([
+  expect(specialCards(game()).map((card) => card.cardInstanceId)).toEqual([
     'horizon',
     'library-ensemble',
     'frost-pulse',
@@ -86,7 +86,7 @@ it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用
     );
     state = act(state, { type: 'card', index: 0 });
     expect(state.cardUseCounts.class).toBe(count);
-    expect(state.deck.some((card) => card.id === 'class')).toBe(count < 3);
+    expect(state.deck.some((card) => card.cardInstanceId === 'class')).toBe(count < 3);
     expect(state.specialUsed).toEqual(
       count < 3 ? ['library-pages', 'library-ensemble'] : ['library-ensemble'],
     );
@@ -100,39 +100,48 @@ it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用
 
 it('共鳴の再使用は種別・メンバーを絞り、追加共鳴とトークン共鳴を区別する', () => {
   const initial = game('library');
-  const normal = initial.deck.find((card) => card.id === 'library-pages');
-  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  const normal = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
+  const extra = initial.deck.find((card) => card.cardInstanceId === 'library-ensemble');
   if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
   const otherExtra: Card = {
     ...extra,
-    id: 'extra-other-member',
+    cardInstanceId: 'extra-other-member',
     charactersId: 1041,
     unitIds: [2],
   };
-  const tokenSpecial: Card = { ...normal, id: 'token-special', token: 'story' };
+  const tokenSpecial: Card = { ...normal, cardInstanceId: 'token-special', token: 'story' };
   const deck = [...initial.deck, otherExtra, tokenSpecial];
   const state = {
     ...initial,
     deck,
     cardPool: deck,
-    specialUsed: [normal.id, extra.id, otherExtra.id, tokenSpecial.id],
+    specialUsed: [
+      normal.cardInstanceId,
+      extra.cardInstanceId,
+      otherExtra.cardInstanceId,
+      tokenSpecial.cardInstanceId,
+    ],
   };
   const next = applyEffect(
     state,
     { kind: 'reset-special', scope: 'extra', target: { kind: 'member', member: 1021 } },
-    initial.deck.find((card) => card.id === 'library-invitation'),
+    initial.deck.find((card) => card.cardInstanceId === 'library-invitation'),
   );
-  expect(next.specialUsed).toEqual([normal.id, otherExtra.id, tokenSpecial.id]);
+  expect(next.specialUsed).toEqual([
+    normal.cardInstanceId,
+    otherExtra.cardInstanceId,
+    tokenSpecial.cardInstanceId,
+  ]);
 });
 
 it('全ての共鳴を戻すときも先頭以外の通常共鳴を対象に含めない', () => {
   const initial = game('library');
-  const normal = initial.deck.find((card) => card.id === 'library-pages');
-  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  const normal = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
+  const extra = initial.deck.find((card) => card.cardInstanceId === 'library-ensemble');
   if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
   const otherNormal: Card = {
     ...normal,
-    id: 'normal-other-member',
+    cardInstanceId: 'normal-other-member',
     charactersId: 1041,
     unitIds: [2],
   };
@@ -141,14 +150,14 @@ it('全ての共鳴を戻すときも先頭以外の通常共鳴を対象に含�
     ...initial,
     deck,
     cardPool: deck,
-    specialUsed: [normal.id, extra.id, otherNormal.id],
+    specialUsed: [normal.cardInstanceId, extra.cardInstanceId, otherNormal.cardInstanceId],
   };
   const next = applyEffect(
     state,
     { kind: 'reset-special', scope: 'all', target: { kind: 'all' } },
-    initial.deck.find((card) => card.id === 'library-invitation'),
+    initial.deck.find((card) => card.cardInstanceId === 'library-invitation'),
   );
-  expect(next.specialUsed).toEqual([otherNormal.id]);
+  expect(next.specialUsed).toEqual([otherNormal.cardInstanceId]);
 });
 
 it('共鳴を使ったカード自身は再使用対象から除き、他の対象共鳴を戻す', () => {
@@ -159,7 +168,7 @@ it('共鳴を使ったカード自身は再使用対象から除き、他の対�
     currentSkillType: 1,
     specialUsed: ['library-pages', 'library-ensemble'],
   };
-  const source = deck.find((card) => card.id === 'library-pages');
+  const source = deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const next = applyEffect(
     state,
@@ -171,7 +180,7 @@ it('共鳴を使ったカード自身は再使用対象から除き、他の対�
 
 it('通常スキルからの共鳴再使用では発動元カード自身も対象にする', () => {
   const initial = game('library');
-  const source = initial.deck.find((card) => card.id === 'library-pages');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
   if (!source) throw new Error('発動元カードがありません。');
   const state = {
     ...initial,
@@ -190,28 +199,33 @@ it('通常スキルからの共鳴再使用では発動元カード自身も対�
 
 it('共鳴の再使用はユニットと発動元以外の対象を適用する', () => {
   const initial = game('library');
-  const normal = initial.deck.find((card) => card.id === 'library-pages');
-  const extra = initial.deck.find((card) => card.id === 'library-ensemble');
+  const normal = initial.deck.find((card) => card.cardInstanceId === 'library-pages');
+  const extra = initial.deck.find((card) => card.cardInstanceId === 'library-ensemble');
   if (!normal?.special || !extra?.special) throw new Error('共鳴カードがありません。');
-  const otherExtra: Card = { ...extra, id: 'extra-other-member', charactersId: 1041, unitIds: [2] };
+  const otherExtra: Card = {
+    ...extra,
+    cardInstanceId: 'extra-other-member',
+    charactersId: 1041,
+    unitIds: [2],
+  };
   const deck = [...initial.deck, otherExtra];
   const state = {
     ...initial,
     deck,
     cardPool: deck,
-    specialUsed: [normal.id, extra.id, otherExtra.id],
+    specialUsed: [normal.cardInstanceId, extra.cardInstanceId, otherExtra.cardInstanceId],
   };
   const unitReset = applyEffect(
     state,
     { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 1 } },
-    initial.deck.find((card) => card.id === 'library-invitation'),
+    initial.deck.find((card) => card.cardInstanceId === 'library-invitation'),
   );
-  expect(unitReset.specialUsed).toEqual([otherExtra.id]);
+  expect(unitReset.specialUsed).toEqual([otherExtra.cardInstanceId]);
 
   const otherReset = applyEffect(
     state,
     { kind: 'reset-special', scope: 'all', target: { kind: 'others' } },
     normal,
   );
-  expect(otherReset.specialUsed).toEqual([normal.id]);
+  expect(otherReset.specialUsed).toEqual([normal.cardInstanceId]);
 });

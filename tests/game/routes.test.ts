@@ -20,8 +20,8 @@ describe('固定プリセット', () => {
     expect(routes.library.deck).toHaveLength(6);
     expect(routes.genesis.deck).toHaveLength(10);
     for (const route of Object.values(routes)) expect(() => validateDeck(route.deck)).not.toThrow();
-    expect(routes.library.deck.map((card) => card.id)).not.toEqual(
-      routes.genesis.deck.map((card) => card.id),
+    expect(routes.library.deck.map((card) => card.cardInstanceId)).not.toEqual(
+      routes.genesis.deck.map((card) => card.cardInstanceId),
     );
   });
 

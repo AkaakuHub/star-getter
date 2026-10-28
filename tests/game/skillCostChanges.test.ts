@@ -13,9 +13,13 @@ import { game } from './support/game';
 
 it('条件1から15までのコスト変化を対応する現在値から計算する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
-  const other = initial.deck.find((card) => card.id === 'rain-preparation');
-  const poolCard = initial.deck.find((card) => card.id !== source?.id && card.id !== other?.id);
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
+  const other = initial.deck.find((card) => card.cardInstanceId === 'rain-preparation');
+  const poolCard = initial.deck.find(
+    (card) =>
+      card.cardInstanceId !== source?.cardInstanceId &&
+      card.cardInstanceId !== other?.cardInstanceId,
+  );
   if (!source || !other || !poolCard) throw new Error('検証用カードがありません。');
   const cards = [
     {
@@ -43,14 +47,14 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
       deck: cards,
       cardPool: [...cards, poolCard],
       handCardStats: {
-        [source.id]: {
+        [source.cardInstanceId]: {
           isActive: true,
           initialSectionIndex: 0,
           sectionCount: 0,
           skillUseCountsByMember: { 1030: 2 },
           skillUseCountsByMainEffect: { 900: 2 },
         },
-        [other.id]: {
+        [other.cardInstanceId]: {
           isActive: true,
           initialSectionIndex: 0,
           sectionCount: 0,
@@ -58,12 +62,12 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
           skillUseCountsByMainEffect: {},
         },
       },
-      cardUseCounts: { [source.id]: 2, [other.id]: 2 },
+      cardUseCounts: { [source.cardInstanceId]: 2, [other.cardInstanceId]: 2 },
       moodOffset: 12,
       boosts: [{ percent: 20, untilTick: 999999 }],
       mental: { ...initial.mental, currentMental: 50 },
     },
-    { hand: cards.map((card) => card.id) },
+    { hand: cards.map((card) => card.cardInstanceId) },
   );
   const expected = [10, 20, 10, 5, 0, 20, 20, 10, 200, 10, 10, 0, 20, 10, 10];
   for (let index = 0; index < expected.length; index++) {
@@ -98,7 +102,7 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
 
 it('セクション期限のスキルコスト変化を期限後に除去する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const state = applyEffect(
     initial,
@@ -127,7 +131,7 @@ it('Action17の条件4は最大元気に対する整数元気割合を使う', (
     maximumMental: 200,
     mental: { ...baseState.mental, currentMental: 100 },
   };
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const changed = applyEffect(
     initial,
@@ -158,7 +162,7 @@ it('Action17の条件9は参照実装のfloat精度に丸めたBonusScoreValue�
       },
     ],
   };
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const changed = applyEffect(
     initial,
@@ -176,14 +180,14 @@ it('Action17の条件9は参照実装のfloat精度に丸めたBonusScoreValue�
 
 it('Action17のメンバー使用数は使用カードが手札を離れた後も手札統計に残す', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
-  const used = initial.deck.find((card) => card.id === 'rain-preparation');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
+  const used = initial.deck.find((card) => card.cardInstanceId === 'rain-preparation');
   if (!source || !used) throw new Error('検証用カードがありません。');
   const hand = withBoardState(
     { ...initial, handEffectCardIds: [], handCardStats: {} },
-    { hand: [source.id] },
+    { hand: [source.cardInstanceId] },
   );
-  const withStats = initializeHandCardStats(hand, [source.id]);
+  const withStats = initializeHandCardStats(hand, [source.cardInstanceId]);
   const withCostChange = applyEffect(
     withStats,
     {
@@ -197,14 +201,16 @@ it('Action17のメンバー使用数は使用カードが手札を離れた後�
     source,
   );
   const afterUse = notifyHandSkillUse(withCostChange, used, applyEffect);
-  expect(afterUse.hand).toEqual([source.id]);
-  expect(afterUse.handCardStats[source.id]?.skillUseCountsByMember[used.charactersId]).toBe(1);
+  expect(afterUse.hand).toEqual([source.cardInstanceId]);
+  expect(
+    afterUse.handCardStats[source.cardInstanceId]?.skillUseCountsByMember[used.charactersId],
+  ).toBe(1);
   expect(cardCost(afterUse, source) - cardCost(withCostChange, source)).toBe(10);
 });
 
 it('Action17は負数をActionType52で増幅してint32化する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const withAction52 = applyEffect(initial, {
     kind: 'skill-boost',
@@ -230,7 +236,7 @@ it('Action17は負数をActionType52で増幅してint32化する', () => {
 
 it('Action17の解除キーで通常効果を解除し、InvocationType 0x388は期限とDeactivator解除を無視する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('検証用カードがありません。');
   const normal = applyEffect(
     initial,
@@ -275,9 +281,9 @@ it('Action17の解除キーで通常効果を解除し、InvocationType 0x388は
 
 it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変更する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   const targetId = initial.hand[0];
-  const target = initial.deck.find((card) => card.id === targetId);
+  const target = initial.deck.find((card) => card.cardInstanceId === targetId);
   if (!source || !target) throw new Error('検証用カードがありません。');
   const changed = applyEffect(
     initial,
@@ -290,20 +296,20 @@ it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変�
     },
     source,
   );
-  expect(changed.onceSkillCostChanges[target.id]).toBe(2);
+  expect(changed.onceSkillCostChanges[target.cardInstanceId]).toBe(2);
   expect(cardCost(changed, target)).toBe(cardCost(initial, target) + 2);
   const used = act(
     { ...changed, ap: { ...changed.ap, currentAp: 1000 } },
-    { type: 'card', index: initial.hand.indexOf(target.id) },
+    { type: 'card', index: initial.hand.indexOf(target.cardInstanceId) },
   );
-  expect(used.onceSkillCostChanges[target.id]).toBeUndefined();
+  expect(used.onceSkillCostChanges[target.cardInstanceId]).toBeUndefined();
 });
 
 it('ActionType29は山札上の対象カードだけに適用し、負数をActionType52で増幅する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   const targetId = boardCardIds(initial, liveBoardState.deck)[0];
-  const target = initial.deck.find((card) => card.id === targetId);
+  const target = initial.deck.find((card) => card.cardInstanceId === targetId);
   if (!source || !target) throw new Error('検証用カードがありません。');
   const boosted = applyEffect(initial, {
     kind: 'skill-boost',
@@ -317,7 +323,7 @@ it('ActionType29は山札上の対象カードだけに適用し、負数をActi
     { kind: 'deck-skill-cost-change', num: -20_000, targetRange: 3, target: 'all', targetId: 0 },
     source,
   );
-  expect(changed.onceSkillCostChanges[target.id]).toBe(-4);
+  expect(changed.onceSkillCostChanges[target.cardInstanceId]).toBe(-4);
   expect(changed.onceSkillCostChanges[initial.hand[0] ?? '']).toBeUndefined();
   expect(changed.action52Buffs).toHaveLength(0);
 });
@@ -326,7 +332,7 @@ it('ActionType29の全範囲にはProxy中のカードも含める', () => {
   const initial = game();
   const target = initial.deck[0];
   if (!target) throw new Error('対象カードがありません。');
-  const proxyState = withBoardState({ ...initial }, { proxy: [target.id] });
+  const proxyState = withBoardState({ ...initial }, { proxy: [target.cardInstanceId] });
   const changed = applyEffect(proxyState, {
     kind: 'deck-skill-cost-change',
     num: 10_000,
@@ -335,5 +341,5 @@ it('ActionType29の全範囲にはProxy中のカードも含める', () => {
     targetId: 0,
   });
 
-  expect(changed.onceSkillCostChanges[target.id]).toBe(1);
+  expect(changed.onceSkillCostChanges[target.cardInstanceId]).toBe(1);
 });

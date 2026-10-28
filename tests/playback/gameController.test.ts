@@ -13,7 +13,7 @@ describe('ゲーム時計とゲームの同期', () => {
     const initial = controller.state;
     const index = initial.hand.findIndex((_, slot) => canUseCard(initial, slot));
     controller.tapCard(index);
-    expect(controller.selectedCard?.id).toBe(initial.hand[index]);
+    expect(controller.selectedCard?.cardInstanceId).toBe(initial.hand[index]);
     expect(controller.state.ap.currentAp).toBe(initial.ap.currentAp);
     expect(controller.state.stats.cardsUsed).toBe(0);
     controller.tapCard(index);
@@ -27,7 +27,7 @@ describe('ゲーム時計とゲームの同期', () => {
     await controller.togglePause();
     controller.tapCard(index);
     controller.tapCard(index);
-    expect(controller.selectedCard?.id).toBe(controller.state.hand[index]);
+    expect(controller.selectedCard?.cardInstanceId).toBe(controller.state.hand[index]);
     expect(controller.state.stats.cardsUsed).toBe(0);
     await controller.togglePause();
     controller.activateSelected();

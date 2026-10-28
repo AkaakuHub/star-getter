@@ -43,7 +43,7 @@ it('対象メンバーのトークンだけを順序付きで追加し、同じ�
   const withToken = activateSpecialAppealToken(state, effect);
   expect(withToken.specialAppealTokens.map((token) => token.recordId)).toEqual([2, 1]);
   expect(activateSpecialAppealToken(withToken, effect).specialAppealTokens).toHaveLength(2);
-  expect(withToken.specialAppealTokens[0]?.card.id).toBe('202');
+  expect(withToken.specialAppealTokens[0]?.card.cardInstanceId).toBe('202');
 });
 
 it('初期クールタイムを音楽GenerationsIdと一致する既存トークンから引き継ぐ', () => {
@@ -99,7 +99,7 @@ it('トークン共鳴を使うと同じTokenSetIdのクールタイムだけ開
     targetMember: 1021 as const,
     card: {
       ...base,
-      id: '201',
+      cardInstanceId: '201',
       cardDatasId: '201',
       charactersId: 0 as const,
       special: { ...base.special, effects: [] },

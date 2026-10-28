@@ -12,7 +12,7 @@ import { withHand } from './support/game';
 
 const setup = {
   presetId: 'genesis',
-  cardIds: ['signal-maker', 'even-rhythm', 'odd-rhythm', 'camera', 'class', 'perennial'],
+  cardDatasIds: ['signal-maker', 'even-rhythm', 'odd-rhythm', 'camera', 'class', 'perennial'],
 } as const;
 
 function initial(): GameState {
@@ -41,14 +41,16 @@ test('信号旗の生成と除外で偶数→奇数→偶数を操作して、�
   const odd = use(generated, 'odd-rhythm');
   expect(odd.stats.cardsUsed).toBe(3);
   expect(odd.sectionBeatHeartBonus).toBeGreaterThan(generated.sectionBeatHeartBonus);
-  const returned = use(odd, pennant.id);
+  const returned = use(odd, pennant.cardInstanceId);
   expect(returned.deck).toHaveLength(6);
-  expect(returned.cardPool.some((card) => card.id === pennant.id)).toBe(true);
+  expect(returned.cardPool.some((card) => card.cardInstanceId === pennant.cardInstanceId)).toBe(
+    true,
+  );
   expect([
     ...returned.hand,
     ...boardCardIds(returned, liveBoardState.deck),
     ...boardCardIds(returned, liveBoardState.graveyard),
-  ]).not.toContain(pennant.id);
+  ]).not.toContain(pennant.cardInstanceId);
   const repeated = use(returned, 'even-rhythm');
   expect(repeated.boosts.length).toBeGreaterThan(returned.boosts.length);
   expect(repeated.genesis.effects).toHaveLength(0);
@@ -73,7 +75,7 @@ test('三拍子を手札に残した回収は奇数枚でだけきらめきを�
   expect(heartCount(odd)).toBeGreaterThanOrEqual(500000);
   const pennant = odd.deck.find((card) => card.token === 'pennant');
   if (!pennant) throw new Error('信号旗がありません。');
-  const returned = use(odd, pennant.id);
+  const returned = use(odd, pennant.cardInstanceId);
   const stopped = collectHearts(addHearts(withHand(returned, ['odd-rhythm']), 500000));
   expect(heartCount(stopped)).toBe(0);
 });

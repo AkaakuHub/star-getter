@@ -6,8 +6,8 @@ import { game } from './support/game';
 
 it('ActionType32は対象カードの元気回復を増幅し、指定回数で解除する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
-  const target = initial.deck.find((card) => card.id === 'rain-preparation');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
+  const target = initial.deck.find((card) => card.cardInstanceId === 'rain-preparation');
   if (!source || !target) throw new Error('検証用カードがありません。');
   const clean = {
     ...initial,
@@ -46,7 +46,7 @@ it('ActionType32は対象カードの元気回復を増幅し、指定回数で�
 
 it('ActionType32はミリ秒・パート期限とInvocationType抑止を処理する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   const nextSection = initial.track.sections[1];
   if (!source || !nextSection) throw new Error('検証用データがありません。');
   const effect = {
@@ -75,7 +75,7 @@ it('ActionType32はミリ秒・パート期限とInvocationType抑止を処理�
 
 it('ActionType32の登録値にActionType52を適用する', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const action52 = applyEffect(
     initial,
@@ -107,7 +107,7 @@ it('ActionType32の登録値にActionType52を適用する', () => {
 
 it('ActionType32は小数の追加率を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const percentages = [6_000, -6_000, 5_000, 15_000].map((num) => {
     const changed = applyEffect(

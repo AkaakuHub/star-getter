@@ -23,7 +23,7 @@ function rainState(): GameState {
 }
 
 function applyRainSkill(state: GameState): GameState {
-  const card = state.deck.find((item) => item.id === 'frost-echo');
+  const card = state.deck.find((item) => item.cardInstanceId === 'frost-echo');
   if (!card) throw new Error('雨音のカードがありません。');
   return card.effects.reduce((next, effect) => applyEffect(next, effect, card), state);
 }
@@ -70,7 +70,7 @@ it('開花中の50万回収は通常の元気と熱気が未達でも枝と検�
 
 it('熱気増幅の対象は追加メンバーを含む同じユニット全員になる', () => {
   const state = game();
-  const pulse = state.deck.find((card) => card.id === 'frost-pulse');
+  const pulse = state.deck.find((card) => card.cardInstanceId === 'frost-pulse');
   if (!pulse) throw new Error('凍空の鼓動がありません。');
   const next = pulse.effects.reduce((current, effect) => applyEffect(current, effect, pulse), {
     ...state,

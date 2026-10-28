@@ -177,7 +177,12 @@ it('ActionType28のカード枚数にActionType18の詳細値係数を適用す�
     ...initial,
     tokenCatalog: [],
     parameterValueFactors: [
-      { cardId: source.id, sourceEffectId: '18', targetDetailId: countDetailId, factor: 2 },
+      {
+        cardId: source.cardInstanceId,
+        sourceEffectId: '18',
+        targetDetailId: countDetailId,
+        factor: 2,
+      },
     ],
   };
 

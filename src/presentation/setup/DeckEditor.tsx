@@ -19,15 +19,15 @@ export function DeckEditor({
   return (
     <main className="setup-page">
       <header className="setup-heading">
-        <h1>編成{setup.cardIds.length}枚</h1>
+        <h1>編成{setup.cardDatasIds.length}枚</h1>
         <button className="button quiet" type="button" onClick={onBack}>
           <ArrowLeft size={18} aria-hidden="true" />
           戻る
         </button>
       </header>
       <ol className="setup-selected">
-        {resolveDeck(setup.cardIds).map((card, index) => (
-          <li key={card.id}>
+        {resolveDeck(setup.cardDatasIds).map((card, index) => (
+          <li key={card.cardDatasId}>
             <button
               className={'card-browser-card color-' + card.performer}
               type="button"
@@ -43,16 +43,16 @@ export function DeckEditor({
                 type="button"
                 disabled={index === 0}
                 aria-label={card.name + 'を上へ'}
-                onClick={() => onChange(moveSetupCard(setup, card.id, -1))}
+                onClick={() => onChange(moveSetupCard(setup, card.cardDatasId, -1))}
               >
                 <ArrowUp size={18} aria-hidden="true" />
               </button>
               <button
                 className="icon-button"
                 type="button"
-                disabled={index === setup.cardIds.length - 1}
+                disabled={index === setup.cardDatasIds.length - 1}
                 aria-label={card.name + 'を下へ'}
-                onClick={() => onChange(moveSetupCard(setup, card.id, 1))}
+                onClick={() => onChange(moveSetupCard(setup, card.cardDatasId, 1))}
               >
                 <ArrowDown size={18} aria-hidden="true" />
               </button>
@@ -60,7 +60,7 @@ export function DeckEditor({
                 className="icon-button"
                 type="button"
                 aria-label={card.name + 'を外す'}
-                onClick={() => onChange(toggleSetupCard(setup, card.id))}
+                onClick={() => onChange(toggleSetupCard(setup, card.cardDatasId))}
               >
                 <Minus size={18} aria-hidden="true" />
               </button>
@@ -72,17 +72,17 @@ export function DeckEditor({
         <h2>カード一覧</h2>
         <div className="setup-deck-grid">
           {baseCards.map((card) => (
-            <div key={card.id} className="setup-catalog-card">
+            <div key={card.cardDatasId} className="setup-catalog-card">
               <button
                 type="button"
                 className={'card-browser-card color-' + card.performer}
                 aria-label={card.name}
-                data-card-id={card.id}
-                aria-pressed={setup.cardIds.includes(card.id)}
-                onClick={() => onChange(toggleSetupCard(setup, card.id))}
+                data-card-id={card.cardDatasId}
+                aria-pressed={setup.cardDatasIds.includes(card.cardDatasId)}
+                onClick={() => onChange(toggleSetupCard(setup, card.cardDatasId))}
               >
                 <HandCardFace card={card} consumeAp={card.consumeAp} />
-                {setup.cardIds.includes(card.id) && (
+                {setup.cardDatasIds.includes(card.cardDatasId) && (
                   <Check className="setup-card-check" size={22} aria-hidden="true" />
                 )}
               </button>

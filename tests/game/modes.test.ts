@@ -95,7 +95,9 @@ describe('モード切替と切替時効果', () => {
         },
       },
     } as const;
-    const cards = initial.deck.map((item) => (item.id === card.id ? card : item));
+    const cards = initial.deck.map((item) =>
+      item.cardInstanceId === card.cardInstanceId ? card : item,
+    );
     const state = withBoardState(
       {
         ...initial,
@@ -105,7 +107,7 @@ describe('モード切替と切替時効果', () => {
         phase: 'playing' as const,
         ap: { ...initial.ap, currentAp: 100 },
       },
-      { hand: [card.id] },
+      { hand: [card.cardInstanceId] },
     );
     const enabled = applyEffect(state, { kind: 'mode', modeId: 88n, change: 'on' });
     expect(cardCost(state, card)).toBe(1);
@@ -135,21 +137,27 @@ describe('モード切替と切替時効果', () => {
         },
       },
     } as const;
-    const deck = initial.deck.map((item) => (item.id === card.id ? card : item));
+    const deck = initial.deck.map((item) =>
+      item.cardInstanceId === card.cardInstanceId ? card : item,
+    );
     const prepared = withBoardState(
-      { ...initial, deck, cardPool: deck, handEffectCardIds: [card.id] },
-      { hand: [card.id] },
+      { ...initial, deck, cardPool: deck, handEffectCardIds: [card.cardInstanceId] },
+      { hand: [card.cardInstanceId] },
     );
     const off = activateModeAbilityEffects(prepared, card, applyEffect);
     expect(off.handLimit).toBe(initial.handLimit + 1);
     const on = applyEffect(off, { kind: 'mode', modeId: 1n, change: 'on' });
     expect(on.handLimit).toBe(initial.handLimit + 2);
-    const disposed = disposeHandEffects(on, [card.id]);
+    const disposed = disposeHandEffects(on, [card.cardInstanceId]);
     expect(disposed.handLimit).toBe(initial.handLimit);
     const playing = act(
       withBoardState(
         { ...on, phase: 'playing', ap: { ...on.ap, currentAp: 20 } },
-        { deck: deck.filter((item) => item.id !== card.id).map((item) => item.id) },
+        {
+          deck: deck
+            .filter((item) => item.cardInstanceId !== card.cardInstanceId)
+            .map((item) => item.cardInstanceId),
+        },
       ),
       { type: 'card', index: 0 },
     );
@@ -259,9 +267,9 @@ describe('モード切替と切替時効果', () => {
     const first = original.deck[0];
     if (!first) throw new Error('カードがありません。');
     const cards: readonly Card[] = [
-      { ...first, id: 'invoke', effects: [{ kind: 'use-hand' }] },
-      { ...first, id: 'enable', effects: [on] },
-      { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
+      { ...first, cardInstanceId: 'invoke', effects: [{ kind: 'use-hand' }] },
+      { ...first, cardInstanceId: 'enable', effects: [on] },
+      { ...first, cardInstanceId: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
       withBoardState(
@@ -273,7 +281,7 @@ describe('モード切替と切替時効果', () => {
     const state = act(
       withHand(
         prepared,
-        cards.map((card) => card.id),
+        cards.map((card) => card.cardInstanceId),
       ),
       { type: 'card', index: 0 },
     );

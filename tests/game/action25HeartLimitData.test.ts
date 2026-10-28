@@ -53,7 +53,7 @@ it('ActionType25の詳細レコードをcreateGameでハート上限効果へ接
     { id: 25_001_3n, detailType: 'CHANGE_HEART_LIMIT_DISPLAY_TIME_TYPE', targetMood: 0, value: 3n },
   ] as const;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -67,7 +67,9 @@ it('ActionType25の詳細レコードをcreateGameでハート上限効果へ接
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   const effect = compiled?.effects.find((item) => item.kind === 'heart-limit-change');
   expect(effect).toEqual(createHeartLimitChangeEffect({ skillEffectId: 25_001n, details }));
 });
@@ -91,7 +93,12 @@ it('ActionType25はActionType18による計算種別の詳細値補正を適用�
   const state = {
     ...initial,
     parameterValueFactors: [
-      { cardId: card.id, sourceEffectId: 'parameter-value', targetDetailId: detailId, factor: 2 },
+      {
+        cardId: card.cardInstanceId,
+        sourceEffectId: 'parameter-value',
+        targetDetailId: detailId,
+        factor: 2,
+      },
     ],
   };
 

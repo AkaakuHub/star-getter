@@ -1,6 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { tracks } from '../../src/content/tracks';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
@@ -8,7 +8,7 @@ import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation
 function game(count: number) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  const state = act(createGame(track, resolveDeck(defaultDeckIds), 7), { type: 'start' });
+  const state = act(createGame(track, resolveDeck(defaultDeckCardDatasIds), 7), { type: 'start' });
   return addHearts(
     {
       ...state,

@@ -1,7 +1,7 @@
 import { expect, it } from 'vite-plus/test';
 import { projectMoodStepPoints } from '@akaakuhub/suku-sute-core/game/live/moodGraph';
 import { tracks } from '../../src/content/tracks';
-import { resolveDeck, defaultDeckIds } from '../../src/content/cards';
+import { resolveDeck, defaultDeckCardDatasIds } from '../../src/content/cards';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
 
 it('空模様の変更時刻まで値を保ち、−100から100へ垂直に切り替える', () => {
@@ -30,7 +30,7 @@ it('楽曲の空模様値が範囲外なら開始を拒否する', () => {
     ...track,
     moodKeys: [{ songTimeSeconds: 0, keyValue: 101 }],
   };
-  expect(() => createGame(invalid, resolveDeck(defaultDeckIds), 7)).toThrow(
+  expect(() => createGame(invalid, resolveDeck(defaultDeckCardDatasIds), 7)).toThrow(
     '空模様の設定が正しくありません。',
   );
 });

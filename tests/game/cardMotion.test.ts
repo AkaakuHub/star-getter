@@ -1,11 +1,11 @@
 import { expect, it } from 'vite-plus/test';
-import { defaultDeckIds, resolveDeck } from '../../src/content/cards';
+import { defaultDeckCardDatasIds, resolveDeck } from '../../src/content/cards';
 import type { CardUse } from '@akaakuhub/suku-sute-core/game/model';
 import { cardMotion } from '../../src/presentation/cards/cardMotion';
 import { handGeometry } from '../../src/presentation/handLayout';
 
 it('使用位置から0.25秒で中央へ移動し、発動後の0.25秒でフェードする', () => {
-  const card = resolveDeck(defaultDeckIds)[0];
+  const card = resolveDeck(defaultDeckCardDatasIds)[0];
   if (!card) throw new Error('カードがありません。');
   const action: CardUse = { key: 1, tick: 0, card, consumeAp: 3, handIndex: 0, handCount: 5 };
   const start = handGeometry(0, 5);

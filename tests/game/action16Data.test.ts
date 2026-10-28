@@ -9,7 +9,7 @@ it('ActionType16の対象・回数・期限詳細をきらめき増幅Effectへ�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -30,7 +30,9 @@ it('ActionType16の対象・回数・期限詳細をきらめき増幅Effectへ�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'heart-boost')).toMatchObject({
     kind: 'heart-boost',
     percent: 2.5,

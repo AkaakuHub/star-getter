@@ -7,7 +7,7 @@ const appeal = { smile: 1, pure: 1, cool: 1 };
 
 export const routeTokens: readonly Card[] = [
   {
-    id: 'pennant',
+    cardInstanceId: 'pennant',
     cardDatasId: 'pennant',
     name: tokenNames.pennant,
     performer: 'tetra',
@@ -24,7 +24,7 @@ export const routeTokens: readonly Card[] = [
     effects: [whenDeckParity('odd', [{ kind: 'ap', amount: 10 }])],
   },
   {
-    id: 'ensemble',
+    cardInstanceId: 'ensemble',
     cardDatasId: 'ensemble',
     name: tokenNames.ensemble,
     performer: 'tetra',
@@ -56,7 +56,7 @@ export const routeTokens: readonly Card[] = [
     ],
   },
   {
-    id: 'story',
+    cardInstanceId: 'story',
     cardDatasId: 'story',
     name: tokenNames.story,
     performer: 'nova',
@@ -90,7 +90,7 @@ export const routeTokens: readonly Card[] = [
     ],
   },
   {
-    id: 'clock',
+    cardInstanceId: 'clock',
     cardDatasId: 'clock',
     name: tokenNames.clock,
     performer: 'lumen',
@@ -109,7 +109,7 @@ export const routeTokens: readonly Card[] = [
     effects: [handCardCountEffect(3, 2, 1n), { kind: 'mood', amount: 80 }],
   },
   {
-    id: 'bookmark',
+    cardInstanceId: 'bookmark',
     cardDatasId: 'bookmark',
     name: tokenNames.bookmark,
     performer: 'tetra',
@@ -169,7 +169,7 @@ export const routeTokens: readonly Card[] = [
     ],
   },
   {
-    id: 'shadow',
+    cardInstanceId: 'shadow',
     cardDatasId: 'shadow',
     name: tokenNames.shadow,
     performer: 'lumen',

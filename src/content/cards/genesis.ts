@@ -14,7 +14,7 @@ const voltageGains = [2000, 10000, 20000, 40000, 80000, 200000] as const;
 const targetPercents = [20, 100, 200, 400, 800, 2000] as const;
 export const genesisCards: readonly Card[] = [
   {
-    id: 'horizon',
+    cardInstanceId: 'horizon',
     cardDatasId: 'horizon',
     name: '空のはじまり',
     performer: 'nova',
@@ -53,7 +53,7 @@ export const genesisCards: readonly Card[] = [
     ],
   },
   {
-    id: 'frost-echo',
+    cardInstanceId: 'frost-echo',
     cardDatasId: 'frost-echo',
     name: '雨音の反響',
     performer: 'lumen',
@@ -115,7 +115,7 @@ export const genesisCards: readonly Card[] = [
     ],
   },
   {
-    id: 'frost-pulse',
+    cardInstanceId: 'frost-pulse',
     cardDatasId: 'frost-pulse',
     name: '凍空の鼓動',
     performer: 'lumen',
@@ -178,7 +178,7 @@ export const genesisCards: readonly Card[] = [
     ],
   },
   {
-    id: 'perennial',
+    cardInstanceId: 'perennial',
     cardDatasId: 'perennial',
     name: '続いていく雲',
     performer: 'tetra',

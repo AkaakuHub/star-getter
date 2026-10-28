@@ -8,7 +8,7 @@ it('ActionType47〜52/54〜58の詳細レコードを各Effectへ接続する', 
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: ([47, 48, 49, 50, 51, 52, 54, 55, 56, 57, 58] as const).map(
@@ -22,7 +22,9 @@ it('ActionType47〜52/54〜58の詳細レコードを各Effectへ接続する', 
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.some((item) => item.kind === 'beat-heart-value-buff')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'mood-change-skill')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'heart-limit-boost')).toBe(true);

@@ -8,7 +8,7 @@ it('ActionType53は明示された曲・発動元・TokenCardデータでEffect�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -27,7 +27,9 @@ it('ActionType53は明示された曲・発動元・TokenCardデータでEffect�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'special-appeal-token')).toMatchObject({
     kind: 'special-appeal-token',
     musicGenerationsId: 1,

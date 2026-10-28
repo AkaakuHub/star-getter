@@ -29,9 +29,13 @@ export function Hand({
               card.performer +
               (canUseCard(state, index) ? '' : ' is-unavailable')
             }
-            style={handLayout(index, state.hand.length, controller.selectedCard?.id === card.id)}
+            style={handLayout(
+              index,
+              state.hand.length,
+              controller.selectedCard?.cardInstanceId === card.cardInstanceId,
+            )}
             disabled={state.phase !== 'playing' && state.phase !== 'paused'}
-            aria-pressed={controller.selectedCard?.id === card.id}
+            aria-pressed={controller.selectedCard?.cardInstanceId === card.cardInstanceId}
             aria-label={
               card.name + '、エナジー' + cardCost(state, card) + '、' + describeCard(card)
             }

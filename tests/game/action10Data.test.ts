@@ -9,7 +9,7 @@ it('ActionType10の詳細値を熱気加算Effectへ接続する', () => {
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -26,7 +26,9 @@ it('ActionType10の詳細値を熱気加算Effectへ接続する', () => {
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'add-voltage-skill')).toMatchObject({
     kind: 'add-voltage-skill',
     amount: 12_345,
@@ -40,7 +42,7 @@ it('ActionType10のMood補正longを参照実装と同じfloat32に変換する'
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const mood = (1n << 54n) + (1n << 30n) + 1n;
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -63,7 +65,7 @@ it('ActionType10のMood補正longを参照実装と同じfloat32に変換する'
       : card,
   );
   const effect = createGame(track, deck, 7)
-    .deck.find((card) => card.id === source.id)
+    .deck.find((card) => card.cardInstanceId === source.cardInstanceId)
     ?.effects.find((item) => item.kind === 'add-voltage-skill');
   expect(effect).toMatchObject({
     moodBonus: { target: 2, perPoint: Math.fround(int64ToFloat32(mood) / 10_000) },

@@ -19,7 +19,7 @@ export function CardArtwork({ card }: Readonly<{ card: Card }>) {
   const palette = costumePalettes[card.costume];
   return (
     <span
-      className={'card-illustration scene-' + card.costume + ' card-' + card.id}
+      className={'card-illustration scene-' + card.costume + ' card-' + card.cardInstanceId}
       style={{
         '--scene-paper': palette.paper,
         '--scene-dark': palette.fabric,

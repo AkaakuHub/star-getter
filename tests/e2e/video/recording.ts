@@ -26,12 +26,12 @@ export async function readRecording(path: string): Promise<VideoRecording> {
     typeof value.setup !== 'object' ||
     !('presetId' in value.setup) ||
     value.setup.presetId !== value.route ||
-    !('cardIds' in value.setup) ||
-    !Array.isArray(value.setup.cardIds) ||
-    value.setup.cardIds.length < 3 ||
-    value.setup.cardIds.length > 100 ||
-    new Set(value.setup.cardIds).size !== value.setup.cardIds.length ||
-    !value.setup.cardIds.every(
+    !('cardDatasIds' in value.setup) ||
+    !Array.isArray(value.setup.cardDatasIds) ||
+    value.setup.cardDatasIds.length < 3 ||
+    value.setup.cardDatasIds.length > 100 ||
+    new Set(value.setup.cardDatasIds).size !== value.setup.cardDatasIds.length ||
+    !value.setup.cardDatasIds.every(
       (id: unknown): id is string =>
         typeof id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id),
     )

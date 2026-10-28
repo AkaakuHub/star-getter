@@ -15,7 +15,7 @@ export function game(route: RouteId = 'genesis', seed = 7, limit = 100): GameSta
 
 export function withHand(state: GameState, hand: readonly string[]): GameState {
   for (const id of hand) {
-    if (!state.deck.some((card) => card.id === id))
+    if (!state.deck.some((card) => card.cardInstanceId === id))
       throw new Error('手札に存在しないカードがあります。');
   }
   return initializeHandCardStats(

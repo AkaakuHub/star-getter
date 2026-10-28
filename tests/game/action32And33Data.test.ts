@@ -8,7 +8,7 @@ it('ActionType32/33の詳細レコードを各追加バフへ接続する', () =
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -28,7 +28,9 @@ it('ActionType32/33の詳細レコードを各追加バフへ接続する', () =
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.some((item) => item.kind === 'recover-mental-additional-buff')).toBe(
     true,
   );

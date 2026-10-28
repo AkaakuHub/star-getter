@@ -100,19 +100,23 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     throw new Error('コンボ誘発の検証カードがありません。');
   const deck = initial.deck.map((card) => ({
     ...card,
-    consumeAp: card.id === first.id ? 1 : card.consumeAp,
+    consumeAp: card.cardInstanceId === first.cardInstanceId ? 1 : card.consumeAp,
     effects: [{ kind: 'hearts', amount: 0 }] as const,
     passive: {},
   }));
-  const source = deck.find((card) => card.id === first.id);
+  const source = deck.find((card) => card.cardInstanceId === first.cardInstanceId);
   if (!source) throw new Error('コンボ誘発の発動元カードがありません。');
   const ready = withBoardState(
     { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
     {
-      hand: [first.id, second.id],
+      hand: [first.cardInstanceId, second.cardInstanceId],
       deck: deck
-        .filter((card) => card.id !== first.id && card.id !== second.id)
-        .map((card) => card.id),
+        .filter(
+          (card) =>
+            card.cardInstanceId !== first.cardInstanceId &&
+            card.cardInstanceId !== second.cardInstanceId,
+        )
+        .map((card) => card.cardInstanceId),
     },
   );
   const armed = activateComboInduce(

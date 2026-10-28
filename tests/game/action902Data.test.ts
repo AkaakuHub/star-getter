@@ -8,7 +8,7 @@ it('ActionType902の確率・条件・反転詳細を抽選ルールへ接続す
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -26,7 +26,9 @@ it('ActionType902の確率・条件・反転詳細を抽選ルールへ接続す
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.drawRules).toEqual([
     { condition: { kind: 'unit', value: 3 }, negated: true, weight: 2500 },
   ]);

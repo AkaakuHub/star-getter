@@ -21,7 +21,7 @@ it.each(['retain', 'reset'] as const)(
         effects: [{ kind: 'mood' as const, amount: 1 }],
       },
     };
-    const state = withHand({ ...base, deck: [card], cardPool: [card] }, [card.id]);
+    const state = withHand({ ...base, deck: [card], cardPool: [card] }, [card.cardInstanceId]);
     const first = advanceHandCollectionAbilities(state, 500_000);
     expect(first.activated).toEqual([card]);
     expect(canActivateHandCollectionAbility(first.state, card)).toBe(true);
@@ -29,7 +29,7 @@ it.each(['retain', 'reset'] as const)(
     expect(second.activated).toEqual([card]);
     expect(canActivateHandCollectionAbility(second.state, card)).toBe(false);
     expect(advanceHandCollectionAbilities(second.state, 500_000).activated).toEqual([]);
-    const left = disposeHandEffects(second.state, [card.id]);
+    const left = disposeHandEffects(second.state, [card.cardInstanceId]);
     expect(canActivateHandCollectionAbility(left, card)).toBe(limitMemory === 'reset');
   },
 );

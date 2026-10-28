@@ -20,7 +20,7 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
     },
     ['sunrise'],
   );
-  const sun = state.deck.find((card) => card.id === 'sunrise');
+  const sun = state.deck.find((card) => card.cardInstanceId === 'sunrise');
   if (!sun) throw new Error('晴れ間の輪がありません。');
   const effects = sun.effects.filter((effect) => effect.kind === 'conditional');
   const next = effects.reduce((current, effect) => applyEffect(current, effect, sun), state);
@@ -28,8 +28,8 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
     { target: 'voltage', percent: 450, uses: 3, members: [1042] },
     { target: 'attract', percent: 1350, uses: 3, members: [1042] },
   ]);
-  const other = next.deck.find((card) => card.id === 'frost-pulse');
-  const kozu = next.deck.find((card) => card.id === 'rain-preparation');
+  const other = next.deck.find((card) => card.cardInstanceId === 'frost-pulse');
+  const kozu = next.deck.find((card) => card.cardInstanceId === 'rain-preparation');
   if (!other || !kozu) throw new Error('対象カードがありません。');
   expect(applyEffect(next, { kind: 'voltage', amount: 100 }, other).resourceBoosts[0]?.uses).toBe(
     3,

@@ -95,7 +95,7 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   const initial = game('genesis');
   const id = initial.hand[0];
   if (!id) throw new Error('手札がありません。');
-  const card = initial.deck.find((item) => item.id === id);
+  const card = initial.deck.find((item) => item.cardInstanceId === id);
   if (!card) throw new Error('カードがありません。');
   const record = {
     missionType: 2 as const,
@@ -115,12 +115,12 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
       { kind: 'shuffle' as const, recoverDiscard: false, destination: 'draw' as const },
     ],
   };
-  const deck = initial.deck.map((item) => (item.id === id ? updatedCard : item));
+  const deck = initial.deck.map((item) => (item.cardInstanceId === id ? updatedCard : item));
   const state = {
     ...initial,
     randomSeed: 7,
     deck,
-    cardPool: initial.cardPool.map((item) => (item.id === id ? updatedCard : item)),
+    cardPool: initial.cardPool.map((item) => (item.cardInstanceId === id ? updatedCard : item)),
     track: {
       ...initial.track,
       ingameMissionGroups: [{ id: 9, records: [record] }],
@@ -134,7 +134,7 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
 it('一斉生成後のActionType28実生成枚数をミッションへ通知する', () => {
   const initial = game('library');
   const sourceId = initial.hand[0];
-  const source = initial.deck.find((card) => card.id === sourceId);
+  const source = initial.deck.find((card) => card.cardInstanceId === sourceId);
   if (!source) throw new Error('ActionType28の検証カードがありません。');
   const record = {
     missionType: 2 as const,
@@ -151,12 +151,16 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
     ...source,
     effects: [tokenCardEffect(481, 2n)],
   };
-  const deck = initial.deck.map((item) => (item.id === source.id ? card : item));
+  const deck = initial.deck.map((item) =>
+    item.cardInstanceId === source.cardInstanceId ? card : item,
+  );
   const state = {
     ...initial,
     randomSeed: 7,
     deck,
-    cardPool: initial.cardPool.map((item) => (item.id === source.id ? card : item)),
+    cardPool: initial.cardPool.map((item) =>
+      item.cardInstanceId === source.cardInstanceId ? card : item,
+    ),
     track: {
       ...initial.track,
       ingameMissionGroups: [{ id: 28, records: [record] }],

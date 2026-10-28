@@ -6,8 +6,8 @@ import { game } from './support/game';
 
 it('ActionType33は対象カードの耐久値を増幅し、対象外では消費しない', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
-  const target = initial.deck.find((card) => card.id === 'rain-preparation');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
+  const target = initial.deck.find((card) => card.cardInstanceId === 'rain-preparation');
   if (!source || !target) throw new Error('検証用カードがありません。');
   const clean = {
     ...initial,
@@ -69,7 +69,7 @@ it('ActionType33の期限とInvocationType 0x388の期限抑止を適用する',
 
 it('ActionType33は負数と小数の追加率を参照実装のintキャストで0方向へ切り捨てる', () => {
   const initial = game();
-  const source = initial.deck.find((card) => card.id === 'class');
+  const source = initial.deck.find((card) => card.cardInstanceId === 'class');
   if (!source) throw new Error('発動元カードがありません。');
   const percentages = [6_000, -6_000, 5_000, 15_000].map((num) => {
     const changed = applyEffect(

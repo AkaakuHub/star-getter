@@ -53,7 +53,7 @@ it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -75,7 +75,7 @@ it('ActionType20の詳細レコードはcreateGameで通常Effectへ接続する
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   const effect = compiled?.effects.find((item) => item.kind === 'hand-limit');
   if (!effect) throw new Error('ActionType20が生成されていません。');
   expect(effect).toMatchObject({ kind: 'hand-limit', amount: 1, displayTimeType: 3 });
@@ -98,7 +98,7 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -121,11 +121,11 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('カードがありません。');
   const active = activateHandPermanentEffects(state, compiled);
   const baseState = createGame(track, routes.genesis.deck, 7);
-  const baseCard = baseState.deck.find((card) => card.id === source.id);
+  const baseCard = baseState.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!baseCard) throw new Error('比較対象のカードがありません。');
   const expected = activateHandPermanentEffects(baseState, {
     ...baseCard,
@@ -142,8 +142,10 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
   });
   expect(active.handLimit).toBe(expected.handLimit);
   expect(active.handLimitEffects[0]?.remainingSeconds).toBeNull();
-  expect(active.handLimitEffects[0]?.deactivationKey).toBe(`hand-permanent:${source.id}`);
-  expect(disposeHandEffects(active, [source.id]).handLimit).toBe(state.handLimit);
+  expect(active.handLimitEffects[0]?.deactivationKey).toBe(
+    `hand-permanent:${source.cardInstanceId}`,
+  );
+  expect(disposeHandEffects(active, [source.cardInstanceId]).handLimit).toBe(state.handLimit);
 });
 
 it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接続する', () => {
@@ -151,7 +153,7 @@ it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -173,7 +175,7 @@ it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接�
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   const effect = compiled?.effects.find((item) => item.kind === 'ap-speed-change');
   expect(effect).toMatchObject({ kind: 'ap-speed-change', calculationType: 1, num: 100n });
 });
@@ -183,7 +185,7 @@ it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -201,7 +203,7 @@ it('ActionType22の詳細レコードはcreateGameで熱気変換Effectへ接続
       : card,
   );
   const state = createGame(track, deck, 7);
-  const compiled = state.deck.find((card) => card.id === source.id);
+  const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   const effect = compiled?.effects.find((item) => item.kind === 'voltage-convert');
   expect(effect).toMatchObject({ kind: 'voltage-convert', destination: 'hearts', num: 100 });
 });
@@ -211,7 +213,7 @@ it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEff
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -228,7 +230,9 @@ it('ActionType23の詳細レコードはcreateGameで精神力連動ハートEff
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'mental-heart-induce')).toMatchObject({
     kind: 'mental-heart-induce',
     num: 100n,
@@ -241,7 +245,7 @@ it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -258,7 +262,9 @@ it('ActionType25の詳細レコードはcreateGameできらめき上限Effectへ
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'heart-limit-change')).toMatchObject({
     kind: 'heart-limit-change',
     calculationType: 1,
@@ -272,7 +278,7 @@ it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ�
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -289,7 +295,9 @@ it('ActionType29の詳細レコードはcreateGameでデッキAP変更Effectへ�
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.find((item) => item.kind === 'deck-skill-cost-change')).toMatchObject({
     kind: 'deck-skill-cost-change',
     num: -1,
@@ -303,7 +311,7 @@ it('ActionType30/31の詳細レコードはcreateGameで各追加バフへ接続
   const source = routes.genesis.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
   const deck = routes.genesis.deck.map((card) =>
-    card.id === source.id
+    card.cardInstanceId === source.cardInstanceId
       ? {
           ...card,
           actionEffects: [
@@ -323,7 +331,9 @@ it('ActionType30/31の詳細レコードはcreateGameで各追加バフへ接続
         }
       : card,
   );
-  const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
+  const compiled = createGame(track, deck, 7).deck.find(
+    (card) => card.cardInstanceId === source.cardInstanceId,
+  );
   expect(compiled?.effects.some((item) => item.kind === 'love-up-additional-buff')).toBe(true);
   expect(compiled?.effects.some((item) => item.kind === 'voltage-up-additional-buff')).toBe(true);
 });

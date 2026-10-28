@@ -93,7 +93,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     'class',
   ];
   const deck = state.deck
-    .filter((card) => ids.includes(card.id) || card.token === 'shadow')
+    .filter((card) => ids.includes(card.cardInstanceId) || card.token === 'shadow')
     .map((card) => ({
       ...card,
       drawEffects: [{ kind: 'amplify' as const, percent: 1 }],
@@ -112,7 +112,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
       drawContext: 'skill',
       usedCard: { charactersId: 0, unitIds: [2] },
     },
-    { hand: [], deck: deck.map((card) => card.id), graveyard: [] },
+    { hand: [], deck: deck.map((card) => card.cardInstanceId), graveyard: [] },
   );
   const drawn = fillHand(state);
   expect(drawn.hand).toHaveLength(7);

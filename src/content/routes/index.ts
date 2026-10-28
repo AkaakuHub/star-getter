@@ -1,4 +1,4 @@
-import { resolveDeck, defaultDeckIds } from '../cards';
+import { resolveDeck, defaultDeckCardDatasIds } from '../cards';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { routeTokens } from './tokens';
 
@@ -31,6 +31,6 @@ export const routes: Readonly<Record<RouteId, Route>> = {
     name: '開花',
     slug: 'kaika',
     tokens: routeTokens,
-    deck: resolveDeck(defaultDeckIds),
+    deck: resolveDeck(defaultDeckCardDatasIds),
   },
 };

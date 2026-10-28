@@ -11,14 +11,14 @@ it('ヨットの検索を先に登録し、巻き込んだ浮き輪の舵・編�
   const bookmark = state.deck.find((card) => card.token === 'bookmark');
   if (!yacht || !bookmark) throw new Error('検証する追加カードがありません。');
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 100, maxAp: 100 } }, [
-    yacht.id,
-    bookmark.id,
+    yacht.cardInstanceId,
+    bookmark.cardInstanceId,
   ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed - state.stats.cardsUsed).toBe(2);
   expect(
     used.hand.map((id) => {
-      const card = used.deck.find((candidate) => candidate.id === id);
+      const card = used.deck.find((candidate) => candidate.cardInstanceId === id);
       if (!card) throw new Error('補充したカードがありません。');
       return card.token ?? card.unitIds[0];
     }),

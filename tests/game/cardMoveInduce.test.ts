@@ -49,15 +49,15 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
         {
           ...state,
           activation: {
-            sourceId: source.id,
-            usedCards: [source.id],
+            sourceId: source.cardInstanceId,
+            usedCards: [source.cardInstanceId],
             allHand: false,
             recoverDiscard: false,
             handCountChanges: {},
           },
         },
-        { hand: [...new Set([...state.hand, source.id])] },
-        { [source.id]: { skillUseAtBoardState: 7 as const } },
+        { hand: [...new Set([...state.hand, source.cardInstanceId])] },
+        { [source.cardInstanceId]: { skillUseAtBoardState: 7 as const } },
       ),
     );
 
@@ -94,17 +94,17 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
       {
         ...armed,
         activation: {
-          sourceId: source.id,
-          usedCards: [source.id],
+          sourceId: source.cardInstanceId,
+          usedCards: [source.cardInstanceId],
           allHand: false,
           recoverDiscard: false,
           handCountChanges: {},
         },
       },
-      { hand: [...new Set([...armed.hand, source.id])] },
+      { hand: [...new Set([...armed.hand, source.cardInstanceId])] },
     ),
   );
-  expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.id);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.cardInstanceId);
   expect(finished.boosts).toHaveLength(0);
   expect(finished.cardMoveInducers[0]?.useCount).toBe(0);
 });
@@ -126,7 +126,7 @@ it('Proxy領域へ入る時はint32化したLimitNumを使う誘発も発火し�
     },
     source,
   );
-  const moved = moveProxyCard(armed, source.id);
+  const moved = moveProxyCard(armed, source.cardInstanceId);
   expect(moved.boosts).toHaveLength(0);
   expect(moved.cardMoveInducers[0]?.useCount).toBe(0);
 });
@@ -148,7 +148,7 @@ it('Proxy領域へ入る時はint32化したRequireNumを使う誘発も発火�
     },
     source,
   );
-  const moved = moveProxyCard(armed, source.id);
+  const moved = moveProxyCard(armed, source.cardInstanceId);
   expect(moved.boosts).toHaveLength(0);
   expect(moved.cardMoveInducers[0]?.useCount).toBe(0);
 });
@@ -172,11 +172,11 @@ it('ActionType908の上限は通常実行済みの子効果回数も含める', 
     },
     source,
   );
-  const inProxy = withBoardState({ ...armed }, { proxy: [source.id] });
+  const inProxy = withBoardState({ ...armed }, { proxy: [source.cardInstanceId] });
 
-  const moved = induceCardMoves(inProxy, new Set([source.id]), applyEffect);
+  const moved = induceCardMoves(inProxy, new Set([source.cardInstanceId]), applyEffect);
 
   expect(moved.boosts).toEqual(inProxy.boosts);
   expect(moved.cardMoveInducers[0]?.useCount).toBe(1);
-  expect(moved.skillEffectActivationCounts[`${source.id}:706`]).toBe(1);
+  expect(moved.skillEffectActivationCounts[`${source.cardInstanceId}:706`]).toBe(1);
 });

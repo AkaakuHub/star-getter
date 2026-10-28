@@ -11,7 +11,7 @@ export function whenDeckParity(parity: 'even' | 'odd', effects: readonly Effect[
 
 export const parityCards: readonly Card[] = [
   {
-    id: 'signal-maker',
+    cardInstanceId: 'signal-maker',
     cardDatasId: 'signal-maker',
     name: '旗を掲げて',
     performer: 'tetra',
@@ -30,7 +30,7 @@ export const parityCards: readonly Card[] = [
     ],
   },
   {
-    id: 'even-rhythm',
+    cardInstanceId: 'even-rhythm',
     cardDatasId: 'even-rhythm',
     name: '波の二拍子',
     performer: 'nova',
@@ -50,7 +50,7 @@ export const parityCards: readonly Card[] = [
     ],
   },
   {
-    id: 'odd-rhythm',
+    cardInstanceId: 'odd-rhythm',
     cardDatasId: 'odd-rhythm',
     name: '波の三拍子',
     performer: 'lumen',

@@ -238,14 +238,18 @@ describe('カード共通の条件判定', () => {
     } as const;
     const initial = {
       ...original,
-      deck: original.deck.map((card) => (card.id === source.id ? source : card)),
-      cardPool: original.cardPool.map((card) => (card.id === source.id ? source : card)),
+      deck: original.deck.map((card) =>
+        card.cardInstanceId === source.cardInstanceId ? source : card,
+      ),
+      cardPool: original.cardPool.map((card) =>
+        card.cardInstanceId === source.cardInstanceId ? source : card,
+      ),
     };
     const branch = activateHandPermanentEffects(initial, source);
     expect(branch.action52Buffs.map((buff) => buff.percent)).toEqual([10]);
     const switched = applyEffect(branch, { kind: 'mood', amount: 10 }, source);
     expect(switched.action52Buffs.map((buff) => buff.percent)).toEqual([20]);
-    const ended = disposeHandEffects(switched, [source.id]);
+    const ended = disposeHandEffects(switched, [source.cardInstanceId]);
     expect(ended.branchInducers).toHaveLength(0);
     expect(ended.action52Buffs).toHaveLength(0);
   });
