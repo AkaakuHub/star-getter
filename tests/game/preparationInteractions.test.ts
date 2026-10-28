@@ -78,7 +78,7 @@ it('手札中の雨の使用反応で、対応する基本カードとパズル�
   expect(reacted.costReductions['frost-pulse']).toBe(9);
   expect(reacted.costReductions[shadow.cardInstanceId]).toBe(9);
   expect(reacted.costReductions.horizon).toBe(0);
-  expect(reacted.deckActions.shuffles).toHaveLength(1);
+  expect(reacted.deckActions.queue.filter((action) => action.type === 3)).toHaveLength(1);
 });
 
 it('手札誘発はメンバー・スキル記号・ユニット・同一カード・任意のスキルを判定し、上限を守る', () => {
@@ -292,10 +292,10 @@ it('同時に登録した引き直しをまとめず全回実行し、後登録�
   state = applyEffect(state, { kind: 'shuffle', recoverDiscard: false, destination: 'discard' });
   state = applyEffect(state, { kind: 'shuffle', recoverDiscard: false, destination: 'discard' });
   state = applyEffect(state, { kind: 'search-unit', unit: 2, count: 4 });
-  expect(state.deckActions.shuffles).toHaveLength(2);
+  expect(state.deckActions.queue.filter((action) => action.type === 3)).toHaveLength(2);
   expect(state.deckBoard.skillCardSearchParams).toHaveLength(4);
   const flushed = flushDeckActions(state);
-  expect(flushed.deckActions.shuffles).toHaveLength(0);
+  expect(flushed.deckActions.queue.filter((action) => action.type === 3)).toHaveLength(0);
   expect(flushed.deckBoard.skillCardSearchParams).toHaveLength(0);
   expect(flushed.targetBoosts.length).toBeGreaterThan(state.targetBoosts.length);
 });
@@ -346,5 +346,5 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
   expect(replaced.hand).toHaveLength(2);
   expect(replaced.usedCard?.charactersId).toBe(source.charactersId);
   expect(replaced.usedCard?.unitIds).toContain(2);
-  expect(replaced.deckActions.shuffles).toHaveLength(0);
+  expect(replaced.deckActions.queue.filter((action) => action.type === 3)).toHaveLength(0);
 });

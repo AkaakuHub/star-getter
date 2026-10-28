@@ -39,8 +39,8 @@ it('ActionType13はlong値が2³²+1なら種別1として扱わない', () => {
   });
 
   const activated = applyEffect(initial, effect, source);
-  expect(activated.deckActions.shuffles[0]?.options).toEqual({
-    recoverDiscard: false,
-    destination: 'discard',
+  expect(activated.deckActions.queue.find((action) => action.type === 3)?.effect).toEqual({
+    recoveryType: 'no-recovery',
+    stashType: 'graveyard',
   });
 });
