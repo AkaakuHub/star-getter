@@ -11,7 +11,8 @@ it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化�
   expect(advanceTo(initial, 0.58).currentVoltage).toBe(0);
   expect(advanceTo(initial, 0.6).currentVoltage).toBe(1);
   const later = advanceTo(initial, 1.2);
-  expect(later.currentAp).toBe(1);
+  expect(later.currentAp).toBe(0);
+  expect(advanceTo(later, 1.2 + 1 / 60).currentAp).toBe(1);
   expect(later.currentMental).toBe(99);
   expect(later.currentVoltage).toBe(2);
 });
@@ -33,8 +34,13 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
   const fullAfter = advanceAutomaticGauges(full, 1.2);
   expect(emptyAfter.currentAp).toBe(0);
   expect(fullAfter.currentAp).toBe(initial.maxAp);
-  expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(10n);
+  expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(2n);
   expect((fullAfter.bloom?.progress ?? 0n) - (full.bloom?.progress ?? 0n)).toBe(2n);
+  const emptyNext = advanceAutomaticGauges(emptyAfter, 1 / 60);
+  const fullNext = advanceAutomaticGauges(fullAfter, 1 / 60);
+  expect(emptyNext.currentAp).toBe(0);
+  expect((emptyNext.bloom?.progress ?? 0n) - (emptyAfter.bloom?.progress ?? 0n)).toBe(8n);
+  expect(fullNext.bloom?.progress).toBe(fullAfter.bloom?.progress);
 });
 
 it('開花中の自然元気減少は専用値を減らし、休憩防止の付与後だけ停止する', () => {
