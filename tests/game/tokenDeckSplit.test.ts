@@ -1,3 +1,5 @@
+import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
+import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -161,4 +163,54 @@ it('期限切れでメインデッキへ戻す', () => {
     duration: { kind: 'milliseconds', value: 1 },
   });
   expect(advanceTo(split, 0.1).tokenDeckSplit).toBeNull();
+});
+
+it('枚数条件はメインとサブ両方の山札・捨て札を切替後も合計する', () => {
+  const base = game('genesis');
+  const main = base.deck.at(-1);
+  if (!main) throw new Error('メインカードがありません。');
+  const deck = base.deck.map((card) =>
+    card.id === main.id ? card : { ...card, tokenSeriesIds: [42] },
+  );
+  const initial = withHand({ ...base, deck, cardPool: deck }, [main.id]);
+  const split = applyEffect(initial, {
+    kind: 'token-deck-split',
+    seriesIds: [42n],
+    duration: { kind: 'stage', value: 0 },
+  });
+  const splitState = split.tokenDeckSplit;
+  if (!splitState) throw new Error('分割状態がありません。');
+  const [discarded, ...drawPile] = splitState.sub.drawPile;
+  if (!discarded || drawPile.length < 1) throw new Error('サブデッキの山札が不足しています。');
+  const state = {
+    ...split,
+    tokenDeckSplit: { ...splitState, sub: { ...splitState.sub, drawPile, discard: [discarded] } },
+  };
+  const drawCount = state.drawPile.length + drawPile.length;
+  const discardCount = state.discard.length + 1;
+  const assertCounts = (current: typeof split, draw: number, discard: number) => {
+    const input = conditionContext(current);
+    expect(input.cardTotal).toBe(current.deck.length);
+    expect(evaluateCondition({ kind: 'cards', zone: 'draw', minimum: draw }, input)).toBe(true);
+    expect(evaluateCondition({ kind: 'cards', zone: 'draw', minimum: draw + 1 }, input)).toBe(
+      false,
+    );
+    expect(evaluateCondition({ kind: 'cards', zone: 'discard', minimum: discard }, input)).toBe(
+      true,
+    );
+    expect(evaluateCondition({ kind: 'cards', zone: 'discard', minimum: discard + 1 }, input)).toBe(
+      false,
+    );
+  };
+  assertCounts(state, drawCount, discardCount);
+  const switched = act(state, { type: 'switch-token-deck' });
+  expect(switched.tokenDeckSplit?.active).toBe('sub');
+  assertCounts(switched, drawCount, discardCount);
+  const [moved, ...remaining] = switched.drawPile;
+  if (!moved) throw new Error('移動する山札のカードがありません。');
+  const updated = { ...switched, drawPile: remaining, discard: [...switched.discard, moved] };
+  assertCounts(updated, drawCount - 1, discardCount + 1);
+  const returned = act(updated, { type: 'switch-token-deck' });
+  expect(returned.tokenDeckSplit?.active).toBe('main');
+  assertCounts(returned, drawCount - 1, discardCount + 1);
 });
