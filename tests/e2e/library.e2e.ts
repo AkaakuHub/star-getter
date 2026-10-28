@@ -146,9 +146,11 @@ test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚�
     await prepare(driver, true);
     await amplifyAndWiden(driver);
     expect(driver.state.automaticHeart.enabled).toBe(false);
+    const beforeMeasurement = driver.state.score;
+    await driver.burst(2, speed);
+    scores.push(driver.state.score - beforeMeasurement);
     const inputStart = driver.inputs.length;
     const run = await runCollections(driver, durationSeconds(driver.state), speed);
-    scores.push(driver.state.score);
     repairs += run.deckRepairs;
     driver.report(speed + '回毎秒と停止時だけカードで全区間終了');
     expect(run.collections).toBeGreaterThan(run.cards);

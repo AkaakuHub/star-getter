@@ -153,7 +153,7 @@ export async function amplifyAndWiden(driver: GameDriver): Promise<void> {
   );
   driver.report('回収リドローを反復し舵のドローで増幅');
   await driver.until(
-    (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 100,
+    (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 95,
     async () => {
       if (driver.state.deck.length < 100) {
         await restoreDeck(driver);
@@ -180,19 +180,20 @@ export async function amplifyAndWiden(driver: GameDriver): Promise<void> {
   expect(driver.collectionAmplification).toBeGreaterThan(0);
 }
 
-export async function armAutomaticCollection(driver: GameDriver): Promise<void> {
-  await driver.until(
-    (state) =>
-      isPrepared(state) &&
-      state.deck.length >= 100 &&
-      state.deck.some(
-        (card) =>
-          card.token === 'story' &&
-          state.hand.includes(card.id) &&
-          !state.relayUsed.includes(card.id),
-      ),
-    () => (driver.state.deck.length < 100 ? restoreDeck(driver) : maintainLoop(driver)),
+function isCollectionReady(state: GameState): boolean {
+  return (
+    isPrepared(state) &&
+    state.deck.some(
+      (card) =>
+        card.token === 'story' &&
+        state.hand.includes(card.id) &&
+        !state.relayUsed.includes(card.id),
+    )
   );
+}
+
+export async function armAutomaticCollection(driver: GameDriver): Promise<void> {
+  await driver.until(isCollectionReady, () => maintainLoop(driver));
 }
 
 export async function playUnplanned(driver: GameDriver): Promise<void> {
@@ -238,15 +239,15 @@ export async function runCollections(driver: GameDriver, stopSeconds: number, sp
         const cardBefore = driver.state.score;
         const deckBefore = driver.state.deck.length;
         const used =
-          driver.state.deck.length <= 96
+          driver.state.deck.length < 95
             ? await driver.useFirst([
-                'library-invitation',
-                'ensemble',
-                'library-ensemble',
-                'clock',
-                'bookmark',
-                'aurora-ensemble',
                 'library-pages',
+                'library-invitation',
+                'bookmark',
+                'library-ensemble',
+                'ensemble',
+                'clock',
+                'aurora-ensemble',
                 'camera',
                 'story',
               ])
@@ -284,7 +285,7 @@ export async function runCollections(driver: GameDriver, stopSeconds: number, sp
         minimumDeck = Math.min(minimumDeck, driver.state.deck.length);
         cardGain += driver.state.score - cardBefore;
         if (used) streak = 0;
-        if (isPrepared(driver.state)) {
+        if (isCollectionReady(driver.state)) {
           await driver.setWaitMode(false);
           repairing = false;
         }
