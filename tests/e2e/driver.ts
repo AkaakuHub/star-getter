@@ -1,11 +1,11 @@
+import { reportDriver } from './recording/report';
 import type { GameSetup } from '../../src/app/setup/gameSetup';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
 import { createConfiguredGame } from '../../src/app/createConfiguredGame';
 import { GameController } from '../../src/app/gameController';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
-import { cardAt, canUseCard, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
+import { cardAt, canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
 import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
-import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { type GameState, type Card, rules } from '@akaakuhub/suku-sute-core/game/model';
 import { GameRecording, type InputRecord } from './recording/gameRecording';
 import { inputTiming, type InputTiming, type TimeRange } from './input/timing';
@@ -94,7 +94,8 @@ export class GameDriver {
   async setWaitMode(enabled: boolean): Promise<void> {
     if (this.controller.waitModeEnabled === enabled || this.state.phase === 'finished') return;
     await this.think(this.timing.decisionSeconds);
-    const before = this.state;
+    const before = this.controller.state;
+    if (before.phase === 'finished') return;
     await this.controller.toggleWaitMode();
     this.pointer();
     this.recording.record({ kind: 'wait-mode', enabled }, before, this.state, this.elapsedTicks);
@@ -102,8 +103,10 @@ export class GameDriver {
   }
 
   async toggleAutomaticHearts(): Promise<void> {
+    if (this.state.phase === 'finished') return;
     await this.think(this.timing.decisionSeconds);
-    const before = this.state;
+    const before = this.controller.state;
+    if (before.phase === 'finished') return;
     this.controller.toggleAutomaticHearts();
     this.recording.record(
       { kind: 'automatic-hearts', enabled: this.state.automaticHeart.enabled },
@@ -190,6 +193,12 @@ export class GameDriver {
   }
 
   async useFirst(priority: readonly string[]): Promise<Card | undefined> {
+    while (
+      this.controller.waitModeEnabled &&
+      !this.controller.waiting &&
+      this.state.phase === 'playing'
+    )
+      await this.tick();
     const available = this.state.hand
       .map((_, index) => index)
       .filter(
@@ -314,48 +323,7 @@ export class GameDriver {
   }
 
   report(stage: string): void {
-    console.log(
-      JSON.stringify({
-        route: this.route,
-        stage,
-        seconds: Number(this.seconds.toFixed(3)),
-        wallSeconds: Number(this.wallSeconds.toFixed(3)),
-        inputTiming: this.timing,
-        cardActions: this.cardActions,
-        cardsUsed: this.state.stats.cardsUsed,
-        specialActions: this.specialActions,
-        collectionActions: this.collections,
-        automaticCollections: this.automaticCollections,
-        successfulCollections: this.successfulCollections,
-        collectionRedraws: this.collectionRedraws,
-        collectionAmplification: this.collectionAmplification,
-        heartsCollected: this.state.stats.heartsCollected,
-        hearts: heartCount(this.state),
-        heartLimit: this.state.hearts.heartLimit,
-        storyAmplification: this.state.storyAmplification,
-        tokens: Object.fromEntries(
-          ['story', 'clock', 'bookmark', 'ensemble', 'shadow'].map((token) => [
-            token,
-            this.state.deck.filter((card) => card.token === token).length,
-          ]),
-        ),
-        deck: this.state.deck.length,
-        currentAp: this.state.ap.currentAp,
-        mental: this.state.mental.currentMental,
-        currentVoltage: this.state.voltage.currentVoltage.toString(),
-        mood: moodValue(this.state),
-        scoreMultiplier: this.state.scoreMultiplier.toString(),
-        classUses: this.state.cardUseCounts.class ?? 0,
-        shadowUses: this.state.cardUseCounts['shadow-1'] ?? 0,
-        score: this.state.score.toString(),
-        gauge:
-          this.state.genesis.effects.length > 0 ? this.state.genesis.currentGauge.toString() : null,
-        genesisStrength: this.state.genesis.effects[0]?.effectValue ?? null,
-        peakGauge: this.peakGauge.toString(),
-        peakDeckSize: this.peakDeckSize,
-        peakHeartLimit: this.peakHeartLimit,
-      }),
-    );
+    reportDriver(this, stage);
   }
 
   private observe(): void {

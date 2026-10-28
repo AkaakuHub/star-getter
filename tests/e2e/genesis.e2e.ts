@@ -43,31 +43,34 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
   await driver.setWaitMode(true);
   const target = (rules.maxGenesisGauge * 99) / 100;
   while (
-    driver.seconds < durationSeconds(driver.state) - 2 &&
+    driver.seconds < durationSeconds(driver.state) - (stableCollection ? 2 : 0.5) &&
     driver.state.genesis.currentGauge < target
   ) {
     const shadowUses = driver.state.cardUseCounts['shadow-1'] ?? 0;
-    if (!driver.state.automaticHeart.enabled) await driver.toggleAutomaticHearts();
     const progress = driver.state.genesis.currentGauge;
-    if (!stableCollection && progress >= 2_050_000_000) {
-      const used = await driver.useFirst(
-        progress >= 2_120_000_000
-          ? ['horizon', 'sunrise', 'rain-preparation', 'frost-echo']
-          : ['frost-echo', 'horizon', 'sunrise', 'rain-preparation'],
-      );
-      if (used)
-        console.log(
-          JSON.stringify({
-            stage: '上限付近の調整',
-            seconds: driver.seconds,
-            card: used.id,
-            before: progress.toString(),
-            after: driver.state.genesis.currentGauge.toString(),
-          }),
-        );
+    const lastAllHand = driver.inputs.findLast(
+      (row) =>
+        row.input.kind === 'card' &&
+        ['library-ensemble', 'aurora-ensemble'].includes(row.input.card.instanceId) &&
+        row.before.gauge !== null &&
+        row.after.gauge !== null &&
+        Number(row.after.gauge) > Number(row.before.gauge),
+    );
+    const allHandGain =
+      lastAllHand === undefined
+        ? 0
+        : Number(lastAllHand.after.gauge) - Number(lastAllHand.before.gauge);
+    if (!stableCollection && allHandGain > 0 && progress + allHandGain >= target) {
+      const nextTarget = (target + rules.maxGenesisGauge) / 2;
+      if (progress + allHandGain > nextTarget) {
+        await driver.burst(0.1, 15);
+      } else {
+        await driver.useFirst(['library-ensemble', 'aurora-ensemble']);
+      }
       await driver.tick();
       continue;
     }
+    if (!driver.state.automaticHeart.enabled) await driver.toggleAutomaticHearts();
     const created = driver.state.deck.some((card) => card.token === 'shadow');
     const next =
       !created && shadowUses === 0
