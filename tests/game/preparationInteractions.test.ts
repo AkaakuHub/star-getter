@@ -219,7 +219,7 @@ it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', (
   );
 });
 
-it('シールドは自然減少とスキル由来の元気減少を防ぐ', () => {
+it('シールドはスキル由来の元気減少を防ぎ、自然減少では耐久値を消費しない', () => {
   const initial = {
     ...game(),
     hand: [],
@@ -238,8 +238,8 @@ it('シールドは自然減少とスキル由来の元気減少を防ぐ', () =
   expect(damaged.currentMental).toBe(96);
   expect(damaged.mentalShields).toHaveLength(0);
   const natural = advanceAutomaticGauges({ ...shield, mentalTimerSeconds: 0 }, 1.2);
-  expect(natural.currentMental).toBe(100);
-  expect(natural.mentalShields[0]?.durability).toBe(9);
+  expect(natural.currentMental).toBe(99);
+  expect(natural.mentalShields[0]?.durability).toBe(10);
   const active = activateGenesis({ ...shield, moodOffset: -150 }, 1);
   const converted = applyEffect(active, { kind: 'mental', amount: -14 });
   expect(converted.currentMental).toBe(100);

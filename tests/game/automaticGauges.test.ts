@@ -67,6 +67,24 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   expect(protectedAfter.genesis.currentGauge).toBe(initial.genesis.currentGauge + 2);
 });
 
+it('開花とActionType34の併用中は元気タイマーも進めない', () => {
+  const initial = applyEffect(activateGenesis(game(), 1), {
+    kind: 'disable-mental-down',
+    duration: { kind: 'stage', value: 0n },
+  });
+  expect(advanceAutomaticGauges(initial, 1.2).mentalTimerSeconds).toBe(initial.mentalTimerSeconds);
+});
+
+it('休憩開始と回復完了で元気タイマーを0へ戻す', () => {
+  const initial = { ...game('library'), currentMental: 1, mentalTimerSeconds: 0.75 };
+  const down = advanceAutomaticGauges(initial, 5);
+  expect(down.mentalDown).toBe(true);
+  expect(down.mentalTimerSeconds).toBe(0);
+  const recovered = advanceAutomaticGauges(down, 5);
+  expect(recovered.mentalDown).toBe(false);
+  expect(recovered.mentalTimerSeconds).toBe(0);
+});
+
 it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタイマーも停止する', () => {
   const initial = game('library');
   const immediate = applyEffect(initial, {
