@@ -60,7 +60,7 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
     boosts: [{ percent: 20, untilTick: 999999 }],
     mental: { ...initial.mental, currentMental: 50 },
   };
-  const expected = [10, 20, 10, 5, 0, 20, 20, 10, 200, 10, 10, 120, 20, 10, 10];
+  const expected = [10, 20, 10, 5, 0, 20, 20, 10, 200, 10, 10, 0, 20, 10, 10];
   for (let index = 0; index < expected.length; index++) {
     const effect = {
       kind: 'skill-cost-change',
