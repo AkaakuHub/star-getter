@@ -1,3 +1,8 @@
+import { boardCardIds, moveCardsToBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import {
+  liveBoardState,
+  liveDeckBoardCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { conditionContext } from '@akaakuhub/suku-sute-core/game/conditions/gameContext';
 import { evaluateCondition } from '@akaakuhub/suku-sute-core/game/conditions/evaluate';
@@ -46,7 +51,9 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
       .map((item) => item.id)
       .filter(
         (id) =>
-          merged.hand.includes(id) || merged.drawPile.includes(id) || merged.discard.includes(id),
+          merged.hand.includes(id) ||
+          boardCardIds(merged, liveBoardState.deck).includes(id) ||
+          boardCardIds(merged, liveBoardState.graveyard).includes(id),
       ),
   ).toContain(selectedId);
 });
@@ -56,15 +63,17 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const cardData = { ...selected, tokenSeriesIds: [42] };
-  const state = withHand(
+  const hand = withHand(
     {
       ...base,
       deck: base.deck.map((item) => (item.id === selected.id ? cardData : item)),
-      discard: [selected.id],
-      drawPile: base.drawPile.filter((id) => id !== selected.id),
     },
     [base.hand[0] ?? ''],
   );
+  const state = moveCardsToBoard(hand, [selected.id], liveBoardState.graveyard);
+  expect(
+    state.deckBoard.cards.find((card) => card.cardInstanceId === selected.id)?.boardState,
+  ).toBe(3);
   const split = applyEffect(state, {
     kind: 'token-deck-split',
     seriesIds: [42n],
@@ -72,9 +81,17 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
   });
   expect([
     ...(split.tokenDeckSplit?.sub.hand ?? []),
-    ...(split.tokenDeckSplit?.sub.drawPile ?? []),
+    ...split.deckBoard.cards
+      .filter(
+        (card) =>
+          card.boardState === 1 &&
+          split.tokenDeckSplit?.subDeckCardInstanceIds.includes(card.cardInstanceId),
+      )
+      .map((card) => card.cardInstanceId),
   ]).toContain(selected.id);
-  expect(split.tokenDeckSplit?.sub.discard).not.toContain(selected.id);
+  expect(
+    split.deckBoard.cards.find((card) => card.cardInstanceId === selected.id)?.boardState,
+  ).not.toBe(3);
 });
 
 it('ActionType43の系列IDを参照実装のint32へ変換してから照合する', () => {
@@ -95,7 +112,13 @@ it('ActionType43の系列IDを参照実装のint32へ変換してから照合す
   expect(split.tokenDeckSplit?.seriesIds).toEqual([42]);
   expect([
     ...(split.tokenDeckSplit?.sub.hand ?? []),
-    ...(split.tokenDeckSplit?.sub.drawPile ?? []),
+    ...split.deckBoard.cards
+      .filter(
+        (card) =>
+          card.boardState === 1 &&
+          split.tokenDeckSplit?.subDeckCardInstanceIds.includes(card.cardInstanceId),
+      )
+      .map((card) => card.cardInstanceId),
   ]).toContain(selected.id);
 });
 
@@ -139,9 +162,9 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
   if (!emptySubDeck) throw new Error('分割デッキがありません。');
   const switched = act(
     {
-      ...split,
+      ...moveCardsToBoard(split, [selected.id], liveBoardState.extra),
       deckOutCount: 1,
-      tokenDeckSplit: { ...emptySubDeck, sub: { hand: [], drawPile: [], discard: [] } },
+      tokenDeckSplit: { ...emptySubDeck, sub: { hand: [] } },
     },
     { type: 'switch-token-deck' },
   );
@@ -181,14 +204,20 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   });
   const splitState = split.tokenDeckSplit;
   if (!splitState) throw new Error('分割状態がありません。');
-  const [discarded, ...drawPile] = splitState.sub.drawPile;
+  const subDeck = split.deckBoard.cards
+    .filter(
+      (card) =>
+        card.boardState === 1 && splitState.subDeckCardInstanceIds.includes(card.cardInstanceId),
+    )
+    .map((card) => card.cardInstanceId);
+  const [discarded, ...drawPile] = subDeck;
   if (!discarded || drawPile.length < 1) throw new Error('サブデッキの山札が不足しています。');
-  const state = {
-    ...split,
-    tokenDeckSplit: { ...splitState, sub: { ...splitState.sub, drawPile, discard: [discarded] } },
-  };
-  const drawCount = state.drawPile.length + drawPile.length;
-  const discardCount = state.discard.length + 1;
+  const state = moveCardsToBoard(split, [discarded], liveBoardState.graveyard);
+  const drawCount = liveDeckBoardCardInstanceIds(state.deckBoard, liveBoardState.deck).length;
+  const discardCount = liveDeckBoardCardInstanceIds(
+    state.deckBoard,
+    liveBoardState.graveyard,
+  ).length;
   const assertCounts = (current: typeof split, draw: number, discard: number) => {
     const input = conditionContext(current);
     expect(input.cardTotal).toBe(current.deck.length);
@@ -207,9 +236,9 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   const switched = act(state, { type: 'switch-token-deck' });
   expect(switched.tokenDeckSplit?.active).toBe('sub');
   assertCounts(switched, drawCount, discardCount);
-  const [moved, ...remaining] = switched.drawPile;
+  const [moved] = boardCardIds(switched, liveBoardState.deck);
   if (!moved) throw new Error('移動する山札のカードがありません。');
-  const updated = { ...switched, drawPile: remaining, discard: [...switched.discard, moved] };
+  const updated = moveCardsToBoard(switched, [moved], liveBoardState.graveyard);
   assertCounts(updated, drawCount - 1, discardCount + 1);
   const returned = act(updated, { type: 'switch-token-deck' });
   expect(returned.tokenDeckSplit?.active).toBe('main');

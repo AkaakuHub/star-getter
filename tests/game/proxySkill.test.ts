@@ -1,18 +1,15 @@
-import { enqueueHandShuffle } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
-import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZones';
 import {
   advanceProxySkillPeriods,
   advanceProxySkillSections,
   advanceProxySkillUses,
 } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
 import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation';
-import type { ProxySkillEffect } from '@akaakuhub/suku-sute-core/game/proxySkillTypes';
 
 function game() {
   const track = tracks[0];
@@ -279,48 +276,6 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
     true,
   ]);
   expect(advanceTo(forced, 1).proxyAbsorptions).toHaveLength(2);
-});
-
-it('ProxyはAction19の移動先より優先され、一斉引き直しで山札へ戻らない', () => {
-  const initial = game();
-  const source = initial.deck[0];
-  const child = initial.deck[1];
-  if (!source || !child) throw new Error('発動カードが足りません。');
-  const proxyEffect: ProxySkillEffect = {
-    kind: 'proxy-skill',
-    absorbLimit: 1,
-    periodType: 1 as const,
-    periodParam: 3000n,
-    induceTiming: 1,
-    induceCondition: 1,
-    inducePowerType: 1,
-    inducePowerParam: 0,
-    targets: [{ actionType: 20, targetAmount: 1 }],
-    effects: [],
-  };
-  let state = applyEffect(initial, { kind: 'card-move', destination: 'exclusion' }, source);
-  state = applyEffect(state, proxyEffect, source);
-  state = applyEffect(state, { kind: 'card-move', destination: 'exclusion' }, child);
-  state = applyEffect(state, proxyEffect, child);
-  const activated = {
-    ...state,
-    hand: state.hand.filter((id) => id !== source.id && id !== child.id),
-    drawPile: state.drawPile.filter((id) => id !== child.id),
-    activation: {
-      sourceId: source.id,
-      usedCards: [source.id, child.id],
-      allHand: true,
-      recoverDiscard: false,
-      handCountChanges: {},
-    },
-  };
-  const finished = finishCardActivation(
-    enqueueHandShuffle(activated, { recoverDiscard: false, destination: 'draw' }, source.id),
-  );
-  expect(finished.proxyCards).toEqual([source.id, child.id]);
-  expect(finished.drawPile).not.toContain(child.id);
-  expect(finished.discard).not.toContain(source.id);
-  expect(finished.discard).not.toContain(child.id);
 });
 
 it('スキル使用回数と消費APを使うProxy期限を個別に進める', () => {

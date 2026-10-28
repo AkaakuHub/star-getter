@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
@@ -95,15 +96,17 @@ describe('モード切替と切替時効果', () => {
       },
     } as const;
     const cards = initial.deck.map((item) => (item.id === card.id ? card : item));
-    const state = {
-      ...initial,
-      deck: cards,
-      cardPool: cards,
-      modes: createModes([88]),
-      hand: [card.id],
-      phase: 'playing' as const,
-      ap: { ...initial.ap, currentAp: 100 },
-    };
+    const state = withBoardState(
+      {
+        ...initial,
+        deck: cards,
+        cardPool: cards,
+        modes: createModes([88]),
+        phase: 'playing' as const,
+        ap: { ...initial.ap, currentAp: 100 },
+      },
+      { hand: [card.id] },
+    );
     const enabled = applyEffect(state, { kind: 'mode', modeId: 88n, change: 'on' });
     expect(cardCost(state, card)).toBe(1);
     expect(cardCost(enabled, card)).toBe(3);
@@ -133,13 +136,10 @@ describe('モード切替と切替時効果', () => {
       },
     } as const;
     const deck = initial.deck.map((item) => (item.id === card.id ? card : item));
-    const prepared = {
-      ...initial,
-      deck,
-      cardPool: deck,
-      hand: [card.id],
-      handEffectCardIds: [card.id],
-    };
+    const prepared = withBoardState(
+      { ...initial, deck, cardPool: deck, handEffectCardIds: [card.id] },
+      { hand: [card.id] },
+    );
     const off = activateModeAbilityEffects(prepared, card, applyEffect);
     expect(off.handLimit).toBe(initial.handLimit + 1);
     const on = applyEffect(off, { kind: 'mode', modeId: 1n, change: 'on' });
@@ -147,12 +147,10 @@ describe('モード切替と切替時効果', () => {
     const disposed = disposeHandEffects(on, [card.id]);
     expect(disposed.handLimit).toBe(initial.handLimit);
     const playing = act(
-      {
-        ...on,
-        phase: 'playing',
-        drawPile: deck.filter((item) => item.id !== card.id).map((item) => item.id),
-        ap: { ...on.ap, currentAp: 20 },
-      },
+      withBoardState(
+        { ...on, phase: 'playing', ap: { ...on.ap, currentAp: 20 } },
+        { deck: deck.filter((item) => item.id !== card.id).map((item) => item.id) },
+      ),
       { type: 'card', index: 0 },
     );
     expect(playing.ap.currentAp).toBe(20 - cardCost(on, card) + 3);
@@ -266,15 +264,10 @@ describe('モード切替と切替時効果', () => {
       { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
-      {
-        ...original,
-        deck: cards,
-        cardPool: cards,
-        cardSkillUseStates: Object.fromEntries(
-          cards.map((card) => [card.id, { skillUseAtBoardState: 3 as const }]),
-        ),
-        ap: { ...original.ap, currentAp: 100 },
-      },
+      withBoardState(
+        { ...original, deck: cards, cardPool: cards, ap: { ...original.ap, currentAp: 100 } },
+        {},
+      ),
       reaction,
     );
     const state = act(

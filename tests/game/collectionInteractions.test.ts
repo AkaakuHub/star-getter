@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -21,12 +24,14 @@ function game(route: 'library' | 'genesis'): GameState {
 
 it('手札の回収条件は複数回の合計で成立し、自動回収の0.3秒を手動操作へ適用しない', () => {
   const initial = game('genesis');
-  let state: GameState = {
-    ...initial,
-    hand: ['horizon'],
-    handEffectCardIds: ['horizon'],
-    hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
-  };
+  let state: GameState = withBoardState(
+    {
+      ...initial,
+      handEffectCardIds: ['horizon'],
+      hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
+    },
+    { hand: ['horizon'] },
+  );
   state = act(addHearts(state, 2_999), { type: 'collect' });
   expect(heartCount(state)).toBe(0);
   expect(state.handHeartCollectCounts.horizon).toBe(2_999);
@@ -42,20 +47,24 @@ it('手札の回収条件は複数回の合計で成立し、自動回収の0.3�
 
 it('一度の回収で条件を大きく超えても1回だけ発動し、引き直すと回収条件が復帰する', () => {
   const initial = game('genesis');
-  let state: GameState = {
-    ...initial,
-    hand: ['horizon'],
-    handEffectCardIds: ['horizon'],
-    hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
-  };
+  let state: GameState = withBoardState(
+    {
+      ...initial,
+      handEffectCardIds: ['horizon'],
+      hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 10_000 },
+    },
+    { hand: ['horizon'] },
+  );
   state = act(addHearts(state, 9_000), { type: 'collect' });
   expect(state.handHeartCollectCounts.horizon).toBe(0);
   state = act(state, { type: 'collect' });
   expect(heartCount(state)).toBe(0);
-  const redrawn = fillHand({
-    ...shuffleHand(state, { recoverDiscard: true, destination: 'draw' }),
-    drawPile: ['horizon', ...state.deck.map((card) => card.id).filter((id) => id !== 'horizon')],
-  });
+  const redrawn = fillHand(
+    withBoardState(
+      { ...shuffleHand(state, { recoverDiscard: true, destination: 'draw' }) },
+      { deck: ['horizon', ...state.deck.map((card) => card.id).filter((id) => id !== 'horizon')] },
+    ),
+  );
   expect(redrawn.hand).toContain('horizon');
   expect(redrawn.relayUsed).not.toContain('horizon');
   expect(heartCount(act(addHearts(redrawn, 3_000), { type: 'collect' }))).toBeGreaterThan(0);
@@ -73,12 +82,14 @@ it('手札誘発は回収条件を超えるたびに発動し、指定回数で�
       effects: [{ kind: 'ap' as const, amount: 1 }],
     },
   };
-  const state: GameState = {
-    ...initial,
-    deck: [card, ...initial.deck.slice(1)],
-    hand: [card.id],
-    handHeartCollectCounts: { [card.id]: 0 },
-  };
+  const state: GameState = withBoardState(
+    {
+      ...initial,
+      deck: initial.deck.map((item) => (item.id === card.id ? card : item)),
+      handHeartCollectCounts: { [card.id]: 0 },
+    },
+    { hand: [card.id] },
+  );
   const first = advanceHandCollectionAbilities(state, 10);
   expect(first.activated.map((item) => item.id)).toEqual([card.id]);
   const second = advanceHandCollectionAbilities(first.state, 10);
@@ -124,15 +135,16 @@ function preparedLibrary(): GameState {
   if (!bookmark) throw new Error('追加カードがありません。');
   const hand = [bookmark.id, ...stories.map((card) => card.id)];
   return addHearts(
-    {
-      ...state,
-      hand,
-      handEffectCardIds: hand,
-      drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
-      discard: [],
-      storyAmplification: 10_000,
-      hearts: { ...state.hearts, heartLimit: 10_000_000 },
-    },
+    withBoardState(
+      {
+        ...state,
+        hand,
+        handEffectCardIds: hand,
+        storyAmplification: 10_000,
+        hearts: { ...state.hearts, heartLimit: 10_000_000 },
+      },
+      { deck: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)), graveyard: [] },
+    ),
     500_000,
   );
 }
@@ -162,7 +174,8 @@ it('上限1000万でも回収49万9999個では引き直さず、累計50万個�
   const reached = act(addHearts(below, 1), { type: 'collect' });
   expect(reached.stats.heartsCollected).toBe(500_000);
   expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
-  for (const id of initial.hand) expect(reached.discard).toContain(id);
+  for (const id of initial.hand)
+    expect(boardCardIds(reached, liveBoardState.graveyard)).toContain(id);
   expect(reached.hearts.heartLimit).toBe(10_000_000);
 });
 
@@ -171,17 +184,17 @@ it('1000万個を一度に回収しても50万個以上の条件が成立して�
   const reached = act(addHearts(initial, 10_000_000), { type: 'collect' });
   expect(reached.stats.heartsCollected).toBe(10_000_000);
   expect(reached.hand.every((id) => !initial.hand.includes(id))).toBe(true);
-  for (const id of initial.hand) expect(reached.discard).toContain(id);
+  for (const id of initial.hand)
+    expect(boardCardIds(reached, liveBoardState.graveyard)).toContain(id);
 });
 
 it('94枚では回収50万個を満たしても供給も引き直しも発動しない', () => {
   const prepared = preparedLibrary();
-  const removed = prepared.drawPile.slice(0, prepared.deck.length - 94);
-  const initial = {
-    ...prepared,
-    deck: prepared.deck.filter((card) => !removed.includes(card.id)),
-    drawPile: prepared.drawPile.filter((id) => !removed.includes(id)),
-  };
+  const removed = boardCardIds(prepared, liveBoardState.deck).slice(0, prepared.deck.length - 94);
+  const initial = withBoardState(
+    { ...prepared, deck: prepared.deck.filter((card) => !removed.includes(card.id)) },
+    { deck: boardCardIds(prepared, liveBoardState.deck).filter((id) => !removed.includes(id)) },
+  );
   expect(initial.deck).toHaveLength(94);
   const reached = act(initial, { type: 'collect' });
   expect(reached.hand).toEqual(initial.hand);
@@ -201,16 +214,23 @@ it('仕込んだうなばらでは手動連打の回収回数が0.3秒間隔の�
 for (const mood of [-100, 0, 100]) {
   it(`開花の回収特性は空模様${mood}%に応じて3000〜3750回分のきらめきを獲得する`, () => {
     const initial = game('genesis');
-    const state = {
-      ...initial,
-      track: {
-        ...initial.track,
-        moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
+    const state = withBoardState(
+      {
+        ...initial,
+        track: {
+          ...initial.track,
+          moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
+        },
+        handEffectCardIds: ['horizon'],
+        hearts: {
+          ...initial.hearts,
+          stageHearts: [],
+          hiddenHeartBatches: [],
+          heartLimit: 1_000_000,
+        },
       },
-      hand: ['horizon'],
-      handEffectCardIds: ['horizon'],
-      hearts: { ...initial.hearts, stageHearts: [], hiddenHeartBatches: [], heartLimit: 1_000_000 },
-    };
+      { hand: ['horizon'] },
+    );
     const collected = act(addHearts(state, 3_000), { type: 'collect' });
     expect(heartCount(collected)).toBe(beatHeartCount(state) * (mood === 0 ? 3_000 : 3_750));
   });

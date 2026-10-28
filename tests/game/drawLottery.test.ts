@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { drawCandidate, drawWeight } from '@akaakuhub/suku-sute-core/game/cards/drawLottery';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -93,13 +96,13 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   let state = withHand(addTokens(addTokens(game('library'), 'clock', 1), 'story', 1), []);
   const story = state.deck.find((card) => card.token === 'story');
   if (!story) throw new Error('追加カードがありません。');
-  state = {
-    ...state,
-    drawContext: 'skill',
-    usedCard: { charactersId: 1031, unitIds: [] },
-    drawPile: state.drawPile.filter((id) => id !== story.id),
-    discard: [story.id],
-  };
+  state = withBoardState(
+    { ...state, drawContext: 'skill', usedCard: { charactersId: 1031, unitIds: [] } },
+    {
+      deck: boardCardIds(state, liveBoardState.deck).filter((id) => id !== story.id),
+      graveyard: [story.id],
+    },
+  );
   state = applyEffect(state, {
     kind: 'search',
     scope: 'skill',
@@ -126,7 +129,7 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   };
   const drawn = fillHandToCount(state, 3);
   expect(drawn.hand[0]).toBe(story.id);
-  expect(drawn.discard).not.toContain(story.id);
+  expect(boardCardIds(drawn, liveBoardState.graveyard)).not.toContain(story.id);
   expect(drawn.hand[1]).toBe('camera');
   expect(drawn.deck.find((card) => card.id === drawn.hand[2])?.token).toBe('clock');
   expect(drawn.deckActions.searches).toHaveLength(0);
@@ -154,14 +157,16 @@ it('検索条件に一致するカードがない階層は消費し、次の階�
 
 it('スキル検索はアイコンではなくカードのMainEffectを照合する', () => {
   const initial = withHand(game(), []);
-  const state = {
-    ...initial,
-    deck: initial.deck.map((card) =>
-      card.id === 'camera' ? { ...card, mainEffect: 987654 } : card,
-    ),
-    drawContext: 'skill' as const,
-    drawPile: ['camera'],
-  };
+  const state = withBoardState(
+    {
+      ...initial,
+      deck: initial.deck.map((card) =>
+        card.id === 'camera' ? { ...card, mainEffect: 987654 } : card,
+      ),
+      drawContext: 'skill' as const,
+    },
+    { deck: ['camera'] },
+  );
   const searching = applyEffect(state, {
     kind: 'search',
     scope: 'skill',
@@ -185,17 +190,18 @@ it('解除キーが一致する未消費の検索指定を除去する', () => {
 
 it('山札に禁止カードしか残っていなければ捨て札を戻してから優先抽選する', () => {
   const initial = withHand(game('library'), ['class']);
-  const state = {
-    ...initial,
-    drawContext: 'shuffle' as const,
-    drawPile: ['library-ensemble'],
-    discard: initial.deck
-      .filter((card) => !['class', 'library-ensemble'].includes(card.id))
-      .map((card) => card.id),
-  };
+  const state = withBoardState(
+    { ...initial, drawContext: 'shuffle' as const },
+    {
+      deck: ['library-ensemble'],
+      graveyard: initial.deck
+        .filter((card) => !['class', 'library-ensemble'].includes(card.id))
+        .map((card) => card.id),
+    },
+  );
   const drawn = fillHandToCount(state, 2);
   expect(drawn.hand).toContain('aurora-ensemble');
   expect(drawn.hand).not.toContain('library-ensemble');
   expect(drawn.deckOutCount).toBe(state.deckOutCount + 1);
-  expect(drawn.discard).toEqual([]);
+  expect(boardCardIds(drawn, liveBoardState.graveyard)).toEqual([]);
 });

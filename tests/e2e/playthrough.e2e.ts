@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
 import { createConfiguredGame } from '../../src/app/createConfiguredGame';
@@ -29,7 +31,11 @@ test('全区間のカード使用と回収を最後まで処理する', () => {
 });
 
 function expectOwnedOnce(state: GameState) {
-  const ids = [...state.hand, ...state.drawPile, ...state.discard];
+  const ids = [
+    ...state.hand,
+    ...boardCardIds(state, liveBoardState.deck),
+    ...boardCardIds(state, liveBoardState.graveyard),
+  ];
   expect(new Set(ids).size).toBe(ids.length);
   expect([...ids].sort()).toEqual(state.deck.map((card) => card.id).sort());
 }

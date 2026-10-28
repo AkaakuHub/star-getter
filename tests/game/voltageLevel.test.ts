@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -19,11 +20,10 @@ it('通常上限1000を追加の共鳴で1500へ増やし、800万Pt刻みの閾
   expect(voltageThreshold(1001)).toBe(663_000_001n);
   expect(voltageThreshold(1500)).toBe(4_655_000_001n);
   const gained = applyEffect(
-    {
-      ...extended,
-      hand: [],
-      voltage: { ...extended.voltage, currentVoltage: BigInt(655_000_001) },
-    },
+    withBoardState(
+      { ...extended, voltage: { ...extended.voltage, currentVoltage: BigInt(655_000_001) } },
+      { hand: [] },
+    ),
     { kind: 'voltage', amount: 8_000_000 },
   );
   expect(voltageLevel(gained.voltage.currentVoltage, gained.maximumVoltageLevel)).toBe(1001);
@@ -34,7 +34,10 @@ it('通常上限1000を追加の共鳴で1500へ増やし、800万Pt刻みの閾
 it('固定値のFloat32丸め後は999段階で、自然増加の1Ptで1000段階へ達する', () => {
   const state = applyEffect(game(), { kind: 'voltage-set', amount: 655_000_001 });
   expect(voltageLevel(state.voltage.currentVoltage, state.maximumVoltageLevel)).toBe(999);
-  const gained = applyEffect({ ...state, hand: [] }, { kind: 'voltage', amount: 1 });
+  const gained = applyEffect(withBoardState({ ...state }, { hand: [] }), {
+    kind: 'voltage',
+    amount: 1,
+  });
   expect(voltageLevel(gained.voltage.currentVoltage, gained.maximumVoltageLevel)).toBe(1000);
 });
 

@@ -1,3 +1,9 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import {
+  liveBoardState,
+  liveDeckBoardCardInstanceIds,
+} from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -42,21 +48,22 @@ it('ActionType46は期限切れで目標未達のProxyカードを墓地へ戻�
     },
     source,
   );
-  const inProxy = {
-    ...active,
-    hand: active.hand.filter((id) => id !== source.id),
-    drawPile: active.drawPile.filter((id) => id !== source.id),
-    discard: active.discard.filter((id) => id !== source.id),
-    proxyCards: [...active.proxyCards, source.id],
-    cardSkillUseStates: {
-      ...active.cardSkillUseStates,
-      [source.id]: { skillUseAtBoardState: 3 as const },
+  const inProxy = withBoardState(
+    { ...active },
+    {
+      hand: active.hand.filter((id) => id !== source.id),
+      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.id),
+      graveyard: boardCardIds(active, liveBoardState.graveyard).filter((id) => id !== source.id),
+      proxy: [...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy), source.id],
     },
-  };
+    { [source.id]: { skillUseAtBoardState: 3 as const } },
+  );
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
   expect(expired.proxyAbsorptions).toHaveLength(0);
-  expect(expired.proxyCards).not.toContain(source.id);
-  expect(expired.discard).toContain(source.id);
+  expect(liveDeckBoardCardInstanceIds(expired.deckBoard, liveBoardState.proxy)).not.toContain(
+    source.id,
+  );
+  expect(boardCardIds(expired, liveBoardState.graveyard)).toContain(source.id);
   expect(expired.boosts).toHaveLength(inProxy.boosts.length + 1);
   expect(expired.cardMoveInducers[0]?.useCount).toBe(1);
 });
@@ -98,17 +105,16 @@ it('ActionType908は墓地行き時に参照実装のint32 LimitNumで上限を�
     },
     source,
   );
-  const inProxy = {
-    ...active,
-    hand: active.hand.filter((id) => id !== source.id),
-    drawPile: active.drawPile.filter((id) => id !== source.id),
-    discard: active.discard.filter((id) => id !== source.id),
-    proxyCards: [...active.proxyCards, source.id],
-    cardSkillUseStates: {
-      ...active.cardSkillUseStates,
-      [source.id]: { skillUseAtBoardState: 3 as const },
+  const inProxy = withBoardState(
+    { ...active },
+    {
+      hand: active.hand.filter((id) => id !== source.id),
+      deck: boardCardIds(active, liveBoardState.deck).filter((id) => id !== source.id),
+      graveyard: boardCardIds(active, liveBoardState.graveyard).filter((id) => id !== source.id),
+      proxy: [...liveDeckBoardCardInstanceIds(active.deckBoard, liveBoardState.proxy), source.id],
     },
-  };
+    { [source.id]: { skillUseAtBoardState: 3 as const } },
+  );
 
   const expired = advanceProxySkillPeriods(inProxy, 0.2, applyEffect);
 

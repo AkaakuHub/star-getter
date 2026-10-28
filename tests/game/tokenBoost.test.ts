@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import {
   beginTokenGeneration,
@@ -151,15 +152,10 @@ it('ActionType28のlong枚数は通常生成でfloat32化し、一斉生成で�
   const initial = game('library');
   const source = initial.deck[0];
   if (!source) throw new Error('カードがありません。');
-  const state = {
-    ...initial,
-    deck: [source],
-    cardPool: [source],
-    drawPile: [source.id],
-    hand: [],
-    tokenCatalog: [],
-    tokenGroups: [],
-  };
+  const state = withBoardState(
+    { ...initial, deck: [source], cardPool: [source], tokenCatalog: [], tokenGroups: [] },
+    { deck: [source.id], hand: [] },
+  );
   const count = (1n << 32n) + 1n;
   const ordinary = applyEffect(state, tokenCardEffect(481, count), source);
   expect(ordinary.deck).toHaveLength(1);

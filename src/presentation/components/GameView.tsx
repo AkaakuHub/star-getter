@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { Pause, Menu, List, Layers, Star, Volume2, VolumeX } from 'lucide-preact';
 import type { GameController } from '../../app/gameController';
 import type { RouteId } from '../../content/routes';
@@ -70,7 +72,8 @@ export function GameView({
           disabled={busy}
         >
           <Layers size={13} aria-hidden="true" />
-          山札{state.drawPile.length}・捨札{state.discard.length}
+          山札{boardCardIds(state, liveBoardState.deck).length}・捨札
+          {boardCardIds(state, liveBoardState.graveyard).length}
         </button>
         <button
           type="button"

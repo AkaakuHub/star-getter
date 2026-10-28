@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { routes } from '../../src/content/routes';
@@ -76,15 +77,10 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
     { ...card, id: 'action-901-c', actionEffects: [] },
   ];
   const initial = createGame(track, deck, 7);
-  const drawState = {
-    ...initial,
-    hand: [],
-    handCardStats: {},
-    handEffectCardIds: [],
-    drawPile: [card.id],
-    discard: [],
-    drawContext: 'idle' as const,
-  };
+  const drawState = withBoardState(
+    { ...initial, handCardStats: {}, handEffectCardIds: [], drawContext: 'idle' as const },
+    { hand: [], deck: [card.id], graveyard: [] },
+  );
   const drawn = fillHandToCount(drawState, 1);
   expect(drawn.moodOffset - initial.moodOffset).toBe(10);
   const started = act(initial, { type: 'start' });

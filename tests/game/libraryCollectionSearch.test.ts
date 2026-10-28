@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -18,11 +21,13 @@ it('複数の浮き輪が同時に回収効果を発動しても貝がら・舵�
   if (!book || !second || !third || !discarded || !story)
     throw new Error('確認用カードがありません。');
   const hand = withHand(base, [book.id, second.id, third.id, story.id]);
-  const ready = {
-    ...hand,
-    drawPile: hand.drawPile.filter((id) => id !== discarded.id),
-    discard: [discarded.id],
-  };
+  const ready = withBoardState(
+    { ...hand },
+    {
+      deck: boardCardIds(hand, liveBoardState.deck).filter((id) => id !== discarded.id),
+      graveyard: [discarded.id],
+    },
+  );
   const expanded = applyEffect(ready, { kind: 'heart-limit', amount: 999_900 });
   const filled = applyEffect(expanded, { kind: 'hearts', amount: 500_000 });
   const next = collectHearts(filled);

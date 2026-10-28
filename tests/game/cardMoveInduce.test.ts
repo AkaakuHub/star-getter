@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { induceCardMoves } from '@akaakuhub/suku-sute-core/game/effects/cardMoveInduce';
@@ -5,21 +8,22 @@ import { finishCardActivation } from '@akaakuhub/suku-sute-core/game/cards/cardZ
 import { game } from './support/game';
 
 function moveProxyCard(state: ReturnType<typeof game>, cardId: string) {
-  return finishCardActivation({
-    ...state,
-    hand: [...new Set([...state.hand, cardId])],
-    cardSkillUseStates: {
-      ...state.cardSkillUseStates,
-      [cardId]: { skillUseAtBoardState: 7 as const },
-    },
-    activation: {
-      sourceId: cardId,
-      usedCards: [cardId],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
-    },
-  });
+  return finishCardActivation(
+    withBoardState(
+      {
+        ...state,
+        activation: {
+          sourceId: cardId,
+          usedCards: [cardId],
+          allHand: false,
+          recoverDiscard: false,
+          handCountChanges: {},
+        },
+      },
+      { hand: [...new Set([...state.hand, cardId])] },
+      { [cardId]: { skillUseAtBoardState: 7 as const } },
+    ),
+  );
 }
 
 it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () => {
@@ -40,21 +44,22 @@ it('Proxy領域へ入る移動では墓地行き誘発を発動しない', () =>
     source,
   );
   const moveProxyCard = (state: typeof armed) =>
-    finishCardActivation({
-      ...state,
-      hand: [...new Set([...state.hand, source.id])],
-      cardSkillUseStates: {
-        ...state.cardSkillUseStates,
-        [source.id]: { skillUseAtBoardState: 7 as const },
-      },
-      activation: {
-        sourceId: source.id,
-        usedCards: [source.id],
-        allHand: false,
-        recoverDiscard: false,
-        handCountChanges: {},
-      },
-    });
+    finishCardActivation(
+      withBoardState(
+        {
+          ...state,
+          activation: {
+            sourceId: source.id,
+            usedCards: [source.id],
+            allHand: false,
+            recoverDiscard: false,
+            handCountChanges: {},
+          },
+        },
+        { hand: [...new Set([...state.hand, source.id])] },
+        { [source.id]: { skillUseAtBoardState: 7 as const } },
+      ),
+    );
 
   const firstMove = moveProxyCard(armed);
   expect(firstMove.boosts).toHaveLength(0);
@@ -84,18 +89,22 @@ it('通常カードの捨て札行きではカード移動誘発を発動しな�
     },
     source,
   );
-  const finished = finishCardActivation({
-    ...armed,
-    hand: [...new Set([...armed.hand, source.id])],
-    activation: {
-      sourceId: source.id,
-      usedCards: [source.id],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
-    },
-  });
-  expect(finished.discard).toContain(source.id);
+  const finished = finishCardActivation(
+    withBoardState(
+      {
+        ...armed,
+        activation: {
+          sourceId: source.id,
+          usedCards: [source.id],
+          allHand: false,
+          recoverDiscard: false,
+          handCountChanges: {},
+        },
+      },
+      { hand: [...new Set([...armed.hand, source.id])] },
+    ),
+  );
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.id);
   expect(finished.boosts).toHaveLength(0);
   expect(finished.cardMoveInducers[0]?.useCount).toBe(0);
 });
@@ -163,11 +172,7 @@ it('ActionType908の上限は通常実行済みの子効果回数も含める', 
     },
     source,
   );
-  const inProxy = {
-    ...armed,
-    proxyCards: [source.id],
-    cardSkillUseStates: armed.cardSkillUseStates,
-  };
+  const inProxy = withBoardState({ ...armed }, { proxy: [source.id] });
 
   const moved = induceCardMoves(inProxy, new Set([source.id]), applyEffect);
 

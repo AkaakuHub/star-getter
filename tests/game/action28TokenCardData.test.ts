@@ -113,7 +113,7 @@ it('ActionType28はAbility系列が0のTokenCardDataを追加する', () => {
   const generated = result.deck.find((card) => card.tokenCard);
   expect(generated?.tokenCardAbilitySeriesId).toBeNull();
   expect(result.deck).toHaveLength(initial.deck.length + 1);
-  expect(result.nextTokenId).toBe(initial.nextTokenId + 1);
+  expect(result.deckBoard.nextCardInstanceId).toBe(initial.deckBoard.nextCardInstanceId + 1);
 });
 
 it('ActionType28はseries detailのlong値で補正対象を照合し、生成カードにはint32値を設定する', () => {

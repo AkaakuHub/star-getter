@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { createLiveHandCardStats } from '@akaakuhub/suku-sute-core/runtime/cards/handCardStats';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -63,20 +64,20 @@ it('Action901は有効な手札でもGenesisがなければMental条件を判定
       },
     ],
   } as const;
-  const base = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [],
-    handCardStats: {},
-    handEffectCardIds: [],
-    drawPile: [card.id],
-    discard: [],
-    drawContext: 'idle' as const,
-    ap: { ...initial.ap, currentAp: 100 },
-    mental: { ...initial.mental, currentMental: 100 },
-    maximumMental: 100,
-  };
+  const base = withBoardState(
+    {
+      ...initial,
+      deck: [card],
+      cardPool: [card],
+      handCardStats: {},
+      handEffectCardIds: [],
+      drawContext: 'idle' as const,
+      ap: { ...initial.ap, currentAp: 100 },
+      mental: { ...initial.mental, currentMental: 100 },
+      maximumMental: 100,
+    },
+    { hand: [], deck: [card.id], graveyard: [] },
+  );
   const result = fillHandToCount(base, 1);
   expect(result.moodOffset).toBe(
     applyEffect(base, card.ability893Effects[0].whenFalse[0], card).moodOffset,
@@ -87,17 +88,20 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('検証用カードがありません。');
-  const state = {
-    ...initial,
-    handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
-    activation: {
-      sourceId: card.id,
-      usedCards: [card.id],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
+  const state = withBoardState(
+    {
+      ...initial,
+      handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
+      activation: {
+        sourceId: card.id,
+        usedCards: [card.id],
+        allHand: false,
+        recoverDiscard: false,
+        handCountChanges: {},
+      },
     },
-  };
+    {},
+  );
   const active = applyEffect(
     state,
     {
@@ -129,17 +133,20 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('検証用カードがありません。');
-  const state = {
-    ...initial,
-    handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
-    activation: {
-      sourceId: card.id,
-      usedCards: [card.id],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
+  const state = withBoardState(
+    {
+      ...initial,
+      handCardStats: { [card.id]: { ...createLiveHandCardStats(0), isActive: false } },
+      activation: {
+        sourceId: card.id,
+        usedCards: [card.id],
+        allHand: false,
+        recoverDiscard: false,
+        handCountChanges: {},
+      },
     },
-  };
+    {},
+  );
   const result = applyEffect(
     state,
     {

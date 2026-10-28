@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import {
   activateHandPermanentEffects,
@@ -21,15 +22,10 @@ it('Action904のAction58子効果は手札離脱時に上限を戻す', () => {
       },
     ],
   };
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [card.id],
-    handEffectCardIds: [card.id],
-    drawPile: [],
-    discard: [],
-  };
+  const state = withBoardState(
+    { ...initial, deck: [card], cardPool: [card], handEffectCardIds: [card.id] },
+    { hand: [card.id], deck: [], graveyard: [] },
+  );
 
   const active = activateHandPermanentEffects(state, card);
 

@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -37,15 +38,17 @@ it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化�
 
 it('開花中も通常APが上限未満なら自然回復を専用値へ変換し、通常APを保持する', () => {
   const baseState2 = advanceTo(game(), 12);
-  const initial = {
-    ...baseState2,
-    moodOffset: -100,
-    hand: ['horizon'],
-    handEffectCardIds: ['horizon'],
-    mentalProtected: true,
-    ap: { ...baseState2.ap, timerSeconds: 0, currentAp: 0 },
-    voltage: { ...baseState2.voltage, timerSeconds: 0 },
-  };
+  const initial = withBoardState(
+    {
+      ...baseState2,
+      moodOffset: -100,
+      handEffectCardIds: ['horizon'],
+      mentalProtected: true,
+      ap: { ...baseState2.ap, timerSeconds: 0, currentAp: 0 },
+      voltage: { ...baseState2.voltage, timerSeconds: 0 },
+    },
+    { hand: ['horizon'] },
+  );
   const empty = activateGenesis(initial, 1);
   const full = activateGenesis(
     { ...initial, ap: { ...initial.ap, currentAp: initial.ap.maxAp } },
@@ -67,15 +70,17 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
 it('開花中の自然元気減少は専用値を減らし、休憩防止の付与後だけ停止する', () => {
   const base = advanceTo(game(), 12);
   const initial = activateGenesis(
-    {
-      ...base,
-      moodOffset: -100,
-      hand: ['horizon'],
-      handEffectCardIds: ['horizon'],
-      mental: { ...base.mental, timerSeconds: 0 },
-      ap: { ...base.ap, currentAp: base.ap.maxAp, timerSeconds: 0 },
-      voltage: { ...base.voltage, timerSeconds: 0 },
-    },
+    withBoardState(
+      {
+        ...base,
+        moodOffset: -100,
+        handEffectCardIds: ['horizon'],
+        mental: { ...base.mental, timerSeconds: 0 },
+        ap: { ...base.ap, currentAp: base.ap.maxAp, timerSeconds: 0 },
+        voltage: { ...base.voltage, timerSeconds: 0 },
+      },
+      { hand: ['horizon'] },
+    ),
     1,
   );
   const protectedState = { ...initial, mentalProtected: true };

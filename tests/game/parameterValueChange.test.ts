@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
 import {
@@ -251,16 +252,16 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
       },
     ],
   } as const;
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [],
-    handEffectCardIds: [],
-    drawPile: [card.id],
-    discard: [],
-    drawContext: 'skill' as const,
-  };
+  const state = withBoardState(
+    {
+      ...initial,
+      deck: [card],
+      cardPool: [card],
+      handEffectCardIds: [],
+      drawContext: 'skill' as const,
+    },
+    { hand: [], deck: [card.id], graveyard: [] },
+  );
   const unrelated = applyParameterValueChange(state, card, {
     ...effect,
     sourceEffectId: 'unrelated-change',

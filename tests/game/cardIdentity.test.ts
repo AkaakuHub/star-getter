@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
@@ -8,12 +9,14 @@ it.each([1, 2])('複数ユニットのカードを手札条件14の所属%sへ�
   const base = initial.deck[0];
   if (!base) throw new Error('発動元カードがありません。');
   const source = { ...base, unitIds: [1, 2] };
-  const state = {
-    ...initial,
-    deck: initial.deck.map((card) => (card.id === source.id ? source : card)),
-    cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
-    hand: [source.id],
-  };
+  const state = withBoardState(
+    {
+      ...initial,
+      deck: initial.deck.map((card) => (card.id === source.id ? source : card)),
+      cardPool: initial.cardPool.map((card) => (card.id === source.id ? source : card)),
+    },
+    { hand: [source.id] },
+  );
   const changed = applyEffect(
     state,
     {

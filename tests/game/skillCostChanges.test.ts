@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
@@ -34,32 +37,34 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
   ];
   const sourceCard = cards[0];
   if (!sourceCard) throw new Error('発動元カードがありません。');
-  const state: GameState = {
-    ...initial,
-    deck: cards,
-    cardPool: [...cards, poolCard],
-    hand: cards.map((card) => card.id),
-    handCardStats: {
-      [source.id]: {
-        isActive: true,
-        initialSectionIndex: 0,
-        sectionCount: 0,
-        skillUseCountsByMember: { 1030: 2 },
-        skillUseCountsByMainEffect: { 900: 2 },
+  const state: GameState = withBoardState(
+    {
+      ...initial,
+      deck: cards,
+      cardPool: [...cards, poolCard],
+      handCardStats: {
+        [source.id]: {
+          isActive: true,
+          initialSectionIndex: 0,
+          sectionCount: 0,
+          skillUseCountsByMember: { 1030: 2 },
+          skillUseCountsByMainEffect: { 900: 2 },
+        },
+        [other.id]: {
+          isActive: true,
+          initialSectionIndex: 0,
+          sectionCount: 0,
+          skillUseCountsByMember: {},
+          skillUseCountsByMainEffect: {},
+        },
       },
-      [other.id]: {
-        isActive: true,
-        initialSectionIndex: 0,
-        sectionCount: 0,
-        skillUseCountsByMember: {},
-        skillUseCountsByMainEffect: {},
-      },
+      cardUseCounts: { [source.id]: 2, [other.id]: 2 },
+      moodOffset: 12,
+      boosts: [{ percent: 20, untilTick: 999999 }],
+      mental: { ...initial.mental, currentMental: 50 },
     },
-    cardUseCounts: { [source.id]: 2, [other.id]: 2 },
-    moodOffset: 12,
-    boosts: [{ percent: 20, untilTick: 999999 }],
-    mental: { ...initial.mental, currentMental: 50 },
-  };
+    { hand: cards.map((card) => card.id) },
+  );
   const expected = [10, 20, 10, 5, 0, 20, 20, 10, 200, 10, 10, 0, 20, 10, 10];
   for (let index = 0; index < expected.length; index++) {
     const effect = {
@@ -174,12 +179,10 @@ it('Action17のメンバー使用数は使用カードが手札を離れた後�
   const source = initial.deck.find((card) => card.id === 'class');
   const used = initial.deck.find((card) => card.id === 'rain-preparation');
   if (!source || !used) throw new Error('検証用カードがありません。');
-  const hand = {
-    ...initial,
-    hand: [source.id],
-    handEffectCardIds: [],
-    handCardStats: {},
-  };
+  const hand = withBoardState(
+    { ...initial, handEffectCardIds: [], handCardStats: {} },
+    { hand: [source.id] },
+  );
   const withStats = initializeHandCardStats(hand, [source.id]);
   const withCostChange = applyEffect(
     withStats,
@@ -299,7 +302,7 @@ it('ActionType29は対象範囲に応じて一度だけ消費エナジーを変�
 it('ActionType29は山札上の対象カードだけに適用し、負数をActionType52で増幅する', () => {
   const initial = game();
   const source = initial.deck.find((card) => card.id === 'class');
-  const targetId = initial.drawPile[0];
+  const targetId = boardCardIds(initial, liveBoardState.deck)[0];
   const target = initial.deck.find((card) => card.id === targetId);
   if (!source || !target) throw new Error('検証用カードがありません。');
   const boosted = applyEffect(initial, {
@@ -323,10 +326,7 @@ it('ActionType29の全範囲にはProxy中のカードも含める', () => {
   const initial = game();
   const target = initial.deck[0];
   if (!target) throw new Error('対象カードがありません。');
-  const proxyState = {
-    ...initial,
-    proxyCards: [target.id],
-  };
+  const proxyState = withBoardState({ ...initial }, { proxy: [target.id] });
   const changed = applyEffect(proxyState, {
     kind: 'deck-skill-cost-change',
     num: 10_000,

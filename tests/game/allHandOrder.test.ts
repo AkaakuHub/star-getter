@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -32,17 +33,11 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   };
   const deck = [source, child];
   const state = withHand(
-    {
-      ...base,
-      deck,
-      cardPool: deck,
-      handCardStats: {},
-      cardSkillUseStates: {
-        source: { skillUseAtBoardState: 3 },
-        child: { skillUseAtBoardState: 3 },
-      },
-      ap: { ...base.ap, currentAp: 20 },
-    },
+    withBoardState(
+      { ...base, deck, cardPool: deck, handCardStats: {}, ap: { ...base.ap, currentAp: 20 } },
+      {},
+      { ['source']: { skillUseAtBoardState: 3 }, ['child']: { skillUseAtBoardState: 3 } },
+    ),
     [source.id, child.id],
   );
   return { state, source, child };
@@ -94,12 +89,11 @@ it('全手札使用の子に全手札使用があっても各カードを1回ず
   };
   const deck = [...state.deck, last];
   const ready = withHand(
-    {
-      ...state,
-      deck,
-      cardPool: deck,
-      cardSkillUseStates: { ...state.cardSkillUseStates, last: { skillUseAtBoardState: 3 } },
-    },
+    withBoardState(
+      { ...state, deck, cardPool: deck },
+      {},
+      { ['last']: { skillUseAtBoardState: 3 } },
+    ),
     ['source', 'child', 'last'],
   );
   const used = act(ready, { type: 'card', index: 0 });

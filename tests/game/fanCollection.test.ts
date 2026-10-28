@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { addHearts } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -57,39 +58,45 @@ it('APは小数のまま増幅して最後に切り捨て、先に1へ切り上�
   const baseState = game();
   expect(
     applyEffect(
-      {
-        ...baseState,
-        hand: [],
-        handEffectCardIds: [],
-        amplification: 100,
-        ap: { ...baseState.ap, currentAp: 0 },
-      },
+      withBoardState(
+        {
+          ...baseState,
+          handEffectCardIds: [],
+          amplification: 100,
+          ap: { ...baseState.ap, currentAp: 0 },
+        },
+        { hand: [] },
+      ),
       { kind: 'ap', amount: 0.1 },
     ).ap.currentAp,
   ).toBe(0);
   const baseState2 = game();
   expect(
     applyEffect(
-      {
-        ...baseState2,
-        hand: [],
-        handEffectCardIds: [],
-        amplification: 1100,
-        ap: { ...baseState2.ap, currentAp: 0 },
-      },
+      withBoardState(
+        {
+          ...baseState2,
+          handEffectCardIds: [],
+          amplification: 1100,
+          ap: { ...baseState2.ap, currentAp: 0 },
+        },
+        { hand: [] },
+      ),
       { kind: 'ap', amount: 0.1 },
     ).ap.currentAp,
   ).toBe(1);
   const baseState3 = game();
   expect(
     applyEffect(
-      {
-        ...baseState3,
-        hand: [],
-        handEffectCardIds: [],
-        amplification: 150,
-        ap: { ...baseState3.ap, currentAp: 0 },
-      },
+      withBoardState(
+        {
+          ...baseState3,
+          handEffectCardIds: [],
+          amplification: 150,
+          ap: { ...baseState3.ap, currentAp: 0 },
+        },
+        { hand: [] },
+      ),
       { kind: 'ap', amount: 3 },
     ).ap.currentAp,
   ).toBe(4);

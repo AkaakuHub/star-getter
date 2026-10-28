@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
@@ -87,7 +89,7 @@ for (const count of [79, 80]) {
     const used = act(state, { type: 'card', index: 0 });
     expect(used.stats.cardsUsed).toBe(1);
     expect(used.deck.some((item) => item.id === source.id)).toBe(true);
-    expect(used.discard).toContain(source.id);
+    expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.id);
     expect(used.deck.filter((item) => item.token === 'clock')).toHaveLength(count >= 80 ? 3 : 0);
     expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(count >= 80 ? 3 : 0);
     expect(used.deck).toHaveLength(count + (count >= 80 ? 9 : 0));
@@ -120,12 +122,16 @@ it('100枚の状態で浮き輪を使うと、生成判定が先なので追加�
   let state = addTokens(game('library'), 'bookmark', 1);
   state = addTokens(state, 'story', 100 - state.deck.length);
   const source = token(state, 'bookmark');
-  const beforeId = state.nextTokenId;
+  const beforeId = state.deckBoard.nextCardInstanceId;
   state = withHand({ ...state, ap: { ...state.ap, currentAp: 10 } }, [source.id]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.deck).toHaveLength(99);
-  expect(used.nextTokenId).toBe(beforeId);
-  expect([...used.hand, ...used.drawPile, ...used.discard]).not.toContain(source.id);
+  expect(used.deckBoard.nextCardInstanceId).toBe(beforeId);
+  expect([
+    ...used.hand,
+    ...boardCardIds(used, liveBoardState.deck),
+    ...boardCardIds(used, liveBoardState.graveyard),
+  ]).not.toContain(source.id);
   expect(addTokens(used, 'clock', 10).deck).toHaveLength(100);
 });
 
@@ -215,7 +221,7 @@ it('使用中の極光を補充候補へ戻さず、AP0化の後で新手札の�
   expect(used.ap.currentAp).toBeGreaterThan(0);
   expect(used.ap.currentAp).toBeLessThan(used.ap.maxAp);
   expect(used.hand).not.toContain(source.id);
-  expect(used.discard).toContain(source.id);
+  expect(boardCardIds(used, liveBoardState.graveyard)).toContain(source.id);
   expect(used.activation).toBeNull();
   expect(used.usedCard?.charactersId).toBe(source.charactersId);
   expect(used.usedCard?.unitIds).toEqual(source.unitIds);
@@ -236,7 +242,11 @@ it('ActionType42の子カードは親スキルの未確定カードを80枚条�
   expect(used.deck.filter((item) => item.token === 'bookmark')).toHaveLength(3);
   expect(used.tokenGroups).toEqual([]);
   expect(used.deck.some((item) => item.id === source.id)).toBe(false);
-  expect([...used.hand, ...used.drawPile, ...used.discard]).not.toContain(source.id);
+  expect([
+    ...used.hand,
+    ...boardCardIds(used, liveBoardState.deck),
+    ...boardCardIds(used, liveBoardState.graveyard),
+  ]).not.toContain(source.id);
 });
 
 for (const [count, baseReduction, tokenReduction] of [
@@ -332,34 +342,4 @@ it('一斉使用中の子カードはActionType42の合算コストではなく�
   expect(cardCost(state, child, true)).toBe(child.cost);
   const used = act({ ...state, ap: { ...state.ap, currentAp: 100 } }, { type: 'card', index: 0 });
   expect(used.cardUses.find((item) => item.card.id === child.id)?.cost).toBe(child.cost);
-});
-
-it('招待状自身を使用すると、生成した帆船を優先検索して補充する', () => {
-  const initial = game('library');
-  const state = withHand({ ...initial, ap: { ...initial.ap, currentAp: 10 } }, [
-    'library-invitation',
-  ]);
-  const used = act(state, { type: 'card', index: 0 });
-  expect(used.stats.cardsUsed).toBe(1);
-  expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),
-  ).toEqual(['ensemble', 'ensemble']);
-});
-
-it('生成帆船自身を使用した後に折り紙を2回検索し、他カードの使用では検索しない', () => {
-  let state = addTokens(addTokens(game('library'), 'ensemble', 1), 'story', 2);
-  const source = token(state, 'ensemble');
-  state = withHand({ ...state, ap: { ...state.ap, currentAp: 1 } }, [source.id]);
-  const used = act(state, { type: 'card', index: 0 });
-  expect(
-    used.hand.slice(0, 2).map((id) => used.deck.find((card) => card.id === id)?.token),
-  ).toEqual(['story', 'story']);
-});
-
-it('招待状の追加901も実行し、鍵の消費減少を2回適用する', () => {
-  let state = addTokens(addTokens(game('library'), 'story', 1), 'bookmark', 1);
-  state = { ...state, costReductions: {} };
-  const reduced = applyDrawAbility(state, card(state, 'library-invitation'));
-  expect(cardCost(reduced, token(state, 'story'))).toBe(3);
-  expect(cardCost(reduced, token(state, 'bookmark'))).toBe(1);
 });

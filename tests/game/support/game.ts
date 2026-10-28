@@ -1,3 +1,4 @@
+import { createCardDeckBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { routes, type RouteId } from '../../../src/content/routes';
 import { tracks } from '../../../src/content/tracks';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -22,8 +23,7 @@ export function withHand(state: GameState, hand: readonly string[]): GameState {
       ...state,
       hand,
       handEffectCardIds: hand,
-      drawPile: state.deck.map((card) => card.id).filter((id) => !hand.includes(id)),
-      discard: [],
+      deckBoard: { ...state.deckBoard, cards: createCardDeckBoard(state.deck, hand).cards },
     },
     hand,
   );

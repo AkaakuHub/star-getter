@@ -28,7 +28,7 @@ function play(limit: number) {
     score: state.score,
     stats: state.stats,
     hand: state.hand,
-    drawPile: state.drawPile,
+    deckBoard: state.deckBoard,
     randomSeed: state.randomSeed,
   };
 }

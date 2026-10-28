@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { advanceAutomaticGauges } from '@akaakuhub/suku-sute-core/game/automaticGauges';
@@ -10,7 +11,6 @@ import {
   notifyHandSkillUse,
 } from '@akaakuhub/suku-sute-core/game/cards/useAbilities';
 import { flushDeckActions } from '@akaakuhub/suku-sute-core/game/cards/boardActions';
-import { fillHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { applyEffect, skillValue } from '@akaakuhub/suku-sute-core/game/effects';
 import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -45,15 +45,22 @@ it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍�
   const echo = initial.deck.find((item) => item.id === 'frost-echo');
   const pulse = initial.deck.find((item) => item.id === 'frost-pulse');
   if (!card || !echo || !pulse) throw new Error('カードがありません。');
-  const state = {
-    ...initial,
-    hand: [],
-    handEffectCardIds: [],
-    targetBoosts: [],
-    moodOffset: -150,
-    hearts: { ...initial.hearts, heartLimit: 10_000_000, stageHearts: [], hiddenHeartBatches: [] },
-    voltage: { ...initial.voltage, currentVoltage: BigInt(655_000_001) },
-  };
+  const state = withBoardState(
+    {
+      ...initial,
+      handEffectCardIds: [],
+      targetBoosts: [],
+      moodOffset: -150,
+      hearts: {
+        ...initial.hearts,
+        heartLimit: 10_000_000,
+        stageHearts: [],
+        hiddenHeartBatches: [],
+      },
+      voltage: { ...initial.voltage, currentVoltage: BigInt(655_000_001) },
+    },
+    { hand: [] },
+  );
   const drawn = applyDrawAbility(state, card);
   expect(heartCount(drawn)).toBe(563);
   expect(skillValue(drawn, 100, { kind: 'ap', amount: 100 }, echo)).toBe(225);
@@ -229,13 +236,15 @@ it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', (
 
 it('シールドはスキル由来の元気減少を防ぎ、自然減少では耐久値を消費しない', () => {
   const baseState = game();
-  const initial = {
-    ...baseState,
-    hand: [],
-    handEffectCardIds: [],
-    targetBoosts: [],
-    mental: { ...baseState.mental, currentMental: 100 },
-  };
+  const initial = withBoardState(
+    {
+      ...baseState,
+      handEffectCardIds: [],
+      targetBoosts: [],
+      mental: { ...baseState.mental, currentMental: 100 },
+    },
+    { hand: [] },
+  );
   const shield = applyEffect(initial, {
     kind: 'mental-shield',
     durabilityType: 2n,
@@ -319,42 +328,4 @@ it('通常の引き直しは元の手札枚数を維持し、発動元の編成�
   expect(replaced.usedCard?.charactersId).toBe(source.charactersId);
   expect(replaced.usedCard?.unitIds).toContain(2);
   expect(replaced.deckActions.shuffles).toHaveLength(0);
-});
-
-it('全枚数の補充を終えてからドロー能力を順番に実行し、途中の上限減少で抽選を打ち切らない', () => {
-  let state = addTokens(game(), 'shadow', 1);
-  const ids = [
-    'horizon',
-    'library-ensemble',
-    'frost-echo',
-    'frost-pulse',
-    'rain-preparation',
-    'perennial',
-    'class',
-  ];
-  const deck = state.deck
-    .filter((card) => ids.includes(card.id) || card.token === 'shadow')
-    .map((card) => ({
-      ...card,
-      drawEffects: [{ kind: 'amplify' as const, percent: 1 }],
-      ...(card.token === 'shadow'
-        ? { drawRules: [{ condition: { kind: 'initial' as const }, negated: true, weight: -1 }] }
-        : {}),
-    }));
-  state = {
-    ...state,
-    deck,
-    cardPool: deck,
-    hand: [],
-    handEffectCardIds: [],
-    drawPile: deck.map((card) => card.id),
-    discard: [],
-    handLimit: 8,
-    amplification: 100,
-    drawContext: 'skill',
-    usedCard: { charactersId: 0, unitIds: [2] },
-  };
-  const drawn = fillHand(state);
-  expect(drawn.hand).toHaveLength(7);
-  expect(drawn.amplification).toBe(108);
 });

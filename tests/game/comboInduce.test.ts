@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -105,16 +106,15 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
   }));
   const source = deck.find((card) => card.id === first.id);
   if (!source) throw new Error('コンボ誘発の発動元カードがありません。');
-  const ready = {
-    ...initial,
-    deck,
-    cardPool: deck,
-    hand: [first.id, second.id],
-    drawPile: deck
-      .filter((card) => card.id !== first.id && card.id !== second.id)
-      .map((card) => card.id),
-    ap: { ...initial.ap, currentAp: 100 },
-  };
+  const ready = withBoardState(
+    { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
+    {
+      hand: [first.id, second.id],
+      deck: deck
+        .filter((card) => card.id !== first.id && card.id !== second.id)
+        .map((card) => card.id),
+    },
+  );
   const armed = activateComboInduce(
     ready,
     {

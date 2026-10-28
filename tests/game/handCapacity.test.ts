@@ -1,3 +1,6 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -76,15 +79,10 @@ it('Action904の子Action20は手札中だけ有効で、離脱時に解除す�
     ...original,
     handPermanentEffects: [handCardCountEffect(-1, 2, 1n)],
   };
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [card.id],
-    handEffectCardIds: [card.id],
-    drawPile: [],
-    discard: [],
-  };
+  const state = withBoardState(
+    { ...initial, deck: [card], cardPool: [card], handEffectCardIds: [card.id] },
+    { hand: [card.id], deck: [], graveyard: [] },
+  );
   const active = activateHandPermanentEffects(state, card);
   expect(active.handLimit).toBe(4);
   expect(advanceHandLimitEffects(active, 100).state.handLimit).toBe(4);
@@ -101,17 +99,17 @@ it('Action904は通常ドローで手札へ入った時点で子効果を発動�
     ...original,
     handPermanentEffects: [handCardCountEffect(-1, 3, 0n)],
   };
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [],
-    handCardStats: {},
-    handEffectCardIds: [],
-    drawPile: [card.id],
-    discard: [],
-    drawContext: 'skill' as const,
-  };
+  const state = withBoardState(
+    {
+      ...initial,
+      deck: [card],
+      cardPool: [card],
+      handCardStats: {},
+      handEffectCardIds: [],
+      drawContext: 'skill' as const,
+    },
+    { hand: [], deck: [card.id], graveyard: [] },
+  );
 
   const drawn = fillHandToCount(state, 1);
 
@@ -136,15 +134,10 @@ it('Action904のAction2子効果は手札離脱時に解除する', () => {
       },
     ],
   };
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [card.id],
-    handEffectCardIds: [card.id],
-    drawPile: [],
-    discard: [],
-  };
+  const state = withBoardState(
+    { ...initial, deck: [card], cardPool: [card], handEffectCardIds: [card.id] },
+    { hand: [card.id], deck: [], graveyard: [] },
+  );
   const active = activateHandPermanentEffects(state, card);
   expect(active.skillScoreUps).toHaveLength(1);
   expect(disposeHandEffects(active, [card.id]).skillScoreUps).toHaveLength(0);
@@ -166,15 +159,10 @@ it('Action904のAction52子効果は自動期限を止め、手札離脱時に�
       },
     ],
   };
-  const state = {
-    ...initial,
-    deck: [card],
-    cardPool: [card],
-    hand: [card.id],
-    handEffectCardIds: [card.id],
-    drawPile: [],
-    discard: [],
-  };
+  const state = withBoardState(
+    { ...initial, deck: [card], cardPool: [card], handEffectCardIds: [card.id] },
+    { hand: [card.id], deck: [], graveyard: [] },
+  );
 
   const active = activateHandPermanentEffects(state, card);
 
@@ -220,58 +208,68 @@ it('手札枚数を減らす効果はランダム除外後に発動元を補充�
   const state = fillHand(game());
   const source = state.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
-  const activated = {
-    ...state,
-    hand: state.hand.filter((id) => id !== source.id),
-    activation: {
-      sourceId: source.id,
-      usedCards: [source.id],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
+  const activated = withBoardState(
+    {
+      ...state,
+      activation: {
+        sourceId: source.id,
+        usedCards: [source.id],
+        allHand: false,
+        recoverDiscard: false,
+        handCountChanges: {},
+      },
     },
-  };
+    { hand: state.hand.filter((id) => id !== source.id) },
+  );
   const changed = applyEffect(activated, handCardCountEffect(-1, 3, 0n), source);
   const finished = finishCardActivation(changed);
   expect(finished.hand).toHaveLength(3);
-  expect(finished.discard).toHaveLength(2);
-  expect(finished.discard).toContain(source.id);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toHaveLength(2);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.id);
 });
 
 it('手札目標数より多い状態では使用元カードを補充しない', () => {
   const state = fillHand({ ...game(), handLimit: 7 });
   const source = state.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
-  const activated = {
-    ...state,
-    handLimit: 5,
-    hand: state.hand.filter((id) => id !== source.id),
-    activation: {
-      sourceId: source.id,
-      usedCards: [source.id],
-      allHand: false,
-      recoverDiscard: false,
-      handCountChanges: {},
+  const activated = withBoardState(
+    {
+      ...state,
+      handLimit: 5,
+      activation: {
+        sourceId: source.id,
+        usedCards: [source.id],
+        allHand: false,
+        recoverDiscard: false,
+        handCountChanges: {},
+      },
     },
-  };
+    { hand: state.hand.filter((id) => id !== source.id) },
+  );
   const finished = finishCardActivation(activated);
   expect(finished.hand).toHaveLength(6);
-  expect(finished.discard).toContain(source.id);
+  expect(boardCardIds(finished, liveBoardState.graveyard)).toContain(source.id);
 });
 
 it('手札内の減少効果を合算してから、上限を3〜8枚に制限する', () => {
   const state = game();
   const card = state.deck[0];
   if (!card) throw new Error('カードがありません。');
-  const compressed = {
-    ...state,
-    hand: [card.id],
-    drawPile: state.deck.filter((item) => item.id !== card.id).map((item) => item.id),
-    discard: [],
-    deck: state.deck.map((item) =>
-      item.id === card.id ? { ...item, passive: { heartsPercent: 100, handLimitDelta: -3 } } : item,
-    ),
-  };
+  const compressed = withBoardState(
+    {
+      ...state,
+      deck: state.deck.map((item) =>
+        item.id === card.id
+          ? { ...item, passive: { heartsPercent: 100, handLimitDelta: -3 } }
+          : item,
+      ),
+    },
+    {
+      hand: [card.id],
+      deck: state.deck.filter((item) => item.id !== card.id).map((item) => item.id),
+      graveyard: [],
+    },
+  );
   expect(handCapacity(compressed)).toBe(3);
   expect(fillHand(compressed).hand).toHaveLength(3);
   expect(handCapacity({ ...compressed, handLimit: 11 })).toBe(8);
@@ -279,14 +277,15 @@ it('手札内の減少効果を合算してから、上限を3〜8枚に制限�
 
 it('手札最大化は手札を8枚まで補充し、期限後も保持した手札を減らさない', () => {
   const initial = game();
-  const shortHand = {
-    ...initial,
-    handLimit: 4,
-    hand: initial.hand.slice(0, 3),
-    drawPile: initial.deck
-      .map((card) => card.id)
-      .filter((id) => !initial.hand.slice(0, 3).includes(id)),
-  };
+  const shortHand = withBoardState(
+    { ...initial, handLimit: 4 },
+    {
+      hand: initial.hand.slice(0, 3),
+      deck: initial.deck
+        .map((card) => card.id)
+        .filter((id) => !initial.hand.slice(0, 3).includes(id)),
+    },
+  );
   const expanded = applyEffect(shortHand, {
     kind: 'hand-max-card',
     duration: { kind: 'sections', value: 1n },

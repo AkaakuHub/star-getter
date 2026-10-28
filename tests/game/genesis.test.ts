@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { changeResource } from '@akaakuhub/suku-sute-core/game/resources';
 import { describe, expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -131,7 +132,10 @@ describe('開花の専用ゲージ', () => {
   });
 
   it('発動前の増幅だけが強度を増やし、発動後の増幅はすでに決まった強度を変えない', () => {
-    const initial = { ...advanceTo(game(), 12), moodOffset: -100, hand: ['horizon'] };
+    const initial = withBoardState(
+      { ...advanceTo(game(), 12), moodOffset: -100 },
+      { hand: ['horizon'] },
+    );
     const prepared = applyEffect(applyEffect(initial, { kind: 'amplify', percent: 50 }), {
       kind: 'genesis',
       effectValue: 3.5,

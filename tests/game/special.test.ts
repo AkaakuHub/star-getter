@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
 import type { GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -89,7 +91,11 @@ it('3回使用で通常の共鳴を戻して除外し、追加の共鳴は使用
       count < 3 ? ['library-pages', 'library-ensemble'] : ['library-ensemble'],
     );
   }
-  expect([...state.hand, ...state.drawPile, ...state.discard]).not.toContain('class');
+  expect([
+    ...state.hand,
+    ...boardCardIds(state, liveBoardState.deck),
+    ...boardCardIds(state, liveBoardState.graveyard),
+  ]).not.toContain('class');
 });
 
 it('共鳴の再使用は種別・メンバーを絞り、追加共鳴とトークン共鳴を区別する', () => {

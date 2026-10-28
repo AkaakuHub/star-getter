@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { createReshuffleEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/reshuffle';
@@ -21,7 +23,7 @@ it('Action13は手札を引き直し、使用カードの補充を抑止する',
     { type: 'card', index: 0 },
   );
   expect(used.hand).toHaveLength(initial.hand.length - 1);
-  expect(used.discard).toContain(sourceId);
+  expect(boardCardIds(used, liveBoardState.graveyard)).toContain(sourceId);
 });
 
 it('ActionType13はlong値が2³²+1なら種別1として扱わない', () => {

@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { activateHandPermanentEffects } from '@akaakuhub/suku-sute-core/game/cards/handEffects';
@@ -41,19 +42,19 @@ it.each([false, true])(
     };
     const deck = [source, drawn];
     const hand = withHand(
-      {
-        ...base,
-        deck,
-        cardPool: deck,
-        cardSkillUseStates: {
-          source: { skillUseAtBoardState: 3 },
-          drawn: { skillUseAtBoardState: 3 },
+      withBoardState(
+        {
+          ...base,
+          deck,
+          cardPool: deck,
+          handCardStats: {},
+          activeHandPermanentCardIds: [],
+          action52Buffs: [],
+          ap: { ...base.ap, currentAp: 20, maxAp: 100 },
         },
-        handCardStats: {},
-        activeHandPermanentCardIds: [],
-        action52Buffs: [],
-        ap: { ...base.ap, currentAp: 20, maxAp: 100 },
-      },
+        {},
+        { ['source']: { skillUseAtBoardState: 3 }, ['drawn']: { skillUseAtBoardState: 3 } },
+      ),
       [source.id],
     );
     const active = activateHandPermanentEffects(hand, source);

@@ -1,3 +1,4 @@
+import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
@@ -83,14 +84,13 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
   }));
   const sourceCard = deck.find((card) => card.id === source.id);
   if (!sourceCard) throw new Error('追加きらめき誘発カードが編成にありません。');
-  const state = {
-    ...initial,
-    deck,
-    cardPool: deck,
-    hand: [source.id],
-    drawPile: deck.filter((card) => card.id !== source.id).map((card) => card.id),
-    ap: { ...initial.ap, currentAp: 100 },
-  };
+  const state = withBoardState(
+    { ...initial, deck, cardPool: deck, ap: { ...initial.ap, currentAp: 100 } },
+    {
+      hand: [source.id],
+      deck: deck.filter((card) => card.id !== source.id).map((card) => card.id),
+    },
+  );
   const used = act(state, { type: 'card', index: 0 });
   expect(heartCount(used)).toBeGreaterThan(1);
   const stopped = act(used, {

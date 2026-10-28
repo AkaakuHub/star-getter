@@ -1,3 +1,5 @@
+import { boardCardIds } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
+import { liveBoardState } from '@akaakuhub/suku-sute-core/runtime/cards/deckBoardState';
 import { expect, test } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
@@ -42,7 +44,11 @@ test('信号旗の生成と除外で偶数→奇数→偶数を操作して、�
   const returned = use(odd, pennant.id);
   expect(returned.deck).toHaveLength(6);
   expect(returned.cardPool.some((card) => card.id === pennant.id)).toBe(true);
-  expect([...returned.hand, ...returned.drawPile, ...returned.discard]).not.toContain(pennant.id);
+  expect([
+    ...returned.hand,
+    ...boardCardIds(returned, liveBoardState.deck),
+    ...boardCardIds(returned, liveBoardState.graveyard),
+  ]).not.toContain(pennant.id);
   const repeated = use(returned, 'even-rhythm');
   expect(repeated.boosts.length).toBeGreaterThan(returned.boosts.length);
   expect(repeated.genesis.effects).toHaveLength(0);
