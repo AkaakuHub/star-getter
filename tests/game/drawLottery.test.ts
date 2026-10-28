@@ -4,6 +4,7 @@ import { withBoardState } from './support/board';
 import { expect, it } from 'vite-plus/test';
 import { drawWeight } from '@akaakuhub/suku-sute-core/game/cards/drawLottery';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { createCardSearchEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/cardSearch';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { fillHand, fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
@@ -140,18 +141,26 @@ it('スキル検索はアイコンではなくカードのMainEffectを照合す
     {
       ...initial,
       deck: initial.deck.map((card) =>
-        card.cardInstanceId === 'camera' ? { ...card, skillMainEffect: 987654 } : card,
+        card.cardInstanceId === 'camera'
+          ? { ...card, skillMainEffect: 987654, skillIcon: 1, drawRules: [] }
+          : card.cardInstanceId === 'perennial'
+            ? { ...card, skillMainEffect: 12, skillIcon: 987654, drawRules: [] }
+            : card,
       ),
-      drawContext: 'skill' as const,
+      drawContext: 'initial' as const,
     },
-    { deck: ['camera'] },
+    { deck: ['camera', 'perennial'] },
   );
-  const searching = applyEffect(state, {
-    kind: 'search',
-    scope: 'skill',
-    target: { kind: 'main-effect', actionType: 987654 },
-    count: 1,
-  });
+  const searching = applyEffect(
+    state,
+    createCardSearchEffect({
+      skillEffectId: 15n,
+      details: [
+        { id: 1n, detailType: 'CARD_SEARCH_TYPE', value: 1n },
+        { id: 2n, detailType: 'CARD_SEARCH_ID', value: 987654n },
+      ],
+    }),
+  );
   expect(fillHandToCount(searching, 1).hand).toEqual(['camera']);
 });
 

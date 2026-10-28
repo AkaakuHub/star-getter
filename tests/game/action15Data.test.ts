@@ -31,7 +31,7 @@ it('ActionType15の検索種別とIDを検索Effectへ接続する', () => {
   expect(compiled?.effects.find((item) => item.kind === 'search')).toMatchObject({
     kind: 'search',
     scope: 'skill',
-    target: { kind: 'skill-icon', icon: 12 },
+    target: { kind: 'main-effect', actionType: 12 },
     count: 1,
   });
 });
