@@ -84,7 +84,7 @@ it('Action21の加算・SkillBoost・Proxy吸収を計算順どおり適用す�
     induceCondition: 1 as const,
     inducePowerType: 1 as const,
     inducePowerParam: 0n,
-    inducedEffects: [],
+    induceEffects: [],
     effects: [{ actionType: 21, targetAmount: 50n, totalAmount: 0n }],
   };
   const protectedState = { ...initial, proxySkills: [absorption] };

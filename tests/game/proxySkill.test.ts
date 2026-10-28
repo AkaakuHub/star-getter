@@ -213,7 +213,7 @@ it('Proxy誘発タイミング3はruntimeのIsAbsorbEnd判定に従う', () => {
   expect(afterSection.ap.currentAp).toBe(ended.ap.currentAp);
 });
 
-it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () => {
+it('Action57は指定条件のProxyを即時誘発して解除する', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -229,7 +229,7 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
       inducePowerType: 1,
       inducePowerParam: 0n,
       targets: [{ actionType: 20, targetAmount: 1 }],
-      effects: [],
+      effects: [{ actionType: 14, effect: { kind: 'ap', amount: 2 } }],
     },
     source,
   );
@@ -263,16 +263,14 @@ it('Action57は指定条件に該当するProxyだけIsAbsorbEndにする', () =
     ),
   };
   const forced = applyEffect(reached, { kind: 'proxy-skill-forced-activation', targetType: 4n });
-  expect(forced.proxySkills.map((absorption) => absorption.isAbsorbEnd)).toEqual([true, false]);
+  expect(forced.proxySkills.map((absorption) => absorption.id)).toEqual([first.id + 1]);
+  expect(forced.ap.currentAp).toBe(reached.ap.currentAp + 8);
   const forcedUnlimited = applyEffect(reached, {
     kind: 'proxy-skill-forced-activation',
     targetType: 9_007_203_549_708_291n,
   });
-  expect(forcedUnlimited.proxySkills.map((absorption) => absorption.isAbsorbEnd)).toEqual([
-    false,
-    true,
-  ]);
-  expect(advanceTo(forced, 1).proxySkills).toHaveLength(2);
+  expect(forcedUnlimited.proxySkills.map((absorption) => absorption.id)).toEqual([first.id]);
+  expect(advanceTo(forced, 1).proxySkills).toHaveLength(1);
 });
 
 it('スキル使用回数と消費APを使うProxy期限を個別に進める', () => {
