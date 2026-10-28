@@ -7,7 +7,7 @@ import { formatNumber } from '../score/formatNumber';
 
 export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
   if (state.bloom) return <BloomGauge progress={state.bloom.progress} />;
-  const voltage = voltageLevel(state.excitement, state.maximumVoltageLevel);
+  const voltage = voltageLevel(state.currentVoltage, state.maximumVoltageLevel);
   return (
     <>
       <div
@@ -23,7 +23,9 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         <strong>{formatNumber(voltage)}</strong>
         <div>
           <i
-            style={{ width: voltageProgress(state.excitement, state.maximumVoltageLevel) + '%' }}
+            style={{
+              width: voltageProgress(state.currentVoltage, state.maximumVoltageLevel) + '%',
+            }}
           />
         </div>
       </div>
@@ -34,13 +36,13 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         aria-label="元気"
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={Math.floor(state.stamina)}
+        aria-valuenow={Math.floor(state.currentMental)}
       >
         <BatteryMedium size={15} aria-hidden="true" />
         <div className="vertical-meter">
-          <i style={{ height: state.stamina + '%' }} />
+          <i style={{ height: state.currentMental + '%' }} />
         </div>
-        <strong>{Math.floor(state.stamina)}</strong>
+        <strong>{Math.floor(state.currentMental)}</strong>
         <span>元気</span>
       </div>
       <div
@@ -49,16 +51,16 @@ export function ResourceGauges({ state }: Readonly<{ state: GameState }>) {
         role="progressbar"
         aria-label="エナジー"
         aria-valuemin={0}
-        aria-valuemax={state.maxEnergy}
-        aria-valuenow={Math.floor(state.energy)}
+        aria-valuemax={state.maxAp}
+        aria-valuenow={Math.floor(state.currentAp)}
       >
         <Zap size={15} aria-hidden="true" />
         <div className="vertical-meter">
-          <i style={{ height: (state.energy / state.maxEnergy) * 100 + '%' }} />
+          <i style={{ height: (state.currentAp / state.maxAp) * 100 + '%' }} />
         </div>
         <strong>
-          {Math.floor(state.energy)}
-          <small>/{state.maxEnergy}</small>
+          {Math.floor(state.currentAp)}
+          <small>/{state.maxAp}</small>
         </strong>
         <span>エナジー</span>
       </div>

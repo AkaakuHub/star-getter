@@ -6,18 +6,18 @@ it('ActionType22のマスタリー電圧ボーナスは正の加算を蓄積し�
   const initial = game();
   const state = {
     ...initial,
-    excitement: 10,
+    currentVoltage: 10,
     track: {
       ...initial.track,
       masteryVoltageBonus: { demand: 3, gain: 5 },
     },
   };
-  const first = changeResource(state, 'excitement', 2n);
-  expect(first.excitement).toBe(12);
+  const first = changeResource(state, 'voltage', 2n);
+  expect(first.currentVoltage).toBe(12);
   expect(first.masteryVoltageProgress).toBe(2);
 
-  const reached = changeResource(first, 'excitement', 1n);
-  expect(reached.excitement).toBe(18);
+  const reached = changeResource(first, 'voltage', 1n);
+  expect(reached.currentVoltage).toBe(18);
   expect(reached.masteryVoltageProgress).toBe(0);
 });
 
@@ -25,15 +25,15 @@ it('ActionType22のマスタリー電圧ボーナスは閾値を超えても1回
   const initial = game();
   const state = {
     ...initial,
-    excitement: 10,
+    currentVoltage: 10,
     masteryVoltageProgress: 2,
     track: {
       ...initial.track,
       masteryVoltageBonus: { demand: 3, gain: 5 },
     },
   };
-  const changed = changeResource(state, 'excitement', 2n);
-  expect(changed.excitement).toBe(17);
+  const changed = changeResource(state, 'voltage', 2n);
+  expect(changed.currentVoltage).toBe(17);
   expect(changed.masteryVoltageProgress).toBe(0);
 });
 
@@ -46,7 +46,7 @@ it('ActionType22のマスタリー電圧ボーナスは負の加算で進行し�
       masteryVoltageBonus: { demand: 3, gain: 5 },
     },
   };
-  const changed = changeResource(state, 'excitement', -1n);
+  const changed = changeResource(state, 'voltage', -1n);
   expect(changed.masteryVoltageProgress).toBe(0);
 });
 
@@ -59,7 +59,7 @@ it('電圧計のint32変換後の値をマスタリーへ加算する', () => {
       masteryVoltageBonus: { demand: 1, gain: 5 },
     },
   };
-  const changed = changeResource(state, 'excitement', 4_294_967_297n);
-  expect(changed.excitement).toBe(6);
+  const changed = changeResource(state, 'voltage', 4_294_967_297n);
+  expect(changed.currentVoltage).toBe(6);
   expect(changed.masteryVoltageProgress).toBe(0);
 });

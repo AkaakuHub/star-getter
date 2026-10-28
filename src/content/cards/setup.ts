@@ -39,7 +39,7 @@ export const setupCards: readonly Card[] = [
     beatPoint: 100,
     useAbility: 'class',
     effects: [
-      { kind: 'energy', amount: 30 },
+      { kind: 'ap', amount: 30 },
       handCardCountEffect(3, 2, 1n),
       { kind: 'amplify', percent: 30, duration: 'section' },
       { kind: 'shuffle', recoverDiscard: true, destination: 'draw' },
@@ -57,7 +57,7 @@ export const setupCards: readonly Card[] = [
     beatPoint: 100,
     allHandCost: { reductions: [] },
     drawRules: [{ condition: { kind: 'initial' }, negated: true, weight: -1 }],
-    beforeUseEffects: [{ kind: 'energy', amount: -99 }],
+    beforeUseEffects: [{ kind: 'ap', amount: -99 }],
     effects: [
       { kind: 'use-hand' },
       ...Array.from({ length: 9 }, () => ({ kind: 'beat-hearts', amount: 25 }) as const),

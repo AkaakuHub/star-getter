@@ -44,13 +44,13 @@ it('Action22は正の熱気増加を変換し、最後に登録した変換先�
     },
     source,
   );
-  const result = changeResource(latest, 'excitement', 10n, 'skill', source);
-  expect(result.excitement).toBe(initial.excitement);
+  const result = changeResource(latest, 'voltage', 10n, 'skill', source);
+  expect(result.currentVoltage).toBe(initial.currentVoltage);
   expect(result.temporaryScoreBoosts).toEqual([
     { percent: 10, remainingSeconds: null, remainingSections: null, expireOnHeartCollect: true },
   ]);
   expect(heartCount(result)).toBe(0);
-  expect(changeResource({ ...latest, excitement: 10 }, 'excitement', -10n).excitement).toBe(0);
+  expect(changeResource({ ...latest, currentVoltage: 10 }, 'voltage', -10n).currentVoltage).toBe(0);
 });
 
 it('Action22で変換された熱気はActionType46の吸収対象にならない', () => {
@@ -74,7 +74,7 @@ it('Action22で変換された熱気はActionType46の吸収対象にならな�
     },
     source,
   );
-  const result = changeResource(proxied, 'excitement', 10n, 'skill', source);
+  const result = changeResource(proxied, 'voltage', 10n, 'skill', source);
   expect(heartCount(result)).toBe(10);
   expect(result.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(0n);
 });
@@ -97,7 +97,7 @@ it('Action22のLove出力はActionType30追加Buffを適用して使用回数を
     source,
   );
   const active = applyEffect(withLoveBuff, { ...conversion, destination: 'love' }, source);
-  const result = changeResource(active, 'excitement', 10n, 'skill', source);
+  const result = changeResource(active, 'voltage', 10n, 'skill', source);
   expect(result.temporaryScoreBoosts[0]?.percent).toBe(20);
   expect(result.loveUpAdditionalBuffs).toHaveLength(0);
 });
@@ -114,9 +114,9 @@ it('Action22は熟練度ボーナスの熱気も変換する', () => {
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(initial, conversion, source);
-  const converted = changeResource(active, 'excitement', 1n, 'natural', source);
+  const converted = changeResource(active, 'voltage', 1n, 'natural', source);
   expect(heartCount(converted)).toBe(10);
-  expect(converted.excitement).toBe(initial.excitement + 1);
+  expect(converted.currentVoltage).toBe(initial.currentVoltage + 1);
 });
 
 it('Action22の詳細値を参照実装のint32へ変換する', () => {
@@ -143,10 +143,10 @@ it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で�
     { ...conversion, num: 25000, disabledType: 1, disabledValue: 1n },
     source,
   );
-  const converted = changeResource(active, 'excitement', 10n, 'skill', source);
+  const converted = changeResource(active, 'voltage', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(25);
   expect(converted.voltageConversions).toHaveLength(0);
-  expect(converted.excitement).toBe(initial.excitement);
+  expect(converted.currentVoltage).toBe(initial.currentVoltage);
 });
 
 it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {
@@ -158,8 +158,8 @@ it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {
     { ...conversion, disabledType: 1, disabledValue: (1n << 32n) + 2n },
     source,
   );
-  const once = changeResource(active, 'excitement', 1n, 'skill', source);
-  const twice = changeResource(once, 'excitement', 1n, 'skill', source);
+  const once = changeResource(active, 'voltage', 1n, 'skill', source);
+  const twice = changeResource(once, 'voltage', 1n, 'skill', source);
   expect(once.voltageConversions).toHaveLength(1);
   expect(twice.voltageConversions).toHaveLength(1);
 });
@@ -180,9 +180,9 @@ it('ActionType22は解除回数0もlong比較に残し、int32周回後に解除
       conversions: -1,
     })),
   };
-  expect(
-    changeResource(nearWrap, 'excitement', 1n, 'skill', source).voltageConversions,
-  ).toHaveLength(0);
+  expect(changeResource(nearWrap, 'voltage', 1n, 'skill', source).voltageConversions).toHaveLength(
+    0,
+  );
 });
 
 it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する', () => {
@@ -200,24 +200,24 @@ it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する'
     },
     source,
   );
-  const converted = changeResource(active, 'excitement', 100_000n, 'skill', source);
+  const converted = changeResource(active, 'voltage', 100_000n, 'skill', source);
   expect(converted.temporaryScoreBoosts[0]?.percent).toBe(141_006);
 });
 
 it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactivatorを処理する', () => {
-  const initial = { ...unboostedGame(), stamina: 50 };
+  const initial = { ...unboostedGame(), currentMental: 50 };
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const recover = applyEffect(
     initial,
-    { ...conversion, destination: 'stamina', num: 10000 },
+    { ...conversion, destination: 'mental', num: 10000 },
     source,
   );
-  const recovered = changeResource(recover, 'excitement', 5n, 'skill', source);
-  expect(recovered.stamina).toBe(55);
+  const recovered = changeResource(recover, 'voltage', 5n, 'skill', source);
+  expect(recovered.currentMental).toBe(55);
 
   const barrier = applyEffect(
-    { ...initial, stamina: 50 },
+    { ...initial, currentMental: 50 },
     {
       ...conversion,
       destination: 'mental-barrier',
@@ -227,7 +227,7 @@ it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactiv
     },
     source,
   );
-  const protectedState = changeResource(barrier, 'excitement', 5n, 'skill', source);
+  const protectedState = changeResource(barrier, 'voltage', 5n, 'skill', source);
   expect(protectedState.mentalBarriers[0]?.endurance).toBe(5);
   expect(
     act(protectedState, {
@@ -264,7 +264,7 @@ it('Action22のBarrier変換は追加補正後の耐久値を整数化する', (
     },
     source,
   );
-  const converted = changeResource(buffed, 'excitement', 1n, 'skill', source);
+  const converted = changeResource(buffed, 'voltage', 1n, 'skill', source);
   expect(converted.mentalBarriers[0]?.endurance).toBe(1);
 });
 
@@ -295,7 +295,7 @@ it('Action22のBarrier変換はActionType7追加補正前に小数1位へ切り�
     },
     source,
   );
-  const converted = changeResource(buffed, 'excitement', 1n, 'skill', source);
+  const converted = changeResource(buffed, 'voltage', 1n, 'skill', source);
   expect(converted.mentalBarriers[0]?.endurance).toBe(3);
 });
 
@@ -331,7 +331,7 @@ it('Action22のパート・ミリ秒期限とLoveUpの次回ハート回収解�
     },
     source,
   );
-  const active = changeResource(love, 'excitement', 10n, 'skill', source);
+  const active = changeResource(love, 'voltage', 10n, 'skill', source);
   const scored = collectHearts(addHearts(active, 1));
   expect(scored.temporaryScoreBoosts).toHaveLength(0);
 });

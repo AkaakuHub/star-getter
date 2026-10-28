@@ -6,7 +6,7 @@ it('Action5はActionType5・52補正後の割合を最大元気へ適用する',
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
-  const state = { ...initial, stamina: 20 };
+  const state = { ...initial, currentMental: 20 };
   const withAction5 = applyEffect(
     state,
     {
@@ -32,7 +32,7 @@ it('Action5はActionType5・52補正後の割合を最大元気へ適用する',
     { kind: 'recover-mental-skill', amount: 250_000, numberType: 1 },
     source,
   );
-  expect(recovered.stamina).toBe(60);
+  expect(recovered.currentMental).toBe(60);
   expect(recovered.action52Buffs).toHaveLength(0);
 });
 
@@ -40,7 +40,7 @@ it('Action5は非割合の数値種別でもActionType5・52を消費して元�
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
-  const state = { ...initial, stamina: 20 };
+  const state = { ...initial, currentMental: 20 };
   const withAction52 = applyEffect(state, {
     kind: 'skill-boost',
     num: 500_000,
@@ -53,6 +53,6 @@ it('Action5は非割合の数値種別でもActionType5・52を消費して元�
     { kind: 'recover-mental-skill', amount: 250_000, numberType: 2 },
     source,
   );
-  expect(unchanged.stamina).toBe(20);
+  expect(unchanged.currentMental).toBe(20);
   expect(unchanged.action52Buffs).toHaveLength(0);
 });

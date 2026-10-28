@@ -119,7 +119,7 @@ it('カードのActionType13効果をActionType44のミッションへ通知す�
   const state = {
     ...initial,
     randomSeed: 7,
-    energy: initial.maxEnergy,
+    currentAp: initial.maxAp,
     deck,
     cardPool: initial.cardPool.map((item) => (item.id === id ? updatedCard : item)),
     track: {
@@ -155,7 +155,7 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   const state = {
     ...initial,
     randomSeed: 7,
-    energy: initial.maxEnergy,
+    currentAp: initial.maxAp,
     deck,
     cardPool: initial.cardPool.map((item) => (item.id === source.id ? card : item)),
     track: {

@@ -191,9 +191,9 @@ export class GameDriver {
       .filter(
         (index) =>
           this.state.phase === 'playing' &&
-          !this.state.resting &&
+          !this.state.mentalDown &&
           (this.state.bloom !== null ||
-            this.state.energy >= cardCost(this.state, cardAt(this.state, index))),
+            this.state.currentAp >= cardCost(this.state, cardAt(this.state, index))),
       );
     for (const key of priority) {
       const index = available.find((candidate) => {
@@ -336,9 +336,9 @@ export class GameDriver {
           ]),
         ),
         deck: this.state.deck.length,
-        energy: this.state.energy,
-        mental: this.state.stamina,
-        ordinaryVoltage: this.state.excitement,
+        currentAp: this.state.currentAp,
+        mental: this.state.currentMental,
+        ordinaryVoltage: this.state.currentVoltage,
         mood: moodValue(this.state),
         scoreMultiplier: this.state.scoreMultiplier.toString(),
         classUses: this.state.cardUseCounts.class ?? 0,

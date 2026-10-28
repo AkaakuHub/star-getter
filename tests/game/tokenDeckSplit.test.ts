@@ -106,7 +106,7 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
       item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
     ),
     deckOutCount: 1,
-    track: { ...base.track, afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }] },
+    track: { ...base.track, afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }] },
   };
   const split = applyEffect(state, {
     kind: 'token-deck-split',
@@ -115,7 +115,7 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
   });
   expect(split.deckOutCount).toBe(0);
   expect(split.afterMentalDownEvents).toBe(state.afterMentalDownEvents + 1);
-  expect(split.energy).toBe(state.energy + 2);
+  expect(split.currentAp).toBe(state.currentAp + 2);
 });
 
 it('ActionType43は空のサブデッキへの切替後にデッキアウト確認を実行する', () => {
@@ -128,7 +128,7 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
       deck: base.deck.map((item) =>
         item.id === selected.id ? { ...item, tokenSeriesIds: [42] } : item,
       ),
-      track: { ...base.track, afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }] },
+      track: { ...base.track, afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }] },
     },
     { kind: 'token-deck-split', seriesIds: [42n], duration: { kind: 'stage', value: 0 } },
   );
@@ -144,7 +144,7 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
   );
   expect(switched.deckOutCount).toBe(0);
   expect(switched.afterMentalDownEvents).toBe(split.afterMentalDownEvents + 1);
-  expect(switched.energy).toBe(split.energy + 2);
+  expect(switched.currentAp).toBe(split.currentAp + 2);
 });
 
 it('期限切れでメインデッキへ戻す', () => {

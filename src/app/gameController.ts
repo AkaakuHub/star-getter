@@ -77,15 +77,16 @@ export class GameController {
         (mask, _, index) => (canUseCard(this.currentState, index) ? mask | (1 << index) : mask),
         0,
       ),
-      skillPoint: Math.trunc(this.currentState.energy),
+      skillPoint: Math.trunc(this.currentState.currentAp),
       ableUseSkill:
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
-      mentalDown: this.currentState.resting,
+      mentalDown: this.currentState.mentalDown,
       allSkillsCostOver: this.currentState.hand.every(
         (_, index) =>
           this.currentState.bloom === null &&
-          cardCost(this.currentState, cardAt(this.currentState, index)) > this.currentState.energy,
+          cardCost(this.currentState, cardAt(this.currentState, index)) >
+            this.currentState.currentAp,
       ),
       deltaTimeSeconds,
     });

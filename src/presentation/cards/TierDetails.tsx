@@ -99,7 +99,7 @@ function TierTable({
 
 function columnTitle(effect: Effect): string {
   switch (effect.kind) {
-    case 'excitement':
+    case 'voltage':
       return '熱気Pt.';
     case 'beat-hearts':
       return '自然発生回数';
@@ -120,7 +120,7 @@ function effectValue(effect: Effect, mood: number): string {
   let value: number;
   let unit = '';
   switch (effect.kind) {
-    case 'excitement':
+    case 'voltage':
     case 'beat-hearts':
     case 'hearts':
     case 'heart-limit':

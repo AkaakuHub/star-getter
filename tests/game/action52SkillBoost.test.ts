@@ -50,7 +50,7 @@ it('Action52は対象ActionType52の値へ割合を加え、回数期限を消�
     },
     source,
   );
-  const converted = changeResource(conversion, 'excitement', 10n, 'skill', source);
+  const converted = changeResource(conversion, 'voltage', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(15);
   expect(converted.action52Buffs).toHaveLength(0);
   expect(converted.voltageConversions).toHaveLength(1);
@@ -117,8 +117,8 @@ it('Action14のAP回復にもActionType52を適用して使用回数を消費す
     },
     source,
   );
-  const recovered = applyEffect(active, { kind: 'energy', amount: 10 }, source);
-  expect(recovered.energy).toBe(15);
+  const recovered = applyEffect(active, { kind: 'ap', amount: 10 }, source);
+  expect(recovered.currentAp).toBe(15);
   expect(recovered.action52Buffs).toHaveLength(0);
 });
 

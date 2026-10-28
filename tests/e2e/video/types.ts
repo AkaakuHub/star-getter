@@ -16,7 +16,7 @@ export type ReplaySnapshot = Readonly<{
   score: string;
   gauge: string | null;
   deckSize: number;
-  energy: number;
+  currentAp: number;
   heartLimit: number;
   storyAmplification: number;
   lastActionTick: number;

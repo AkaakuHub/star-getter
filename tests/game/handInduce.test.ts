@@ -28,7 +28,7 @@ it('ActionType37のSetで基礎熱気レベルが上がると手札誘発を起�
       ...initial,
       deck: [card],
       cardPool: [card],
-      excitement: voltageThreshold(1),
+      currentVoltage: voltageThreshold(1),
     },
     [card.id],
   );
@@ -190,7 +190,7 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
       {
         kind: 'branch' as const,
         condition: { kind: 'mood-at-least' as const, value: branchMood },
-        whenTrue: [{ kind: 'energy' as const, amount: 1 }],
+        whenTrue: [{ kind: 'ap' as const, amount: 1 }],
         whenFalse: [],
       },
     ],
@@ -207,11 +207,11 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
       ...initial,
       deck: [card],
       cardPool: [card],
-      energy: initial.maxEnergy,
+      currentAp: initial.maxAp,
       lastActionTick: -1_000_000,
     },
     [card.id],
   );
   const next = act(state, { type: 'card', index: 0 });
-  expect(next.energy).toBe(initial.maxEnergy - card.cost + 1);
+  expect(next.currentAp).toBe(initial.maxAp - card.cost + 1);
 });

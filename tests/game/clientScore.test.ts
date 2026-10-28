@@ -42,7 +42,7 @@ describe('star-getterの回収得点', () => {
   });
 
   it('回収数×熱気によるきらめきランクで倍率が変わる', () => {
-    expect(collectionScore({ ...game(), excitement: 601 }, 10, false, 10)).toBe(15000n);
+    expect(collectionScore({ ...game(), currentVoltage: 601 }, 10, false, 10)).toBe(15000n);
   });
 
   it('STAR増加は加算し、開花プログレスの1.5乗を百分率で加える', () => {
@@ -59,7 +59,7 @@ describe('star-getterの回収得点', () => {
           bloom: {
             progress: 4n,
             strength: 1,
-            rollback: { energy: 10, stamina: 100, excitement: 0 },
+            rollback: { currentAp: 10, currentMental: 100, currentVoltage: 0 },
           },
         },
         10,

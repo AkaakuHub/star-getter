@@ -12,7 +12,7 @@ import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { game, withHand } from './support/game';
 
 function modeGame() {
-  return { ...game('library'), modes: createModes([2, 1, 2]), excitement: 0 };
+  return { ...game('library'), modes: createModes([2, 1, 2]), currentVoltage: 0 };
 }
 const on: Effect = { kind: 'mode', modeId: 1n, change: 'on' };
 const off: Effect = { kind: 'mode', modeId: 1n, change: 'off' };
@@ -21,8 +21,8 @@ const reaction: Effect = {
   modeId: 1,
   thresholds: [1n, 2n],
   effects: [
-    { kind: 'excitement', amount: 10 },
-    { kind: 'energy-limit', amount: 1 },
+    { kind: 'voltage', amount: 10 },
+    { kind: 'ap-limit', amount: 1 },
   ],
   buffNum: 10000n,
 };
@@ -37,11 +37,11 @@ describe('モード切替と切替時効果', () => {
   it('同じONを重複発動せず、OFFからONへの切替だけ数える', () => {
     let state = applyEffect(modeGame(), reaction);
     state = applyEffect(state, on);
-    expect(state.excitement).toBe(10);
+    expect(state.currentVoltage).toBe(10);
     expect(applyEffect(state, on)).toEqual(state);
     state = applyEffect(applyEffect(state, off), on);
-    expect(state.excitement).toBe(30);
-    expect(state.maxEnergy).toBe(modeGame().maxEnergy + 1);
+    expect(state.currentVoltage).toBe(30);
+    expect(state.maxAp).toBe(modeGame().maxAp + 1);
     expect(state.modeReactions[0]?.count).toBe(2);
   });
   it('ActionType35のModeChangeType.Alternateは現在状態を反転する', () => {
@@ -77,13 +77,13 @@ describe('モード切替と切替時効果', () => {
         modeId: 88,
         off: {
           cost: 1,
-          effects: [{ kind: 'excitement', amount: 1 }],
+          effects: [{ kind: 'voltage', amount: 1 }],
           skillIcon: null,
           special: null,
         },
         on: {
           cost: 3,
-          effects: [{ kind: 'excitement', amount: 7 }],
+          effects: [{ kind: 'voltage', amount: 7 }],
           skillIcon: null,
           special: null,
         },
@@ -97,14 +97,14 @@ describe('モード切替と切替時効果', () => {
       modes: createModes([88]),
       hand: [card.id],
       phase: 'playing' as const,
-      energy: 100,
+      currentAp: 100,
     };
     const enabled = applyEffect(state, { kind: 'mode', modeId: 88n, change: 'on' });
     expect(cardCost(state, card)).toBe(1);
     expect(cardCost(enabled, card)).toBe(3);
-    expect(cardAt(enabled, 0).effects).toEqual([{ kind: 'excitement', amount: 7 }]);
+    expect(cardAt(enabled, 0).effects).toEqual([{ kind: 'voltage', amount: 7 }]);
     const used = act(enabled, { type: 'card', index: 0 });
-    expect(used.excitement - enabled.excitement).toBe(28);
+    expect(used.currentVoltage - enabled.currentVoltage).toBe(28);
     expect(used.cardUses[0]?.cost).toBe(3);
   });
   it('Action36のモード別Abilityを切替時に解除して再起動する', () => {
@@ -117,12 +117,12 @@ describe('モード切替と切替時効果', () => {
         modeId: 1,
         off: {
           modeEffects: [handCardCountEffect(1, 3, 0n)],
-          ability893Effects: [{ kind: 'energy', amount: 1 }],
+          ability893Effects: [{ kind: 'ap', amount: 1 }],
           ability894Effects: [],
         },
         on: {
           modeEffects: [handCardCountEffect(2, 3, 0n)],
-          ability893Effects: [{ kind: 'energy', amount: 3 }],
+          ability893Effects: [{ kind: 'ap', amount: 3 }],
           ability894Effects: [],
         },
       },
@@ -145,21 +145,21 @@ describe('モード切替と切替時効果', () => {
       {
         ...on,
         phase: 'playing',
-        energy: 20,
+        currentAp: 20,
         drawPile: deck.filter((item) => item.id !== card.id).map((item) => item.id),
       },
       { type: 'card', index: 0 },
     );
-    expect(playing.energy).toBe(20 - cardCost(on, card) + 3);
+    expect(playing.currentAp).toBe(20 - cardCost(on, card) + 3);
   });
   it('切替保留中は状態を変えず、解除後にFIFOで実行する', () => {
     let state = applyEffect(modeGame(), reaction);
     state = { ...state, modes: { ...state.modes, held: true } };
     for (const effect of [on, off, on]) state = applyEffect(state, effect);
-    expect(state.excitement).toBe(0);
+    expect(state.currentVoltage).toBe(0);
     expect(state.modes.queue).toHaveLength(3);
     state = drainModeChanges({ ...state, modes: { ...state.modes, held: false } }, applyEffect);
-    expect(state.excitement).toBe(30);
+    expect(state.currentVoltage).toBe(30);
     expect(state.modes.queue).toHaveLength(0);
   });
   it('ActionType45のNumToValueを効果加算後にEffectPowerとして適用する', () => {
@@ -182,11 +182,11 @@ describe('モード切替と切替時効果', () => {
       kind: 'mode-reaction',
       modeId: 1,
       thresholds: [1n],
-      effects: [{ kind: 'excitement', amount: 1 }],
+      effects: [{ kind: 'voltage', amount: 1 }],
       buffNum: 15_000n,
     });
 
-    expect(applyEffect(registered, on).excitement).toBe(1);
+    expect(applyEffect(registered, on).currentVoltage).toBe(1);
   });
   it('ActionType45は子効果がない場合、表示・誘発を登録しない', () => {
     const state = modeGame();
@@ -208,21 +208,21 @@ describe('モード切替と切替時効果', () => {
         deckOutCount: 2,
         track: {
           ...initial.track,
-          afterMentalDownEffects: [{ kind: 'excitement', amount: 5 }],
+          afterMentalDownEffects: [{ kind: 'voltage', amount: 5 }],
         },
       },
       {
         kind: 'mode-reaction',
         modeId: 1,
         thresholds: [1n],
-        effects: [{ kind: 'energy-limit', amount: 1 }],
+        effects: [{ kind: 'ap-limit', amount: 1 }],
         buffNum: 0n,
       },
     );
     state = applyEffect(state, on);
     expect(state.deckOutCount).toBe(1);
     expect(state.afterMentalDownEvents).toBe(1);
-    expect(state.excitement).toBe(5);
+    expect(state.currentVoltage).toBe(5);
   });
   it('切替時効果による別モードの切替を同じキューで処理する', () => {
     let state = applyEffect(modeGame(), {
@@ -236,12 +236,12 @@ describe('モード切替と切替時効果', () => {
       kind: 'mode-reaction',
       modeId: 2,
       thresholds: [1n],
-      effects: [{ kind: 'energy-limit', amount: 2 }],
+      effects: [{ kind: 'ap-limit', amount: 2 }],
       buffNum: 0n,
     });
     state = applyEffect(state, on);
     expect(state.modes.entries.every((entry) => entry.on)).toBe(true);
-    expect(state.maxEnergy).toBe(modeGame().maxEnergy + 2);
+    expect(state.maxAp).toBe(modeGame().maxAp + 2);
     expect(state.modes.changing).toBe(false);
   });
   it('登録されていないモードとカード効果のID0では発動しない', () => {
@@ -261,7 +261,7 @@ describe('モード切替と切替時効果', () => {
       { ...first, id: 'reset', effects: [{ kind: 'voltage-set', amount: 0 }] },
     ];
     const prepared = applyEffect(
-      { ...original, deck: cards, cardPool: cards, energy: 100 },
+      { ...original, deck: cards, cardPool: cards, currentAp: 100 },
       reaction,
     );
     const state = act(
@@ -271,7 +271,7 @@ describe('モード切替と切替時効果', () => {
       ),
       { type: 'card', index: 0 },
     );
-    expect(state.excitement).toBe(10);
+    expect(state.currentVoltage).toBe(10);
     expect(state.modeReactions[0]?.count).toBe(1);
     expect(state.modes.held).toBe(false);
   });

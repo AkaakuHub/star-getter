@@ -14,7 +14,7 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillSkillLevel: 4,
     seriesMainEffect: 1,
     seriesSkillIcon: 5,
-    variant: { cost: 3, effects: [{ kind: 'energy', amount: 2 }], skillIcon: 5, special: null },
+    variant: { cost: 3, effects: [{ kind: 'ap', amount: 2 }], skillIcon: 5, special: null },
   },
   {
     skillType: 3,
@@ -98,7 +98,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
       seriesId: 42,
       mainEffect: 1,
       skillIcon: 5,
-      variant: { cost: 3, effects: [{ kind: 'energy', amount: 2 }], skillIcon: 5, special: null },
+      variant: { cost: 3, effects: [{ kind: 'ap', amount: 2 }], skillIcon: 5, special: null },
     },
     ability: {
       seriesId: 43,
@@ -129,7 +129,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
     skillIcon: 5,
     tokenCardAbilitySeriesId: 43n,
     tokenSeriesIds: [42],
-    effects: [{ kind: 'energy', amount: 2 }],
+    effects: [{ kind: 'ap', amount: 2 }],
     ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
   });
   expect(state.tokenCatalog).toHaveLength(0);

@@ -56,8 +56,8 @@ describe('カード共通の条件判定', () => {
     },
     { condition: { kind: 'heat', minimum: 950 }, less: { kind: 'heat', minimum: 951 } },
     {
-      condition: { kind: 'stamina', minimumPercent: 30 },
-      less: { kind: 'stamina', minimumPercent: 31 },
+      condition: { kind: 'mental', minimumPercent: 30 },
+      less: { kind: 'mental', minimumPercent: 31 },
     },
     { condition: { kind: 'weather', minimum: -100 }, less: { kind: 'weather', minimum: -99 } },
     { condition: { kind: 'part-from', number: 3 }, less: { kind: 'part-from', number: 4 } },
@@ -101,12 +101,12 @@ describe('カード共通の条件判定', () => {
     const effect = {
       kind: 'branch' as const,
       condition: { kind: 'heat' as const, minimum: 100_000 },
-      whenTrue: [{ kind: 'energy-limit' as const, amount: 1 }],
-      whenFalse: [{ kind: 'energy-limit' as const, amount: 2 }],
+      whenTrue: [{ kind: 'ap-limit' as const, amount: 1 }],
+      whenFalse: [{ kind: 'ap-limit' as const, amount: 2 }],
     };
-    expect(applyEffect(initial, effect).maxEnergy).toBe(initial.maxEnergy + 1);
+    expect(applyEffect(initial, effect).maxAp).toBe(initial.maxAp + 1);
     const bloom = applyEffect(initial, { kind: 'bloom', strength: 1 });
-    expect(applyEffect(bloom, effect).maxEnergy).toBe(initial.maxEnergy + 1);
+    expect(applyEffect(bloom, effect).maxAp).toBe(initial.maxAp + 1);
   });
   it('開花中は元気割合と熱気段階の条件でもtrue枝・false枝を実行する', () => {
     const initial = game();
@@ -114,10 +114,10 @@ describe('カード共通の条件判定', () => {
     const result = applyEffect(bloom, {
       kind: 'branch',
       condition: { kind: 'mental-at-most', fraction: 0.5 },
-      whenTrue: [{ kind: 'energy-limit', amount: 1 }],
-      whenFalse: [{ kind: 'energy-limit', amount: 2 }],
+      whenTrue: [{ kind: 'ap-limit', amount: 1 }],
+      whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxEnergy).toBe(bloom.maxEnergy + 3);
+    expect(result.maxAp).toBe(bloom.maxAp + 3);
   });
   it('開花中も空模様分岐は両側を発動しない', () => {
     const bloom = applyEffect(game(), { kind: 'bloom', strength: 1 });
@@ -125,10 +125,10 @@ describe('カード共通の条件判定', () => {
     const result = applyEffect(bloom, {
       kind: 'branch',
       condition: { kind: 'weather', minimum: context.weather },
-      whenTrue: [{ kind: 'energy-limit', amount: 1 }],
-      whenFalse: [{ kind: 'energy-limit', amount: 2 }],
+      whenTrue: [{ kind: 'ap-limit', amount: 1 }],
+      whenFalse: [{ kind: 'ap-limit', amount: 2 }],
     });
-    expect(result.maxEnergy).toBe(bloom.maxEnergy + 1);
+    expect(result.maxAp).toBe(bloom.maxAp + 1);
   });
   it('永続分岐は条件変化時に前の子効果を解除して切り替える', () => {
     const original = game();

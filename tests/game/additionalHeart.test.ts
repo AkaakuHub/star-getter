@@ -89,7 +89,7 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
     cardPool: deck,
     hand: [source.id],
     drawPile: deck.filter((card) => card.id !== source.id).map((card) => card.id),
-    energy: 100,
+    currentAp: 100,
   };
   const used = act(state, { type: 'card', index: 0 });
   expect(heartCount(used)).toBeGreaterThan(1);

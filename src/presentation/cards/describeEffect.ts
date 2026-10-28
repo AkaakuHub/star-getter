@@ -90,7 +90,7 @@ export function describeEffect(effect: Effect): string {
       return `代理カードが捨て札へ移るたび、${effect.effects.map(describeEffect).join('')}`;
     case 'voltage-tier':
       return `熱気Lv.${effect.step}ごとに効果が変化する。${effect.tiers.map((tier, index) => `Lv.${index * effect.step}以上：${tier.map(describeEffect).join('')}`).join('')}`;
-    case 'energy-limit':
+    case 'ap-limit':
       return `このステージ中、エナジー上限を${effect.amount}増加する。`;
     case 'reset-special':
       return '対応する共鳴を再使用できるようにする。';
@@ -183,11 +183,11 @@ export function describeEffect(effect: Effect): string {
         : 'ビートに応じた追加のきらめきを獲得する。';
     case 'skill-score-up':
       return 'スキルで獲得するSTARを増加する。';
-    case 'energy':
+    case 'ap':
       return `エナジーを${Math.abs(effect.amount)}${effect.amount < 0 ? '減らす' : '回復する'}。開花中は回復量と効果増幅に応じて開花プログレスを増加させる。`;
-    case 'stamina':
+    case 'mental':
       return `元気を${effect.amount}%回復する。開花中は回復効果を開花プログレスへ変換する。`;
-    case 'excitement':
+    case 'voltage':
       return `熱気Pt.を${effect.amount}獲得する。開花中は獲得効果を開花プログレスへ変換する。`;
     case 'boost':
       return `このステージ中、獲得するSTARを${Math.round((effect.multiplier - 1) * 100)}%増加させる。この効果は重複し、効果増幅の対象となる。`;
@@ -198,7 +198,7 @@ export function describeEffect(effect: Effect): string {
     case 'bloom':
       return 'このステージ中、開花を発動し、きらめきを結晶に変化させる。エナジー・熱気・元気の増減を開花プログレスに変換し、プログレスの1.5乗に応じて回収時のSTARが増加する。発動時のゲージを保持し、開花中はエナジー残量に関係なくアクションを使用できる。使用時のエナジー消費もプログレスへ変換する。';
     case 'resource-boost':
-      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'excitement' ? '熱気ゲイン' : effect.target === 'attract' ? 'STAR増加' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
+      return `${effect.condition === 'always' ? '' : effect.condition === 'voltage20' ? '熱気Lv.が20以上のとき、' : '元気が100%のとき、'}${effect.uses === null ? 'このステージ中、' : `${effect.uses}回の間、`}${effect.target === 'voltage' ? '熱気ゲイン' : effect.target === 'attract' ? 'STAR増加' : '元気リカバー'}効果を${effect.percent}%増幅する。`;
     case 'collect':
       return '出現中のきらめきを全て回収する。';
   }

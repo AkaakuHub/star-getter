@@ -22,7 +22,7 @@ type Snapshot = Readonly<{
   score: string;
   gauge: string | null;
   deckSize: number;
-  energy: number;
+  currentAp: number;
   hearts: number;
   heartLimit: number;
   storyAmplification: number;
@@ -55,7 +55,7 @@ function snapshot(state: GameState): Snapshot {
     score: state.score.toString(),
     gauge: state.bloom?.progress.toString() ?? null,
     deckSize: state.deck.length,
-    energy: state.energy,
+    currentAp: state.currentAp,
     hearts: heartCount(state),
     heartLimit: state.hearts.heartLimit,
     storyAmplification: state.storyAmplification,

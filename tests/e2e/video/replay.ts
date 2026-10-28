@@ -100,7 +100,7 @@ export async function verifyInput(page: Page, row: InputRecord): Promise<void> {
     'score',
     'gauge',
     'deckSize',
-    'energy',
+    'currentAp',
     'heartLimit',
     'storyAmplification',
     'lastActionTick',

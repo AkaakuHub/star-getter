@@ -53,7 +53,7 @@ export function createGameController(
         score: state.score.toString(),
         gauge: state.bloom?.progress.toString() ?? null,
         deckSize: state.deck.length,
-        energy: state.energy,
+        currentAp: state.currentAp,
         heartLimit: state.hearts.heartLimit,
         storyAmplification: state.storyAmplification,
         lastActionTick: state.lastActionTick,

@@ -18,7 +18,7 @@ it('Action10はActionType10・52適用後に熱気を加算する', () => {
     { kind: 'add-voltage-skill', amount: 1_000_000, numberType: 1 },
     source,
   );
-  expect(boosted.excitement).toBe(initial.excitement + 150);
+  expect(boosted.currentVoltage).toBe(initial.currentVoltage + 150);
   expect(boosted.action52Buffs).toHaveLength(0);
 });
 
@@ -38,12 +38,12 @@ it('Action10は数値種別1以外では補正を消費して熱気を加算し�
     { kind: 'add-voltage-skill', amount: 1_000_000, numberType: 2 },
     source,
   );
-  expect(unchanged.excitement).toBe(initial.excitement);
+  expect(unchanged.currentVoltage).toBe(initial.currentVoltage);
   expect(unchanged.action52Buffs).toHaveLength(0);
 });
 
 it('Action10の詳細値と補正値を参照実装のint32として扱う', () => {
-  const initial = { ...game(), excitement: 500_000_000 };
+  const initial = { ...game(), currentVoltage: 500_000_000 };
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const changed = applyEffect(
@@ -51,5 +51,5 @@ it('Action10の詳細値と補正値を参照実装のint32として扱う', () 
     { kind: 'add-voltage-skill', amount: 2_147_483_648, numberType: 1 },
     source,
   );
-  expect(changed.excitement).toBe(499_785_252);
+  expect(changed.currentVoltage).toBe(499_785_252);
 });

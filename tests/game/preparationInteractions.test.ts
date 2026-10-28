@@ -24,7 +24,7 @@ it('自然な空模様に雨100%はなく、準備カードの使用で最初の
   let state = game();
   for (const expected of [-50, -100]) {
     state = withHand(
-      { ...state, energy: 20, maxEnergy: 20, tick: state.tick + cardCooldownTicks(state) },
+      { ...state, currentAp: 20, maxAp: 20, tick: state.tick + cardCooldownTicks(state) },
       ['rain-preparation'],
     );
     state = act(state, { type: 'card', index: 0 });
@@ -46,14 +46,14 @@ it('ドロー時の11段階増幅は雨音だけに適用し、同じ雨の凍�
     hand: [],
     handEffectCardIds: [],
     targetBoosts: [],
-    excitement: 655_000_001,
+    currentVoltage: 655_000_001,
     moodOffset: -150,
     hearts: { ...initial.hearts, heartLimit: 10_000_000, stageHearts: [], hiddenHeartBatches: [] },
   };
   const drawn = applyDrawAbility(state, card);
   expect(heartCount(drawn)).toBe(563);
-  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, echo)).toBe(225);
-  expect(skillValue(drawn, 100, { kind: 'energy', amount: 100 }, pulse)).toBe(100);
+  expect(skillValue(drawn, 100, { kind: 'ap', amount: 100 }, echo)).toBe(225);
+  expect(skillValue(drawn, 100, { kind: 'ap', amount: 100 }, pulse)).toBe(100);
 });
 
 it('手札中の雨の使用反応で、対応する基本カードとパズルだけの消費を減らす', () => {
@@ -92,13 +92,13 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
           trigger,
           limit: 1n,
           limitMemory: 'reset' as const,
-          effects: [{ kind: 'energy' as const, amount: 1 }],
+          effects: [{ kind: 'ap' as const, amount: 1 }],
         },
       ],
     };
     const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
     const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
-    const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
+    const state = withHand({ ...initial, deck, cardPool, currentAp: 0 }, [source.id]);
     const currentUsed = trigger.kind === 'same-card' ? handCard : used;
     const first =
       trigger.kind === 'same-card'
@@ -108,8 +108,8 @@ it('手札誘発はメンバー・スキル記号・ユニット・同一カー�
       trigger.kind === 'same-card'
         ? notifyHandCardBeforeUse(first, currentUsed, 2, applyEffect)
         : notifyHandSkillUse(first, currentUsed, applyEffect);
-    expect(first.energy).toBe(1);
-    expect(second.energy).toBe(1);
+    expect(first.currentAp).toBe(1);
+    expect(second.currentAp).toBe(1);
     expect(second.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(1);
     expect(
       disposeHandEffects(second, [source.id]).handUseActivationCounts[`${source.id}:test-inducer`],
@@ -127,7 +127,7 @@ it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適�
       {
         sourceEffectId: 'test-inducer',
         trigger: { kind: 'voltage-increase' as const },
-        effects: [{ kind: 'energy' as const, amount: 1 }],
+        effects: [{ kind: 'ap' as const, amount: 1 }],
       },
     ],
   };
@@ -138,17 +138,17 @@ it('熱気段階の上昇ごとに誘発し、自然増加と上限回数を適�
       ...initial,
       deck,
       cardPool,
-      energy: 0,
+      currentAp: 0,
       maximumVoltageLevel: 1500,
-      excitement: 655_000_001,
+      currentVoltage: 655_000_001,
     },
     [source.id],
   );
-  const changed = applyEffect(state, { kind: 'excitement', amount: 16_000_000 });
-  expect(changed.energy).toBe(2);
+  const changed = applyEffect(state, { kind: 'voltage', amount: 16_000_000 });
+  expect(changed.currentAp).toBe(2);
   expect(changed.handUseActivationCounts[`${source.id}:test-inducer`]).toBe(2);
   const natural = advanceAutomaticGauges(
-    { ...state, excitement: 655_000_000 },
+    { ...state, currentVoltage: 655_000_000 },
     state.track.stage.voltageIncreaseIntervalSeconds + 0.1,
     applyEffect,
   );
@@ -172,7 +172,7 @@ it('パート切替時に手札誘発を一度実行する', () => {
   };
   const deck = initial.deck.map((card) => (card.id === source.id ? handCard : card));
   const cardPool = initial.cardPool.map((card) => (card.id === source.id ? handCard : card));
-  const state = withHand({ ...initial, deck, cardPool, energy: 0 }, [source.id]);
+  const state = withHand({ ...initial, deck, cardPool, currentAp: 0 }, [source.id]);
   const changed = advanceTo(state, 25);
   expect(sectionAt(changed)).not.toBe(sectionAt(state));
   expect(changed.moodOffset).toBe(1);
@@ -220,7 +220,13 @@ it('手札離脱時に子効果の詳細値と発動数を初期値へ戻す', (
 });
 
 it('シールドは自然減少とスキル由来の元気減少を防ぐ', () => {
-  const initial = { ...game(), hand: [], handEffectCardIds: [], stamina: 100, targetBoosts: [] };
+  const initial = {
+    ...game(),
+    hand: [],
+    handEffectCardIds: [],
+    currentMental: 100,
+    targetBoosts: [],
+  };
   const shield = applyEffect(initial, {
     kind: 'mental-shield',
     durabilityType: 2n,
@@ -228,15 +234,15 @@ it('シールドは自然減少とスキル由来の元気減少を防ぐ', () =
     duration: { kind: 'stage' },
     applyCount: 0n,
   });
-  const damaged = applyEffect(shield, { kind: 'stamina', amount: -14 });
-  expect(damaged.stamina).toBe(96);
+  const damaged = applyEffect(shield, { kind: 'mental', amount: -14 });
+  expect(damaged.currentMental).toBe(96);
   expect(damaged.mentalShields).toHaveLength(0);
   const natural = advanceAutomaticGauges({ ...shield, mentalTimerSeconds: 0 }, 1.2);
-  expect(natural.stamina).toBe(100);
+  expect(natural.currentMental).toBe(100);
   expect(natural.mentalShields[0]?.durability).toBe(9);
   const active = activateBloom({ ...shield, moodOffset: -150 }, 1);
-  const converted = applyEffect(active, { kind: 'stamina', amount: -14 });
-  expect(converted.stamina).toBe(100);
+  const converted = applyEffect(active, { kind: 'mental', amount: -14 });
+  expect(converted.currentMental).toBe(100);
   expect(converted.mentalShields).toHaveLength(0);
   expect(converted.bloom?.progress).toBe((active.bloom?.progress ?? 0n) - 4n);
 });
@@ -270,8 +276,8 @@ for (const [points, expected] of [
         ...initial,
         deck,
         mentalProtected: true,
-        stamina: 0,
-        excitement: points,
+        currentMental: 0,
+        currentVoltage: points,
         maximumVoltageLevel: 1500,
         hearts: {
           ...initial.hearts,
@@ -283,7 +289,7 @@ for (const [points, expected] of [
       ['frost-echo'],
     );
     state = act(addHearts(state, 500_000), { type: 'collect' });
-    expect(state.excitement).toBe(expected);
+    expect(state.currentVoltage).toBe(expected);
   });
 }
 

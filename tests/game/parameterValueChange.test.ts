@@ -102,7 +102,7 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
   const result = applyEffect(
     changed,
     {
-      kind: 'energy',
+      kind: 'ap',
       amount: 10,
       parameterDetails: {
         amount: {
@@ -114,7 +114,7 @@ it('詳細ID係数を通常の効果値へ適用する', () => {
     },
     card,
   );
-  expect(result.energy).toBe(7);
+  expect(result.currentAp).toBe(7);
 });
 
 it('詳細値へ係数を掛けた結果をruntimeと同じく正の無限大方向へ丸める', () => {
@@ -130,7 +130,7 @@ it('詳細値へ係数を掛けた結果をruntimeと同じく正の無限大方
     increment: 2_500,
   });
   const effect = {
-    kind: 'energy',
+    kind: 'ap',
     amount: 0,
     parameterDetails: {
       amount: { id: 202141300101n, value: 1n, unitsPerValue: 1 },
@@ -281,7 +281,7 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
       deactivationKey: `hand-permanent:${card.id}`,
     },
   ]);
-  expect(skillValue(active, 100, { kind: 'energy', amount: 100 }, card)).toBe(400);
+  expect(skillValue(active, 100, { kind: 'ap', amount: 100 }, card)).toBe(400);
   expect(
     active.parameterValueFactors.find((factor) => factor.sourceEffectId === effect.sourceEffectId)
       ?.factor,
@@ -289,7 +289,7 @@ it('HandPermanentのAction18は手札追加で発動し、手札離脱で解除�
   const disposed = removeRandomHandCards(active, 1);
   expect(disposed.activeHandPermanentCardIds).toHaveLength(0);
   expect(disposed.targetBoosts).toHaveLength(0);
-  expect(skillValue(disposed, 100, { kind: 'energy', amount: 100 }, card)).toBe(100);
+  expect(skillValue(disposed, 100, { kind: 'ap', amount: 100 }, card)).toBe(100);
   expect(
     disposed.parameterValueFactors.some(
       (factor) => factor.sourceEffectId === effect.sourceEffectId,

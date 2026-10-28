@@ -9,18 +9,18 @@ import { game } from './support/game';
 
 describe('無限ゲージ', () => {
   it('期限中はAPを消費できず、AP無限の解除後も現在値を維持する', () => {
-    const initial = { ...game(), energy: 2 };
+    const initial = { ...game(), currentAp: 2 };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'ap',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(active.energy).toBe(active.maxEnergy);
+    expect(active.currentAp).toBe(active.maxAp);
     const during = advanceTo(active, 0.25);
-    expect(during.energy).toBe(during.maxEnergy);
+    expect(during.currentAp).toBe(during.maxAp);
     const ended = advanceTo(during, 0.5 + 1 / 60);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.energy).toBe(ended.maxEnergy);
+    expect(ended.currentAp).toBe(ended.maxAp);
   });
 
   it('重複する熱気無限のうち最後の期限でレベル10へ戻す', () => {
@@ -37,10 +37,10 @@ describe('無限ゲージ', () => {
     });
     const overlap = advanceTo(second, 0.5 + 1 / 60);
     expect(overlap.gaugeInfinities).toHaveLength(1);
-    expect(overlap.excitement).toBe(second.excitement);
+    expect(overlap.currentVoltage).toBe(second.currentVoltage);
     const ended = advanceTo(overlap, 1 + 1 / 60);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.excitement).toBe(voltageThreshold(10));
+    expect(ended.currentVoltage).toBe(voltageThreshold(10));
   });
 
   it('Action39は無限開始時の熱気差をMasteryへ渡し、報酬を変換する', () => {
@@ -73,16 +73,16 @@ describe('無限ゲージ', () => {
   });
 
   it('元気無限の開始と最終解除で元気タイマーを0へ戻す', () => {
-    const initial = { ...game(), stamina: 42, mentalTimerSeconds: 0.4 };
+    const initial = { ...game(), currentMental: 42, mentalTimerSeconds: 0.4 };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'mental',
       duration: { kind: 'milliseconds', value: 500 },
     });
-    expect(active.stamina).toBe(100);
+    expect(active.currentMental).toBe(100);
     expect(active.mentalTimerSeconds).toBe(0);
     const ended = advanceTo({ ...active, mentalTimerSeconds: 0.4 }, 0.5);
-    expect(ended.stamina).toBe(100);
+    expect(ended.currentMental).toBe(100);
     expect(ended.mentalTimerSeconds).toBe(0);
   });
 
@@ -124,7 +124,7 @@ describe('無限ゲージ', () => {
   });
 
   it('期限抑止された効果はDeactivatorまで残り、解除時に最後のゲージ値へ戻す', () => {
-    const initial = { ...game(), excitement: 100 };
+    const initial = { ...game(), currentVoltage: 100 };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
@@ -138,11 +138,11 @@ describe('無限ゲージ', () => {
       deactivationKey: 'voltage-infinity',
     });
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.excitement).toBe(voltageThreshold(10));
+    expect(ended.currentVoltage).toBe(voltageThreshold(10));
   });
 
   it('ActionType39の電圧解除で永続電圧分岐を切り替える', () => {
-    const base = { ...game(), excitement: voltageThreshold(20) };
+    const base = { ...game(), currentVoltage: voltageThreshold(20) };
     const source = base.deck[0];
     if (!source) throw new Error('発動元カードがありません。');
     const branch = applyEffect(
@@ -184,7 +184,7 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
-    expect(ended.excitement).toBe(voltageThreshold(10));
+    expect(ended.currentVoltage).toBe(voltageThreshold(10));
     expect(ended.action52Buffs.map((buff) => buff.percent)).toEqual([20]);
     const timed = applyEffect(branch, {
       kind: 'infinity-gauge',
@@ -205,8 +205,8 @@ describe('無限ゲージ', () => {
     expect(active.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 500n);
     const finished = finishBloom(active);
     expect(finished.gaugeInfinities[0]?.suspended).toBe(false);
-    expect(finished.energy).toBe(finished.maxEnergy);
-    expect(changeResource(finished, 'energy', -1n).energy).toBe(finished.energy);
+    expect(finished.currentAp).toBe(finished.maxAp);
+    expect(changeResource(finished, 'ap', -1n).currentAp).toBe(finished.currentAp);
   });
 
   it('開花中は500のGenesisゲージを加算し、期限付き無限状態を保留する', () => {
@@ -221,7 +221,7 @@ describe('無限ゲージ', () => {
   });
 
   it('開花中の熱気無限解除は熱気を維持してGenesis進捗へ目標差を加算する', () => {
-    const initial = { ...activateBloom(game('bloom'), 1), excitement: 100 };
+    const initial = { ...activateBloom(game('bloom'), 1), currentVoltage: 100 };
     const active = applyEffect(initial, {
       kind: 'infinity-gauge',
       gauge: 'voltage',
@@ -235,12 +235,12 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'voltage-infinity',
     });
-    expect(ended.excitement).toBe(active.excitement);
+    expect(ended.currentVoltage).toBe(active.currentVoltage);
     expect(ended.bloom?.progress).toBe(bloom.progress + 23n);
   });
 
   it('開花中に元気無限を解除しても元気回復誘発を起こさない', () => {
-    const base = { ...game('bloom'), stamina: 42, mentalTimerSeconds: 0.4 };
+    const base = { ...game('bloom'), currentMental: 42, mentalTimerSeconds: 0.4 };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -261,14 +261,14 @@ describe('無限ゲージ', () => {
       type: 'deactivate-infinity-gauge',
       deactivationKey: 'mental-infinity',
     });
-    expect(ended.stamina).toBe(42);
+    expect(ended.currentMental).toBe(42);
     expect(ended.mentalTimerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
-    expect(finishBloom(ended).stamina).toBe(42);
+    expect(finishBloom(ended).currentMental).toBe(42);
   });
 
   it('開花中の元気無限期限切れでも元気回復誘発を起こさない', () => {
-    const base = { ...game('bloom'), stamina: 42, mentalTimerSeconds: 0.4 };
+    const base = { ...game('bloom'), currentMental: 42, mentalTimerSeconds: 0.4 };
     const inducing = applyEffect(base, {
       kind: 'mental-heart-induce',
       num: 10_000n,
@@ -285,7 +285,7 @@ describe('無限ゲージ', () => {
     });
     const ended = expireGaugeInfinities(active, 'milliseconds', 0.5);
     expect(ended.gaugeInfinities).toHaveLength(0);
-    expect(ended.stamina).toBe(42);
+    expect(ended.currentMental).toBe(42);
     expect(ended.mentalTimerSeconds).toBe(0);
     expect(ended.hearts).toEqual(active.hearts);
   });
@@ -320,8 +320,8 @@ describe('無限ゲージ', () => {
     const generated =
       finished.hearts.stageHearts.length +
       finished.hearts.hiddenHeartBatches.reduce((sum, batch) => sum + batch.count, 0);
-    expect(finished.excitement).toBe(voltageThreshold(finished.maximumVoltageLevel));
-    expect(finished.stamina).toBe(150);
+    expect(finished.currentVoltage).toBe(voltageThreshold(finished.maximumVoltageLevel));
+    expect(finished.currentMental).toBe(150);
     expect(generated).toBe(150);
   });
 });

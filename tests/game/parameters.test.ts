@@ -96,6 +96,6 @@ describe('原実装のパラメータ計算', () => {
     expect(staminaMaximum(100, [{ calculation: 'add', value: 2000 }])).toBe(1000);
     expect(staminaMaximum(100, [{ calculation: 'fixed', value: 0 }])).toBe(1);
     expect(staminaMaximum(100, [], 2)).toBe(100);
-    expect(applyEffect(game(), { kind: 'energy-limit', amount: 200 }).maxEnergy).toBe(100);
+    expect(applyEffect(game(), { kind: 'ap-limit', amount: 200 }).maxAp).toBe(100);
   });
 });

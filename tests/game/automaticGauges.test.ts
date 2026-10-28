@@ -7,13 +7,13 @@ import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { game } from './support/game';
 
 it('標準条件のAP・元気・熱気は個別の間隔で整数ずつ変化する', () => {
-  const initial = { ...game('library'), energy: 0 };
-  expect(advanceTo(initial, 0.58).excitement).toBe(0);
-  expect(advanceTo(initial, 0.6).excitement).toBe(1);
+  const initial = { ...game('library'), currentAp: 0 };
+  expect(advanceTo(initial, 0.58).currentVoltage).toBe(0);
+  expect(advanceTo(initial, 0.6).currentVoltage).toBe(1);
   const later = advanceTo(initial, 1.2);
-  expect(later.energy).toBe(1);
-  expect(later.stamina).toBe(99);
-  expect(later.excitement).toBe(2);
+  expect(later.currentAp).toBe(1);
+  expect(later.currentMental).toBe(99);
+  expect(later.currentVoltage).toBe(2);
 });
 
 it('開花中も通常APが上限未満なら自然回復を専用値へ変換し、通常APを保持する', () => {
@@ -25,14 +25,14 @@ it('開花中も通常APが上限未満なら自然回復を専用値へ変換�
     mentalProtected: true,
     apTimerSeconds: 0,
     voltageTimerSeconds: 0,
-    energy: 0,
+    currentAp: 0,
   };
   const empty = activateBloom(initial, 1);
-  const full = activateBloom({ ...initial, energy: initial.maxEnergy }, 1);
+  const full = activateBloom({ ...initial, currentAp: initial.maxAp }, 1);
   const emptyAfter = advanceAutomaticGauges(empty, 1.2);
   const fullAfter = advanceAutomaticGauges(full, 1.2);
-  expect(emptyAfter.energy).toBe(0);
-  expect(fullAfter.energy).toBe(initial.maxEnergy);
+  expect(emptyAfter.currentAp).toBe(0);
+  expect(fullAfter.currentAp).toBe(initial.maxAp);
   expect((emptyAfter.bloom?.progress ?? 0n) - (empty.bloom?.progress ?? 0n)).toBe(10n);
   expect((fullAfter.bloom?.progress ?? 0n) - (full.bloom?.progress ?? 0n)).toBe(2n);
 });
@@ -45,7 +45,7 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
       moodOffset: -100,
       hand: ['horizon'],
       handEffectCardIds: ['horizon'],
-      energy: base.maxEnergy,
+      currentAp: base.maxAp,
       apTimerSeconds: 0,
       voltageTimerSeconds: 0,
       mentalTimerSeconds: 0,
@@ -55,8 +55,8 @@ it('開花中の自然元気減少は専用値を減らし、休憩防止の付�
   const protectedState = { ...initial, mentalProtected: true };
   const normal = advanceAutomaticGauges(initial, 1.2),
     protectedAfter = advanceAutomaticGauges(protectedState, 1.2);
-  expect(normal.stamina).toBe(initial.stamina);
-  expect(normal.excitement).toBe(initial.excitement);
+  expect(normal.currentMental).toBe(initial.currentMental);
+  expect(normal.currentVoltage).toBe(initial.currentVoltage);
   expect(normal.bloom?.progress).toBe(initial.bloom?.progress);
   expect(protectedAfter.bloom?.progress).toBe((initial.bloom?.progress ?? 0n) + 2n);
 });
@@ -83,7 +83,7 @@ it('0ミリ秒の停止は無効で、複数の停止期限が切れるまでタ
   const expired = advanceTo(half, 1 + 1 / 60);
   expect(expired.voltageStops).toHaveLength(0);
   expect(expired.voltageTimerSeconds).toBe(0);
-  expect(advanceTo(expired, 1.6).excitement).toBe(1);
+  expect(advanceTo(expired, 1.6).currentVoltage).toBe(1);
 });
 
 it('パート数で指定した熱気停止は指定回数の切替まで継続する', () => {
@@ -97,10 +97,10 @@ it('パート数で指定した熱気停止は指定回数の切替まで継続�
   if (!firstSection || !secondSection) throw new Error('パートが不足しています。');
   const first = advanceTo(stops, (firstSection.startBeat * 60) / initial.track.bpm);
   expect(first.voltageStops[0]?.remainingSections).toBe(1n);
-  expect(first.excitement).toBe(0);
+  expect(first.currentVoltage).toBe(0);
   const second = advanceTo(first, (secondSection.startBeat * 60) / initial.track.bpm + 1 / 60);
   expect(second.voltageStops).toHaveLength(0);
-  expect(second.excitement).toBe(0);
+  expect(second.currentVoltage).toBe(0);
 });
 
 it('外部解除型は指定期限で自動解除せず、Deactivatorで解除する', () => {

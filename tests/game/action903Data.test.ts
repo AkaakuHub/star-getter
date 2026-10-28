@@ -38,7 +38,7 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
                 { id: 6n, detailType: 'HAND_INDUCE_LIMIT_NUM', value: 1n },
                 { id: 7n, detailType: 'HAND_INDUCE_LIMIT_MEMOLY_TYPE', value: 2n },
               ],
-              effects: [{ kind: 'energy' as const, amount: 1 }],
+              effects: [{ kind: 'ap' as const, amount: 1 }],
             },
           ],
         }
@@ -57,7 +57,7 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
     {
       sourceEffectId: '9032',
       trigger: { kind: 'heart-quantity-count', count: 2n },
-      effects: [{ kind: 'energy', amount: 1 }],
+      effects: [{ kind: 'ap', amount: 1 }],
       limit: 1n,
       limitMemory: 'retain',
     },
@@ -72,5 +72,5 @@ it('ActionType903の複数の条件・子効果・回数設定を手札誘発へ
   ).toBeUndefined();
   const secondHeart = notifyHandHeartCollect(firstHeart, 1, applyEffect);
   expect(secondHeart.handUseActivationCounts[handInducerStateKey(source.id, '9032')]).toBe(1);
-  expect(secondHeart.energy).toBe(memberTriggered.energy + 1);
+  expect(secondHeart.currentAp).toBe(memberTriggered.currentAp + 1);
 });

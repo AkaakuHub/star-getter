@@ -29,15 +29,15 @@ it('ActionType41は対象ActionTypeだけ親引数とデッキ補正込みのEff
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
-    { ...initial, deck: initial.deck.slice(0, 2), stamina: 40, deckOutCount: 1 },
+    { ...initial, deck: initial.deck.slice(0, 2), currentMental: 40, deckOutCount: 1 },
     effect,
     source,
     2,
     3,
   );
-  const next = changeResource(active, 'stamina', 10n, 'skill', source, applyEffect);
+  const next = changeResource(active, 'mental', 10n, 'skill', source, applyEffect);
   expect(next.moodOffset).toBe(603);
-  const zeroEvent = changeResource(active, 'stamina', 0n, 'skill', source, applyEffect);
+  const zeroEvent = changeResource(active, 'mental', 0n, 'skill', source, applyEffect);
   expect(zeroEvent.moodOffset).toBe(3);
   expect(zeroEvent.deckOutCount).toBe(0);
 });
@@ -52,13 +52,13 @@ it('ActionType41は負のイベントを無視し、電圧上昇を対応する�
     deckUnderLimit: 0n,
     effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
   });
-  const negative = changeResource(active, 'excitement', -5n, 'skill', undefined, applyEffect);
+  const negative = changeResource(active, 'voltage', -5n, 'skill', undefined, applyEffect);
   expect(negative.moodOffset).toBe(0);
-  const positive = changeResource(negative, 'excitement', 5n, 'skill', undefined, applyEffect);
+  const positive = changeResource(negative, 'voltage', 5n, 'skill', undefined, applyEffect);
   expect(positive.moodOffset).toBe(0);
-  const induced = changeResource(negative, 'excitement', 5n, 'skill', undefined, applyEffect, true);
+  const induced = changeResource(negative, 'voltage', 5n, 'skill', undefined, applyEffect, true);
   expect(induced.moodOffset).toBe(5);
-  const natural = changeResource(negative, 'excitement', 5n, 'natural', undefined, applyEffect);
+  const natural = changeResource(negative, 'voltage', 5n, 'natural', undefined, applyEffect);
   expect(natural.moodOffset).toBe(0);
 });
 
@@ -82,7 +82,7 @@ it('ActionType41はバリア登録が成立したときに耐久値を通知す�
 });
 
 it('ActionType7の耐久無限バリアは最大元気値をActionType41へ通知する', () => {
-  const initial = { ...game(), maximumMental: 200, stamina: 200 };
+  const initial = { ...game(), maximumMental: 200, currentMental: 200 };
   const active = applyEffect(initial, {
     ...effect,
     condition: 'mental-barrier',
@@ -111,7 +111,7 @@ it('ActionType41はdeck補正上限を参照実装同様にint32へ変換する'
     deckUnderLimit: 4_294_967_296n,
     effects: [{ actionType: 1, effect: { kind: 'mood', amount: 1 } }],
   });
-  const next = changeResource(active, 'stamina', 1n, 'skill', undefined, applyEffect);
+  const next = changeResource(active, 'mental', 1n, 'skill', undefined, applyEffect);
   expect(next.moodOffset).toBe(1);
 });
 
@@ -138,7 +138,7 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(
-    { ...initial, stamina: 50, deckOutCount: 1 },
+    { ...initial, currentMental: 50, deckOutCount: 1 },
     { ...effect, effects: [{ actionType: 5, effect: { kind: 'mood', amount: 3 } }] },
     source,
   );
@@ -158,8 +158,8 @@ it('ActionType41の子効果はActionType5のProxy吸収時に誘発しない', 
     },
     source,
   );
-  const next = changeResource(proxied, 'stamina', 5n, 'skill', source, applyEffect);
-  expect(next.stamina).toBe(50);
+  const next = changeResource(proxied, 'mental', 5n, 'skill', source, applyEffect);
+  expect(next.currentMental).toBe(50);
   expect(next.moodOffset).toBe(0);
   expect(next.deckOutCount).toBe(1);
   expect(next.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(5n);

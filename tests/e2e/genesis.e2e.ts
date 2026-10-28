@@ -35,7 +35,7 @@ async function activate(driver: GameDriver): Promise<number> {
     (row) => row.input.kind === 'special' && row.input.card.instanceId === 'horizon',
   );
   if (!activation) throw new Error('開花の発動記録がありません。');
-  return activation.before.energy - 20;
+  return activation.before.currentAp - 20;
 }
 
 async function prepare(driver: GameDriver, stableCollection = true): Promise<void> {
@@ -128,9 +128,13 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   const paidEnergy = await activate(driver);
   expect(driver.state.cardUseCounts['frost-echo'] ?? 0).toBe(0);
   expect(driver.state.cardUseCounts['rain-preparation'] ?? 0).toBe(0);
-  expect(driver.state.bloom?.rollback.energy).toBe(paidEnergy);
+  expect(driver.state.bloom?.rollback.currentAp).toBe(paidEnergy);
   const initialGauge = driver.state.bloom?.progress ?? 0n;
-  const ordinary = [driver.state.energy, driver.state.stamina, driver.state.excitement];
+  const ordinary = [
+    driver.state.currentAp,
+    driver.state.currentMental,
+    driver.state.currentVoltage,
+  ];
   const earlyBefore = driver.state.score;
   await driver.burst(2, 10);
   const earlyGain = driver.state.score - earlyBefore;
@@ -146,7 +150,9 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
     }),
   );
   expect(driver.peakGauge).toBeGreaterThan(initialGauge);
-  expect([driver.state.energy, driver.state.stamina, driver.state.excitement]).toEqual(ordinary);
+  expect([driver.state.currentAp, driver.state.currentMental, driver.state.currentVoltage]).toEqual(
+    ordinary,
+  );
   expect(driver.state.cardUseCounts['shadow-1']).toBeGreaterThanOrEqual(14);
   const measurementTick = driver.state.tick;
   const before = driver.state.score;

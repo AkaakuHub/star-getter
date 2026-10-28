@@ -17,7 +17,7 @@ it('ActionType12の条件と子Effectを分岐Effectへ接続する', () => {
               destination: 'effects' as const,
               condition: { kind: 'heat' as const, minimum: 50 },
               whenTrue: [{ kind: 'hearts' as const, amount: 100 }],
-              whenFalse: [{ kind: 'stamina' as const, amount: 200 }],
+              whenFalse: [{ kind: 'mental' as const, amount: 200 }],
             },
           ],
         }
@@ -28,6 +28,6 @@ it('ActionType12の条件と子Effectを分岐Effectへ接続する', () => {
     kind: 'branch',
     condition: { kind: 'heat', minimum: 50 },
     whenTrue: [{ kind: 'hearts', amount: 100 }],
-    whenFalse: [{ kind: 'stamina', amount: 200 }],
+    whenFalse: [{ kind: 'mental', amount: 200 }],
   });
 });

@@ -11,7 +11,11 @@ export function paintHearts(
   height: number,
 ): void {
   context.clearRect(0, 0, width, height);
-  const rank = calculateLiveHeartRank(heartCount(state), Math.floor(state.excitement / 2), null);
+  const rank = calculateLiveHeartRank(
+    heartCount(state),
+    Math.floor(state.currentVoltage / 2),
+    null,
+  );
   const pixelsPerWorldUnit = height / (9.600000381469727 * 2);
   const presentations = projectLiveHeartPresentations(state.hearts.stageHearts, rank.rank);
   let drawn = 0;

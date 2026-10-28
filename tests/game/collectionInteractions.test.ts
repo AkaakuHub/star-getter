@@ -70,7 +70,7 @@ it('手札誘発は回収条件を超えるたびに発動し、指定回数で�
     collectionEffects: {
       threshold: 10,
       limit: 2,
-      effects: [{ kind: 'energy' as const, amount: 1 }],
+      effects: [{ kind: 'ap' as const, amount: 1 }],
     },
   };
   const state: GameState = {
@@ -94,14 +94,14 @@ it('手札誘発の回数は離脱時に初期化し、記憶指定時は保持�
   if (!original) throw new Error('カードがありません。');
   const resetCard = {
     ...original,
-    collectionEffects: { threshold: 10, effects: [{ kind: 'energy' as const, amount: 1 }] },
+    collectionEffects: { threshold: 10, effects: [{ kind: 'ap' as const, amount: 1 }] },
   };
   const retainCard = {
     ...original,
     collectionEffects: {
       threshold: 10,
       limitMemory: 'retain' as const,
-      effects: [{ kind: 'energy' as const, amount: 1 }],
+      effects: [{ kind: 'ap' as const, amount: 1 }],
     },
   };
   const state = {

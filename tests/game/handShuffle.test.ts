@@ -30,7 +30,7 @@ for (const recoverDiscard of [false, true]) {
 
 it('一斉使用内のリセットシャッフルは発動した本人を戻さず、他のカードを山札へ戻す', () => {
   const state = withHand(
-    { ...addTokens(game('library'), 'story', 30), energy: 100, maxEnergy: 100 },
+    { ...addTokens(game('library'), 'story', 30), currentAp: 100, maxAp: 100 },
     ['aurora-ensemble', 'class'],
   );
   const used = act(state, { type: 'card', index: 0 });
@@ -42,7 +42,7 @@ it('一斉使用内のリセットシャッフルは発動した本人を戻さ�
 });
 
 it('一斉使用内の通常リシャッフルでは使用したカードを捨て札へ移す', () => {
-  const state = withHand({ ...addTokens(game(), 'story', 30), energy: 100, maxEnergy: 100 }, [
+  const state = withHand({ ...addTokens(game(), 'story', 30), currentAp: 100, maxAp: 100 }, [
     'aurora-ensemble',
     'frost-echo',
   ]);

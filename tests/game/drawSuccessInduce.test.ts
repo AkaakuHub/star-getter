@@ -6,11 +6,15 @@ import { evaluateDrawSuccessInduce } from '@akaakuhub/suku-sute-core/game/effect
 import { game } from './support/game';
 
 it('ActionType901の元気割合条件は参照実装同様に以下で判定し、IsActiveで分岐する', () => {
-  const state = { ...game(), stamina: 40, maximumMental: 100, excitement: 100_000_000 };
+  const state = { ...game(), currentMental: 40, maximumMental: 100, currentVoltage: 100_000_000 };
   expect(evaluateDrawSuccessInduce(state, false, 2n, 500_000n)).toBe(true);
-  expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, false, 2n, 500_000n)).toBe(false);
-  expect(evaluateDrawSuccessInduce({ ...state, stamina: 50 }, false, 2n, 500_000n)).toBe(true);
-  expect(evaluateDrawSuccessInduce({ ...state, stamina: 80 }, true, 2n, 500_000n)).toBe(true);
+  expect(evaluateDrawSuccessInduce({ ...state, currentMental: 80 }, false, 2n, 500_000n)).toBe(
+    false,
+  );
+  expect(evaluateDrawSuccessInduce({ ...state, currentMental: 50 }, false, 2n, 500_000n)).toBe(
+    true,
+  );
+  expect(evaluateDrawSuccessInduce({ ...state, currentMental: 80 }, true, 2n, 500_000n)).toBe(true);
   expect(evaluateDrawSuccessInduce(state, false, 5n, 0n)).toBe(false);
   expect(evaluateDrawSuccessInduce(state, true, 5n, 0n)).toBe(true);
   expect(evaluateDrawSuccessInduce(state, true, 2n + 4_294_967_296n, 500_000n)).toBe(true);
@@ -39,7 +43,7 @@ it('Action901はAbility893の発火時にドロー時点のHandCardStatsを参�
     ...initial,
     deck: [card],
     cardPool: [card],
-    energy: 100,
+    currentAp: 100,
     hand: [],
     handCardStats: {},
     handEffectCardIds: [],

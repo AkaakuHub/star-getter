@@ -45,8 +45,8 @@ export const bloomCards: readonly Card[] = [
     effects: [
       { kind: 'beat-hearts', amount: 300, moodBonus: { target: 2, perPoint: 1.5 } },
       { kind: 'ap-speed', percent: 30, duration: 'stage' },
-      { kind: 'excitement', amount: 3000, moodBonus: { target: 2, perPoint: 15 } },
-      { kind: 'stamina', amount: 300, moodBonus: { target: 2, perPoint: 1.5 } },
+      { kind: 'voltage', amount: 3000, moodBonus: { target: 2, perPoint: 15 } },
+      { kind: 'mental', amount: 300, moodBonus: { target: 2, perPoint: 1.5 } },
     ],
   },
   {
@@ -67,7 +67,7 @@ export const bloomCards: readonly Card[] = [
         trigger: { kind: 'unit', unit: 2n },
         effects: [
           { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
-          { kind: 'energy', amount: 9 },
+          { kind: 'ap', amount: 9 },
         ],
       },
     ],
@@ -83,7 +83,7 @@ export const bloomCards: readonly Card[] = [
         kind: 'voltage-tier',
         step: 200,
         tiers: voltagePoints.map<readonly Effect[]>((amount) => [
-          { kind: 'excitement', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+          { kind: 'voltage', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
         ]),
       },
       mellow([
@@ -128,7 +128,7 @@ export const bloomCards: readonly Card[] = [
       effects: [
         {
           kind: 'resource-boost',
-          target: 'excitement',
+          target: 'voltage',
           percent: baselineMemberFanLevels[1022],
           moodBonus: { target: 3, perPoint: baselineMemberFanLevels[1022] * 0.005 },
           uses: null,
@@ -149,7 +149,7 @@ export const bloomCards: readonly Card[] = [
         kind: 'voltage-tier',
         step: 200,
         tiers: voltageGains.map<readonly Effect[]>((amount) => [
-          { kind: 'excitement', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
+          { kind: 'voltage', amount, moodBonus: { target: 3, perPoint: amount * 0.005 } },
         ]),
       },
       mellow([
@@ -187,7 +187,7 @@ export const bloomCards: readonly Card[] = [
       mellow([
         {
           kind: 'resource-boost',
-          target: 'excitement',
+          target: 'voltage',
           percent: 300,
           uses: 5,
           condition: 'always',

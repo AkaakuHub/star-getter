@@ -27,7 +27,7 @@ export const sunriseCard: Card = {
     drained([
       {
         kind: 'resource-boost',
-        target: 'excitement',
+        target: 'voltage',
         members: [1042],
         percent: 300,
         moodBonus: { target: 3, perPoint: 1.5 },

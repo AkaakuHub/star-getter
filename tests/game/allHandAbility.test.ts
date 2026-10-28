@@ -22,7 +22,10 @@ it('ActionType42は子カードのAbility894を起動する', () => {
   const deck = initial.deck.map((item) =>
     item.id === source.id ? updatedSource : item.id === child.id ? updatedChild : item,
   );
-  const state = withHand({ ...initial, deck, cardPool: deck, energy: 100 }, [source.id, child.id]);
+  const state = withHand({ ...initial, deck, cardPool: deck, currentAp: 100 }, [
+    source.id,
+    child.id,
+  ]);
   const used = act(state, { type: 'card', index: 0 });
   expect(used.stats.cardsUsed).toBe(2);
   expect(moodValue(used)).toBe(1);
@@ -68,7 +71,7 @@ it('ActionType42は参照実装と同じ順に手札誘発を先に実行して�
       deck,
       cardPool: deck,
       handEffectCardIds: [inducer.id],
-      energy: 100,
+      currentAp: 100,
     },
     [source.id, inducer.id],
   );

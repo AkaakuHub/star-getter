@@ -24,7 +24,7 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
                 { id: 3n, detailType: 'DRAW_SUCCESS_INDUCE_DISABLED_TYPE', value: 1n },
               ],
               whenTrue: [{ kind: 'mood' as const, amount: 10 }],
-              whenFalse: [{ kind: 'energy' as const, amount: 1 }],
+              whenFalse: [{ kind: 'ap' as const, amount: 1 }],
             },
           ],
         }
@@ -38,7 +38,7 @@ it('ActionType901の条件分岐と子効果をAbility893へ接続する', () =>
     branchValue: 5000n,
     disabledType: 1n,
     whenTrue: [{ kind: 'mood', amount: 10 }],
-    whenFalse: [{ kind: 'energy', amount: 1 }],
+    whenFalse: [{ kind: 'ap', amount: 1 }],
   });
   expect(compiled?.drawEffects).toBeUndefined();
 });

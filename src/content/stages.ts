@@ -2,7 +2,7 @@ import { calculateLiveBaseGaugeIntervalSeconds } from '@akaakuhub/suku-sute-core
 import { type StageGauges } from '@akaakuhub/suku-sute-core/game/live/gaugeTiming';
 
 export const standardStage: StageGauges = {
-  maxEnergy: 20,
+  maxAp: 20,
   apIncreaseIntervalSeconds: Math.fround(1160 / 1000),
   mentalDecreaseIntervalSeconds: calculateLiveBaseGaugeIntervalSeconds(1000, 11605),
   voltageIncreaseIntervalSeconds: calculateLiveBaseGaugeIntervalSeconds(500, 11605),

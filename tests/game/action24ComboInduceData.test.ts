@@ -63,7 +63,7 @@ it('ActionType24の詳細レコードと子効果をcreateGameで接続する', 
     { id: 24_001_2n, detailType: 'COMBO_INDUCE_DISPLAY_TIME_TYPE', value: 3n },
     { id: 24_001_3n, detailType: 'COMBO_INDUCE_REPEAT_ACTION', value: 1n },
   ] as const;
-  const childEffects = [{ kind: 'energy' as const, amount: 2 }];
+  const childEffects = [{ kind: 'ap' as const, amount: 2 }];
   const deck = routes.bloom.deck.map((card) =>
     card.id === source.id
       ? {

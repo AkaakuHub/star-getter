@@ -83,8 +83,8 @@ describe('元気バリア', () => {
       attenuation: 1,
       duration: { kind: 'stage' },
     });
-    const damaged = changeResource(active, 'stamina', -3n);
-    expect(damaged.stamina).toBe(99);
+    const damaged = changeResource(active, 'mental', -3n);
+    expect(damaged.currentMental).toBe(99);
     expect(damaged.mentalBarriers[0]?.currentEndurance).toBe(2);
   });
 
@@ -110,8 +110,8 @@ describe('元気バリア', () => {
       attenuation: 1,
       duration: { kind: 'stage' },
     });
-    expect(changeResource(active, 'stamina', -5n).stamina).toBe(100);
-    expect(advanceAutomaticGauges(active, 1.2).stamina).toBe(100);
+    expect(changeResource(active, 'mental', -5n).currentMental).toBe(100);
+    expect(advanceAutomaticGauges(active, 1.2).currentMental).toBe(100);
   });
 
   it('自然減少は有限耐久を1ずつ使い切った後に元気へ通す', () => {
@@ -127,7 +127,7 @@ describe('元気バリア', () => {
       active,
       active.track.stage.mentalDecreaseIntervalSeconds * 2 + 0.1,
     );
-    expect(after.stamina).toBe(99);
+    expect(after.currentMental).toBe(99);
     expect(after.mentalBarriers[0]?.currentEndurance).toBe(1);
   });
 
@@ -149,7 +149,7 @@ describe('元気バリア', () => {
         0.3,
       5,
     );
-    expect(changeResource(active, 'stamina', -3n).stamina).toBe(99);
+    expect(changeResource(active, 'mental', -3n).currentMental).toBe(99);
   });
 
   it('パート期限でバリアを解除する', () => {

@@ -15,7 +15,13 @@ import { game, withHand } from './support/game';
 
 function active() {
   return activateBloom(
-    { ...advanceTo(game(), 12), moodOffset: -100, energy: 0, excitement: 40, stamina: 80 },
+    {
+      ...advanceTo(game(), 12),
+      moodOffset: -100,
+      currentAp: 0,
+      currentVoltage: 40,
+      currentMental: 80,
+    },
     1,
   );
 }
@@ -45,11 +51,11 @@ describe('開花の専用ゲージ', () => {
     if (!state.bloom) throw new Error('開花が発動していません。');
     const maximum = changeBloomResource(
       { ...state, bloom: { ...state.bloom, progress: rules.maxBloomGauge - 1n } },
-      'excitement',
+      'voltage',
       1n,
     );
     expect(maximum.bloom?.progress).toBe(2_147_483_647n);
-    expect(changeBloomResource(maximum, 'excitement', 1n).bloom?.progress).toBe(0n);
+    expect(changeBloomResource(maximum, 'voltage', 1n).bloom?.progress).toBe(0n);
   });
 
   for (const mood of [-100, -99, 0, 100]) {
@@ -57,8 +63,8 @@ describe('開花の専用ゲージ', () => {
       const initial = game();
       const state = {
         ...initial,
-        energy: 20,
-        maxEnergy: 20,
+        currentAp: 20,
+        maxAp: 20,
         track: {
           ...initial.track,
           moodKeys: [{ songTimeSeconds: 0, keyValue: mood }],
@@ -72,12 +78,12 @@ describe('開花の専用ゲージ', () => {
 
   it('通常カードの使用では発動せず、共鳴で20エナジーを払って発動する', () => {
     let state = advanceTo(game(), 12);
-    state = withHand({ ...state, moodOffset: -100, energy: 20, maxEnergy: 20 }, ['horizon']);
+    state = withHand({ ...state, moodOffset: -100, currentAp: 20, maxAp: 20 }, ['horizon']);
     expect(act(state, { type: 'card', index: 0 }).bloom).toBeNull();
     expect(canUseSpecial(state, 'horizon')).toBe(true);
     const changed = act(state, { type: 'special', cardId: 'horizon' });
     expect(changed.bloom?.strength).toBe(3.5);
-    expect(changed.energy).toBe(0);
+    expect(changed.currentAp).toBe(0);
     expect(changed.stats.specialsUsed).toBe(1);
     expect(changed.stats.cardsUsed).toBe(0);
   });
@@ -85,17 +91,17 @@ describe('開花の専用ゲージ', () => {
   it('AP・元気・熱気をそれぞれFloat32で換算して切り上げ、通常値を更新しない', () => {
     const state = active();
     expect(state.bloom?.progress).toBe(30n);
-    let changed = changeBloomResource(state, 'energy', 9n);
+    let changed = changeBloomResource(state, 'ap', 9n);
     expect(changed.bloom?.progress).toBe(52n);
-    changed = changeBloomResource(changed, 'stamina', 100n);
+    changed = changeBloomResource(changed, 'mental', 100n);
     expect(changed.bloom?.progress).toBe(72n);
-    changed = changeBloomResource(changed, 'excitement', 2n);
+    changed = changeBloomResource(changed, 'voltage', 2n);
     expect(changed.bloom?.progress).toBe(74n);
-    changed = changeBloomResource(changed, 'energy', -4n);
+    changed = changeBloomResource(changed, 'ap', -4n);
     expect(changed.bloom?.progress).toBe(59n);
-    expect([changed.energy, changed.stamina, changed.excitement]).toEqual([0, 80, 40]);
+    expect([changed.currentAp, changed.currentMental, changed.currentVoltage]).toEqual([0, 80, 40]);
     expect(finishBloom(changed).bloom).toBeNull();
-    expect(finishBloom(changed).stamina).toBe(80);
+    expect(finishBloom(changed).currentMental).toBe(80);
   });
 
   it('開花終了時に参照実装のMental値変更通知をActionType23へ伝える', () => {
@@ -103,7 +109,7 @@ describe('開花の専用ゲージ', () => {
     const source = initial.deck[0];
     if (!source) throw new Error('ActionType23の発動元カードがありません。');
     const mentalHeartInducing = applyEffect(
-      activateBloom({ ...initial, stamina: 80 }, 1),
+      activateBloom({ ...initial, currentMental: 80 }, 1),
       {
         kind: 'mental-heart-induce',
         num: 10_000n,
@@ -134,10 +140,10 @@ describe('開花の専用ゲージ', () => {
 
   it('熱気の固定値変更もFloat32の値と専用ゲージ変換を通り、通常値を上書きしない', () => {
     const normal = applyEffect(game(), { kind: 'voltage-set', amount: 655_000_001 });
-    expect(normal.excitement).toBe(655_000_000);
+    expect(normal.currentVoltage).toBe(655_000_000);
     const state = active();
     const changed = applyEffect(state, { kind: 'voltage-set', amount: 655_000_001 });
-    expect(changed.excitement).toBe(state.excitement);
+    expect(changed.currentVoltage).toBe(state.currentVoltage);
     expect(changed.bloom?.progress).toBeGreaterThan(state.bloom?.progress ?? 0n);
   });
 });

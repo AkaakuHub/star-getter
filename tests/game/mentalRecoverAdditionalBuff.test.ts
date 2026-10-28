@@ -11,7 +11,7 @@ it('ActionType32は対象カードの元気回復を増幅し、指定回数で�
   if (!source || !target) throw new Error('検証用カードがありません。');
   const clean = {
     ...initial,
-    stamina: 0,
+    currentMental: 0,
     amplification: 100,
     storyAmplification: 0,
     handEffectCardIds: [],
@@ -32,11 +32,11 @@ it('ActionType32は対象カードの元気回復を増幅し、指定回数で�
     },
     source,
   );
-  const recovered = applyEffect(buffed, { kind: 'stamina', amount: 20 }, target);
-  expect(recovered.stamina).toBe(40);
+  const recovered = applyEffect(buffed, { kind: 'mental', amount: 20 }, target);
+  expect(recovered.currentMental).toBe(40);
   expect(recovered.mentalRecoverAdditionalBuffs).toHaveLength(0);
-  const unmatched = applyEffect(buffed, { kind: 'stamina', amount: 20 }, source);
-  expect(unmatched.stamina).toBe(20);
+  const unmatched = applyEffect(buffed, { kind: 'mental', amount: 20 }, source);
+  expect(unmatched.currentMental).toBe(20);
   const deactivated = act(buffed, {
     type: 'deactivate-mental-recover-additional-buff',
     deactivationKey: 'mental-recover-test',

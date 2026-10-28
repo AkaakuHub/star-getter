@@ -7,7 +7,7 @@ it('ActionType904の子効果IDを手札永続効果へ接続する', () => {
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const child = { kind: 'energy' as const, amount: 2 };
+  const child = { kind: 'ap' as const, amount: 2 };
   const deck = routes.bloom.deck.map((card) =>
     card.id === source.id
       ? {

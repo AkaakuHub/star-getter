@@ -31,8 +31,8 @@ it('ActionType14のAP回復詳細値と空模様補正をAP効果へ接続する
       : card,
   );
   const compiled = createGame(track, deck, 7).deck.find((card) => card.id === source.id);
-  expect(compiled?.effects.find((item) => item.kind === 'energy')).toEqual({
-    kind: 'energy',
+  expect(compiled?.effects.find((item) => item.kind === 'ap')).toEqual({
+    kind: 'ap',
     amount: 2.5,
     moodBonus: { target: 1, perPoint: 0.5 },
   });
@@ -68,7 +68,7 @@ it('ActionType14のlong値を参照実装と同じfloat32に変換する', () =>
   );
   const effect = createGame(track, deck, 7)
     .deck.find((card) => card.id === source.id)
-    ?.effects.find((item) => item.kind === 'energy');
+    ?.effects.find((item) => item.kind === 'ap');
   expect(effect).toMatchObject({
     amount: Math.fround(int64ToFloat32(base) / 10_000),
     moodBonus: { target: 1, perPoint: Math.fround(int64ToFloat32(mood) / 10_000) },

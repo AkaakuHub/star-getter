@@ -26,6 +26,6 @@ describe('固定プリセット', () => {
   });
 
   it('開始時のエナジーは0で、開始能力による回復を捏造しない', () => {
-    for (const routeId of routeIds) expect(game(routeId).energy).toBe(0);
+    for (const routeId of routeIds) expect(game(routeId).currentAp).toBe(0);
   });
 });

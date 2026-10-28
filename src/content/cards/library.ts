@@ -69,7 +69,7 @@ export const libraryCards: readonly Card[] = [
     collectionEffects: {
       threshold: 300_000,
       limit: 1,
-      effects: [{ kind: 'energy', amount: baselineMemberFanLevels[1021] * 0.1 }],
+      effects: [{ kind: 'ap', amount: baselineMemberFanLevels[1021] * 0.1 }],
     },
     effects: [
       { kind: 'use-hand' },
@@ -88,7 +88,7 @@ export const libraryCards: readonly Card[] = [
       extra: true,
       effects: [
         { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 1 } },
-        { kind: 'energy-limit', amount: 10 },
+        { kind: 'ap-limit', amount: 10 },
       ],
     },
   },

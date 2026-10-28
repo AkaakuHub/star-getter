@@ -12,10 +12,14 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
     {
       ...initial,
       moodOffset: -100,
-      stamina: 80,
+      currentMental: 80,
       amplification: 100,
       targetBoosts: [],
-      bloom: { progress: 1n, strength: 3.5, rollback: { energy: 0, stamina: 80, excitement: 0 } },
+      bloom: {
+        progress: 1n,
+        strength: 3.5,
+        rollback: { currentAp: 0, currentMental: 80, currentVoltage: 0 },
+      },
     },
     ['sunrise'],
   );
@@ -24,18 +28,16 @@ it('開花中の元気条件は成立し、雨100のときだけ対象限定の�
   const effects = sun.effects.filter((effect) => effect.kind === 'conditional');
   const next = effects.reduce((current, effect) => applyEffect(current, effect, sun), state);
   expect(next.resourceBoosts).toEqual([
-    { target: 'excitement', percent: 450, uses: 3, members: [1042] },
+    { target: 'voltage', percent: 450, uses: 3, members: [1042] },
     { target: 'attract', percent: 1350, uses: 3, members: [1042] },
   ]);
   const other = next.deck.find((card) => card.id === 'frost-pulse');
   const kozu = next.deck.find((card) => card.id === 'rain-preparation');
   if (!other || !kozu) throw new Error('対象カードがありません。');
-  expect(
-    applyEffect(next, { kind: 'excitement', amount: 100 }, other).resourceBoosts[0]?.uses,
-  ).toBe(3);
-  expect(applyEffect(next, { kind: 'excitement', amount: 100 }, kozu).resourceBoosts[0]?.uses).toBe(
-    2,
+  expect(applyEffect(next, { kind: 'voltage', amount: 100 }, other).resourceBoosts[0]?.uses).toBe(
+    3,
   );
+  expect(applyEffect(next, { kind: 'voltage', amount: 100 }, kozu).resourceBoosts[0]?.uses).toBe(2);
   const sunny = effects.reduce((current, effect) => applyEffect(current, effect, sun), {
     ...state,
     moodOffset: 0,

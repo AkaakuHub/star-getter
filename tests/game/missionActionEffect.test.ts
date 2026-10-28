@@ -140,7 +140,7 @@ it('子効果で発動したActionType14もActionType44へ通知する', () => {
   const changed = applyEffect(startIngameMission(initial, 14n), {
     kind: 'branch',
     condition: { kind: 'heat', minimum: 0 },
-    whenTrue: [{ kind: 'energy', amount: 2 }],
+    whenTrue: [{ kind: 'ap', amount: 2 }],
     whenFalse: [],
   });
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
@@ -151,7 +151,7 @@ it('ActionType10は上限適用前の参照実装 EffectAmountをミッション
   const capped = {
     ...initial,
     maximumVoltageLevel: 1,
-    excitement: voltageThreshold(1),
+    currentVoltage: voltageThreshold(1),
   };
   const effect = createAddVoltageEffect({
     skillEffectId: 10n,
@@ -161,7 +161,7 @@ it('ActionType10は上限適用前の参照実装 EffectAmountをミッション
     ],
   });
   const changed = applyEffect(startIngameMission(capped, 10n), effect);
-  expect(changed.excitement).toBe(capped.excitement);
+  expect(changed.currentVoltage).toBe(capped.currentVoltage);
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 

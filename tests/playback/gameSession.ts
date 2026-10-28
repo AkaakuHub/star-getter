@@ -66,14 +66,14 @@ class TestAudio implements GameAudio {
   }
 }
 
-export function session(energy = 10) {
+export function session(currentAp = 10) {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
   const clock = new TestClock();
   const frames = new TestFrames();
   const audio = new TestAudio();
   const controller = new GameController(
-    { ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens), energy },
+    { ...createGame(track, routes.library.deck, 7, 100, routes.library.tokens), currentAp },
     clock,
     frames,
     audio,

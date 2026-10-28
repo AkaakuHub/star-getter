@@ -7,7 +7,7 @@ it('ActionType906の必要使用回数・上限と子効果IDを使用回数誘�
   const track = tracks[0];
   const source = routes.bloom.deck[0];
   if (!track || !source) throw new Error('ゲームデータがありません。');
-  const child = { kind: 'energy' as const, amount: 2, skillEffectId: 90611n };
+  const child = { kind: 'ap' as const, amount: 2, skillEffectId: 90611n };
   const deck = routes.bloom.deck.map((card) =>
     card.id === source.id
       ? {

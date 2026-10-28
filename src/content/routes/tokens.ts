@@ -52,7 +52,7 @@ export const routeTokens: readonly Card[] = [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },
       { kind: 'heart-limit', amount: 36 },
       { kind: 'boost', multiplier: 4, moodBonus: { target: 1, perPoint: 1.5 } },
-      { kind: 'excitement', amount: 100, moodBonus: { target: 1, perPoint: 0.5 } },
+      { kind: 'voltage', amount: 100, moodBonus: { target: 1, perPoint: 0.5 } },
       {
         kind: 'conditional',
         condition: 'happy100',
@@ -60,7 +60,7 @@ export const routeTokens: readonly Card[] = [
           { kind: 'beat-hearts', amount: 150, moodBonus: { target: 1, perPoint: 0.75 } },
           { kind: 'heart-limit', amount: 360 },
           { kind: 'boost', multiplier: 31, moodBonus: { target: 1, perPoint: 15 } },
-          { kind: 'excitement', amount: 1000, moodBonus: { target: 1, perPoint: 5 } },
+          { kind: 'voltage', amount: 1000, moodBonus: { target: 1, perPoint: 5 } },
         ],
       },
     ],
@@ -122,7 +122,7 @@ export const routeTokens: readonly Card[] = [
     useAbility: 'shadow',
     effects: [
       { kind: 'shuffle', recoverDiscard: true, destination: 'draw' },
-      { kind: 'energy', amount: -99 },
+      { kind: 'ap', amount: -99 },
     ],
   },
 ];

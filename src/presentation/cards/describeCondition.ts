@@ -21,7 +21,7 @@ export function describeCondition(condition: GameCondition): string {
       return condition.number === 99 ? '山場' : `パート${condition.number}`;
     case 'heat':
       return `熱気が${formatNumber(condition.minimum)}段階以上`;
-    case 'stamina':
+    case 'mental':
       return `元気が${formatNumber(condition.minimumPercent)}%以上`;
     case 'weather':
       return `空模様が${formatNumber(condition.minimum)}%以上`;

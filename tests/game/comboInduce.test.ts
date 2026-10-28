@@ -27,7 +27,7 @@ function setup(repeatAction: 0 | 1 | 2 = 0) {
     duration: { kind: 'stage', value: 0 },
     effects: [
       { kind: 'hearts', amount: 1 },
-      { kind: 'energy', amount: 1 },
+      { kind: 'ap', amount: 1 },
     ],
     deactivationKey: 'combo',
   } as const;
@@ -44,7 +44,7 @@ it('指定メンバーの合計APからEffectPowerを求め、1秒後に子効�
   expect(complete.comboInducer?.phase).toBe('activating');
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(heartCount(activated)).toBe(4);
-  expect(activated.energy).toBe(4);
+  expect(activated.currentAp).toBe(4);
   expect(activated.deckOutCount).toBe(0);
   expect(activated.comboInducer?.phase).toBe('resetting');
   const queued = notifyComboSkillPoint(activated, source, 3);
@@ -62,7 +62,7 @@ it('ActionType24の子効果はCheckDeckOutを1回だけ通知する', () => {
     deckOutCount: 3,
     track: {
       ...state.track,
-      afterMentalDownEffects: [{ kind: 'energy' as const, amount: 2 }],
+      afterMentalDownEffects: [{ kind: 'ap' as const, amount: 2 }],
     },
     comboInducer: { ...inducer, effects: [{ kind: 'mood' as const, amount: 1 }] },
   };
@@ -70,7 +70,7 @@ it('ActionType24の子効果はCheckDeckOutを1回だけ通知する', () => {
   const activated = advanceComboInducer(complete, 1, applyEffect);
   expect(activated.deckOutCount).toBe(2);
   expect(activated.afterMentalDownEvents).toBe(1);
-  expect(activated.energy).toBe(configured.energy + 2);
+  expect(activated.currentAp).toBe(configured.currentAp + 2);
 });
 
 it('ActionType24はlong積をfloat32へ直接変換する', () => {
@@ -113,7 +113,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     drawPile: deck
       .filter((card) => card.id !== first.id && card.id !== second.id)
       .map((card) => card.id),
-    energy: 100,
+    currentAp: 100,
   };
   const armed = activateComboInduce(
     ready,
