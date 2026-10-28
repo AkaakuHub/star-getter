@@ -177,13 +177,13 @@ it('Action904のAction52子効果は自動期限を止め、手札離脱時に�
   expect(disposeHandEffects(afterTime, [card.cardInstanceId]).action52Buffs).toHaveLength(0);
 });
 
-it('手札枚数変更にスキル増幅を適用して整数化する', () => {
+it('手札枚数変更にスキル増幅を適用して切り上げる', () => {
   const state = { ...game(), amplification: 150 };
   const next = applyEffect(state, handCardCountEffect(3, 3, 0n));
-  expect(next.tokenCardDeck.handTargetCounts.current).toBe(9);
+  expect(next.tokenCardDeck.handTargetCounts.current).toBe(10);
 });
 
-it('ActionType20へ発動元対象のActionType52補正を適用して整数化する', () => {
+it('ActionType20へ発動元対象のActionType52補正を適用して切り上げる', () => {
   const base = game();
   const source = base.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
@@ -206,7 +206,7 @@ it('ActionType20へ発動元対象のActionType52補正を適用して整数化�
     source,
   );
   const changed = applyEffect(boosted, handCardCountEffect(3, 3, 0n), source);
-  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(9);
+  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(10);
 });
 
 it('手札枚数を1枚減らす効果は使用元だけを抜き、ほかのカードを減らさない', () => {
