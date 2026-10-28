@@ -121,8 +121,10 @@ export class GameDriver {
   async tick(): Promise<void> {
     await Promise.resolve();
     this.elapsedTicks++;
-    if (this.elapsedTicks > 300 * rules.ticksPerSecond)
+    if (this.elapsedTicks > 300 * rules.ticksPerSecond) {
+      this.report('操作時間上限');
       throw new Error('操作開始から300秒以内に手順が完了しませんでした。');
+    }
     const before = this.state.stats.heartsCollected;
     const hand = this.state.hand.join(',');
     const amplification = this.state.storyAmplification;
