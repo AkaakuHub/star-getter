@@ -21,6 +21,23 @@ export async function readRecording(path: string): Promise<VideoRecording> {
     throw new Error('E2Eの操作記録を指定してください。');
   const final = value.finalState;
   if (
+    !('setup' in value) ||
+    !value.setup ||
+    typeof value.setup !== 'object' ||
+    !('presetId' in value.setup) ||
+    value.setup.presetId !== value.route ||
+    !('cardIds' in value.setup) ||
+    !Array.isArray(value.setup.cardIds) ||
+    value.setup.cardIds.length < 3 ||
+    value.setup.cardIds.length > 100 ||
+    new Set(value.setup.cardIds).size !== value.setup.cardIds.length ||
+    !value.setup.cardIds.every(
+      (id: unknown): id is string =>
+        typeof id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id),
+    )
+  )
+    throw new Error('操作記録の編成が正しくありません。');
+  if (
     !('score' in final) ||
     typeof final.score !== 'string' ||
     !('wallSeconds' in final) ||

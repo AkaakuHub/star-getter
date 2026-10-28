@@ -1,3 +1,4 @@
+import type { GameSetup } from '../../../src/app/setup/gameSetup';
 import { afterEach } from 'vite-plus/test';
 import type { RouteId } from '../../../src/content/routes';
 import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
@@ -85,12 +86,16 @@ export class GameRecording {
   private wallTick = 0;
 
   constructor(
-    readonly route: RouteId,
+    readonly setup: GameSetup,
     readonly seed: number,
     private state: GameState,
     readonly timing: InputTiming,
   ) {
     recordings.push(this);
+  }
+
+  get route(): RouteId {
+    return this.setup.presetId;
   }
 
   get finalState() {

@@ -1,3 +1,4 @@
+import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
 import { durationSeconds, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -123,7 +124,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
 }
 
 test('開花:共鳴→追加カード→雨→除外→引き直しで専用値を育てて手動回収する', async () => {
-  const driver = await GameDriver.create('genesis');
+  const driver = await GameDriver.create(createPresetSetup('genesis'));
   driver.report('開始');
   const paidEnergy = await activate(driver);
   expect(driver.state.cardUseCounts['frost-echo'] ?? 0).toBe(0);
@@ -159,7 +160,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
   await driver.burst(2, 10);
   const preparedGain = driver.state.score - before;
   driver.report('連打2秒');
-  const plain = await GameDriver.create('genesis');
+  const plain = await GameDriver.create(createPresetSetup('genesis'));
   await plain.burst(measurementTick / rules.ticksPerSecond, 10);
   const plainBefore = plain.state.score;
   await plain.burst(2, 10);
@@ -172,7 +173,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
     await driver.tick();
   }
   driver.report('15回毎秒で全区間終了');
-  const omitted = await GameDriver.create('genesis');
+  const omitted = await GameDriver.create(createPresetSetup('genesis'));
   await omitted.finishWithCards(priority);
   omitted.report('順序を省略した連打');
   console.log(
@@ -193,7 +194,7 @@ test('開花:共鳴→追加カード→雨→除外→引き直しで専用値�
 });
 
 test('開花:カード準備を専用値上限の直前まで継続する', async () => {
-  const driver = await GameDriver.create('genesis');
+  const driver = await GameDriver.create(createPresetSetup('genesis'));
   await activate(driver);
   await driver.burst(2, 10);
   await prepare(driver, false);

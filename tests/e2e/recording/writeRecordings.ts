@@ -146,6 +146,7 @@ export function writeRecordings(label: string, recordings: readonly GameRecordin
         {
           test: label,
           route: recording.route,
+          setup: recording.setup,
           seed: recording.seed,
           inputTiming: recording.timing,
           ticksPerSecond: rules.ticksPerSecond,

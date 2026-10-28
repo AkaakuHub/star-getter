@@ -77,6 +77,7 @@ export function DeckEditor({
                 type="button"
                 className={'card-browser-card color-' + card.performer}
                 aria-label={card.name}
+                data-card-id={card.id}
                 aria-pressed={setup.cardIds.includes(card.id)}
                 onClick={() => onChange(toggleSetupCard(setup, card.id))}
               >

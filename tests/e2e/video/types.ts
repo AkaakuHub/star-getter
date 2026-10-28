@@ -1,8 +1,10 @@
 import type { RouteId } from '../../../src/content/routes';
+import type { GameSetup } from '../../../src/app/setup/gameSetup';
 import type { InputRecord, RecordedInput } from '../recording/gameRecording';
 
 export type VideoRecording = Readonly<{
   route: RouteId;
+  setup: GameSetup;
   seed: number;
   ticksPerSecond: number;
   finalState: InputRecord['after'] &
@@ -42,7 +44,7 @@ export type TapRecord = Readonly<{
 
 declare global {
   interface Window {
-    e2eVideoConfig: Readonly<{ route: RouteId; seed: number }>;
+    e2eVideoConfig: Readonly<{ setup: GameSetup; seed: number }>;
     e2eVideoSession: ReplaySession | undefined;
     e2eVideoTapLabel: string;
   }

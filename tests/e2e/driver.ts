@@ -1,6 +1,5 @@
-import { createPresetSetup } from '../../src/app/setup/gameSetup';
+import type { GameSetup } from '../../src/app/setup/gameSetup';
 import { cardCost } from '@akaakuhub/suku-sute-core/game/cards/cost';
-import type { RouteId } from '../../src/content/routes';
 import { createConfiguredGame } from '../../src/app/createConfiguredGame';
 import { GameController } from '../../src/app/gameController';
 import { ScenarioAudio, ScenarioClock, ScenarioFrames } from './playback';
@@ -32,25 +31,29 @@ export class GameDriver {
   peakHeartLimit = 0;
 
   private constructor(
-    readonly route: RouteId,
+    readonly setup: GameSetup,
     readonly seed = 7,
     readonly timing: InputTiming = inputTiming,
   ) {
     this.controller = new GameController(
-      createConfiguredGame(createPresetSetup(route), seed, 100),
+      createConfiguredGame(setup, seed, 100),
       this.clock,
       this.frames,
       new ScenarioAudio(),
       false,
     );
     this.timingRandom = createRangeRandom((seed ^ 0x5bd1e995) >>> 0);
-    this.recording = new GameRecording(route, seed, this.state, timing);
+    this.recording = new GameRecording(setup, seed, this.state, timing);
   }
 
-  static async create(route: RouteId, seed = 7): Promise<GameDriver> {
-    const driver = new GameDriver(route, seed);
+  static async create(setup: GameSetup, seed = 7): Promise<GameDriver> {
+    const driver = new GameDriver(setup, seed);
     await driver.toggleAutomaticHearts();
     return driver;
+  }
+
+  get route() {
+    return this.setup.presetId;
   }
 
   get state(): GameState {

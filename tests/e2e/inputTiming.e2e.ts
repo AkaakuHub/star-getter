@@ -1,10 +1,11 @@
+import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
 import { canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
 import { GameDriver } from './driver';
 
 for (const waitMode of [false, true]) {
   test(`操作時間:自動停止${waitMode ? 'ON' : 'OFF'}でも判断と選択後の時間を使う`, async () => {
-    const driver = await GameDriver.create('library');
+    const driver = await GameDriver.create(createPresetSetup('library'));
     await driver.until(
       (state) => state.hand.some((id, index) => id === 'class' && canUseCard(state, index)),
       () => Promise.resolve(),
@@ -28,7 +29,7 @@ for (const waitMode of [false, true]) {
 }
 
 test('操作時間:使用間隔中に次の手札を確認し、発動時は本体の使用間隔を守る', async () => {
-  const driver = await GameDriver.create('library');
+  const driver = await GameDriver.create(createPresetSetup('library'));
   await driver.until(
     (state) => state.hand.some((id, index) => id === 'class' && canUseCard(state, index)),
     () => Promise.resolve(),

@@ -4,6 +4,7 @@ import { installTapOverlay } from './browser/taps.ts';
 import { createEncoder } from './encoder.ts';
 import { paint, replayInput, snapshot, verifyInput } from './replay.ts';
 import type { TapRecord, VideoRecording } from './types.ts';
+import { configureDeck } from './configureDeck.ts';
 
 export async function renderVideo(
   browser: Browser,
@@ -27,7 +28,7 @@ export async function renderVideo(
     (config) => {
       window.e2eVideoConfig = config;
     },
-    { route: recording.route, seed: recording.seed },
+    { setup: recording.setup, seed: recording.seed },
   );
   await page.addInitScript(installTapOverlay);
   await page.route('**/src/app/createGameController.ts', (route) =>
@@ -40,6 +41,7 @@ export async function renderVideo(
   await page.clock.install({ time: epoch });
   await page.clock.pauseAt(epoch);
   await page.goto(url + '?route=' + (recording.route === 'library' ? 'unabara' : 'kaika'));
+  await configureDeck(page, recording.setup);
   const start = await page
     .getByRole('button', { name: 'はじめる', exact: true })
     .evaluate((element) => {

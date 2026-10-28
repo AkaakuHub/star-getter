@@ -1,3 +1,4 @@
+import { createPresetSetup } from '../../src/app/setup/gameSetup';
 import { expect, test } from 'vite-plus/test';
 import { durationSeconds } from '@akaakuhub/suku-sute-core/game/projection';
 import { GameDriver } from './driver';
@@ -11,7 +12,7 @@ import {
 } from './library/strategy';
 
 test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到達する', async () => {
-  const driver = await GameDriver.create('library');
+  const driver = await GameDriver.create(createPresetSetup('library'));
   driver.report('開始');
   expect(driver.state.storyAmplification).toBe(0);
   await prepare(driver, true);
@@ -22,10 +23,10 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
     expect(driver.state.deck.some((card) => card.token === token)).toBe(true);
   expect(driver.state.stats.cardsUsed).toBeGreaterThan(driver.cardActions);
   expect(driver.state.storyAmplification).toBeGreaterThan(0);
-  const unplanned = await GameDriver.create('library');
+  const unplanned = await GameDriver.create(createPresetSetup('library'));
   await playUnplanned(unplanned);
   unplanned.report('手札の先頭から使用可能なカードを使って全区間終了');
-  const omitted = await GameDriver.create('library');
+  const omitted = await GameDriver.create(createPresetSetup('library'));
   await omitted.finishWithCards(libraryPriority);
   omitted.report('共鳴の準備を省略して終了');
   await amplifyAndWiden(driver);
@@ -67,7 +68,7 @@ test('うなばら:生成と回収増幅を準備し終盤の連打で京へ到�
 
 for (const seed of [456, 1234]) {
   test(`うなばら:別の初期手札でも準備から回収連鎖へ移行する（seed ${seed}）`, async () => {
-    const driver = await GameDriver.create('library', seed);
+    const driver = await GameDriver.create(createPresetSetup('library'), seed);
     await prepare(driver, true);
     await amplifyAndWiden(driver);
     const run = await runCollections(driver, durationSeconds(driver.state), 15);
@@ -80,13 +81,13 @@ for (const seed of [456, 1234]) {
 }
 
 test('うなばら:同じ曲で未準備の回収と準備後の回収を比較する', async () => {
-  const prepared = await GameDriver.create('library');
+  const prepared = await GameDriver.create(createPresetSetup('library'));
   await prepare(prepared, true);
   const start = prepared.seconds;
   const score = prepared.state.score;
   await prepared.burst(2, 10);
   const preparedGain = prepared.state.score - score;
-  const plain = await GameDriver.create('library');
+  const plain = await GameDriver.create(createPresetSetup('library'));
   await plain.burst(start, 10);
   const plainScore = plain.state.score;
   await plain.burst(2, 10);
@@ -109,7 +110,7 @@ test('うなばら:同じ曲で未準備の回収と準備後の回収を比較�
 });
 
 test('うなばら:autoONはカードも手動回収も使わず間隔付きで連鎖する', async () => {
-  const driver = await GameDriver.create('library');
+  const driver = await GameDriver.create(createPresetSetup('library'));
   await prepare(driver, true);
   await amplifyAndWiden(driver);
   await armAutomaticCollection(driver);
@@ -141,7 +142,7 @@ test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚�
   const scores: bigint[] = [];
   let repairs = 0;
   for (const speed of [5, 10, 15] as const) {
-    const driver = await GameDriver.create('library');
+    const driver = await GameDriver.create(createPresetSetup('library'));
     await prepare(driver, true);
     await amplifyAndWiden(driver);
     expect(driver.state.automaticHeart.enabled).toBe(false);

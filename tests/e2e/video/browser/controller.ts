@@ -12,7 +12,12 @@ export function createGameController(
   preferences: GamePreferences,
 ): GameController {
   const config = window.e2eVideoConfig;
-  if (setup.presetId !== config.route) throw new Error('録画対象のプリセットが一致しません。');
+  if (
+    setup.presetId !== config.setup.presetId ||
+    setup.cardIds.length !== config.setup.cardIds.length ||
+    setup.cardIds.some((id, index) => id !== config.setup.cardIds[index])
+  )
+    throw new Error('録画対象の編成または並び順が一致しません。');
   const clock = new ScenarioClock();
   const frames = new ScenarioFrames();
   const controller = new GameController(
