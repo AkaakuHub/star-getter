@@ -73,3 +73,18 @@ it('子カードのコストに発動元の使用通知を先取りしない', (
   const used = act(changed, { type: 'card', index: 0 });
   expect(used.cardUses.find((entry) => entry.card.id === child.id)?.cost).toBe(1);
 });
+
+it('全手札使用の子に全手札使用があっても各カードを1回ずつ発動する', () => {
+  const { state, child } = setup([{ kind: 'use-hand' }], [{ kind: 'use-hand' }]);
+  const last: Card = {
+    ...child,
+    id: 'last',
+    name: '最後のカード',
+    effects: [{ kind: 'mood', amount: 1 }],
+  };
+  const deck = [...state.deck, last];
+  const ready = withHand({ ...state, deck, cardPool: deck }, ['source', 'child', 'last']);
+  const used = act(ready, { type: 'card', index: 0 });
+  expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source', 'child', 'last']);
+  expect(moodValue(used)).toBe(1);
+});
