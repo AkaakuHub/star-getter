@@ -183,3 +183,25 @@ it('全手札補充では使用元を保持し、使用スキルの抽選条件�
   expect(used.lastUsedSkillIcon).toBeNull();
   expect(used.tokenCardDeck.isAllHandSkill).toBe(false);
 });
+
+it('子カードの検索を全手札補充に使用し、親の完了時に使い残しを消す', () => {
+  const { state } = setup(
+    [{ kind: 'use-hand' }],
+    [{ kind: 'search', scope: 'skill', target: { kind: 'member', member: 1031 }, count: 12 }],
+  );
+  const used = act(state, { type: 'card', index: 0 });
+  expect(used.hand).toContain('child');
+  expect(used.deckBoard.skillCardSearchParams).toEqual([]);
+  expect(used.deckActions.queue).toEqual([]);
+});
+
+it('通常の親カードも補充終了後に使い残した検索を消す', () => {
+  const { state } = setup(
+    [{ kind: 'search', scope: 'grade', target: { kind: 'member', member: 1031 }, count: 12 }],
+    [],
+  );
+  const used = act(state, { type: 'card', index: 0 });
+  expect(used.hand).toContain('child');
+  expect(used.deckBoard.gradeCardSearchParams).toEqual([]);
+  expect(used.deckActions.queue).toEqual([]);
+});
