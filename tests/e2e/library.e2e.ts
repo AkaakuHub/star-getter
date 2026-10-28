@@ -148,6 +148,14 @@ test('うなばら:autoOFFは速度別の回収と停止時の再始動、95枚�
     expect(driver.state.automaticHeart.enabled).toBe(false);
     const beforeMeasurement = driver.state.score;
     await driver.burst(2, speed);
+    console.log(
+      JSON.stringify({
+        route: 'library',
+        stage: '回収速度測定',
+        speed,
+        gain: (driver.state.score - beforeMeasurement).toString(),
+      }),
+    );
     scores.push(driver.state.score - beforeMeasurement);
     const inputStart = driver.inputs.length;
     const run = await runCollections(driver, durationSeconds(driver.state), speed);

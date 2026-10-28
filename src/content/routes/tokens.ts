@@ -109,6 +109,41 @@ export const routeTokens: readonly Card[] = [
     token: 'bookmark',
     exhausts: true,
     drawAbility: 'bookmark',
+    collectionEffects: {
+      threshold: 500_000,
+      limit: 19,
+      limitMemory: 'retain',
+      effects: [
+        {
+          kind: 'branch',
+          condition: { kind: 'cards', zone: 'all', minimum: 95 },
+          whenTrue: [
+            { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },
+            ...Array.from({ length: 3 }, () => [
+              {
+                kind: 'search',
+                scope: 'section',
+                target: { kind: 'token', token: 'bookmark' },
+                count: 1,
+              } as const,
+              {
+                kind: 'search',
+                scope: 'section',
+                target: { kind: 'token', token: 'story' },
+                count: 1,
+              } as const,
+              {
+                kind: 'search',
+                scope: 'section',
+                target: { kind: 'token', token: 'clock' },
+                count: 1,
+              } as const,
+            ]).flat(),
+          ],
+          whenFalse: [],
+        },
+      ],
+    },
     beforeUseEffects: [{ kind: 'tokens', token: 'story', count: 1 }],
     effects: [
       { kind: 'shuffle', recoverDiscard: false, destination: 'discard' },

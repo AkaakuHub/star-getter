@@ -30,9 +30,9 @@ export const libraryCards: readonly Card[] = [
       ],
     },
     effects: [
-      { kind: 'tokens', token: 'story', count: 8 },
-      { kind: 'tokens', token: 'clock', count: 1 },
-      { kind: 'tokens', token: 'bookmark', count: 1 },
+      { kind: 'tokens', token: 'story', count: 2 },
+      { kind: 'tokens', token: 'clock', count: 6 },
+      { kind: 'tokens', token: 'bookmark', count: 2 },
     ],
   },
   {

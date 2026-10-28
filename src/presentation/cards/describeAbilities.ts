@@ -1,3 +1,4 @@
+import { collectionLimitDescription } from './collectionLimitDescription';
 import { describeEffect } from './describeEffect';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { handUseTriggerDescription } from './targetNames';
@@ -5,7 +6,7 @@ import { handUseTriggerDescription } from './targetNames';
 export function describeAbilities(card: Card): string {
   let text = card.drawEffects ? `引いたとき、${card.drawEffects.map(describeEffect).join('')}` : '';
   if (card.collectionEffects)
-    text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収するたび、${card.collectionEffects.effects.map(describeEffect).join('')}${card.collectionEffects.limit === undefined || card.collectionEffects.limit === 0 ? '回数制限なし' : `最大${card.collectionEffects.limit}回`}発動する。`;
+    text += `手札にある間、累計${card.collectionEffects.threshold.toLocaleString('ja-JP')}個を回収するたび、${card.collectionEffects.effects.map(describeEffect).join('')}${collectionLimitDescription(card.collectionEffects)}発動する。`;
   if (card.beforeUseEffects)
     text += `使用時、${card.beforeUseEffects.map(describeEffect).join('')}`;
   for (const inducer of card.handInducers ?? [])
@@ -24,7 +25,7 @@ export function describeAbilities(card: Card): string {
       break;
     case 'bookmark':
       text +=
-        '引いたとき、編成枚数に応じてエナジーを1〜8回復する。80枚以上で手札にある間、貝がらの効果を+1001%増幅する。手札にある間に累計50万個を回収したとき、編成95枚以上で手札を引き直す。';
+        '引いたとき、編成枚数に応じてエナジーを1〜8回復する。80枚以上で手札にある間、貝がらの効果を+1001%増幅する。';
       break;
     case 'story':
       text +=

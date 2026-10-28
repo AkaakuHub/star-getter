@@ -1,3 +1,4 @@
+import { canActivateHandCollectionAbility } from '@akaakuhub/suku-sute-core/game/cards/collectionAbilities';
 import { type GameState, rules } from '@akaakuhub/suku-sute-core/game/model';
 import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
@@ -17,13 +18,38 @@ export const libraryPriority = [
   'bookmark',
 ];
 
+const repairPriority = [
+  'library-pages',
+  'library-invitation',
+  'bookmark',
+  'library-ensemble',
+  'ensemble',
+  'clock',
+  'aurora-ensemble',
+  'camera',
+  'story',
+];
+const restartPriority = [
+  'bookmark',
+  'clock',
+  'library-invitation',
+  'ensemble',
+  'library-ensemble',
+  'camera',
+  'library-pages',
+  'story',
+  'aurora-ensemble',
+];
+
 function isPrepared(state: GameState): boolean {
   const hand = state.deck.filter((card) => state.hand.includes(card.id));
   return (
     state.deck.length >= 95 &&
     state.hearts.heartLimit >= 500_000 &&
     hand.some((card) => card.token === 'story') &&
-    hand.some((card) => card.token === 'bookmark' && !state.relayUsed.includes(card.id)) &&
+    hand.some(
+      (card) => card.token === 'bookmark' && canActivateHandCollectionAbility(state, card),
+    ) &&
     moodValue(state) === 100 &&
     heartCount(state) >= 500_000
   );
@@ -87,29 +113,8 @@ export async function prepare(driver: GameDriver, waitMode: boolean): Promise<vo
   });
 }
 
-function hasAvailableBookmark(state: GameState): boolean {
-  return state.deck.some(
-    (card) =>
-      card.token === 'bookmark' &&
-      state.hand.includes(card.id) &&
-      !state.relayUsed.includes(card.id),
-  );
-}
-
 async function restoreDeck(driver: GameDriver): Promise<void> {
-  const clocks = driver.state.deck.filter((card) => card.token === 'clock').length;
-  await driver.useFirst([
-    'library-invitation',
-    'library-ensemble',
-    'ensemble',
-    'library-pages',
-    ...(moodValue(driver.state) < 100 || clocks > 3 ? ['clock'] : []),
-    'bookmark',
-    'story',
-    'clock',
-    'aurora-ensemble',
-    'camera',
-  ]);
+  await driver.useFirst(repairPriority);
   if (driver.inputTick % 6 === 0) driver.collect();
 }
 
@@ -130,17 +135,8 @@ async function maintainLoop(driver: GameDriver): Promise<void> {
       'camera',
       'aurora-ensemble',
     ]);
-  } else if (!hasAvailableBookmark(driver.state) || heartCount(driver.state) < 500_000) {
-    await driver.useFirst([
-      'library-ensemble',
-      'library-invitation',
-      'bookmark',
-      'ensemble',
-      'story',
-      'aurora-ensemble',
-      'library-pages',
-      'camera',
-    ]);
+  } else if (!isCollectionReady(driver.state)) {
+    await driver.useFirst(restartPriority);
   }
   if (driver.inputTick % 6 === 0) driver.collect();
 }
@@ -155,7 +151,7 @@ export async function amplifyAndWiden(driver: GameDriver): Promise<void> {
   await driver.until(
     (state) => state.hearts.heartLimit === 10_000_000 && state.deck.length >= 95,
     async () => {
-      if (driver.state.deck.length < 100) {
+      if (driver.state.deck.length < 95) {
         await restoreDeck(driver);
       } else {
         await driver.useFirst([
@@ -187,7 +183,7 @@ function isCollectionReady(state: GameState): boolean {
       (card) =>
         card.token === 'story' &&
         state.hand.includes(card.id) &&
-        !state.relayUsed.includes(card.id),
+        canActivateHandCollectionAbility(state, card),
     )
   );
 }
@@ -240,42 +236,9 @@ export async function runCollections(driver: GameDriver, stopSeconds: number, sp
         const deckBefore = driver.state.deck.length;
         const used =
           driver.state.deck.length < 95
-            ? await driver.useFirst([
-                'library-pages',
-                'library-invitation',
-                'bookmark',
-                'library-ensemble',
-                'ensemble',
-                'clock',
-                'aurora-ensemble',
-                'camera',
-                'story',
-              ])
-            : await driver.useFirst(
-                hasAvailableBookmark(driver.state)
-                  ? [
-                      'story',
-                      'clock',
-                      'bookmark',
-                      'ensemble',
-                      'library-ensemble',
-                      'library-invitation',
-                      'camera',
-                      'library-pages',
-                      'aurora-ensemble',
-                    ]
-                  : [
-                      'bookmark',
-                      'clock',
-                      'library-invitation',
-                      'ensemble',
-                      'library-ensemble',
-                      'camera',
-                      'library-pages',
-                      'story',
-                      'aurora-ensemble',
-                    ],
-              );
+            ? await driver.useFirst(repairPriority)
+            : await driver.useFirst(restartPriority);
+
         if (
           deckBefore <= 96 &&
           driver.state.deck.length > deckBefore &&

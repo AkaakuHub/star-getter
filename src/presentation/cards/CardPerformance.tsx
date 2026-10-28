@@ -1,3 +1,4 @@
+import { collectionLimitDescription } from './collectionLimitDescription';
 import type { Card } from '@akaakuhub/suku-sute-core/game/model';
 import { describeCardTraits } from '../cardDescription';
 import { CardArtwork } from '../mascots/CardArtwork';
@@ -63,9 +64,7 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
           <section>
             <h3>
               手札内で累計{collectionEffects.threshold.toLocaleString('ja-JP')}個回収したとき
-              {collectionEffects.limit === undefined || collectionEffects.limit === 0
-                ? '（回数制限なし）'
-                : `（最大${collectionEffects.limit}回）`}
+              {`（${collectionLimitDescription(collectionEffects)}）`}
             </h3>
             <EffectDetails effects={collectionEffects.effects} />
           </section>
