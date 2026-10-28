@@ -68,7 +68,7 @@ export function StartScreen({
                   aria-label={card.name + 'の性能を確認'}
                   onClick={() => setSelected(card)}
                 >
-                  <HandCardFace card={card} cost={card.cost} />
+                  <HandCardFace card={card} consumeAp={card.consumeAp} />
                 </button>
               ))}
             </div>
@@ -101,7 +101,7 @@ export function StartScreen({
       )}
       {selected && (
         <Modal title={selected.name} onClose={() => setSelected(null)} className="card-detail">
-          <CardPerformance card={selected} cost={selected.cost} />
+          <CardPerformance card={selected} consumeAp={selected.consumeAp} />
         </Modal>
       )}
     </div>

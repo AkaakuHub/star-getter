@@ -18,8 +18,8 @@ it('AP無限中は最大APを超えるカードと共鳴を使用できる', () 
         card.id === source.id
           ? {
               ...card,
-              cost: state.ap.maxAp + 10,
-              special: { ...special, cost: state.ap.maxAp + 10 },
+              consumeAp: state.ap.maxAp + 10,
+              special: { ...special, consumeAp: state.ap.maxAp + 10 },
             }
           : card,
       ),

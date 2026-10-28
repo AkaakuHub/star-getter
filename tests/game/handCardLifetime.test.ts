@@ -20,7 +20,7 @@ it.each([false, true])(
       costume: null,
       appeal,
       beatPoint: 0,
-      cost: 1,
+      consumeAp: 1,
       effects: allHand ? [{ kind: 'use-hand' }] : [],
       handPermanentEffects: [
         {

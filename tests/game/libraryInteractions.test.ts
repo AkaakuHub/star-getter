@@ -338,8 +338,8 @@ it('一斉使用中の子カードはActionType42の合算コストではなく�
     },
     [source.id, child.id],
   );
-  expect(cardCost(state, child)).toBeGreaterThan(child.cost);
-  expect(cardCost(state, child, true)).toBe(child.cost);
+  expect(cardCost(state, child)).toBeGreaterThan(child.consumeAp);
+  expect(cardCost(state, child, true)).toBe(child.consumeAp);
   const used = act({ ...state, ap: { ...state.ap, currentAp: 100 } }, { type: 'card', index: 0 });
-  expect(used.cardUses.find((item) => item.card.id === child.id)?.cost).toBe(child.cost);
+  expect(used.cardUses.find((item) => item.card.id === child.id)?.consumeAp).toBe(child.consumeAp);
 });

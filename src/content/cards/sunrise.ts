@@ -18,7 +18,7 @@ export const sunriseCard: Card = {
   charactersId: 1032,
   unitIds: [2],
   costume: 'sunny',
-  cost: 5,
+  consumeAp: 5,
   appeal: { smile: 3300, pure: 5500, cool: 5700 },
   beatPoint: 100,
   effects: [

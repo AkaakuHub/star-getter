@@ -10,12 +10,12 @@ export const libraryCards: readonly Card[] = [
     charactersId: 1031,
     unitIds: [1],
     costume: 'blossom',
-    cost: 8,
+    consumeAp: 8,
     appeal: { smile: 4950, pure: 6050, cool: 3400 },
     beatPoint: 100,
     beforeUseAbility: 'story-boost',
     special: {
-      cost: 3,
+      consumeAp: 3,
       extra: false,
       effects: [
         {
@@ -42,7 +42,7 @@ export const libraryCards: readonly Card[] = [
     charactersId: 1041,
     unitIds: [1],
     costume: 'ribbon',
-    cost: 8,
+    consumeAp: 8,
     appeal: { smile: 5000, pure: 6100, cool: 3300 },
     beatPoint: 100,
     drawAbility: 'library',
@@ -56,7 +56,7 @@ export const libraryCards: readonly Card[] = [
     charactersId: 1021,
     unitIds: [1],
     costume: 'moon',
-    cost: 0,
+    consumeAp: 0,
     appeal: { smile: 6950, pure: 5700, cool: 3550 },
     beatPoint: 100,
     allHandCost: {
@@ -84,7 +84,7 @@ export const libraryCards: readonly Card[] = [
       },
     ],
     special: {
-      cost: 3,
+      consumeAp: 3,
       extra: true,
       effects: [
         { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 1 } },

@@ -169,7 +169,7 @@ it('ActionType28のカード枚数にActionType18の詳細値係数を適用す�
       seriesId: 0,
       mainEffect: 0,
       skillIcon: 0,
-      variant: { cost: 1, effects: [], skillIcon: 0, special: null },
+      variant: { consumeAp: 1, effects: [], skillIcon: 0, special: null },
     },
     ability: null,
   } as const;

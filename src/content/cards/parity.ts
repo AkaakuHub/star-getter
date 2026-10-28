@@ -17,7 +17,7 @@ export const parityCards: readonly Card[] = [
     charactersId: 1021,
     unitIds: [1],
     costume: 'sailor',
-    cost: 2,
+    consumeAp: 2,
     appeal: { smile: 5000, pure: 5000, cool: 5000 },
     beatPoint: 100,
     effects: [
@@ -33,7 +33,7 @@ export const parityCards: readonly Card[] = [
     charactersId: 1031,
     unitIds: [1],
     costume: 'moon',
-    cost: 3,
+    consumeAp: 3,
     appeal: { smile: 5000, pure: 5000, cool: 5000 },
     beatPoint: 100,
     effects: [
@@ -50,7 +50,7 @@ export const parityCards: readonly Card[] = [
     charactersId: 1042,
     unitIds: [2],
     costume: 'prism',
-    cost: 3,
+    consumeAp: 3,
     appeal: { smile: 5000, pure: 5000, cool: 5000 },
     beatPoint: 100,
     collectionEffects: {

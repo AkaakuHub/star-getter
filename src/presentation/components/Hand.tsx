@@ -45,7 +45,7 @@ export function Hand({
               if (event.detail === 0) use();
             }}
           >
-            <HandCardFace card={card} cost={cardCost(state, card)} />
+            <HandCardFace card={card} consumeAp={cardCost(state, card)} />
           </button>
         );
       })}

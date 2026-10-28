@@ -46,7 +46,7 @@ export function CardBrowser({
                     onClick={() => setSelected(card)}
                     aria-label={card.name + 'の性能を確認'}
                   >
-                    <HandCardFace card={card} cost={cardCost(state, card)} />
+                    <HandCardFace card={card} consumeAp={cardCost(state, card)} />
                   </button>
                 ))}
               </div>
@@ -64,7 +64,7 @@ export function CardBrowser({
             <ChevronLeft size={20} aria-hidden="true" />
             一覧に戻る
           </button>
-          <CardPerformance card={selected} cost={cardCost(state, selected)} />
+          <CardPerformance card={selected} consumeAp={cardCost(state, selected)} />
         </Modal>
       )}
     </>

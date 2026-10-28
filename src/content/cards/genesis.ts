@@ -20,13 +20,13 @@ export const genesisCards: readonly Card[] = [
     charactersId: 1031,
     unitIds: [1],
     costume: 'star',
-    cost: 20,
+    consumeAp: 20,
     appeal: { smile: 6300, pure: 4400, cool: 3500 },
     beatPoint: 100,
     drawAbility: 'genesis',
     relay: { threshold: 3000, hearts: 3000, beats: true, moodBonus: { target: 2, perPoint: 15 } },
     special: {
-      cost: 20,
+      consumeAp: 20,
       extra: false,
       effects: [
         { kind: 'genesis', effectValue: 3.5 },
@@ -56,7 +56,7 @@ export const genesisCards: readonly Card[] = [
     charactersId: 1032,
     unitIds: [2],
     costume: 'snow',
-    cost: 14,
+    consumeAp: 14,
     appeal: { smile: 3900, pure: 4000, cool: 6600 },
     beatPoint: 100,
     beforeUseAbility: 'rain-echo',
@@ -115,7 +115,7 @@ export const genesisCards: readonly Card[] = [
     charactersId: 1022,
     unitIds: [2],
     costume: 'witch',
-    cost: 14,
+    consumeAp: 14,
     appeal: { smile: 4900, pure: 4600, cool: 7000 },
     beatPoint: 100,
     drawRules: [
@@ -137,7 +137,7 @@ export const genesisCards: readonly Card[] = [
       ],
     },
     special: {
-      cost: 3,
+      consumeAp: 3,
       extra: true,
       effects: [
         { kind: 'reset-special', scope: 'all', target: { kind: 'unit', unit: 2 } },
@@ -175,7 +175,7 @@ export const genesisCards: readonly Card[] = [
     charactersId: 1033,
     unitIds: [3],
     costume: 'prism',
-    cost: 13,
+    consumeAp: 13,
     appeal: { smile: 4400, pure: 4900, cool: 5100 },
     beatPoint: 100,
     drawAbility: 'perennial',

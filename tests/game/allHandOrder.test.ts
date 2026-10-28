@@ -20,7 +20,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
     appeal,
     beatPoint: 1,
     mainEffect: 42,
-    cost: 1,
+    consumeAp: 1,
     effects: sourceEffects,
   };
   const child: Card = {
@@ -76,7 +76,7 @@ it('子カードのコストに発動元の使用通知を先取りしない', (
     child,
   );
   const used = act(changed, { type: 'card', index: 0 });
-  expect(used.cardUses.find((entry) => entry.card.id === child.id)?.cost).toBe(1);
+  expect(used.cardUses.find((entry) => entry.card.id === child.id)?.consumeAp).toBe(1);
 });
 
 it('全手札使用の子に全手札使用があっても各カードを1回ずつ発動する', () => {

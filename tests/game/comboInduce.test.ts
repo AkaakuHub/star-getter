@@ -100,7 +100,7 @@ it('カード使用時に実APをコンボ誘発へ渡す', () => {
     throw new Error('コンボ誘発の検証カードがありません。');
   const deck = initial.deck.map((card) => ({
     ...card,
-    cost: card.id === first.id ? 1 : card.cost,
+    consumeAp: card.id === first.id ? 1 : card.consumeAp,
     effects: [{ kind: 'hearts', amount: 0 }] as const,
     passive: {},
   }));

@@ -54,7 +54,7 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
     charactersId: 1021,
     unitIds: [1],
     costume: 'star',
-    cost: 0,
+    consumeAp: 0,
     appeal: { smile: 1, pure: 1, cool: 1 },
     beatPoint: 100,
     effects: [{ kind: 'mood' as const, amount: 0 }],

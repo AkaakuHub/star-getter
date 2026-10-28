@@ -34,7 +34,7 @@ export function DeckEditor({
               aria-label={card.name + 'の性能を確認'}
               onClick={() => onCard(card)}
             >
-              <HandCardFace card={card} cost={card.cost} />
+              <HandCardFace card={card} consumeAp={card.consumeAp} />
             </button>
             <span>{card.name}</span>
             <div className="setup-order">
@@ -81,7 +81,7 @@ export function DeckEditor({
                 aria-pressed={setup.cardIds.includes(card.id)}
                 onClick={() => onChange(toggleSetupCard(setup, card.id))}
               >
-                <HandCardFace card={card} cost={card.cost} />
+                <HandCardFace card={card} consumeAp={card.consumeAp} />
                 {setup.cardIds.includes(card.id) && (
                   <Check className="setup-card-check" size={22} aria-hidden="true" />
                 )}

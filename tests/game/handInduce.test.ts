@@ -214,7 +214,7 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
     [card.id],
   );
   const next = act(state, { type: 'card', index: 0 });
-  expect(next.ap.currentAp).toBe(initial.ap.maxAp - card.cost + 1);
+  expect(next.ap.currentAp).toBe(initial.ap.maxAp - card.consumeAp + 1);
 });
 
 it.each([

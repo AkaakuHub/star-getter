@@ -13,7 +13,7 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillSkillLevel: 1,
     seriesMainEffect: 0,
     seriesSkillIcon: 20,
-    variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+    variant: { consumeAp: 2, effects: [], skillIcon: 20, special: null },
   },
   {
     skillType: 2,
@@ -23,7 +23,7 @@ const cardSkillVariants: readonly CardSkillVariantMaster[] = [
     skillSkillLevel: 1,
     seriesMainEffect: 0,
     seriesSkillIcon: 21,
-    variant: { cost: 3, effects: [], skillIcon: 21, special: null },
+    variant: { consumeAp: 3, effects: [], skillIcon: 21, special: null },
   },
   {
     skillType: 3,
@@ -116,8 +116,8 @@ it('ActionType36のModeIdと詳細構成をカードへ接続する', () => {
   expect(compiled?.modeParameterChanges?.modeId).toBe(100);
   expect(compiled?.modeSkillChanges).toMatchObject({
     modeId: 100,
-    off: { cost: 2, skillIcon: 20 },
-    on: { cost: 3, skillIcon: 21 },
+    off: { consumeAp: 2, skillIcon: 20 },
+    on: { consumeAp: 3, skillIcon: 21 },
   });
   expect(state.modes.entries.some((mode) => mode.id === 100)).toBe(true);
   expect(compiled?.modeAbilityChanges).toMatchObject({
@@ -170,7 +170,7 @@ it('ActionType36は系列IDに一致するMaster variantがない場合に失敗
         skillSkillLevel: 1,
         seriesMainEffect: 0,
         seriesSkillIcon: 20,
-        variant: { cost: 2, effects: [], skillIcon: 20, special: null },
+        variant: { consumeAp: 2, effects: [], skillIcon: 20, special: null },
       },
     ]),
   ).toThrow('モード切替スキル系列Masterを一意に解決できません。');

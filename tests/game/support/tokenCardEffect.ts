@@ -24,7 +24,7 @@ export function tokenCardEffect(
       seriesId: 0,
       mainEffect: 0,
       skillIcon: 0,
-      variant: { cost: 1, effects: [], skillIcon: 0, special: null },
+      variant: { consumeAp: 1, effects: [], skillIcon: 0, special: null },
     },
     ability: null,
     seriesIds,

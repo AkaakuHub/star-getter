@@ -65,7 +65,7 @@ it('Action27は発動元カード自身の使用後に誘発し、外部解除�
   if (!source) throw new Error('追加きらめき誘発の発動元カードがありません。');
   const deck = initial.deck.map((card) => ({
     ...card,
-    cost: card.id === source.id ? 1 : card.cost,
+    consumeAp: card.id === source.id ? 1 : card.consumeAp,
     effects:
       card.id === source.id
         ? ([

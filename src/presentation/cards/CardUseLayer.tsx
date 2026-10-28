@@ -57,7 +57,7 @@ function CardUseGhost({
         transform: `rotate(${start.rotation}deg)`,
       }}
     >
-      <HandCardFace card={action.card} cost={action.cost} />
+      <HandCardFace card={action.card} consumeAp={action.consumeAp} />
     </div>
   );
 }

@@ -82,13 +82,13 @@ describe('モード切替と切替時効果', () => {
       modeSkillChanges: {
         modeId: 88,
         off: {
-          cost: 1,
+          consumeAp: 1,
           effects: [{ kind: 'voltage', amount: 1 }],
           skillIcon: null,
           special: null,
         },
         on: {
-          cost: 3,
+          consumeAp: 3,
           effects: [{ kind: 'voltage', amount: 7 }],
           skillIcon: null,
           special: null,
@@ -113,7 +113,7 @@ describe('モード切替と切替時効果', () => {
     expect(cardAt(enabled, 0).effects).toEqual([{ kind: 'voltage', amount: 7 }]);
     const used = act(enabled, { type: 'card', index: 0 });
     expect(used.voltage.currentVoltage - enabled.voltage.currentVoltage).toBe(28n);
-    expect(used.cardUses[0]?.cost).toBe(3);
+    expect(used.cardUses[0]?.consumeAp).toBe(3);
   });
   it('Action36のモード別Abilityを切替時に解除して再起動する', () => {
     const initial = modeGame();

@@ -5,7 +5,7 @@ import { CardArtwork } from '../mascots/CardArtwork';
 import { EffectDetails } from './EffectDetails';
 import { handUseTriggerDescription } from './targetNames';
 
-export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: number }>) {
+export function CardPerformance({ card, consumeAp }: Readonly<{ card: Card; consumeAp: number }>) {
   const { drawEffects, handInducers, collectionEffects, ...traitsCard } = card;
   const traits = describeCardTraits(traitsCard);
   return (
@@ -16,7 +16,7 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
       <dl className="card-performance-stats">
         <div>
           <dt>エナジー</dt>
-          <dd>{cost}</dd>
+          <dd>{consumeAp}</dd>
         </div>
         <div>
           <dt>輝き</dt>
@@ -38,7 +38,7 @@ export function CardPerformance({ card, cost }: Readonly<{ card: Card; cost: num
         </section>
         {card.special && (
           <section>
-            <h3>共鳴（エナジー{card.special.cost}）</h3>
+            <h3>共鳴（エナジー{card.special.consumeAp}）</h3>
             <EffectDetails effects={card.special.effects} />
           </section>
         )}
