@@ -35,6 +35,28 @@ it('範囲外のAP回復量はint32へ飽和させてから通常APの上限を�
 });
 
 describe('エナジー消費時の回復タイマー', () => {
+  it('0消費ではAP回復用のProxyを消費しない', () => {
+    const state = game();
+    const source = state.deck[0];
+    if (!source) throw new Error('発動元カードがありません。');
+    const active = applyEffect(
+      state,
+      {
+        kind: 'proxy-skill',
+        absorbLimit: 1,
+        periodType: 1,
+        periodParam: 3000n,
+        induceTiming: 1,
+        induceCondition: 1,
+        inducePowerType: 1,
+        inducePowerParam: 0,
+        targets: [{ actionType: 14, targetAmount: 3 }],
+        effects: [],
+      },
+      source,
+    );
+    expect(spendAp(active, 0).proxyAbsorptions).toBe(active.proxyAbsorptions);
+  });
   it('上限で消費すると回復途中の時間を0へ戻す', () => {
     const state = game();
     const next = spendAp(
