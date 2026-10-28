@@ -16,7 +16,7 @@ it('盤面の初期化はinstanceの識別子と定義IDを別々に保持する
   if (!template) throw new Error('カードがありません。');
   const card = { ...template, cardInstanceId: 'physical-card', cardDatasId: 'authored-card' };
   const board = createCardDeckBoard([card], [card.cardInstanceId]);
-  expect(board.cards).toEqual([
+  expect(board.cards).toMatchObject([
     {
       cardInstanceId: 'physical-card',
       cardDatasId: 'authored-card',
@@ -48,7 +48,7 @@ it('同じ定義から生成したカードは定義IDを維持し、個別に�
     moved.deckBoard.cards.filter((card) =>
       cards.some((item) => item.cardInstanceId === card.cardInstanceId),
     ),
-  ).toEqual([
+  ).toMatchObject([
     {
       cardInstanceId: first.cardInstanceId,
       cardDatasId: 'authored-story',

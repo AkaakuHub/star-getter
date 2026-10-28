@@ -19,7 +19,7 @@ function game() {
   });
 }
 
-it('Proxyに吸収された手札数加算を目標数へ反映せず、期限時に原処理の解除量を反映する', () => {
+it('Proxyに吸収された手札数加算は目標数を変えず、期限時にも解除量を通知しない', () => {
   const initial = game();
   const source = initial.deck[0];
   if (!source) throw new Error('Proxy発動元カードがありません。');
@@ -42,7 +42,7 @@ it('Proxyに吸収された手札数加算を目標数へ反映せず、期限�
   const absorbed = applyEffect(state, handCardCountEffect(1, 1, 100n));
   expect(absorbed.tokenCardDeck.handTargetCounts.current).toBe(5);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(1n);
-  expect(advanceTo(absorbed, 0.2).tokenCardDeck.handTargetCounts.current).toBe(4);
+  expect(advanceTo(absorbed, 0.2).tokenCardDeck.handTargetCounts.current).toBe(5);
 });
 
 it('時間期限のProxy吸収を期限後に解除する', () => {

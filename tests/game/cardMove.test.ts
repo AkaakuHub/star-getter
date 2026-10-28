@@ -29,7 +29,6 @@ function activateSourceCard() {
           handCardButtonId: liveHandCardButtonId(state, card.cardInstanceId),
           usedCards: [card.cardInstanceId],
           hasUseAllHandSkill: false,
-          handCountChanges: {},
         },
       },
       {
@@ -85,7 +84,6 @@ it('全手札使用の子の除外特性は既存のProxy移動先を上書き�
         handCardButtonId: liveHandCardButtonId(initial, source.cardInstanceId),
         usedCards: [source.cardInstanceId, child.cardInstanceId],
         hasUseAllHandSkill: true,
-        handCountChanges: {},
       },
     },
     {
@@ -139,7 +137,6 @@ it('ProxyはAction19の移動先より優先され、一斉引き直しで山札
         handCardButtonId: liveHandCardButtonId(state, source.cardInstanceId),
         usedCards: [source.cardInstanceId, child.cardInstanceId],
         hasUseAllHandSkill: true,
-        handCountChanges: {},
       },
     },
     {

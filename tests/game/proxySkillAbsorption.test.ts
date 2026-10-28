@@ -6,6 +6,10 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 import { absorbSkillEffect } from '@akaakuhub/suku-sute-core/game/effects/proxySkill';
 import { createGame } from '@akaakuhub/suku-sute-core/game/simulation';
+import {
+  advanceHandLimitEffects,
+  deactivateHandLimitEffects,
+} from '@akaakuhub/suku-sute-core/game/effects/handLimit';
 
 function game() {
   const track = tracks[0];
@@ -97,6 +101,41 @@ it('ProxyのActionType20吸収累計を参照実装 longと同じ64bitで折り�
   };
   const absorbed = applyEffect(atLongMaximum, handCardCountEffect(1, 3, 0n));
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(-(1n << 63n));
+  expect(absorbed.handLimitEffects).toEqual(atLongMaximum.handLimitEffects);
+});
+
+it('吸収した手札枚数変更は期限到達や強制解除で枚数を減らさない', () => {
+  const initial = game();
+  const source = initial.deck[0];
+  if (!source) throw new Error('Proxy発動元カードがありません。');
+  const active = applyEffect(
+    initial,
+    {
+      kind: 'proxy-skill',
+      absorbLimit: 0,
+      periodType: 1,
+      periodParam: 3000n,
+      induceTiming: 1,
+      induceCondition: 1,
+      inducePowerType: 1,
+      inducePowerParam: 0,
+      targets: [{ actionType: 20, targetAmount: 1 }],
+      effects: [],
+    },
+    source,
+  );
+  const absorbed = applyEffect(
+    active,
+    { ...handCardCountEffect(1, 1, 1000n), deactivationKey: 'count' },
+    source,
+  );
+  expect(absorbed.handLimitEffects).toEqual(active.handLimitEffects);
+  const timed = advanceHandLimitEffects(absorbed, 1);
+  const removed = deactivateHandLimitEffects(timed, 'count');
+  expect(removed.tokenCardDeck.handTargetCounts.current).toBe(
+    active.tokenCardDeck.handTargetCounts.current,
+  );
+  expect(removed.deckActions).toEqual(active.deckActions);
 });
 
 it('ActionType48の負の目標値は非絶対加算で参照実装と同じ下方向判定を使う', () => {
