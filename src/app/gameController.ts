@@ -14,12 +14,12 @@ import {
 } from '@akaakuhub/suku-sute-core/game/projection';
 import { resolveLiveHeartDrawCount } from '@akaakuhub/suku-sute-core/runtime/live/heartPresentation';
 import {
-  advanceWaitMode,
-  createWaitMode,
-  releaseWaitMode,
-  notifyWaitModeSkillUse,
-  type WaitModeState,
-} from '@akaakuhub/suku-sute-core/game/live/waitMode';
+  advanceLiveWaitMode,
+  createLiveWaitMode,
+  releaseLiveWaitMode,
+  notifyLiveWaitModeSkillUse,
+  type LiveWaitModeState,
+} from '@akaakuhub/suku-sute-core/runtime/live/waitMode';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import type { FrameScheduler, PlaybackClock } from './playbackPorts';
 import type { GameAudio } from './gameAudio';
@@ -39,7 +39,7 @@ export class GameController {
   private selection: string | null = null;
   private waitPause: Promise<void> | null = null;
   private waitEnabled = false;
-  private waitState: WaitModeState = createWaitMode();
+  private waitState: LiveWaitModeState = createLiveWaitMode();
 
   get waitModeEnabled(): boolean {
     return this.waitEnabled;
@@ -58,7 +58,7 @@ export class GameController {
     this.waitEnabled = !this.waitEnabled;
     if (!this.waitEnabled) {
       const wasWaiting = this.waiting;
-      this.waitState = createWaitMode();
+      this.waitState = createLiveWaitMode();
       if (wasWaiting) await this.resumeFromWait();
     } else {
       this.waitState = { ...this.waitState, kind: 'force-reserved', remainingCoolTimeSeconds: 0 };
@@ -71,13 +71,13 @@ export class GameController {
 
   private synchronizeWaitMode(deltaTimeSeconds: number): void {
     if (this.currentState.phase !== 'playing' || this.waiting) return;
-    this.waitState = advanceWaitMode(this.waitState, {
+    this.waitState = advanceLiveWaitMode(this.waitState, {
       enabled: this.waitEnabled,
       availableCards: this.currentState.hand.reduce(
         (mask, _, index) => (canUseCard(this.currentState, index) ? mask | (1 << index) : mask),
         0,
       ),
-      skillPoint: Math.trunc(this.currentState.ap.currentAp),
+      ap: this.currentState.ap,
       ableUseSkill:
         this.currentState.tick - this.currentState.lastActionTick >=
         cardCooldownTicks(this.currentState),
@@ -193,7 +193,7 @@ export class GameController {
     const normalSkill = this.currentState.stats.cardsUsed > previousUses;
     if (normalSkill || this.currentState.stats.specialsUsed > previousSpecials) {
       const wasWaiting = this.waiting;
-      this.waitState = notifyWaitModeSkillUse(this.waitState, normalSkill);
+      this.waitState = notifyLiveWaitModeSkillUse(this.waitState, normalSkill);
       if (wasWaiting) void this.resumeFromWait();
     }
     if (this.selection !== null && !this.currentState.hand.includes(this.selection))
@@ -213,7 +213,7 @@ export class GameController {
   cancelWait(): void {
     if (this.disposed || this.busy || !this.waiting || this.currentState.phase !== 'playing')
       return;
-    this.waitState = releaseWaitMode(this.waitState, false);
+    this.waitState = releaseLiveWaitMode(this.waitState, false);
     void this.resumeFromWait();
   }
 
