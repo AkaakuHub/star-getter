@@ -88,3 +88,20 @@ it('全手札使用の子に全手札使用があっても各カードを1回ず
   expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source', 'child', 'last']);
   expect(moodValue(used)).toBe(1);
 });
+
+it('分岐先にある全手札使用は初期状態では無効で他の手札を発動しない', () => {
+  const { state } = setup(
+    [
+      {
+        kind: 'branch',
+        condition: { kind: 'cards', zone: 'all', minimum: 1 },
+        whenTrue: [{ kind: 'use-hand' }],
+        whenFalse: [],
+      },
+    ],
+    [{ kind: 'mood', amount: 1 }],
+  );
+  const used = act(state, { type: 'card', index: 0 });
+  expect(used.cardUses.map((entry) => entry.card.id)).toEqual(['source']);
+  expect(moodValue(used)).toBe(0);
+});
