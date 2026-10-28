@@ -38,8 +38,8 @@ export const parityCards: readonly Card[] = [
     beatPoint: 100,
     effects: [
       whenDeckParity('even', [
-        { kind: 'heart-limit', amount: 10000 },
-        { kind: 'boost', multiplier: 1000 },
+        { kind: 'heart-limit', amount: 100000 },
+        { kind: 'boost', multiplier: 31 },
       ]),
     ],
   },
@@ -53,6 +53,10 @@ export const parityCards: readonly Card[] = [
     cost: 3,
     appeal: { smile: 5000, pure: 5000, cool: 5000 },
     beatPoint: 100,
+    collectionEffects: {
+      threshold: 500000,
+      effects: [whenDeckParity('odd', [{ kind: 'hearts', amount: 500000 }])],
+    },
     effects: [
       whenDeckParity('odd', [
         { kind: 'beat-count', amount: 2000 },

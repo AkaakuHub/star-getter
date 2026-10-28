@@ -4,6 +4,8 @@ import { canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
 import { rules, type GameState } from '@akaakuhub/suku-sute-core/game/model';
 import { createConfiguredGame } from '../../src/app/createConfiguredGame';
+import { addHearts, collectHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
+import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { withHand } from './support/game';
 
 const setup = {
@@ -54,4 +56,18 @@ test('偶数枚で三拍子を使っても、奇数枚で二拍子を使って�
   const wrongEven = use(odd, 'even-rhythm');
   expect(wrongEven.hearts.heartLimit).toBe(odd.hearts.heartLimit);
   expect(wrongEven.boosts).toEqual(odd.boosts);
+});
+
+test('三拍子を手札に残した回収は奇数枚でだけきらめきを補充する', () => {
+  const start = applyEffect(initial(), { kind: 'heart-limit', amount: 500000 });
+  const even = collectHearts(addHearts(withHand(start, ['odd-rhythm']), 500000));
+  expect(heartCount(even)).toBe(0);
+  const prepared = use(use(start, 'even-rhythm'), 'signal-maker');
+  const odd = collectHearts(addHearts(withHand(prepared, ['odd-rhythm']), 500000));
+  expect(heartCount(odd)).toBeGreaterThanOrEqual(500000);
+  const pennant = odd.deck.find((card) => card.token === 'pennant');
+  if (!pennant) throw new Error('信号旗がありません。');
+  const returned = use(odd, pennant.id);
+  const stopped = collectHearts(addHearts(withHand(returned, ['odd-rhythm']), 500000));
+  expect(heartCount(stopped)).toBe(0);
 });
