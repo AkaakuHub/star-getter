@@ -175,7 +175,7 @@ it('一斉生成後のActionType28実生成枚数をミッションへ通知す�
   expect(used.ingameMission?.count).toBe(2);
 });
 
-it('ActionType20のミッションへ手札上限の実変化量を通知する', () => {
+it('ActionType20のミッションへ目標枚数の変更前に効果量を通知する', () => {
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
@@ -198,6 +198,10 @@ it('ActionType20のミッションへ手札上限の実変化量を通知する'
   const effect = handCardCountEffect(3, 3, 0n);
   const changed = applyEffect(started, effect, card);
 
+  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(
+    started.tokenCardDeck.handTargetCounts.current,
+  );
+  expect(changed.deckActions.queue.at(-1)?.type).toBe(0);
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 

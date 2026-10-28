@@ -25,7 +25,7 @@ it('期限終了は解除通知を待機させ、処理時に実手札から補�
       deck: base.deck.slice(3).map((card) => card.cardInstanceId),
     },
   );
-  const active = applyEffect(initial, handCardCountEffect(-3, 1, 100n));
+  const active = flushHandCardCountActions(applyEffect(initial, handCardCountEffect(-3, 1, 100n)));
   const pending = advanceHandLimitEffects(active, 0.2);
   expect(pending.tokenCardDeck.handTargetCounts.current).toBe(2);
   expect(pending.deckActions.queue).toEqual([{ type: 1, param1: 3 }]);

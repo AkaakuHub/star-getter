@@ -173,7 +173,8 @@ it('切替先の能力は枚数調整前の目標を参照し、その変更後�
 it('実際の手札数変更効果とデッキ切替が同じ現在目標を参照する', () => {
   const initial = split();
   const changed = applyEffect(initial, handCardCountEffect(-1, 3, 0n));
-  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(4);
+  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(5);
+  expect(changed.deckActions.queue.at(-1)).toEqual({ type: 0, param1: -1 });
   const sub = act(changed, { type: 'switch-token-deck' });
   expect(liveCurrentHandCardInstanceIds(sub)).toHaveLength(4);
   expect(sub.tokenCardDeck.handTargetCounts).toEqual({ current: 4, main: 4, sub: 5 });

@@ -44,7 +44,8 @@ it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持
     skillEffectId: 90545010017n,
   });
   const applied = applyEffect(game(), effect);
-  expect(applied.tokenCardDeck.handTargetCounts.current).toBe(4);
+  expect(applied.tokenCardDeck.handTargetCounts.current).toBe(5);
+  expect(applied.deckActions.queue.at(-1)).toEqual({ type: 0, param1: -1 });
   expect(applied.handLimitEffects[0]?.remainingSections).toBe((1n << 53n) + 1n);
 });
 

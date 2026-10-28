@@ -8,7 +8,7 @@ import {
 import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { game, withHand } from './support/game';
 
-it('通常カードの次の使用開始で前回のフラグを消し、補充を実行する', () => {
+function readyHand(count: number) {
   const initial = game();
   const card = initial.deck.find((item) => item.cardInstanceId === 'horizon');
   if (!card) throw new Error('発動元カードがありません。');
@@ -25,10 +25,15 @@ it('通常カードの次の使用開始で前回のフラグを消し、補充�
       source.cardInstanceId,
       ...initial.deck
         .filter((item) => item !== card)
-        .slice(0, 4)
+        .slice(0, count - 1)
         .map((item) => item.cardInstanceId),
     ],
   );
+  return { ready, source };
+}
+
+it('通常カードの次の使用開始で前回のフラグを消し、補充を実行する', () => {
+  const { ready, source } = readyHand(5);
   const state = {
     ...ready,
     deckBoard: markLiveCardHandCountActivated(
@@ -45,4 +50,11 @@ it('通常カードの次の使用開始で前回のフラグを消し、補充�
     skillChangeHandCardCountActivated: false,
     skillChangeHandCardCountIsPositive: false,
   });
+});
+
+it('通常の使用後は1枚だけ引き、目標枚数までまとめて引かない', () => {
+  const { ready } = readyHand(1);
+  const used = act(ready, { type: 'card', index: 0 });
+  expect(used.stats.cardsUsed).toBe(ready.stats.cardsUsed + 1);
+  expect(liveCurrentHandCardInstanceIds(used)).toHaveLength(1);
 });

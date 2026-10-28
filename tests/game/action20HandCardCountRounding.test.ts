@@ -52,8 +52,9 @@ it.each([
     if (effect.kind !== 'hand-limit') throw new Error('手札枚数変更ではありません。');
     const result = applyHandLimit(state, effect, card, multiplier);
     expect(result.tokenCardDeck.handTargetCounts.current).toBe(
-      (state.tokenCardDeck.handTargetCounts.current + expected) | 0,
+      state.tokenCardDeck.handTargetCounts.current,
     );
+    expect(result.deckActions.queue.at(-1)).toEqual({ type: 0, param1: expected });
     expect(result.handLimitEffects.at(-1)).toMatchObject({
       amount: expected,
       expirationAmount: -expected | 0,

@@ -6,7 +6,11 @@ import { withBoardState } from './support/board';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { expect, it } from 'vite-plus/test';
-import { fillHand, shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
+import {
+  fillHand,
+  flushHandCardCountActions,
+  shuffleHand,
+} from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { game, withHand, withHandTarget } from './support/game';
 
 for (const recoverDiscard of [false, true]) {
@@ -130,6 +134,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
     { hand: [], deck: deck.map((card) => card.cardInstanceId), graveyard: [] },
   );
   const drawn = fillHand(state);
-  expect(liveCurrentHandCardInstanceIds(drawn)).toHaveLength(7);
+  expect(liveCurrentHandCardInstanceIds(drawn)).toHaveLength(8);
+  expect(liveCurrentHandCardInstanceIds(flushHandCardCountActions(drawn))).toHaveLength(7);
   expect(drawn.amplification).toBe(108);
 });

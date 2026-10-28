@@ -30,7 +30,7 @@ it('招待状自身を使用すると、生成した帆船を優先検索して�
     liveCurrentHandCardInstanceIds(used)
       .slice(0, 2)
       .map((id) => used.deck.find((card) => card.cardInstanceId === id)?.token),
-  ).toEqual(['ensemble', 'ensemble']);
+  ).toEqual(['ensemble']);
 });
 
 it('生成帆船自身を使用した後に折り紙を2回検索し、他カードの使用では検索しない', () => {
