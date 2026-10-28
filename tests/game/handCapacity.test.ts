@@ -332,3 +332,18 @@ it('InvocationType 0x388と0x38bは手動解除まで手札最大化を保つ', 
     expect(ended.hand).toEqual(timed.hand);
   }
 });
+
+it('最大化中の枚数変更は共通の現在目標と解除後の保存目標を更新する', () => {
+  const initial = withHandTarget(game(), 4);
+  const maximum = applyEffect(initial, {
+    kind: 'hand-max-card',
+    duration: { kind: 'sections', value: 1n },
+  });
+  const decreased = applyEffect(maximum, handCardCountEffect(-2, 3, 0n));
+  expect(decreased.tokenCardDeck.handTargetCounts.current).toBe(6);
+  expect(handCapacity(decreased)).toBe(6);
+  const expired = expireHandMaxCardSections(decreased);
+  expect(expired.tokenCardDeck.maxHandSkillActiveCount).toBe(0);
+  expect(expired.tokenCardDeck.handTargetCounts.current).toBe(2);
+  expect(handCapacity(expired)).toBe(3);
+});

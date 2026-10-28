@@ -1,4 +1,4 @@
-import { addLiveHandCardTargetCount } from '@akaakuhub/suku-sute-core/runtime/cards/tokenCardDeck';
+import { addLiveHandCardTargetCount } from '@akaakuhub/suku-sute-core/runtime/cards/handCardTarget';
 import { createCardDeckBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { routes, type RouteId } from '../../../src/content/routes';
 import { tracks } from '../../../src/content/tracks';
