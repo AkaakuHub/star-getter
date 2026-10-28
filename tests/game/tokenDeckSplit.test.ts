@@ -21,7 +21,7 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
   const selectedId = base.deck[5]?.cardInstanceId;
   if (!selectedId) throw new Error('対象カードがありません。');
   const deck = base.deck.map((item) =>
-    item.cardInstanceId === selectedId ? { ...item, tokenSeriesIds: [42] } : item,
+    item.cardInstanceId === selectedId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
   const state = withHand({ ...base, deck }, [base.hand[0] ?? '', selectedId]);
   const split = applyEffect(state, {
@@ -37,7 +37,7 @@ it('指定系列を別デッキへ分け、切替後に統合する', () => {
   expect(
     switched.hand.every((id) =>
       switched.tokenDeckSplit?.seriesIds?.some((seriesId) =>
-        card(switched, id).tokenSeriesIds?.includes(seriesId),
+        card(switched, id).tokenCardSeriesIds?.includes(seriesId),
       ),
     ),
   ).toBe(true);
@@ -59,7 +59,7 @@ it('ActionType43はサブデッキへ移す選択系列の捨て札を山札へ�
   const base = game('genesis');
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
-  const cardData = { ...selected, tokenSeriesIds: [42] };
+  const cardData = { ...selected, tokenCardSeriesIds: [42] };
   const hand = withHand(
     {
       ...base,
@@ -102,7 +102,9 @@ it('ActionType43の系列IDを参照実装のint32へ変換してから照合す
   const state = {
     ...base,
     deck: base.deck.map((item) =>
-      item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenSeriesIds: [42] } : item,
+      item.cardInstanceId === selected.cardInstanceId
+        ? { ...item, tokenCardSeriesIds: [42] }
+        : item,
     ),
   };
   const split = applyEffect(state, {
@@ -130,7 +132,9 @@ it('ActionType43の分割後にデッキアウト確認を実行する', () => {
   const state = {
     ...base,
     deck: base.deck.map((item) =>
-      item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenSeriesIds: [42] } : item,
+      item.cardInstanceId === selected.cardInstanceId
+        ? { ...item, tokenCardSeriesIds: [42] }
+        : item,
     ),
     deckBoard: { ...base.deckBoard, deckOutCount: 1 },
     track: { ...base.track, afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }] },
@@ -153,7 +157,9 @@ it('ActionType43は空のサブデッキへの切替後にデッキアウト確�
     {
       ...base,
       deck: base.deck.map((item) =>
-        item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenSeriesIds: [42] } : item,
+        item.cardInstanceId === selected.cardInstanceId
+          ? { ...item, tokenCardSeriesIds: [42] }
+          : item,
       ),
       track: { ...base.track, afterDeckReloadEffects: [{ kind: 'ap' as const, amount: 2 }] },
     },
@@ -182,7 +188,7 @@ it('期限切れでメインデッキへ戻す', () => {
   const selectedId = base.deck[5]?.cardInstanceId;
   if (!selectedId) throw new Error('対象カードがありません。');
   const deck = base.deck.map((item) =>
-    item.cardInstanceId === selectedId ? { ...item, tokenSeriesIds: [42] } : item,
+    item.cardInstanceId === selectedId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
   const state = withHand({ ...base, deck }, [base.hand[0] ?? '']);
   const split = applyEffect(state, {
@@ -198,7 +204,7 @@ it('枚数条件はメインとサブ両方の山札・捨て札を切替後も�
   const main = base.deck.at(-1);
   if (!main) throw new Error('メインカードがありません。');
   const deck = base.deck.map((card) =>
-    card.cardInstanceId === main.cardInstanceId ? card : { ...card, tokenSeriesIds: [42] },
+    card.cardInstanceId === main.cardInstanceId ? card : { ...card, tokenCardSeriesIds: [42] },
   );
   const initial = withHand({ ...base, deck, cardPool: deck }, [main.cardInstanceId]);
   const split = applyEffect(initial, {
@@ -251,7 +257,7 @@ it('停止中のサブ手札統計はメイン手札の引き直しで消えず�
   const selected = base.deck[5];
   if (!selected) throw new Error('対象カードがありません。');
   const deck = base.deck.map((item) =>
-    item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenSeriesIds: [42] } : item,
+    item.cardInstanceId === selected.cardInstanceId ? { ...item, tokenCardSeriesIds: [42] } : item,
   );
   const initial = withHand({ ...base, deck, cardPool: deck }, [
     base.hand[0] ?? '',

@@ -129,7 +129,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
     skillMainEffect: 1,
     skillIcon: 5,
     tokenCardAbilitySeriesId: 43n,
-    tokenSeriesIds: [42],
+    tokenCardSeriesIds: [42],
     effects: [{ kind: 'ap', amount: 2 }],
     ability893Effects: [{ kind: 'voltage-set', amount: 2 }],
   });

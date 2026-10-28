@@ -18,6 +18,7 @@ export const sunriseCard: Card = {
   performer: 'lumen',
   charactersId: 1032,
   unitIds: [2],
+  tokenCardSeriesIds: [],
   skillMainEffect: null,
   styleType: null,
   costume: 'sunny',

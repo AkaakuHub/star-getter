@@ -120,7 +120,7 @@ it('カードの追加シリーズを対象とする増幅は生成元のシリ�
   const state = {
     ...initial,
     cardPool: initial.cardPool.map((card) =>
-      card.cardInstanceId === source.cardInstanceId ? { ...card, tokenSeriesIds: [7] } : card,
+      card.cardInstanceId === source.cardInstanceId ? { ...card, tokenCardSeriesIds: [7] } : card,
     ),
   };
   const boosted = applyEffect(

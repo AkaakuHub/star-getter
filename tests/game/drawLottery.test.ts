@@ -103,7 +103,7 @@ it('グレード、パート、スキルの順に検索し、グレード検索�
   state = {
     ...state,
     deck: state.deck.map((card) =>
-      card.cardInstanceId === story.cardInstanceId ? { ...card, tokenSeriesIds: [42] } : card,
+      card.cardInstanceId === story.cardInstanceId ? { ...card, tokenCardSeriesIds: [42] } : card,
     ),
   };
   const drawn = fillHandToCount(state, 3);

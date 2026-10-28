@@ -87,7 +87,7 @@ it('Action23はActionType16のメンバー・ユニット・トークン系列�
   const unit = original?.unitIds[0];
   if (!original || (unit !== 1 && unit !== 2 && unit !== 3))
     throw new Error('対象カードがありません。');
-  const source = { ...original, tokenSeriesIds: [42] };
+  const source = { ...original, tokenCardSeriesIds: [42] };
   const state = {
     ...initial,
     deck: initial.deck.map((card) =>

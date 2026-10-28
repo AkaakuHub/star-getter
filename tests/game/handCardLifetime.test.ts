@@ -18,6 +18,7 @@ it.each([false, true])(
       performer: 'nova',
       charactersId: 1021,
       unitIds: [1],
+      tokenCardSeriesIds: [],
       skillMainEffect: null,
       styleType: null,
       costume: null,

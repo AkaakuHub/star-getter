@@ -12,6 +12,7 @@ export const preparationCards: readonly Card[] = [
     performer: 'lumen',
     charactersId: 1042,
     unitIds: [2],
+    tokenCardSeriesIds: [],
     skillMainEffect: null,
     styleType: null,
     costume: 'march',

@@ -240,7 +240,7 @@ it('Action49のParamValuesはParamがNoneのためAction25で条件に使わな�
   const state = game();
   const source = state.deck[0];
   if (!source) throw new Error('きらめき上限変更の発動元カードがありません。');
-  const target = { ...source, tokenSeriesIds: [42] };
+  const target = { ...source, tokenCardSeriesIds: [42] };
   const seriesBuff = applyEffect(state, {
     kind: 'heart-limit-boost',
     calculationType: 2,

@@ -140,7 +140,7 @@ it('ActionType28はseries detailのlong値で補正対象を照合し、生成�
   const result = applyEffect(state, tokenCardEffect(481, 2n, [seriesId]), source);
   const generated = result.deck.filter((card) => card.tokenCard);
   expect(generated).toHaveLength(3);
-  expect(generated.every((card) => card.tokenSeriesIds?.join(',') === '42')).toBe(true);
+  expect(generated.every((card) => card.tokenCardSeriesIds?.join(',') === '42')).toBe(true);
 });
 
 it('ActionType28のカード枚数にActionType18の詳細値係数を適用する', () => {

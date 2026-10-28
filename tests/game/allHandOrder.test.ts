@@ -17,6 +17,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
     name: '発動元',
     charactersId: 1021,
     unitIds: [1],
+    tokenCardSeriesIds: [],
     costume: null,
     performer: 'nova',
     appeal,
