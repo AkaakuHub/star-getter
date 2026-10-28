@@ -2,7 +2,42 @@ import { describe, expect, it } from 'vite-plus/test';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { spendAp } from '@akaakuhub/suku-sute-core/game/resources';
+import { canUseCard } from '@akaakuhub/suku-sute-core/game/projection';
+import { canUseSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { game, withHand } from './support/game';
+
+it('AP無限中は最大APを超えるカードと共鳴を使用できる', () => {
+  const state = game();
+  const source = state.deck[0];
+  if (!source?.special) throw new Error('共鳴付きカードがありません。');
+  const special = source.special;
+  const costly = withHand(
+    {
+      ...state,
+      deck: state.deck.map((card) =>
+        card.id === source.id
+          ? {
+              ...card,
+              cost: state.ap.maxAp + 10,
+              special: { ...special, cost: state.ap.maxAp + 10 },
+            }
+          : card,
+      ),
+    },
+    [source.id],
+  );
+  expect(canUseCard(costly, 0)).toBe(false);
+  expect(canUseSpecial(costly, source.id)).toBe(false);
+  const active = applyEffect(costly, {
+    kind: 'infinity-gauge',
+    gauge: 'ap',
+    duration: { kind: 'stage', value: 0 },
+  });
+  expect(canUseCard(active, 0)).toBe(true);
+  expect(canUseSpecial(active, source.id)).toBe(true);
+  expect(act(active, { type: 'card', index: 0 }).stats.cardsUsed).toBeGreaterThan(0);
+  expect(act(active, { type: 'special', cardId: source.id }).stats.specialsUsed).toBe(1);
+});
 
 it('APの空模様補正と追加値を倍率・EffectPowerより先に適用する', () => {
   const state = game('library');
