@@ -306,19 +306,21 @@ export class GameDriver {
     await this.setWaitMode(false);
     if (this.state.automaticHeart.enabled) await this.toggleAutomaticHearts();
     const target = this.state.tick + Math.round(seconds * rules.ticksPerSecond);
-    let next = this.state.tick;
+    let next = Math.max(this.elapsedTicks, this.nextPointerTick);
     while (this.state.tick < target && this.state.phase === 'playing') {
-      if (this.state.tick >= next) {
+      if (this.elapsedTicks >= next) {
         this.collect();
-        next =
-          this.state.tick +
-          Math.max(
-            1,
-            Math.round(
-              (rules.ticksPerSecond / tapsPerSecond) *
-                this.secondsIn(this.timing.collectionIntervalFactor),
+        next = Math.max(
+          this.nextPointerTick,
+          this.elapsedTicks +
+            Math.max(
+              1,
+              Math.round(
+                (rules.ticksPerSecond / tapsPerSecond) *
+                  this.secondsIn(this.timing.collectionIntervalFactor),
+              ),
             ),
-          );
+        );
       }
       await this.tick();
     }

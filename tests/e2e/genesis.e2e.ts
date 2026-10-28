@@ -94,9 +94,9 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
           ? ['rain-preparation', 'frost-echo', ...priority]
           : shadowUses < 14
             ? liveCurrentHandCardInstanceIds(driver.state).some((id) => id.startsWith('shadow-'))
-              ? ['shadow', 'frost-echo', 'sunrise', 'rain-preparation']
-              : ['frost-echo', 'sunrise', 'rain-preparation', 'aurora-ensemble']
-            : !stableCollection && (driver.state.genesis.effects[0]?.effectValue ?? 0) >= 100
+              ? ['shadow', 'frost-echo', 'sunrise', 'rain-preparation', ...priority]
+              : ['frost-echo', 'sunrise', 'rain-preparation', 'aurora-ensemble', ...priority]
+            : (driver.state.genesis.effects[0]?.effectValue ?? 0) >= 100
               ? ['library-ensemble', 'aurora-ensemble', ...priority]
               : driver.seconds >= 60
                 ? ['camera', ...priority]
@@ -131,8 +131,7 @@ async function prepare(driver: GameDriver, stableCollection = true): Promise<voi
     );
     if (!driver.state.specialUsed.includes('library-ensemble'))
       await driver.special('library-ensemble');
-    if (stableCollection ? driver.seconds >= 75 : preparedGenesisPower(driver) >= 200)
-      await driver.special('horizon');
+    if (preparedGenesisPower(driver) >= 200) await driver.special('horizon');
     if (
       (stableCollection || driver.state.genesis.currentGauge < 2_050_000_000) &&
       driver.inputTick % 6 === 0
