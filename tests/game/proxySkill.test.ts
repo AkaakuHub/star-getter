@@ -293,9 +293,9 @@ it('スキル使用回数と消費APを使うProxy期限を個別に進める', 
   const uses = applyEffect(initial, { ...periodEffect, periodType: 4 as const }, source);
   const costs = applyEffect(uses, { ...periodEffect, periodType: 5 as const }, source);
   const afterUse = advanceProxySkillUses(costs, 'other-card', 2, applyEffect);
-  expect(afterUse.proxySkills.map((item) => item.remainingPeriod)).toEqual([2n, 1n]);
+  expect(afterUse.proxySkills).toMatchObject([{ remainingPeriod: 2n }, { remainingPeriod: 1n }]);
   const afterSecondUse = advanceProxySkillUses(afterUse, 'other-card', 2, applyEffect);
-  expect(afterSecondUse.proxySkills.map((item) => item.remainingPeriod)).toEqual([1n]);
+  expect(afterSecondUse.proxySkills).toMatchObject([{ remainingPeriod: 1n }]);
   expect(
     advanceProxySkillUses(afterSecondUse, 'other-card', 2, applyEffect).proxySkills,
   ).toHaveLength(0);

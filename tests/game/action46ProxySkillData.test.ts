@@ -112,5 +112,8 @@ it('ActionType46のスキル回数期限はlongの精度を保ったまま減る
     source,
   );
   const advanced = advanceProxySkillUses(active, 'other-card', 1, applyEffect);
-  expect(advanced.proxySkills[0]?.remainingPeriod).toBe(periodParam - 1n);
+  expect(advanced.proxySkills[0]).toMatchObject({
+    periodType: 5,
+    remainingPeriod: periodParam - 1n,
+  });
 });
