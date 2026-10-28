@@ -12,6 +12,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   if (!appeal) throw new Error('確認用カードがありません。');
   const source: Card = {
     id: 'source',
+    cardDatasId: 'source',
     name: '発動元',
     charactersId: 1021,
     unitIds: [1],
@@ -27,6 +28,7 @@ function setup(sourceEffects: readonly Effect[], childEffects: readonly Effect[]
   const child: Card = {
     ...source,
     id: 'child',
+    cardDatasId: 'child',
     name: '子カード',
     charactersId: 1031,
     skillMainEffect: 14,
@@ -85,6 +87,7 @@ it('全手札使用の子に全手札使用があっても各カードを1回ず
   const last: Card = {
     ...child,
     id: 'last',
+    cardDatasId: 'last',
     name: '最後のカード',
     effects: [{ kind: 'mood', amount: 1 }],
   };

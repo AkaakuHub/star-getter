@@ -15,6 +15,7 @@ const targetPercents = [20, 100, 200, 400, 800, 2000] as const;
 export const genesisCards: readonly Card[] = [
   {
     id: 'horizon',
+    cardDatasId: 'horizon',
     name: '空のはじまり',
     performer: 'nova',
     charactersId: 1031,
@@ -53,6 +54,7 @@ export const genesisCards: readonly Card[] = [
   },
   {
     id: 'frost-echo',
+    cardDatasId: 'frost-echo',
     name: '雨音の反響',
     performer: 'lumen',
     charactersId: 1032,
@@ -114,6 +116,7 @@ export const genesisCards: readonly Card[] = [
   },
   {
     id: 'frost-pulse',
+    cardDatasId: 'frost-pulse',
     name: '凍空の鼓動',
     performer: 'lumen',
     charactersId: 1022,
@@ -176,6 +179,7 @@ export const genesisCards: readonly Card[] = [
   },
   {
     id: 'perennial',
+    cardDatasId: 'perennial',
     name: '続いていく雲',
     performer: 'tetra',
     charactersId: 1033,

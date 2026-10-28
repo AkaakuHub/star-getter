@@ -13,6 +13,7 @@ const drained = (effects: readonly Effect[]): Effect => ({
 
 export const sunriseCard: Card = {
   id: 'sunrise',
+  cardDatasId: 'sunrise',
   name: '晴れ間の輪',
   performer: 'lumen',
   charactersId: 1032,

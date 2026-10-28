@@ -49,6 +49,7 @@ it('ActionType901はドロー時とカード使用時にAbility893から条件�
   if (!track) throw new Error('楽曲がありません。');
   const card: Card = {
     id: 'action-901',
+    cardDatasId: 'action-901',
     name: 'ActionType901',
     performer: 'nova',
     charactersId: 1021,

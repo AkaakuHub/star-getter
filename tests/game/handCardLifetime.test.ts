@@ -13,6 +13,7 @@ it.each([false, true])(
     if (!appeal) throw new Error('確認用カードがありません。');
     const source: Card = {
       id: 'source',
+      cardDatasId: 'source',
       name: '使用元',
       performer: 'nova',
       charactersId: 1021,
@@ -37,6 +38,7 @@ it.each([false, true])(
     const drawn: Card = {
       ...source,
       id: 'drawn',
+      cardDatasId: 'drawn',
       name: '補充',
       handPermanentEffects: [],
       effects: [],

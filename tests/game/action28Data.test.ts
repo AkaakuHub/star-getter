@@ -115,6 +115,7 @@ it('ActionType28は指定されたTokenCardテンプレートからEffectを生�
   const generated = applyEffect(state, effect, compiled);
   const tokenCard = generated.deck.find((card) => card.tokenCard);
   expect(tokenCard).toMatchObject({
+    cardDatasId: '481',
     name: '',
     costume: null,
     performer: null,

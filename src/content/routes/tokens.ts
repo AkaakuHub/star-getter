@@ -8,6 +8,7 @@ const appeal = { smile: 1, pure: 1, cool: 1 };
 export const routeTokens: readonly Card[] = [
   {
     id: 'pennant',
+    cardDatasId: 'pennant',
     name: tokenNames.pennant,
     performer: 'tetra',
     charactersId: 0,
@@ -24,6 +25,7 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'ensemble',
+    cardDatasId: 'ensemble',
     name: tokenNames.ensemble,
     performer: 'tetra',
     charactersId: 0,
@@ -55,6 +57,7 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'story',
+    cardDatasId: 'story',
     name: tokenNames.story,
     performer: 'nova',
     charactersId: 0,
@@ -88,6 +91,7 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'clock',
+    cardDatasId: 'clock',
     name: tokenNames.clock,
     performer: 'lumen',
     charactersId: 0,
@@ -106,6 +110,7 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'bookmark',
+    cardDatasId: 'bookmark',
     name: tokenNames.bookmark,
     performer: 'tetra',
     charactersId: 0,
@@ -165,6 +170,7 @@ export const routeTokens: readonly Card[] = [
   },
   {
     id: 'shadow',
+    cardDatasId: 'shadow',
     name: tokenNames.shadow,
     performer: 'lumen',
     charactersId: 0,

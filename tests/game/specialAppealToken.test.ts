@@ -100,6 +100,7 @@ it('トークン共鳴を使うと同じTokenSetIdのクールタイムだけ開
     card: {
       ...base,
       id: '201',
+      cardDatasId: '201',
       charactersId: 0 as const,
       special: { ...base.special, effects: [] },
     },
