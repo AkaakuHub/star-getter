@@ -42,17 +42,17 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
     handCardStats: {
       [source.id]: {
         isActive: true,
-        enteredSectionIndex: 0,
+        initialSectionIndex: 0,
+        sectionCount: 0,
         skillUseCountsByMember: { 1030: 2 },
-        skillUseCountsByIcon: { 700: 2 },
-        skillUseCountsByUnit: { 2: 2 },
+        skillUseCountsByMainEffect: { 900: 2 },
       },
       [other.id]: {
         isActive: true,
-        enteredSectionIndex: 0,
+        initialSectionIndex: 0,
+        sectionCount: 0,
         skillUseCountsByMember: {},
-        skillUseCountsByIcon: {},
-        skillUseCountsByUnit: {},
+        skillUseCountsByMainEffect: {},
       },
     },
     cardUseCounts: { [source.id]: 2, [other.id]: 2 },
@@ -72,7 +72,7 @@ it('条件1から15までのコスト変化を対応する現在値から計算�
         index === 5 || index === 10
           ? 1030
           : index === 6
-            ? 700
+            ? 900
             : index === 7
               ? 900
               : index === 9

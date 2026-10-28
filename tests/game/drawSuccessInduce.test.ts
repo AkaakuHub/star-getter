@@ -94,10 +94,10 @@ it('ActionType31はHandCardStats終了時にも追加バフを解除しない', 
       handCardStatsAtUse: {
         [card.id]: {
           isActive: false,
-          enteredSectionIndex: 0,
+          initialSectionIndex: 0,
+          sectionCount: 0,
           skillUseCountsByMember: {},
-          skillUseCountsByIcon: {},
-          skillUseCountsByUnit: {},
+          skillUseCountsByMainEffect: {},
         },
       },
       allHand: false,
@@ -146,10 +146,10 @@ it('disabledType省略時はbranchType3を継続扱いにする', () => {
       handCardStatsAtUse: {
         [card.id]: {
           isActive: false,
-          enteredSectionIndex: 0,
+          initialSectionIndex: 0,
+          sectionCount: 0,
           skillUseCountsByMember: {},
-          skillUseCountsByIcon: {},
-          skillUseCountsByUnit: {},
+          skillUseCountsByMainEffect: {},
         },
       },
       allHand: false,
