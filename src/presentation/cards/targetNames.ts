@@ -19,8 +19,8 @@ export function handUseTriggerDescription(trigger: HandUseTrigger): string {
   switch (trigger.kind) {
     case 'member':
       return `${targetNames([int32(trigger.member)])}のスキルを使用したとき`;
-    case 'skill-icon':
-      return `スキル記号${trigger.icon}を使用したとき`;
+    case 'skill-main-effect':
+      return `スキル記号${trigger.mainEffect}を使用したとき`;
     case 'unit':
       return `${unitCardNames(int32(trigger.unit))}を使用したとき`;
     case 'heart-quantity-count':

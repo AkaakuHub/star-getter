@@ -5,6 +5,7 @@ import { moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { voltageThreshold } from '@akaakuhub/suku-sute-core/game/live/voltageLevel';
 import {
   notifyHandCardBeforeUse,
+  notifyHandSkillUse,
   notifyHandHeartCollect,
 } from '@akaakuhub/suku-sute-core/game/cards/handInduce';
 import { game, withHand } from './support/game';
@@ -215,3 +216,29 @@ it('Action903のUSE子効果はSkillType2の本体効果より先に適用する
   const next = act(state, { type: 'card', index: 0 });
   expect(next.ap.currentAp).toBe(initial.ap.maxAp - card.cost + 1);
 });
+
+it.each([
+  { target: 12n, expected: 1 },
+  { target: 77n, expected: 0 },
+])(
+  '手札誘発は表示用アイコンではなく使用スキルの主効果を判定する（発動数$expected）',
+  ({ target, expected }) => {
+    const initial = game();
+    const original = initial.deck[0];
+    if (!original) throw new Error('確認用カードがありません。');
+    const watcher = {
+      ...original,
+      handInducers: [
+        {
+          sourceEffectId: 'main-effect-inducer',
+          trigger: { kind: 'skill-main-effect' as const, mainEffect: target },
+          effects: [{ kind: 'mood' as const, amount: 1 }],
+        },
+      ],
+    };
+    const state = withHand({ ...initial, deck: [watcher], cardPool: [watcher] }, [watcher.id]);
+    const used = { ...original, id: 'used-card', skillIcon: 77, mainEffect: 12 };
+    const next = notifyHandSkillUse(state, used, applyEffect);
+    expect(next.moodOffset - state.moodOffset).toBe(expected);
+  },
+);
