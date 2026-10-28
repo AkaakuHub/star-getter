@@ -21,9 +21,13 @@ it('ActionType20の未対応計算種別は初回加算せず、期限時の解�
   });
   const neutralState = { ...initial, amplification: 100 };
   const active = applyEffect(neutralState, effect);
-  expect(active.handLimit).toBe(neutralState.handLimit);
+  expect(active.tokenCardDeck.handTargetCounts.current).toBe(
+    neutralState.tokenCardDeck.handTargetCounts.current,
+  );
   expect(active.handLimitEffects).toMatchObject([
     { amount: 0, expirationAmount: -1, remainingSections: 1n },
   ]);
-  expect(expireHandLimitSections(active).state.handLimit).toBe(neutralState.handLimit - 1);
+  expect(expireHandLimitSections(active).state.tokenCardDeck.handTargetCounts.current).toBe(
+    neutralState.tokenCardDeck.handTargetCounts.current - 1,
+  );
 });

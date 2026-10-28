@@ -17,7 +17,7 @@ import { addHearts, heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { cardCooldownTicks, moodValue, sectionAt } from '@akaakuhub/suku-sute-core/game/projection';
 import type { HandUseTrigger } from '@akaakuhub/suku-sute-core/game/cards/cardTypes';
 import { tracks } from '../../src/content/tracks';
-import { game, withHand } from './support/game';
+import { game, withHand, withHandTarget } from './support/game';
 
 it('自然な空模様に雨100%はなく、準備カードの使用で最初のパート中に段階的に下げる', () => {
   expect(tracks.flatMap((track) => track.moodKeys).every((key) => key.keyValue > -100)).toBe(true);
@@ -334,7 +334,7 @@ for (const [points, expected] of [
 }
 
 it('通常の引き直しは元の手札枚数を維持し、発動元の編成でドロー条件を判定する', () => {
-  let state = withHand({ ...game(), handLimit: 8 }, ['frost-echo', 'camera']);
+  let state = withHand(withHandTarget(game(), 8), ['frost-echo', 'camera']);
   const source = state.deck.find((card) => card.cardInstanceId === 'frost-echo');
   if (!source) throw new Error('発動元がありません。');
   state = applyEffect(

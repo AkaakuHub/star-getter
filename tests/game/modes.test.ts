@@ -145,11 +145,17 @@ describe('モード切替と切替時効果', () => {
       { hand: [card.cardInstanceId] },
     );
     const off = activateModeAbilityEffects(prepared, card, applyEffect);
-    expect(off.handLimit).toBe(initial.handLimit + 1);
+    expect(off.tokenCardDeck.handTargetCounts.current).toBe(
+      initial.tokenCardDeck.handTargetCounts.current + 1,
+    );
     const on = applyEffect(off, { kind: 'mode', modeId: 1n, change: 'on' });
-    expect(on.handLimit).toBe(initial.handLimit + 2);
+    expect(on.tokenCardDeck.handTargetCounts.current).toBe(
+      initial.tokenCardDeck.handTargetCounts.current + 2,
+    );
     const disposed = disposeHandEffects(on, [card.cardInstanceId]);
-    expect(disposed.handLimit).toBe(initial.handLimit);
+    expect(disposed.tokenCardDeck.handTargetCounts.current).toBe(
+      initial.tokenCardDeck.handTargetCounts.current,
+    );
     const playing = act(
       withBoardState(
         { ...on, phase: 'playing', ap: { ...on.ap, currentAp: 20 } },

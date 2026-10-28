@@ -1,5 +1,6 @@
 import { expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
+import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 import { switchTokenDeck } from '@akaakuhub/suku-sute-core/game/effects/tokenDeckSplit';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import {
@@ -153,4 +154,16 @@ it('切替先の能力は枚数調整前の目標を参照し、その変更後�
     main: rules.handSize,
     sub: rules.handSize,
   });
+});
+
+it('実際の手札数変更効果とデッキ切替が同じ現在目標を参照する', () => {
+  const initial = split();
+  const changed = applyEffect(initial, handCardCountEffect(-1, 3, 0n));
+  expect(changed.tokenCardDeck.handTargetCounts.current).toBe(4);
+  const sub = act(changed, { type: 'switch-token-deck' });
+  expect(sub.hand).toHaveLength(4);
+  expect(sub.tokenCardDeck.handTargetCounts).toEqual({ current: 4, main: 4, sub: 5 });
+  const main = act(sub, { type: 'switch-token-deck' });
+  expect(main.hand).toEqual(['main']);
+  expect(main.tokenCardDeck.handTargetCounts).toEqual({ current: 4, main: 4, sub: 4 });
 });

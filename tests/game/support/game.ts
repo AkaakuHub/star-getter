@@ -1,3 +1,4 @@
+import { addLiveHandCardTargetCount } from '@akaakuhub/suku-sute-core/runtime/cards/tokenCardDeck';
 import { createCardDeckBoard } from '@akaakuhub/suku-sute-core/game/cards/deckBoard';
 import { routes, type RouteId } from '../../../src/content/routes';
 import { tracks } from '../../../src/content/tracks';
@@ -27,4 +28,14 @@ export function withHand(state: GameState, hand: readonly string[]): GameState {
     },
     hand,
   );
+}
+
+export function withHandTarget(state: GameState, count: number): GameState {
+  return {
+    ...state,
+    tokenCardDeck: addLiveHandCardTargetCount(
+      state.tokenCardDeck,
+      count - state.tokenCardDeck.handTargetCounts.current,
+    ),
+  };
 }

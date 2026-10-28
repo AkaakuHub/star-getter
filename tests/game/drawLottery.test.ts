@@ -7,11 +7,11 @@ import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { fillHand, fillHandToCount } from '@akaakuhub/suku-sute-core/game/cards/drawing';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
-import { game, withHand } from './support/game';
+import { game, withHand, withHandTarget } from './support/game';
 
 it('生成した30枚の末尾順で固定せず、各ドローで乱数を進める', () => {
   let state = addTokens(game('library'), 'story', 30);
-  state = withHand({ ...state, handLimit: 8 }, []);
+  state = withHand(withHandTarget(state, 8), []);
   const first = fillHand(state);
   expect(first.randomSeed).not.toBe(state.randomSeed);
   const stories = first.hand.filter((id) =>

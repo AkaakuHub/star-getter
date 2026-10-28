@@ -5,7 +5,7 @@ import { act } from '@akaakuhub/suku-sute-core/game/actions';
 import { addTokens } from '@akaakuhub/suku-sute-core/game/cards/tokens';
 import { expect, it } from 'vite-plus/test';
 import { fillHand, shuffleHand } from '@akaakuhub/suku-sute-core/game/cards/drawing';
-import { game, withHand } from './support/game';
+import { game, withHand, withHandTarget } from './support/game';
 
 for (const recoverDiscard of [false, true]) {
   for (const destination of ['draw', 'discard'] as const) {
@@ -107,7 +107,7 @@ it('全枚数の補充を終えてからドロー能力を順番に実行し、�
       deck,
       cardPool: deck,
       handEffectCardIds: [],
-      handLimit: 8,
+      tokenCardDeck: withHandTarget(state, 8).tokenCardDeck,
       amplification: 100,
       drawContext: 'skill',
       usedCard: { charactersId: 0, unitIds: [2] },

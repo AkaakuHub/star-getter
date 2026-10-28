@@ -40,9 +40,9 @@ it('Proxyに吸収された手札数加算を目標数へ反映せず、期限�
     source,
   );
   const absorbed = applyEffect(state, handCardCountEffect(1, 1, 100n));
-  expect(absorbed.handLimit).toBe(5);
+  expect(absorbed.tokenCardDeck.handTargetCounts.current).toBe(5);
   expect(absorbed.proxyAbsorptions[0]?.effects[0]?.totalAmount).toBe(1n);
-  expect(advanceTo(absorbed, 0.2).handLimit).toBe(4);
+  expect(advanceTo(absorbed, 0.2).tokenCardDeck.handTargetCounts.current).toBe(4);
 });
 
 it('時間期限のProxy吸収を期限後に解除する', () => {

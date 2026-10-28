@@ -14,7 +14,7 @@ import {
 } from '@akaakuhub/suku-sute-core/game/model';
 import { cardCooldownTicks, moodValue } from '@akaakuhub/suku-sute-core/game/projection';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
-import { game, withHand } from './support/game';
+import { game, withHand, withHandTarget } from './support/game';
 
 function token(state: GameState, kind: TokenId): Card {
   const card = state.deck.find((item) => item.token === kind);
@@ -283,7 +283,7 @@ for (const [count, baseReduction, tokenReduction] of [
       'camera',
       'class',
     ];
-    state = withHand({ ...state, costReductions: {}, handLimit: 8 }, [
+    state = withHand({ ...withHandTarget(state, 8), costReductions: {} }, [
       'library-ensemble',
       ...others,
     ]);

@@ -44,7 +44,7 @@ it('ActionType20のlong詳細値をint32化し、パート期限をlongで保持
     skillEffectId: 90545010017n,
   });
   const applied = applyEffect(game(), effect);
-  expect(applied.handLimit).toBe(4);
+  expect(applied.tokenCardDeck.handTargetCounts.current).toBe(4);
   expect(applied.handLimitEffects[0]?.remainingSections).toBe((1n << 53n) + 1n);
 });
 
@@ -140,12 +140,16 @@ it('ActionType20の詳細レコードはHandPermanentで起動し、手札離脱
       }),
     ],
   });
-  expect(active.handLimit).toBe(expected.handLimit);
+  expect(active.tokenCardDeck.handTargetCounts.current).toBe(
+    expected.tokenCardDeck.handTargetCounts.current,
+  );
   expect(active.handLimitEffects[0]?.remainingSeconds).toBeNull();
   expect(active.handLimitEffects[0]?.deactivationKey).toBe(
     `hand-permanent:${source.cardInstanceId}`,
   );
-  expect(disposeHandEffects(active, [source.cardInstanceId]).handLimit).toBe(state.handLimit);
+  expect(
+    disposeHandEffects(active, [source.cardInstanceId]).tokenCardDeck.handTargetCounts.current,
+  ).toBe(state.tokenCardDeck.handTargetCounts.current);
 });
 
 it('ActionType21の詳細レコードはcreateGameでAP回復速度Effectへ接続する', () => {
