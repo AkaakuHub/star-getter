@@ -32,8 +32,7 @@ it('ActionType6の詳細値を元気継続回復Effectへ接続する', () => {
   expect(compiled?.effects.find((item) => item.kind === 'gauge-regeneration')).toMatchObject({
     kind: 'gauge-regeneration',
     gauge: 'mental',
-    amount: 1.25,
-    amountBasis: 'maximum-gauge',
+    value: 1.25,
     intervalValue: 1_000,
     duration: { kind: 'milliseconds', value: 10_000 },
   });

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { applyEffect } from '@akaakuhub/suku-sute-core/game/effects';
 import { advanceTo } from '@akaakuhub/suku-sute-core/game/simulation';
+import { activateGenesis } from '@akaakuhub/suku-sute-core/game/genesis';
+import { addLiveGenesisGauge } from '@akaakuhub/suku-sute-core/runtime/skills/genesisSkill';
+import { heartCount } from '@akaakuhub/suku-sute-core/game/hearts';
 import { addHearts } from '@akaakuhub/suku-sute-core/game/hearts';
 import { advanceSectionChange } from '@akaakuhub/suku-sute-core/game/sectionChange';
 import { act } from '@akaakuhub/suku-sute-core/game/actions';
@@ -8,15 +11,14 @@ import { game } from './support/game';
 
 describe('ゲージの継続回復', () => {
   it('最大元気に対する割合を各回の元気回復量へ変換する', () => {
-    const baseState = game();
+    const baseState = regenerationGame();
     const active = applyEffect(
       { ...baseState, maximumMental: 100, mental: { ...baseState.mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
         calculationType: 1,
-        amount: 0.05,
-        amountBasis: 'maximum-gauge',
+        value: 5,
         intervalType: 1,
         intervalValue: 200,
         duration: { kind: 'milliseconds', value: 600 },
@@ -26,8 +28,8 @@ describe('ゲージの継続回復', () => {
     expect(advanceTo(active, 0.21).mental.currentMental).toBe(50);
   });
 
-  it('Action11は汎用スキル増幅と切り上げを使わず周期ごとに熱気を加算する', () => {
-    const baseState2 = game();
+  it('Action11は汎用スキル増幅を使わずobserverで切り上げて熱気を加算する', () => {
+    const baseState2 = regenerationGame();
     const active = applyEffect(
       {
         ...baseState2,
@@ -38,26 +40,24 @@ describe('ゲージの継続回復', () => {
         kind: 'gauge-regeneration',
         gauge: 'voltage',
         calculationType: 1,
-        amount: 10.5,
-        amountBasis: 'skill-fixed',
+        value: 10.5,
         intervalType: 1,
         intervalValue: 200,
         duration: { kind: 'milliseconds', value: 600 },
       },
     );
-    expect(active.voltage.currentVoltage).toBe(510n);
-    expect(advanceTo(active, 0.21).voltage.currentVoltage).toBe(520n);
+    expect(active.voltage.currentVoltage).toBe(511n);
+    expect(advanceTo(active, 0.21).voltage.currentVoltage).toBe(522n);
   });
 
   it('元気は発動時に回復し、周期回復後に期限切れとなる', () => {
-    const baseState3 = game();
+    const baseState3 = regenerationGame();
     const initial = { ...baseState3, mental: { ...baseState3.mental, currentMental: 40 } };
     const active = applyEffect(initial, {
       kind: 'gauge-regeneration',
       gauge: 'mental',
       calculationType: 1,
-      amount: 10,
-      amountBasis: 'fixed',
+      value: 10,
       intervalType: 1,
       intervalValue: 200,
       duration: { kind: 'milliseconds', value: 600 },
@@ -69,7 +69,7 @@ describe('ゲージの継続回復', () => {
   });
 
   it('熱気は発動時と期限中の周期ごとに加算し、レベル上限でもポイントを保持する', () => {
-    const baseState4 = game();
+    const baseState4 = regenerationGame();
     const initial = {
       ...baseState4,
       track: {
@@ -82,8 +82,7 @@ describe('ゲージの継続回復', () => {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
       calculationType: 1,
-      amount: 10,
-      amountBasis: 'fixed',
+      value: 10,
       intervalType: 1,
       intervalValue: 200,
       duration: { kind: 'milliseconds', value: 600 },
@@ -94,7 +93,7 @@ describe('ゲージの継続回復', () => {
   });
 
   it('継続回復は一回限りの熱気・元気追加バフを消費しない', () => {
-    const baseState5 = game();
+    const baseState5 = regenerationGame();
     const initial = {
       ...baseState5,
       resourceBoosts: [
@@ -108,8 +107,7 @@ describe('ゲージの継続回復', () => {
       kind: 'gauge-regeneration',
       gauge: 'mental',
       calculationType: 1,
-      amount: 10,
-      amountBasis: 'fixed',
+      value: 10,
       intervalType: 2,
       intervalValue: 200,
       duration: { kind: 'milliseconds', value: 500 },
@@ -118,8 +116,7 @@ describe('ゲージの継続回復', () => {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
       calculationType: 1,
-      amount: 10,
-      amountBasis: 'fixed',
+      value: 10,
       intervalType: 2,
       intervalValue: 200,
       duration: { kind: 'milliseconds', value: 500 },
@@ -130,7 +127,7 @@ describe('ゲージの継続回復', () => {
   });
 
   it('Beat Heart間隔指定は自然発生の通知回数で回復を繰り返す', () => {
-    const baseState6 = game();
+    const baseState6 = regenerationGame();
     const active = applyEffect(
       {
         ...baseState6,
@@ -144,8 +141,7 @@ describe('ゲージの継続回復', () => {
         kind: 'gauge-regeneration',
         gauge: 'mental',
         calculationType: 1,
-        amount: 10,
-        amountBasis: 'fixed',
+        value: 10,
         intervalType: 2,
         intervalValue: 2,
         duration: { kind: 'sections', value: 2 },
@@ -164,12 +160,11 @@ describe('ゲージの継続回復', () => {
   });
 
   it('パート期限の回復はHeart生成で終了せずパート変更で終了する', () => {
-    const active = applyEffect(game(), {
+    const active = applyEffect(regenerationGame(), {
       kind: 'gauge-regeneration',
       gauge: 'voltage',
       calculationType: 1,
-      amount: 1,
-      amountBasis: 'fixed',
+      value: 1,
       intervalType: 1,
       intervalValue: 100,
       duration: { kind: 'sections', value: 1 },
@@ -181,15 +176,14 @@ describe('ゲージの継続回復', () => {
   });
 
   it('外部解除とInvocationTypeによる自動期限抑止を処理する', () => {
-    const baseState7 = game();
+    const baseState7 = regenerationGame();
     const active = applyEffect(
       { ...baseState7, mental: { ...baseState7.mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
         calculationType: 1,
-        amount: 10,
-        amountBasis: 'fixed',
+        value: 10,
         intervalType: 1,
         intervalValue: 200,
         duration: { kind: 'milliseconds', value: 500 },
@@ -206,15 +200,14 @@ describe('ゲージの継続回復', () => {
   });
 
   it('計算種別1以外は追加バフ適用後も元気を回復しない', () => {
-    const baseState8 = game();
+    const baseState8 = regenerationGame();
     const inactive = applyEffect(
       { ...baseState8, mental: { ...baseState8.mental, currentMental: 40 } },
       {
         kind: 'gauge-regeneration',
         gauge: 'mental',
         calculationType: 2,
-        amount: 10,
-        amountBasis: 'fixed',
+        value: 10,
         intervalType: 1,
         intervalValue: 200,
         duration: { kind: 'milliseconds', value: 500 },
@@ -225,15 +218,14 @@ describe('ゲージの継続回復', () => {
   });
 
   it('Action11の熱気継続加算にも特殊誘発の解除制御を適用する', () => {
-    const baseState9 = game();
+    const baseState9 = regenerationGame();
     const active = applyEffect(
       { ...baseState9, voltage: { ...baseState9.voltage, currentVoltage: BigInt(20) } },
       {
         kind: 'gauge-regeneration',
         gauge: 'voltage',
         calculationType: 1,
-        amount: 5,
-        amountBasis: 'fixed',
+        value: 5,
         intervalType: 1,
         intervalValue: 100,
         duration: { kind: 'milliseconds', value: 500 },
@@ -253,7 +245,7 @@ describe('ゲージの継続回復', () => {
 });
 
 it('追加Heartは回復通知に数えず生成上限0でも自然発生の通知で回復する', () => {
-  const base = game();
+  const base = regenerationGame();
   const active = applyEffect(
     {
       ...base,
@@ -265,8 +257,7 @@ it('追加Heartは回復通知に数えず生成上限0でも自然発生の通�
       kind: 'gauge-regeneration',
       gauge: 'mental',
       calculationType: 1,
-      amount: 10,
-      amountBasis: 'fixed',
+      value: 10,
       intervalType: 2,
       intervalValue: 1,
       duration: { kind: 'sections', value: 2 },
@@ -282,4 +273,64 @@ it('追加Heartは回復通知に数えず生成上限0でも自然発生の通�
   const natural = advanceTo(extra, (2 * 60) / active.track.bpm + 1 / 60);
   expect(natural.mental.currentMental).toBe(60);
   expect(natural.regenGaugeEffects).toHaveLength(1);
+});
+
+function regenerationGame() {
+  const base = game();
+  return { ...base, maximumMental: 100 };
+}
+
+it('Voltage継続回復の切り上げ後の値も変換処理へ渡す', () => {
+  const initial = regenerationGame();
+  const source = initial.deck[0];
+  if (!source) throw new Error('回復元カードがありません。');
+  const converted = applyEffect(
+    initial,
+    {
+      kind: 'voltage-convert',
+      destination: 'hearts',
+      num: 10000,
+      outputDuration: { kind: 'stage', value: 0 },
+      convertDisabledType: 0,
+      displayDuration: { kind: 'stage', value: 0 },
+      disabledType: 0,
+      disabledValue: 0n,
+    },
+    source,
+  );
+  const active = applyEffect(
+    converted,
+    {
+      kind: 'gauge-regeneration',
+      gauge: 'voltage',
+      calculationType: 1,
+      value: 2.1,
+      intervalType: 1,
+      intervalValue: 1000,
+      duration: { kind: 'milliseconds', value: 5000 },
+    },
+    source,
+  );
+  expect(heartCount(active)).toBe(3);
+  expect(active.voltage.currentVoltage).toBe(initial.voltage.currentVoltage);
+});
+
+it('Mental継続回復はGenesis中にゲージへ渡し元気を変更しない', () => {
+  const base = regenerationGame();
+  const initial = activateGenesis({ ...base, mental: { ...base.mental, currentMental: 40 } }, 100);
+  const active = applyEffect(initial, {
+    kind: 'gauge-regeneration',
+    gauge: 'mental',
+    calculationType: 1,
+    value: 10,
+    intervalType: 1,
+    intervalValue: 1000,
+    duration: { kind: 'milliseconds', value: 5000 },
+  });
+  expect(active.mental.currentMental).toBe(40);
+  expect(active.genesis.currentGauge).toBe(
+    addLiveGenesisGauge(initial.genesis, { actionType: 0, gaugeType: 2, effectValue: 10 })
+      .currentGauge,
+  );
+  expect(active.genesis.currentGauge).toBeGreaterThan(initial.genesis.currentGauge);
 });

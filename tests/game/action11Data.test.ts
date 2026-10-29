@@ -32,8 +32,7 @@ it('ActionType11の詳細値を熱気継続回復Effectへ接続する', () => {
   expect(compiled?.effects.find((item) => item.kind === 'gauge-regeneration')).toMatchObject({
     kind: 'gauge-regeneration',
     gauge: 'voltage',
-    amount: 1.25,
-    amountBasis: 'skill-fixed',
+    value: 1.25,
     intervalValue: 1_000,
     duration: { kind: 'milliseconds', value: 10_000 },
   });
