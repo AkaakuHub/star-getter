@@ -34,7 +34,7 @@ it('ActionType6の詳細値を元気継続回復Effectへ接続する', () => {
     gauge: 'mental',
     amount: 1.25,
     amountBasis: 'maximum-gauge',
-    intervalMilliseconds: 1_000,
+    intervalValue: 1_000,
     duration: { kind: 'milliseconds', value: 10_000 },
   });
 });

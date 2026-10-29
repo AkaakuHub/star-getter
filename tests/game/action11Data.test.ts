@@ -34,7 +34,7 @@ it('ActionType11の詳細値を熱気継続回復Effectへ接続する', () => {
     gauge: 'voltage',
     amount: 1.25,
     amountBasis: 'skill-fixed',
-    intervalMilliseconds: 1_000,
+    intervalValue: 1_000,
     duration: { kind: 'milliseconds', value: 10_000 },
   });
 });
