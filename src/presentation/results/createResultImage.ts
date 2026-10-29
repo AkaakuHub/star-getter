@@ -14,7 +14,7 @@ export async function createResultImage(state: GameState, route: RouteId): Promi
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = '#353148';
   context.font = '800 40px sans-serif';
-  context.fillText('star-getter', 64, 80);
+  context.fillText('ラブゲッター', 64, 80);
   context.textAlign = 'right';
   context.font = '700 32px sans-serif';
   context.fillText(routes[route].name, 1136, 80);
@@ -36,5 +36,5 @@ export async function createResultImage(state: GameState, route: RouteId): Promi
       else reject(new Error('結果画像を作成できませんでした。'));
     }, 'image/png');
   });
-  return new File([blob], `star-getter-${route}.png`, { type: 'image/png' });
+  return new File([blob], `ラブゲッター-${route}.png`, { type: 'image/png' });
 }

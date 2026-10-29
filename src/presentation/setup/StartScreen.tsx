@@ -33,7 +33,7 @@ export function StartScreen({
       ) : (
         <main className="setup-page">
           <header className="setup-heading">
-            <h1>star-getter</h1>
+            <h1>ラブゲッター</h1>
           </header>
           <fieldset className="setup-presets">
             <legend>プリセット</legend>
