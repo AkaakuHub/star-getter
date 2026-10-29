@@ -31,7 +31,7 @@ it('ActionType1の比率計算は自然発生数を基準にし、非ミリ秒�
   const initial = game();
   const card = initial.deck[0];
   if (!card) throw new Error('カードがありません。');
-  const expectedCount = Math.trunc(beatHeartCount(initial) * 1.5);
+  const expectedCount = Math.ceil(beatHeartCount(initial) * 1.5);
   const result = applyEffect(
     initial,
     {
