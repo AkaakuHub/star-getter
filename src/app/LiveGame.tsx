@@ -12,6 +12,7 @@ import {
 import type { GamePreferences } from './gamePreferences';
 import { routeUrl } from './initialRoute';
 import { useGameControls } from './useGameControls';
+import { usePortalNavigation } from './usePortalNavigation';
 import { hasAvailableSpecial } from '@akaakuhub/suku-sute-core/game/special';
 import { SpecialSelection } from '../presentation/special/SpecialSelection';
 
@@ -32,6 +33,7 @@ export function LiveGame({
   const [resumeAfterPanel, setResumeAfterPanel] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  usePortalNavigation(controller, setError);
   const [, refresh] = useState(0);
   useEffect(() => controller.subscribe(() => refresh((value) => value + 1)), [controller]);
   useEffect(

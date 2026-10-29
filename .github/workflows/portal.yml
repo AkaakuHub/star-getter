@@ -3,6 +3,14 @@ name: Deploy game portal
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'tests/**'
+      - '**/*.test.*'
+      - '**/*.spec.*'
+      - '.github/**'
+      - 'lefthook.yml'
   workflow_dispatch:
 
 permissions:
