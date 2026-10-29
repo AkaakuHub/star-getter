@@ -1,3 +1,4 @@
+import { rainCollectionEffects } from './collectionEffects';
 import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
 import { handCardCountEffect } from '@akaakuhub/suku-sute-core/game/actionTypeEffects/handCardCount';
 
@@ -19,7 +20,7 @@ export const preparationCards: readonly Card[] = [
     consumeAp: 14,
     appeal: { smile: 3850, pure: 4250, cool: 6400 },
     beatPoint: 100,
-    collectionAbility: 'rain-pulse',
+    collectionEffects: rainCollectionEffects,
     effects: [
       { kind: 'mood', amount: -50 },
       {

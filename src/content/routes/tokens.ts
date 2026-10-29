@@ -75,6 +75,20 @@ export const routeTokens: readonly Card[] = [
     token: 'story',
     exhausts: true,
     drawAbility: 'story',
+    collectionEffects: {
+      threshold: 500_000,
+      limit: 1,
+      effects: [
+        {
+          kind: 'branch',
+          condition: { kind: 'cards', zone: 'all', minimum: 95 },
+          whenTrue: [
+            { kind: 'beat-hearts', amount: 1001, moodBonus: { target: 1, perPoint: 5.005 } },
+          ],
+          whenFalse: [],
+        },
+      ],
+    },
     beforeUseEffects: [{ kind: 'search-token', token: 'bookmark', count: 1 }],
     effects: [
       { kind: 'beat-hearts', amount: 15, moodBonus: { target: 1, perPoint: 0.075 } },

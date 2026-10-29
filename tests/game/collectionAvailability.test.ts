@@ -33,3 +33,14 @@ it.each(['retain', 'reset'] as const)(
     expect(canActivateHandCollectionAbility(left, card)).toBe(limitMemory === 'reset');
   },
 );
+
+it('トークン名だけでは回収効果を発動しない', () => {
+  const base = game();
+  const original = base.deck[0];
+  if (!original) throw new Error('確認用カードがありません。');
+  const { collectionEffects: _collectionEffects, ...plain } = original;
+  const card = { ...plain, token: 'story' };
+  const state = withHand({ ...base, deck: [card], cardPool: [card] }, [card.cardInstanceId]);
+  expect(canActivateHandCollectionAbility(state, card)).toBe(false);
+  expect(advanceHandCollectionAbilities(state, 500_000).activated).toEqual([]);
+});

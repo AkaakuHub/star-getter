@@ -17,10 +17,6 @@ export function describeCardTraits(card: Card): readonly string[] {
     traits.push(
       `手札にある間、きらめき獲得数を+${card.passive.heartsPercent}%し、手札上限を${Math.abs(card.passive.handLimitDelta ?? 0)}枚減少する。`,
     );
-  if (card.relay)
-    traits.push(
-      `手札にある間、累計${card.relay.threshold.toLocaleString('ja-JP')}個を回収したとき、${card.relay.beats ? '自然発生' : 'きらめきを'}${card.relay.hearts.toLocaleString('ja-JP')}${card.relay.beats ? '回分のきらめき' : '個'}を獲得する。この特性は再ドローで再発動できる。`,
-    );
   if (card.passive?.skillBoost)
     traits.push(
       `手札にある間、${targetNames(card.passive.skillBoost.members)}のアクション効果を+${card.passive.skillBoost.percent}%増幅する。`,

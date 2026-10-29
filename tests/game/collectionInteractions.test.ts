@@ -42,7 +42,7 @@ it('手札の回収条件は複数回の合計で成立し、自動回収の0.3�
   state = act(addHearts(state, 1), { type: 'collect' });
   expect(state.tick).toBe(0);
   expect(heartCount(state)).toBeGreaterThanOrEqual(3_000);
-  expect(state.relayUsed).toContain('horizon');
+  expect(state.handCollectionActivationCounts.horizon).toBe(1);
   const repeated = act(state, { type: 'collect' });
   expect(repeated.tick).toBe(0);
   expect(repeated.score).toBeGreaterThan(state.score);
@@ -75,13 +75,13 @@ it('一度の回収で条件を大きく超えても1回だけ発動し、引き
     ),
   );
   expect(liveCurrentHandCardInstanceIds(redrawn)).toContain('horizon');
-  expect(redrawn.relayUsed).not.toContain('horizon');
+  expect(redrawn.handCollectionActivationCounts.horizon).toBeUndefined();
   expect(heartCount(act(addHearts(redrawn, 3_000), { type: 'collect' }))).toBeGreaterThan(0);
 });
 
 it('手札誘発は回収条件を超えるたびに発動し、指定回数で止まる', () => {
   const initial = game('genesis');
-  const original = initial.deck.find((item) => !item.relay);
+  const original = initial.deck[0];
   if (!original) throw new Error('カードがありません。');
   const card = {
     ...original,

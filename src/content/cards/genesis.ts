@@ -1,3 +1,4 @@
+import { rainCollectionEffects } from './collectionEffects';
 import { createLiveOnDrawInduceEffect } from '@akaakuhub/suku-sute-core/runtime/cards/onDrawInduceEffect';
 import { baselineMemberFanLevels } from '../memberDefaults';
 import type { Card, Effect } from '@akaakuhub/suku-sute-core/game/model';
@@ -29,7 +30,11 @@ export const genesisCards: readonly Card[] = [
     appeal: { smile: 6300, pure: 4400, cool: 3500 },
     beatPoint: 100,
     drawAbility: 'genesis',
-    relay: { threshold: 3000, hearts: 3000, beats: true, moodBonus: { target: 2, perPoint: 15 } },
+    collectionEffects: {
+      threshold: 3000,
+      limit: 1,
+      effects: [{ kind: 'beat-hearts', amount: 3000, moodBonus: { target: 2, perPoint: 15 } }],
+    },
     special: {
       consumeAp: 20,
       extra: false,
@@ -69,7 +74,7 @@ export const genesisCards: readonly Card[] = [
     appeal: { smile: 3900, pure: 4000, cool: 6600 },
     beatPoint: 100,
     beforeUseAbility: 'rain-echo',
-    collectionAbility: 'rain-echo',
+    collectionEffects: rainCollectionEffects,
     handInducers: [
       {
         sourceEffectId: 'frost-echo-hand-use',

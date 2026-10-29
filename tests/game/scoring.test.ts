@@ -1,4 +1,3 @@
-import { liveCurrentHandCardInstanceIds } from '@akaakuhub/suku-sute-core/runtime/cards/liveHand';
 import { describe, expect, it } from 'vite-plus/test';
 import { routes } from '../../src/content/routes';
 import { tracks } from '../../src/content/tracks';
@@ -10,12 +9,20 @@ import { advanceTo, createGame } from '@akaakuhub/suku-sute-core/game/simulation
 function game(): GameState {
   const track = tracks[0];
   if (!track) throw new Error('テスト楽曲がありません。');
-  const state = act(createGame(track, routes.genesis.deck, 456, 100, routes.genesis.tokens), {
-    type: 'start',
-  });
+  const state = act(
+    createGame(
+      track,
+      routes.genesis.deck.map(({ collectionEffects: _collectionEffects, ...card }) => card),
+      456,
+      100,
+      routes.genesis.tokens,
+    ),
+    {
+      type: 'start',
+    },
+  );
   return {
     ...state,
-    relayUsed: [...liveCurrentHandCardInstanceIds(state)],
     hearts: { ...state.hearts, stageHearts: [], hiddenHeartBatches: [] },
   };
 }

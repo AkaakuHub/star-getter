@@ -12,9 +12,6 @@ export function describeAbilities(card: Card): string {
     text += `使用時、${card.beforeUseEffects.map(describeEffect).join('')}`;
   for (const inducer of card.handInducers ?? [])
     text += `手札にある間、${handUseTriggerDescription(inducer.trigger)}、${inducer.effects.map(describeEffect).join('')}${inducer.limit === undefined || inducer.limit === 0n ? '' : `最大${inducer.limit}回発動する。`}`;
-  if (card.collectionAbility === 'rain-pulse')
-    text +=
-      '手札にある間に累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直し、雨音の反響・凍空の鼓動・雨の準備を次の4回優先して引く。熱気を140万減らし、1000段階以上ならさらに1400万減らす。';
   switch (card.drawAbility) {
     case 'library':
       text +=
@@ -30,7 +27,7 @@ export function describeAbilities(card: Card): string {
       break;
     case 'story':
       text +=
-        '引いたとき、編成枚数に応じて自然発生20〜200回分のきらめきを獲得する。80枚以上で手札にある間、貝がらの効果を+1001%増幅する。手札にある間に累計50万個を回収したとき、編成95枚以上で自然発生1001回分のきらめきを獲得する。';
+        '引いたとき、編成枚数に応じて自然発生20〜200回分のきらめきを獲得する。80枚以上で手札にある間、貝がらの効果を+1001%増幅する。';
       break;
     case 'camera':
       text +=
@@ -53,8 +50,7 @@ export function describeAbilities(card: Card): string {
       text += '使用後、編成枚数に応じて貝がらの効果をこのライブ中+100〜1001%増幅する。';
       break;
     case 'rain-echo':
-      text +=
-        '初回使用後、パズルを1枚追加する。累計50万個回収時、熱気950段階以上かつ元気0%なら手札を引き直して熱気を140万減らす。1000段階以上ならさらに1400万減らす。';
+      text += '初回使用後、パズルを1枚追加する。';
       break;
   }
   switch (card.useAbility) {

@@ -77,7 +77,7 @@ function snapshot(state: GameState): Snapshot {
         instanceId: id,
         name: card.name,
         collectedCount: state.handHeartCollectCounts[id] ?? 0,
-        collectionUsed: state.relayUsed.includes(id),
+        collectionUsed: (state.handCollectionActivationCounts[id] ?? 0) > 0,
       };
     }),
   };
