@@ -46,22 +46,25 @@ describe('無限ゲージ', () => {
 
   it('Action39は無限開始時の熱気差をMasteryへ渡し、報酬を変換する', () => {
     const initial = game();
+    const source = initial.deck[0];
+    if (!source) throw new Error('発動元カードがありません。');
     const conversion = {
-      id: 1,
-      destination: 'love' as const,
+      effectId: '1',
+      destination: 'love-up' as const,
       num: 10_000,
-      outputDuration: { kind: 'milliseconds' as const, value: 1000 },
+      resultDuration: { kind: 'milliseconds' as const, remainingSeconds: 1 },
+      resultDisabledType: 0 as const,
       disabledOnConvertCount: null,
       conversions: 0,
-      expireOnHeartCollect: false,
-      remainingSeconds: null,
-      remainingSections: null,
+      duration: { kind: 'full-end' as const },
+      parentControlsLifetime: false,
+      card: source,
       deactivationKey: null,
     };
     const state = {
       ...initial,
       track: { ...initial.track, masteryVoltageBonus: { demand: 1, gain: 3 } },
-      voltageConversions: [conversion],
+      convertVoltageUpEffects: [conversion],
     };
     const active = applyEffect(state, {
       kind: 'infinity-gauge',
@@ -69,7 +72,7 @@ describe('無限ゲージ', () => {
       duration: { kind: 'stage', value: 0 },
     });
     expect(active.masteryVoltageProgress).toBe(0);
-    expect(active.voltageConversions[0]?.conversions).toBe(1);
+    expect(active.convertVoltageUpEffects[0]?.conversions).toBe(1);
     expect(active.temporaryScoreBoosts.at(-1)?.percent).toBe(3);
   });
 

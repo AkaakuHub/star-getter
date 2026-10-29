@@ -97,9 +97,9 @@ it('ActionType22のHandPermanent詳細レコードは自動期限を止め、離
   const compiled = state.deck.find((card) => card.cardInstanceId === source.cardInstanceId);
   if (!compiled) throw new Error('ActionType22の発動元カードがありません。');
   const activated = activateHandPermanentEffects(state, compiled);
-  expect(activated.voltageConversions).toHaveLength(1);
-  expect(activated.voltageConversions[0]?.remainingSeconds).toBeNull();
-  expect(disposeHandEffects(activated, [compiled.cardInstanceId]).voltageConversions).toHaveLength(
-    0,
-  );
+  expect(activated.convertVoltageUpEffects).toHaveLength(1);
+  expect(activated.convertVoltageUpEffects[0]?.parentControlsLifetime).toBe(true);
+  expect(
+    disposeHandEffects(activated, [compiled.cardInstanceId]).convertVoltageUpEffects,
+  ).toHaveLength(0);
 });

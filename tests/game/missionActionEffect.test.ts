@@ -51,7 +51,11 @@ it('ActionType7通知は割合適用後の実際のバリア耐久値を使う',
     attenuation: 1,
     duration: { kind: 'stage' },
   });
-  expect(changed.mentalBarriers[0]?.endurance).toBe(50);
+  expect(changed.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 50,
+    consumed: 0,
+  });
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
 });
 
@@ -83,7 +87,7 @@ it('Proxyに吸収されたActionType7も参照実装のEffectAmountでミッシ
     attenuation: 1,
     duration: { kind: 'stage' },
   });
-  expect(changed.mentalBarriers).toHaveLength(0);
+  expect(changed.mentalBarriers.effects).toHaveLength(0);
   expect(changed.ingameMission?.cooldownSeconds).toBe(1);
   expect(changed.ingameMission?.count).toBe(50);
 });

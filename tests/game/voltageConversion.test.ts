@@ -129,7 +129,7 @@ it('Action22の詳細値を参照実装のint32へ変換する', () => {
   const source = game().deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const converted = applyEffect(game(), { ...conversion, num: 2_147_483_648 }, source);
-  expect(converted.voltageConversions[0]?.num).toBe(-2_147_483_648);
+  expect(converted.convertVoltageUpEffects[0]?.num).toBe(-2_147_483_648);
 });
 
 it('ActionType22はActionType52適用前に変換数を整数化する', () => {
@@ -137,7 +137,7 @@ it('ActionType22はActionType52適用前に変換数を整数化する', () => {
   const source = initial.deck[0];
   if (!source) throw new Error('発動元カードがありません。');
   const active = applyEffect(initial, { ...conversion, num: 1.9 }, source);
-  expect(active.voltageConversions[0]?.num).toBe(1);
+  expect(active.convertVoltageUpEffects[0]?.num).toBe(1);
 });
 
 it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で解除する', () => {
@@ -151,7 +151,7 @@ it('Action22のHeart変換はnum×熱気を10000で換算し、変換回数で�
   );
   const converted = changeResource(active, 'voltage', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(25);
-  expect(converted.voltageConversions).toHaveLength(0);
+  expect(converted.convertVoltageUpEffects).toHaveLength(0);
   expect(converted.voltage.currentVoltage).toBe(initial.voltage.currentVoltage);
 });
 
@@ -166,8 +166,8 @@ it('ActionType22は解除回数のlong値をint32へ切り詰めない', () => {
   );
   const once = changeResource(active, 'voltage', 1n, 'skill', source);
   const twice = changeResource(once, 'voltage', 1n, 'skill', source);
-  expect(once.voltageConversions).toHaveLength(1);
-  expect(twice.voltageConversions).toHaveLength(1);
+  expect(once.convertVoltageUpEffects).toHaveLength(1);
+  expect(twice.convertVoltageUpEffects).toHaveLength(1);
 });
 
 it('ActionType22は解除回数0もlong比較に残し、int32周回後に解除する', () => {
@@ -181,14 +181,14 @@ it('ActionType22は解除回数0もlong比較に残し、int32周回後に解除
   );
   const nearWrap = {
     ...active,
-    voltageConversions: active.voltageConversions.map((item) => ({
+    convertVoltageUpEffects: active.convertVoltageUpEffects.map((item) => ({
       ...item,
       conversions: -1,
     })),
   };
-  expect(changeResource(nearWrap, 'voltage', 1n, 'skill', source).voltageConversions).toHaveLength(
-    0,
-  );
+  expect(
+    changeResource(nearWrap, 'voltage', 1n, 'skill', source).convertVoltageUpEffects,
+  ).toHaveLength(0);
 });
 
 it('ActionType22はnumと熱気をint32乗算してからfloat32へ変換する', () => {
@@ -234,12 +234,16 @@ it('Action22のMental回復とBarrier変換を適用し、活動期限とdeactiv
     source,
   );
   const protectedState = changeResource(barrier, 'voltage', 5n, 'skill', source);
-  expect(protectedState.mentalBarriers[0]?.endurance).toBe(5);
+  expect(protectedState.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 5,
+    consumed: 0,
+  });
   expect(
     act(protectedState, {
       type: 'deactivate-voltage-convert',
       deactivationKey: 'barrier-convert',
-    }).voltageConversions,
+    }).convertVoltageUpEffects,
   ).toHaveLength(0);
 });
 
@@ -271,7 +275,11 @@ it('Action22のBarrier変換は追加補正後の耐久値を整数化する', (
     source,
   );
   const converted = changeResource(buffed, 'voltage', 1n, 'skill', source);
-  expect(converted.mentalBarriers[0]?.endurance).toBe(1);
+  expect(converted.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 1,
+    consumed: 0,
+  });
 });
 
 it('Action22のBarrier変換はActionType7追加補正前に小数1位へ切り上げる', () => {
@@ -302,7 +310,11 @@ it('Action22のBarrier変換はActionType7追加補正前に小数1位へ切り�
     source,
   );
   const converted = changeResource(buffed, 'voltage', 1n, 'skill', source);
-  expect(converted.mentalBarriers[0]?.endurance).toBe(3);
+  expect(converted.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 3,
+    consumed: 0,
+  });
 });
 
 it('Action22のパート・ミリ秒期限とLoveUpの次回ハート回収解除を処理する', () => {
@@ -317,14 +329,14 @@ it('Action22のパート・ミリ秒期限とLoveUpの次回ハート回収解�
     { ...conversion, displayDuration: { kind: 'sections', value: 1 } },
     source,
   );
-  expect(advanceTo(sectional, sectionTime).voltageConversions).toHaveLength(0);
+  expect(advanceTo(sectional, sectionTime).convertVoltageUpEffects).toHaveLength(0);
 
   const timed = applyEffect(
     initial,
     { ...conversion, displayDuration: { kind: 'milliseconds', value: 100 } },
     source,
   );
-  expect(advanceTo(timed, 0.2).voltageConversions).toHaveLength(0);
+  expect(advanceTo(timed, 0.2).convertVoltageUpEffects).toHaveLength(0);
 
   const love = applyEffect(
     initial,

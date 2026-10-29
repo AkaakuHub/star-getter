@@ -205,16 +205,21 @@ it('Action907は子効果のCheckDeckOutを実行する', () => {
   const state = {
     ...initial,
     deckBoard: { ...initial.deckBoard, deckOutCount: 1 },
-    mentalBarriers: [
-      {
-        kind: 'endurance' as const,
-        endurance: 10,
-        currentEndurance: 0,
-        attenuation: 0,
-        remainingSeconds: null,
-        remainingSections: null,
-      },
-    ],
+    mentalBarriers: {
+      effects: [
+        {
+          effectId: 'endurance',
+          barrierType: 'endurance' as const,
+          endurance: { kind: 'finite' as const, maximum: 10, consumed: 0 },
+          attenuationFactor: 0,
+          duration: { kind: 'full-end' as const },
+          limitTimeSeconds: Infinity,
+          parentControlsLifetime: false,
+          deactivationKey: null,
+        },
+      ],
+      additionalBuffs: [],
+    },
     effectInducers: [
       {
         sourceCardId: source.cardInstanceId,

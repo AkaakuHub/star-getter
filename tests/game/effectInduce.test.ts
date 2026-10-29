@@ -35,7 +35,7 @@ it('ボーナス得点のしきい値を満たすと子効果を有効化し、�
   expect(armed.boosts.reduce((sum, item) => sum + item.percent, 0)).toBe(30);
   const withoutBonus = refreshEffectInducers({ ...armed, boosts: [] }, applyEffect);
   expect(withoutBonus.boosts).toHaveLength(0);
-  expect(withoutBonus.mentalBarriers).toHaveLength(0);
+  expect(withoutBonus.mentalBarriers.effects).toHaveLength(0);
   expect(withoutBonus.effectInducers[0]?.active).toBe(false);
 });
 
@@ -67,7 +67,10 @@ it('耐久バリアがあるときだけ子効果を有効化する', () => {
     source,
   );
   expect(armed.boosts).toHaveLength(1);
-  const withoutBarrier = refreshEffectInducers({ ...armed, mentalBarriers: [] }, applyEffect);
+  const withoutBarrier = refreshEffectInducers(
+    { ...armed, mentalBarriers: { effects: [], additionalBuffs: [] } },
+    applyEffect,
+  );
   expect(withoutBarrier.boosts).toHaveLength(0);
   expect(withoutBarrier.effectInducers[0]?.active).toBe(false);
 });
@@ -111,7 +114,10 @@ it('ActionType31の子効果は誘発条件が外れても自身の期限まで�
   );
 
   expect(armed.voltageUpAdditionalBuffs).toHaveLength(1);
-  const conditionEnded = refreshEffectInducers({ ...armed, mentalBarriers: [] }, applyEffect);
+  const conditionEnded = refreshEffectInducers(
+    { ...armed, mentalBarriers: { effects: [], additionalBuffs: [] } },
+    applyEffect,
+  );
   expect(conditionEnded.voltageUpAdditionalBuffs).toHaveLength(1);
   expect(conditionEnded.effectInducers[0]?.active).toBe(false);
 });

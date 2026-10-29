@@ -38,10 +38,18 @@ it('ActionType33は対象カードの耐久値を増幅し、対象外では消�
     duration: { kind: 'stage' },
   } as const;
   const unmatched = applyEffect(buffed, barrier, source);
-  expect(unmatched.mentalBarriers[0]?.endurance).toBe(10);
+  expect(unmatched.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 10,
+    consumed: 0,
+  });
   expect(unmatched.mentalBarrierAdditionalBuffs).toHaveLength(1);
   const matched = applyEffect(buffed, barrier, target);
-  expect(matched.mentalBarriers[0]?.endurance).toBe(15);
+  expect(matched.mentalBarriers.effects[0]?.endurance).toEqual({
+    kind: 'finite',
+    maximum: 15,
+    consumed: 0,
+  });
   expect(matched.mentalBarrierAdditionalBuffs).toHaveLength(0);
 });
 

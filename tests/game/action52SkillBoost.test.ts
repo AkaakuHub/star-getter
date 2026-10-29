@@ -53,7 +53,7 @@ it('Action52は対象ActionType52の値へ割合を加え、回数期限を消�
   const converted = changeResource(conversion, 'voltage', 10n, 'skill', source);
   expect(heartCount(converted)).toBe(15);
   expect(converted.action52Buffs).toHaveLength(0);
-  expect(converted.voltageConversions).toHaveLength(1);
+  expect(converted.convertVoltageUpEffects).toHaveLength(1);
 });
 
 it('Action52は参照実装のMultiply2計算と同じ精度で最後にfloatへ丸める', () => {
@@ -99,7 +99,7 @@ it('Action52の対象外カードでは回数期限を消費しない', () => {
     source,
   );
   expect(conversion.action52Buffs).toHaveLength(1);
-  expect(conversion.voltageConversions[0]?.num).toBe(10000);
+  expect(conversion.convertVoltageUpEffects[0]?.num).toBe(10000);
 });
 
 it('Action14のAP回復にもActionType52を適用して使用回数を消費する', () => {

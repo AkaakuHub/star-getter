@@ -61,7 +61,7 @@ it('ActionType37は変換やActionType52を使わず、浮動小数点丸め後�
   );
   const set = applyEffect(active, { kind: 'voltage-set', amount: 655_000_001 });
   expect(set.voltage.currentVoltage).toBe(655_000_000n);
-  expect(set.voltageConversions).toHaveLength(1);
+  expect(set.convertVoltageUpEffects).toHaveLength(1);
   expect(set.hearts).toEqual(active.hearts);
 });
 

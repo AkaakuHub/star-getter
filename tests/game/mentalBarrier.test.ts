@@ -23,7 +23,11 @@ describe('元気バリア', () => {
         duration: { kind: 'stage' },
       },
     );
-    expect(active.mentalBarriers[0]?.endurance).toBe(20);
+    expect(active.mentalBarriers.effects[0]?.endurance).toEqual({
+      kind: 'finite',
+      maximum: 20,
+      consumed: 0,
+    });
   });
 
   it('有限耐久が0になる時は参照実装同様にバリアを登録しない', () => {
@@ -35,7 +39,7 @@ describe('元気バリア', () => {
       attenuation: 0,
       duration: { kind: 'stage' },
     });
-    expect(active.mentalBarriers).toHaveLength(0);
+    expect(active.mentalBarriers.effects).toHaveLength(0);
   });
 
   it('ActionType7を整数耐久値として吸収し、上限到達後はバリアを登録する', () => {
@@ -66,11 +70,18 @@ describe('元気バリア', () => {
       attenuation: 0,
       duration: { kind: 'stage' },
     } as const;
-    const first = addMentalBarrier(active, barrier, 5.8, 0);
-    expect(first.mentalBarriers).toHaveLength(0);
+    const first = addMentalBarrier(active, { ...barrier, duration: { kind: 'full-end' } }, 5.8, 0);
+    expect(first.mentalBarriers.effects).toHaveLength(0);
     expect(first.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
-    const afterLimit = addMentalBarrier(first, barrier, 3, 0);
-    expect(afterLimit.mentalBarriers).toMatchObject([{ kind: 'endurance', endurance: 3 }]);
+    const afterLimit = addMentalBarrier(
+      first,
+      { ...barrier, duration: { kind: 'full-end' } },
+      3,
+      0,
+    );
+    expect(afterLimit.mentalBarriers.effects).toMatchObject([
+      { barrierType: 'endurance', endurance: { kind: 'finite', maximum: 3 } },
+    ]);
     expect(afterLimit.proxySkills[0]?.effects[0]?.totalAmount).toBe(5n);
   });
 
@@ -85,7 +96,7 @@ describe('元気バリア', () => {
     });
     const damaged = changeResource(active, 'mental', -3n);
     expect(damaged.mental.currentMental).toBe(99);
-    expect(damaged.mentalBarriers[0]?.currentEndurance).toBe(2);
+    expect(damaged.mentalBarriers.effects[0]?.endurance).toMatchObject({ consumed: 2 });
   });
 
   it('InvocationType 0x388では指定時間が過ぎてもバリアを維持する', () => {
@@ -98,7 +109,7 @@ describe('元気バリア', () => {
       duration: { kind: 'milliseconds', value: 100 },
       invocationType: 0x388,
     });
-    expect(advanceTo(active, 1).mentalBarriers).toHaveLength(1);
+    expect(advanceTo(active, 1).mentalBarriers.effects).toHaveLength(1);
   });
 
   it('耐久無限型はスキルと自然減少を吸収する', () => {
@@ -128,7 +139,7 @@ describe('元気バリア', () => {
       active.track.stage.mentalDecreaseIntervalSeconds * 2 + 0.1,
     );
     expect(after.mental.currentMental).toBe(99);
-    expect(after.mentalBarriers[0]?.currentEndurance).toBe(1);
+    expect(after.mentalBarriers.effects[0]?.endurance).toMatchObject({ consumed: 1 });
   });
 
   it('減衰型はスキル減少量を減らし、自然減少間隔と途中時間を倍率で伸ばす', () => {
@@ -165,6 +176,6 @@ describe('元気バリア', () => {
     const section = active.track.sections[1];
     if (!section) throw new Error('次のパートがありません。');
     const ended = advanceTo(active, (section.startBeat * 60) / active.track.bpm + 1 / 60);
-    expect(ended.mentalBarriers).toHaveLength(0);
+    expect(ended.mentalBarriers.effects).toHaveLength(0);
   });
 });
