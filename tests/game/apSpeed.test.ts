@@ -286,3 +286,21 @@ it('Action21は小数の補正値を切り捨てずAPKと同じ切り上げで�
     factor: Math.fround(0.9998),
   });
 });
+
+it('複数のAP速度を同時に解除しても各解除の前後でtimerを補正する', () => {
+  const base = game();
+  const initial = {
+    ...base,
+    track: { ...base.track, stage: { ...base.track.stage, apIncreaseIntervalSeconds: 1 } },
+    ap: { ...base.ap, currentAp: base.ap.maxAp, timerSeconds: Math.fround(0.3) },
+    apIncreaseSpeedEffects: [0.15, 0.7].map((factor) => ({
+      effectId: null,
+      deactivationKey: 'shared',
+      calculation: { kind: 'multiply' as const, factor: Math.fround(factor) },
+      duration: { kind: 'milliseconds' as const, remainingSeconds: 0.5 },
+    })),
+  };
+  const changed = act(initial, { type: 'deactivate-ap-speed', deactivationKey: 'shared' });
+  expect(changed.apIncreaseSpeedEffects).toEqual([]);
+  expect(changed.ap.timerSeconds).toBe(3.000000238418579);
+});
